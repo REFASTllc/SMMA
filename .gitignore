@@ -1,0 +1,7 @@
+*.o
+*.d
+Makefile
+\build
+\nbproject
+\dist
+*.DS_Store
