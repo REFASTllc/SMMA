@@ -174,7 +174,7 @@ void system_IOs(void)
     ODCAbits.ODCA5 = 0;         //RA5 open-drain disable
     ODCAbits.ODCA6 = 0;         //RA6 open-drain disable
     ODCAbits.ODCA7 = 0;         //RA7 open-drain disable
-    ODCAbits.ODCA9 = 0;         //RA9 open-drain disable
+    ODCAbits.ODCA9 = 1;         //RA9 = sink / source input 7
     ODCAbits.ODCA10 = 0;        //RA10 open-drain disable
     ODCAbits.ODCA14 = 0;        //RA14 open-drain disable
     ODCAbits.ODCA15 = 0;        //RA15 open-drain disable
@@ -246,8 +246,8 @@ void system_IOs(void)
     TRISDbits.TRISD5 = 1;       //RD5= input
     TRISDbits.TRISD6 = 1;       //RD6= input
     TRISDbits.TRISD7 = 1;       //RD7= input
-    TRISDbits.TRISD8 = 1;       //RD8= input
-    TRISDbits.TRISD9 = 1;       //RD9= input
+    TRISDbits.TRISD8 = 1;       //RD8= sink / source input 6
+    TRISDbits.TRISD9 = 1;       //RD9= sink / source input 3
     TRISDbits.TRISD10 = 1;      //RD10= input
     TRISDbits.TRISD11 = 1;      //RD11= input
     TRISDbits.TRISD12 = 1;      //RD12= input
@@ -286,7 +286,7 @@ void system_IOs(void)
     TRISEbits.TRISE5 = 1;       //RE5= input
     TRISEbits.TRISE6 = 1;       //RE6= input
     TRISEbits.TRISE7 = 1;       //RE7= input
-    TRISEbits.TRISE8 = 1;       //RE8= input
+    TRISEbits.TRISE8 = 1;       //RE8= sink / source input 0
     TRISEbits.TRISE9 = 1;       //RE9= input 
     
 //Port E open drain configuration register (0= disable / 1 = enable)
@@ -306,8 +306,8 @@ void system_IOs(void)
     PORTF = 0x00;               //reset PORTF0:8_12:13
     
 //Port E tris register (0= output / 1 = input)
-    TRISFbits.TRISF0 = 1;       //RF0= input
-    TRISFbits.TRISF1 = 1;       //RF1= input
+    TRISFbits.TRISF0 = 1;       //RF0= sink / source input 1
+    TRISFbits.TRISF1 = 1;       //RF1= sink / source input 2
     TRISFbits.TRISF2 = 1;       //RF2= input --> U1Rx
     TRISFbits.TRISF3 = 0;       //RF3= output --> U1Tx
     TRISFbits.TRISF4 = 1;       //RF4= input --> U2Rx
@@ -336,8 +336,8 @@ void system_IOs(void)
     PORTG = 0x00;               //reset PORTG0:3_6:9_12:15
     
 //Port E tris register (0= output / 1 = input)
-    TRISGbits.TRISG0 = 1;       //RG0= input
-    TRISGbits.TRISG1 = 1;       //RG1= input
+    TRISGbits.TRISG0 = 1;       //RG0= sink / source input 5
+    TRISGbits.TRISG1 = 1;       //RG1= sink / source input 4
     TRISGbits.TRISG2 = 1;       //RG2= input
     TRISGbits.TRISG3 = 1;       //RG3= input
     TRISGbits.TRISG6 = 1;       //RG6= input

@@ -41,6 +41,14 @@
 #define oSinkSource5        PORTGbits.RG13          // Sink / Source output 5
 #define oSinkSource6        PORTEbits.RE2           // Sink / Source output 6
 #define oSinkSource7        PORTEbits.RE3           // Sink / Source output 7
+#define iSinkSource0        PORTEbits.RE8           // Sink / Source input 0
+#define iSinkSource1        PORTFbits.RF0           // Sink / Source input 1
+#define iSinkSource2        PORTFbits.RF1           // Sink / Source input 2
+#define iSinkSource3        PORTDbits.RD9           // Sink / Source input 3
+#define iSinkSource4        PORTGbits.RG1           // Sink / Source input 4
+#define iSinkSource5        PORTGbits.RG0           // Sink / Source input 5
+#define iSinkSource6        PORTDbits.RD8           // Sink / Source input 6
+#define iSinkSource7        PORTAbits.RA9           // Sink / Source input 7
 
 #define oVmotOnOff          PORTEbits.RE4           //output to switch on / off Umot
 #define oUniCoilB2          PORTEbits.RE3           //output to switch on / off coil B2 from unipolar driver

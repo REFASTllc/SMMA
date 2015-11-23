@@ -48,7 +48,7 @@ void funct_init(void)
     //...
     
 //define outputs
-    oUmotOnOff = 0;                 //switch off the general supply   
+    oVmotOnOff = 0;                 //switch off the general supply   
 }   //end of funct_init
 
 
