@@ -159,7 +159,7 @@ void system_IOs(void)
     TRISAbits.TRISA4 = 1;       //RA4= input
     TRISAbits.TRISA5 = 1;       //RA5= input
     TRISAbits.TRISA6 = 1;       //RA6= input
-    TRISAbits.TRISA7 = 1;       //RA7= input
+    TRISAbits.TRISA7 = 0;       //RA7= sink / source output 0
     TRISAbits.TRISA9 = 1;       //RA9= input
     TRISAbits.TRISA10 = 1;      //RA10= input
     TRISAbits.TRISA14 = 1;      //RA14= input
@@ -278,10 +278,10 @@ void system_IOs(void)
     PORTE = 0x00;               //reset PORTE0:9 
     
 //Port E tris register (0= output / 1 = input)
-    TRISEbits.TRISE0 = 1;       //RE0= input
-    TRISEbits.TRISE1 = 1;       //RE1= input
-    TRISEbits.TRISE2 = 1;       //RE2= input
-    TRISEbits.TRISE3 = 1;       //RE3= input
+    TRISEbits.TRISE0 = 0;       //RE0= sink / source output 1
+    TRISEbits.TRISE1 = 0;       //RE1= sink / source output 2
+    TRISEbits.TRISE2 = 0;       //RE2= sink / source output 6
+    TRISEbits.TRISE3 = 0;       //RE3= sink / source output 7
     TRISEbits.TRISE4 = 1;       //RE4= input
     TRISEbits.TRISE5 = 1;       //RE5= input
     TRISEbits.TRISE6 = 1;       //RE6= input
@@ -344,9 +344,9 @@ void system_IOs(void)
     TRISGbits.TRISG7 = 1;       //RG7= input
     TRISGbits.TRISG8 = 1;       //RG8= input
     TRISGbits.TRISG9 = 1;       //RG9= input
-    TRISGbits.TRISG12 = 1;      //RG12= input
-    TRISGbits.TRISG13 = 1;      //RG13= input
-    TRISGbits.TRISG14 = 1;      //RG14= input
+    TRISGbits.TRISG12 = 0;      //RG12= sink / source output 3
+    TRISGbits.TRISG13 = 0;      //RG13= sink / source output 4
+    TRISGbits.TRISG14 = 0;      //RG14= sink / source output 5
     TRISGbits.TRISG15 = 1;      //RG15= input
     
 //Port G open drain configuration register (0= disable / 1 = enable)

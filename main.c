@@ -44,7 +44,7 @@ void main(void)
     
     PORTDbits.RD0 =! PORTDbits.RD0;  
     
-    oUmotOnOff = 1;
+    oVmotOnOff = 1;
     
     while(1)
     {

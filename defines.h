@@ -31,11 +31,23 @@
 #ifndef DEFINES_H
 #define	DEFINES_H
 
-#define oUmotOnOff          PORTEbits.RE4           //output to switch on / off Umot
+// Inputs & Outputs definitions
+// Sink / Source Outputs
+#define oSinkSource0        PORTAbits.RA7           // Sink / Source output 0
+#define oSinkSource1        PORTEbits.RE0           // Sink / Source output 1
+#define oSinkSource2        PORTEbits.RE1           // Sink / Source output 2
+#define oSinkSource3        PORTGbits.RG14          // Sink / Source output 3
+#define oSinkSource4        PORTGbits.RG12          // Sink / Source output 4
+#define oSinkSource5        PORTGbits.RG13          // Sink / Source output 5
+#define oSinkSource6        PORTEbits.RE2           // Sink / Source output 6
+#define oSinkSource7        PORTEbits.RE3           // Sink / Source output 7
+
+#define oVmotOnOff          PORTEbits.RE4           //output to switch on / off Umot
 #define oUniCoilB2          PORTEbits.RE3           //output to switch on / off coil B2 from unipolar driver
 #define oUniCoilB1          PORTEbits.RE2           //output to switch on / off coil B1 from unipolar driver
 #define oUniCoilA2          PORTGbits.RG13          //output to switch on / off coil A2 from unipolar driver 
 #define oUniCoilA1          PORTGbits.RG12          //output to switch on / off coil A1 from unipolar driver 
+
 
 
 //error code definition
