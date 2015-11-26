@@ -139,7 +139,7 @@ typedef struct                      //definitions of multiple variable for comma
     volatile unsigned int uint16_Imin;              //minimal ON current for the coils in [mA]
     volatile unsigned int uint16_Imax;              //maximal ON current for the coils in [mA]
     volatile unsigned int uint16_Umot;              //test voltage for the actuators in [mV]
-    volatile unsigned char uint8_MotTyp;            //motor type in ASCII
+    volatile unsigned char uint8_MotTyp;            //motor type in ASCII ('U', 'B', 'L' or 'N')
     volatile unsigned char uint8_StepMode;          //step mode of the actuator in decimal
     volatile unsigned long uint32_StepCount;        //step count in decimal
     volatile unsigned long uint32_FreeStepCount;    //free step count in decimal

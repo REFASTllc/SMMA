@@ -40,10 +40,10 @@ void main(void)
     system_init();          //call subroutine
       
     asm("ei");              //enable all interrupts (code in assembler)  
-                            //use decleration "di" to disable all interrupts
+                            //use declaration "di" to disable all interrupts
     
-    PORTDbits.RD0 =! PORTDbits.RD0;  
-    
+    oTestLed1 = 1;
+    oTestLed2 = 1;
     oVmotOnOff = 1;
     
     while(1)
@@ -58,18 +58,14 @@ void main(void)
         }     
         
         if(!g_UART2txd.uint8_BufEmpty)  //send buffer not empty?
-        {
             IEC1bits.U2TXIE = 1;        //enable the send interrupt
-        }
         else
         {
             //do nothing
         }
         
         if(!g_UART2rxd.uint8_BufEmpty)  //receive buffer not empty?
-        {
             cmd_check();                //call subroutine
-        }
         else
         {
             //do nothing
