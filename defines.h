@@ -48,14 +48,15 @@
 #define iSinkSource4        PORTGbits.RG1           // Sink / Source input 4
 #define iSinkSource5        PORTGbits.RG0           // Sink / Source input 5
 #define iSinkSource6        PORTDbits.RD8           // Sink / Source input 6
-#define iSinkSource7        PORTAbits.RA9           // Sink / Source input 7
+#define iSinkSource7        PORTAbits.RA6           // Sink / Source input 7
 // Bipolar driver
 #define iBiDiagSignal       PORTDbits.RD1           // Diag signal of bipolar driver
-#define oBiStepSignal       PORTEbits.RE9           // Step signal of bipolar driver
+#define oBiStepSignal       PORTDbits.RD0           // Step signal of bipolar driver
 #define oBiDirSignal        PORTDbits.RD2           // DIR signal of bipolar driver
 #define oBiResetSignal      PORTCbits.RC4           // RESET signal of bipolar driver
 #define oBiStrnSignal       PORTAbits.RA2           // STRn signal of bipolar driver
 #define oBiPhCurrCtrl       PORTDbits.RD3           // Phase current control A & B
+#define oBiEnaVmot          PORTDbits.RD11          // Enable of the motor supply
 #define oBiRelayCoilA       PORTDbits.RD12          // Control relay for coil A
 #define oBiRelayCoilB       PORTDbits.RD13          // Control relay for coil B
 // Unipolar driver
