@@ -49,13 +49,54 @@
 #define iSinkSource5        PORTGbits.RG0           // Sink / Source input 5
 #define iSinkSource6        PORTDbits.RD8           // Sink / Source input 6
 #define iSinkSource7        PORTAbits.RA9           // Sink / Source input 7
-
-#define oVmotOnOff          PORTEbits.RE4           //output to switch on / off Umot
-#define oUniCoilB2          PORTEbits.RE3           //output to switch on / off coil B2 from unipolar driver
-#define oUniCoilB1          PORTEbits.RE2           //output to switch on / off coil B1 from unipolar driver
-#define oUniCoilA2          PORTGbits.RG13          //output to switch on / off coil A2 from unipolar driver 
-#define oUniCoilA1          PORTGbits.RG12          //output to switch on / off coil A1 from unipolar driver 
-
+// Bipolar driver
+#define iBiDiagSignal       PORTDbits.RD1           // Diag signal of bipolar driver
+#define oBiStepSignal       PORTEbits.RE9           // Step signal of bipolar driver
+#define oBiDirSignal        PORTDbits.RD2           // DIR signal of bipolar driver
+#define oBiResetSignal      PORTCbits.RC4           // RESET signal of bipolar driver
+#define oBiStrnSignal       PORTAbits.RA2           // STRn signal of bipolar driver
+#define oBiPhCurrCtrl       PORTDbits.RD3           // Phase current control A & B
+#define oBiRelayCoilA       PORTDbits.RD12          // Control relay for coil A
+#define oBiRelayCoilB       PORTDbits.RD13          // Control relay for coil B
+// Unipolar driver
+#define oUniCoilB2          PORTDbits.RD7           // Output to switch on / off coil B2 from unipolar driver
+#define oUniCoilB1          PORTDbits.RD6           // Output to switch on / off coil B1 from unipolar driver
+#define oUniCoilA2          PORTDbits.RD5           // Output to switch on / off coil A2 from unipolar driver 
+#define oUniCoilA1          PORTDbits.RD4           // Output to switch on / off coil A1 from unipolar driver 
+// General
+#define oVmotOnOff          PORTBbits.RB14          // Output to switch on / off Umot
+#define oEnaCoilResMeas     PORTBbits.RB15          // Enable to switch the measure to coil resistor
+#define oEnaCurrSource      PORTDbits.RD10          // Enable of the constant current source
+#define oTestLed1           PORTEbits.RE5           // Test LED 1
+#define oTestLed2           PORTEbits.RE6           // Test LED 2
+#define oFrontLedGRN        PORTBbits.RB1           // Front green led
+#define oFrontLedRED        PORTBbits.RB0           // Front red led
+// LIN driver
+#define oEnaVLINSupply      PORTAbits.RA14          // Enable of V LIN supply
+#define oEnaLINDriver       PORTAbits.RA5           // Enable of LIN driver
+#define oSPModeSignalLIN    PORTAbits.RA4           // SP_MODE signal of LIN driver
+#define iNRESSignalLIN      PORTAbits.RA3           // RES signal of LIN driver
+// RF Module
+#define oCMDModeSignal      PORTAbits.RA15          // CMD_MODE signal of RF module
+// Communication
+#define oLIN_RFSwitch       PORTCbits.RC15          // Switch of the communication between LIN driver and RF module
+// SD Card
+#define iDetectSD           PORTAbits.RA0           // Detection of the SD Card
+// USB interface
+#define iUSBSupplyDetect    PORTGbits.RG15          // Detection of USB connection
+// RTCC Chip
+#define iINTSignalRTC       PORTEbits.RE9           // INT signal of RTCC chip
+// AD channels
+#define adUniICoilA1        3                       // Measure of Icoil A1 (Unipolar)
+#define adUniICoilA2        2                       // Measure of Icoil A2 (Unipolar)
+#define adUniICoilB1        5                       // Measure of Icoil B1 (Unipolar)
+#define adUniICoilB2        4                       // Measure of Icoil B2 (Unipolar)
+#define adBiRefSignal       7                       // Measure of voltage reference of Ref signal
+#define adBiICoilA          10                      // Measure of Icoil A (bipolar)
+#define adBiICoilB          6                       // Measure of Icoil B (bipolar)
+#define adMotorCurrent      9                       // Measure of current of the motor
+#define adMotorSupply       8                       // Measure of motor supply and coil resistor
+#define adBattVoltCtrl      11                      // Measure of the voltage of the backup battery
 
 
 //error code definition
