@@ -43,7 +43,8 @@ extern unsigned char funct_CheckCmdSILIM(void);
 extern unsigned char funct_CheckCmdSMTYP(void);
 extern void funct_LoadDeviceInfo(void);
 extern void funct_FrontLED(unsigned char uint8_color);
-
+extern void funct_OutputHandler(unsigned char uint8_ToDo,unsigned char uint8_value);
+extern unsigned char funct_IOhandler(unsigned char uint8_ToDo,unsigned char uint8_IO,unsigned char uint8_value);
 
 #define _Active         1           //used for variable uint8_sending
 #define _Inactive       0           //used for variable uint8_sending
@@ -51,10 +52,17 @@ extern void funct_FrontLED(unsigned char uint8_color);
 #define _Dec            0           //deceleration used for variable uint8_kind
 #define _Step           1           //used for variable uint8_sort
 #define _Freq           0           //used for variable uint8_sort
-#define _FLEDblack      0           //front LED switched off
-#define _FLEDgreen      1           //front LED = green
-#define _FLEDred        2           //front LED = red
-#define _FLEDorange     3           //front LED = orange
+#define _FLEDblack      0           //front LED switched off used for uint8_color
+#define _FLEDgreen      1           //front LED = green used for uint8_color
+#define _FLEDred        2           //front LED = red used for uint8_color
+#define _FLEDorange     3           //front LED = orange used for uint8_color
+#define _ClrBit         0           //used for variable uint8_ToDo and to clear the bit/output (reason for value 0)
+#define _SetBit         1           //used for variable uint8_ToDo and to set the bit/output (rason for value 1)
+#define _GetPort        2           //used for variable uint8_ToDo
+#define _SetPort        3           //used for variable uint8_ToDo
+#define _GetBit         4           //used for variable uint8_ToDo
+#define _Input          0           //used for uint8_IO
+#define _Output         1           //used for uint8_IO
 
 
 typedef struct                      //definitions of multiple variable for function

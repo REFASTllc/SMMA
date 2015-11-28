@@ -88,8 +88,8 @@ void param_init(void)
  
     g_Param.uint8_AccNumbRamp = 50;     //set the number of ramps for acceleration
     g_Param.uint8_DecNumbRamp = 50;     //set the number of ramps for deceleration
-    g_Param.uint8_ValPort = 0;          //range 0...255
-    g_Param.uint8_Bit = 0;              //range 0...7
+    //g_Param.uint8_ValPort = 0;          //range 0...255 <-- don't delete it, maybe I need it again A. Staub
+    //g_Param.uint8_Bit = 0;              //range 0...7 <-- don't delete it, maybe I need it again A. Staub
     g_Param.uint8_TestVoltage = 0;      //range 0...7 V
   
     //define the current level array for microstepping

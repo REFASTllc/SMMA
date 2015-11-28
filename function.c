@@ -20,6 +20,8 @@
  *                          - funct_CheckCmdSMTYP
  *                          - funct_LoadDeviceInfo  
  *                          - funct_FrontLED
+ *                          - funct_OutputHandler
+ *                          - funct_IOhandler
 ***********************************************************************************************************************/
 
 
@@ -660,3 +662,193 @@ void funct_FrontLED(unsigned char uint8_color)
             break;
     }
 }   //end of funct_FrontLED
+
+
+/**********************************************************************************************************************
+ * Routine:                 funct_OutputHandler
+
+ * Description:
+ * This subroutine handels the output port. It can set directly an output according to the received
+ * parameter or clear and set an output pin separatly. 
+ * Please note:
+ * It is IMPORTANT to not change the definition of _ClrBit and _SetBit from the file function.h
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        28.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint8_ToDo
+ *                          uint8_value
+ * Output:                  -
+ * Global variable:         -
+***********************************************************************************************************************/
+void funct_OutputHandler(unsigned char uint8_ToDo,unsigned char uint8_value)
+{
+    if(uint8_ToDo == _SetPort)  //set directly a port?
+    {
+        oSinkSource0 = uint8_value;
+        oSinkSource1 = uint8_value >> 1;
+        oSinkSource2 = uint8_value >> 2;
+        oSinkSource3 = uint8_value >> 3;
+        oSinkSource4 = uint8_value >> 4;
+        oSinkSource5 = uint8_value >> 5;
+        oSinkSource6 = uint8_value >> 6;
+        oSinkSource7 = uint8_value >> 7;
+    }
+    else if ((uint8_ToDo == _SetBit) || (uint8_ToDo == _ClrBit))    //clear or set a bit/output?    
+    {
+        switch(uint8_value) //verify which output must be set or clear
+        {
+            case (0):       //output 0?
+                oSinkSource0 = uint8_ToDo;
+                break;
+                
+            case (1):       //output 1?
+                oSinkSource1 = uint8_ToDo;
+                break;
+                
+            case (2):       //output 2?
+                oSinkSource2 = uint8_ToDo;
+                break;
+                
+            case (3):       //output 3?
+                oSinkSource3 = uint8_ToDo;
+                break;
+                
+            case (4):       //output 4?
+                oSinkSource4 = uint8_ToDo;
+                break;
+                
+            case (5):       //output 5?
+                oSinkSource5 = uint8_ToDo;
+                break;
+                
+            case (6):       //output 6?
+                oSinkSource6 = uint8_ToDo;
+                break;
+                
+            case (7):       //output 7?
+                oSinkSource7 = uint8_ToDo;
+                break;
+                
+            default:        //do nothing
+                break;
+        }
+    }
+    else
+    {
+        //do nothing - not defined!
+    }
+}   //end of funct_SetIOhandler
+
+
+/**********************************************************************************************************************
+ * Routine:                 funct_IOhandler
+
+ * Description:
+ * ...
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        28.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint8_ToDo
+ *                          uint8_IO
+ *                          uint8_value
+ * Output:                  -
+ * Global variable:         -
+***********************************************************************************************************************/
+unsigned char funct_IOhandler(unsigned char uint8_ToDo,unsigned char uint8_IO,unsigned char uint8_value)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    
+    if(uint8_ToDo == _GetPort)  //read a complete port?
+    {
+        if(uint8_IO == _Input)          //from the input?
+        {
+            uint8_Result |= iSinkSource7 << 7;
+            uint8_Result |= iSinkSource6 << 6;
+            uint8_Result |= iSinkSource5 << 5;
+            uint8_Result |= iSinkSource4 << 4;
+            uint8_Result |= iSinkSource3 << 3;
+            uint8_Result |= iSinkSource2 << 2;
+            uint8_Result |= iSinkSource1 << 1;
+            uint8_Result |= iSinkSource0; 
+        }
+        else if (uint8_IO == _Output)   //from the output?
+        {
+            uint8_Result |= oSinkSource7 << 7;
+            uint8_Result |= oSinkSource6 << 6;
+            uint8_Result |= oSinkSource5 << 5;
+            uint8_Result |= oSinkSource4 << 4;
+            uint8_Result |= oSinkSource3 << 3;
+            uint8_Result |= oSinkSource2 << 2;
+            uint8_Result |= oSinkSource1 << 1;
+            uint8_Result |= oSinkSource0; 
+        }
+        else
+        {
+            //do nothing - not defined!
+        }
+    }
+    else if (uint8_ToDo == _GetBit) //read only one bit?
+    {
+        if(uint8_IO == _Input)          //from the input?
+        {
+            //
+        }
+        else if (uint8_IO == _Output)   //from the output?
+        {
+            switch(uint8_value)
+            {
+                case (0):   //output 0?
+                    uint8_Result = oSinkSource0;
+                    break;
+                    
+                case (1):   //output 1?
+                    uint8_Result = oSinkSource1;
+                    break;
+                    
+                case (2):   //output 2?
+                    uint8_Result = oSinkSource2;
+                    break;
+                    
+                case (3):   //output 3?
+                    uint8_Result = oSinkSource3;
+                    break;
+                    
+                case (4):   //output 4?
+                    uint8_Result = oSinkSource4;
+                    break;
+                    
+                case (5):   //output 5?
+                    uint8_Result = oSinkSource5;
+                    break;
+                    
+                case (6):   //output 6?
+                    uint8_Result = oSinkSource6;
+                    break;
+                    
+                case (7):   //output 7?
+                    uint8_Result = oSinkSource7;
+                    break;
+                    
+                default:
+                    uint8_Result = 0;
+                    break;                    
+            }
+        }
+        else
+        {
+            //do nothing - not defined!
+        }
+    }
+    else
+    {
+        //do nothing - not defined!
+    }
+    
+    return uint8_Result;
+}   //end of funct_IOhandler

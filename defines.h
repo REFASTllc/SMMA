@@ -103,6 +103,8 @@
 //error code definition
                             //general errors
 #define _GlobalLock         0               //driver detected a POR; user configuration not guaranteed
+#define _OutOfTolValPort    40              //SOUT; value to write on the output port out of tolerance
+#define _OutOfTolBit        41              //SBIT, CBIT, GBIT; bit value out of tolerance
 #define _StepModeSSMOD      42              //SSMOD; step mode not defined
 #define _OutOfTolSCOILON    43              //SCOILON; received parameters out of tolerance
 #define _OutOfTolRUN        44              //RUN; received parameters out of tolerance
@@ -172,7 +174,7 @@
 #define _IdGSMOD            36              //get step mode
 #define _IdSERUN            37              //-KO- set the E-running parameters with stall detection
 #define _IdGERUN            38              //get the E-running parameters
-#define _IdERUN             39              //run the motor with stall detection and free run
+#define _IdERUN             39              //E-run the motor with stall detection and free run
 #define _IdGO               40              //start the motor and run until stop command "BREAK"
 #define _IdSIMAN            41              //-KO- set chopper current in stop mode
 #define _IdGIMAN            42              //-KO- get chopper current in stop mode

@@ -106,7 +106,7 @@ void system_init(void)
 //front LED = black status (off)
     funct_FrontLED(_FLEDblack);             //call subroutine and switch on green LED
     
-//switch on the follow outputs
+//switch on the debugging LED's
     oTestLed1 = 1;                          //switch on the output for the test LED1
     oTestLed2 = 1;                          //switch on the output for the test LED2
     

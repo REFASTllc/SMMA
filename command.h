@@ -55,6 +55,12 @@ extern void cmd_MUMOT(void);
 extern void cmd_SCOILON(void);
 extern void cmd_SSMOD(void);
 extern void cmd_GSMOD(void);
+extern void cmd_SBIT(void);
+extern void cmd_CBIT(void);
+extern void cmd_GBIT(void);
+extern void cmd_SOUT(void);
+extern void cmd_GOUT(void);
+extern void cmd_GINP(void);
 
 
 typedef struct                      //definitions of multiple variable for command

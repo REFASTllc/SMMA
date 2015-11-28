@@ -84,18 +84,16 @@ extern void param_init(void);
 #define _BipDecIMax         2800        //<OK> maximal chopper current for deceleration in [mA]
 #define _BipIPctMin         0           //<OK> minimal percentage for the half step compensated in [%]
 #define _BipIPctMax         100         //<OK> maximal percentage for the half step compensated in [%]
-
+#define _BitMin             0           //<OK> minimal range in decimal for bit
+#define _BitMax             7           //<OK> maximal range in decimal for bit
+#define _ValPortMin         0           //<OK> minimal value in decimal from the I/O port 
+#define _ValPortMax         255         //<OK> maximal value in decimal from the I/O port
 
 /*
 #define StepModeMin       0           //OK range for step mode -> minimum
 #define StepModeMax       5           //OK range for step mode -> maximum
-
 #define FreeStepCountMin  0           //minimal free step count
 #define FreeStepCountMax  7200000     //maximal free step count
-#define BitMin            0           //OK range for bit --> minimum
-#define BitMax            7           //OK range for bit --> maximum
-#define ValPortMin        0           //OK minimal value in decimal from the I/O port 
-#define ValPortMax        255         //OK maximal value in decimal from the I/O port
 //#define TestVoltageMin    0           //minimal test voltage for the calibration
 //#define TestVoltageMax    7           //maximal test voltage for the calibration
 #define CurrentLevelMin   20          //OK minimal current level in [mA]
@@ -161,8 +159,8 @@ typedef struct                      //definitions of multiple variable for comma
     volatile unsigned int uint16_DecNumbStep[50];   //array of: number of steps for the deceleration
     volatile unsigned int uint16_DecFreq[50];       //array of: frequency for the deceleration
     volatile unsigned char uint8_DecNumbRamp;       //deceleration - how many ramps are stored  
-    volatile unsigned char uint8_ValPort;           //value in decimal from the I/O port
-    volatile unsigned char uint8_Bit;               //bit of the I/O port
+    //volatile unsigned char uint8_ValPort;           //value in decimal from the I/O port <-- don't delte it, mybe I need it again A. Staub
+    //volatile unsigned char uint8_Bit;               //bit of the I/O port <-- don't delete it, maybe I need it again A. Staub
     volatile unsigned char uint8_TestVoltage;       //known voltage reference for the calibartion 
     volatile unsigned int uint16_CurrentLevel[16];  //array of: current level for the uStepping [mA]
     volatile unsigned int uint16_SCiLevel;          //short-circuit current limit [mA]

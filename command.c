@@ -33,6 +33,12 @@
  *                          - cmd_SCOILON
  *                          - cmd_SSMOD
  *                          - cmd_GSMOD
+ *                          - cmd_SBIT
+ *                          - cmd_CBIT
+ *                          - cmd_GBIT
+ *                          - cmd_SOUT
+ *                          - cmd_GOUT
+ *                          - cmd_GINP
 ***********************************************************************************************************************/
 
 
@@ -225,7 +231,7 @@ void cmd_check(void)
                 }
                 else
                 {
-                    //otherwise verify if the it was a comma (in this case ArrAsciiPos is 255)
+                    //otherwise verify if it was a comma (in this case ArrAsciiPos is 255)
                     if(g_Funct.uint8_ArrAsciiPos == 255)
                     {
                         //in this case set all bits 
@@ -429,9 +435,9 @@ void cmd_check(void)
                     break;
                 /*
                 case (38):  //command GERUN
-                    cmd_GERUN();      //call subroutine
+                    cmd_GERUN();        //call subroutine
                     break;
-                                
+                              
                 case (39):  //command ERUN
                     cmd_ERUN();         //call subroutine
                     break;
@@ -449,31 +455,31 @@ void cmd_check(void)
                     g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
-                /*
+                
                 case (43):  //command SBIT
                     cmd_SBIT();       //call subroutine
                     break;
-      
+                
                 case (44):  //command CBIT
                     cmd_CBIT();       //call subroutine
                     break;
-      
+                
                 case (45):  //command GBIT
                     cmd_GBIT();       //call subroutine
                     break;
-      
+                
                 case (46):  //command SOUT
                     cmd_SOUT();       //call subroutine
                     break;
-      
+                
                 case (47):  //command GOUT
                     cmd_GOUT();       //call subroutine
                     break;
-      
+                
                 case (48):  //command GINP
                     cmd_GINP();       //call subroutine
                     break;
-      
+                /*
                 case (49):  //command SMCRSTP
                     cmd_SMCRSTP();    //call subroutine
                     break;
@@ -2429,12 +2435,12 @@ void cmd_SCOILON(void)
  * Output:                  -
  * Global variable:         g_Param.
  *                              - uint8_StepMode
+ *                              - uint8_ErrCode
  *                          g_Uni.
  *                              - uint8_Settings
  *                          g_Cmd.
  *                              - uint8_ParamPos
  *                              - uint32_TempPara
- *                              - uint8_ErrCode
 ***********************************************************************************************************************/
 void cmd_SSMOD(void)
 {
@@ -2531,7 +2537,287 @@ void cmd_GSMOD(void)
 {
     uart2_sendbuffer('E');                    //first the letter E
     uart2_sendbuffer(',');                    //then the comma
-    funct_IntToAscii(g_Param.uint8_StepMode,_Active); //add the step moe
+    funct_IntToAscii(g_Param.uint8_StepMode,_Active); //add the step mode
     uart2_sendbuffer(13);                     //add the CR at the end
 }   //end of cmd_GSMOD
 
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SBIT
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then set the corresponding bit / output 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        28.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+ * Global variable:         g_Cmd.
+ *                              - uint8_ParamPos
+ *                              - uint32_TempPara
+ *                          g_Param.
+ *                              - uint8_ErrCode
+***********************************************************************************************************************/
+void cmd_SBIT(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    
+    if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[1],_BitMin,_BitMax);
+        
+        if(uint8_Result == 1)   //each parameter within the tolerance?
+        {
+            //set the corresponding bit / output by call the subroutine
+            funct_OutputHandler(_SetBit,(g_Cmd.uint32_TempPara[1] & 0xFF));
+                   
+            //send back the needed informations
+            uart2_sendbuffer('E');                  //first the letter E
+            uart2_sendbuffer(13);                   //add the CR at the end
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolBit;       //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }  
+}   //end of cmd_SBIT
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_CBIT
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then clear the corresponding bit / output 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        28.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+ * Global variable:         g_Cmd.
+ *                              - uint8_ParamPos
+ *                              - uint32_TempPara
+ *                          g_Param.
+ *                              - uint8_ErrCode
+***********************************************************************************************************************/
+void cmd_CBIT(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    
+    if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[1],_BitMin,_BitMax);
+        
+        if(uint8_Result == 1)   //each parameter within the tolerance?
+        {
+            //set the corresponding bit / output by call the subroutine
+            funct_OutputHandler(_ClrBit,(g_Cmd.uint32_TempPara[1] & 0xFF));
+                   
+            //send back the needed informations
+            uart2_sendbuffer('E');                  //first the letter E
+            uart2_sendbuffer(13);                   //add the CR at the end
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolBit;       //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }  
+}   //end of cmd_CBIT
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GBIT
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then send back the corresponding bit / output 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        28.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+ * Global variable:         g_Cmd.
+ *                              - uint8_ParamPos
+ *                              - uint32_TempPara
+ *                          g_Param.
+ *                              - uint8_ErrCode
+***********************************************************************************************************************/
+void cmd_GBIT(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    auto unsigned char uint8_value;         //local work byte
+    
+    if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[1],_BitMin,_BitMax);
+        
+        if(uint8_Result == 1)   //each parameter within the tolerance?
+        {
+            //get the corresponding bit / output by call the subroutine
+            uint8_value = funct_IOhandler(_GetBit,_Output,(g_Cmd.uint32_TempPara[1] & 0xFF));
+                   
+            //send back the needed informations
+            uart2_sendbuffer('E');                  //first the letter E
+            uart2_sendbuffer(',');                  //then the comma
+            funct_IntToAscii(uint8_value,_Active);  //add the value
+            uart2_sendbuffer(13);                   //add the CR at the end
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolBit;       //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }  
+}   //end of cmd_GBIT
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SOUT
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then set the output port
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        28.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+ * Global variable:         g_Cmd.
+ *                              - uint8_ParamPos
+ *                              - uint32_TempPara
+ *                          g_Param.
+ *                              - uint8_ErrCode
+***********************************************************************************************************************/
+void cmd_SOUT(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    
+    if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[1],_ValPortMin,_ValPortMax);
+        
+        if(uint8_Result == 1)   //each parameter within the tolerance?
+        {
+            //set the corresponding bit / output by call the subroutine
+            funct_OutputHandler(_SetPort,(g_Cmd.uint32_TempPara[1] & 0xFF));
+                   
+            //send back the needed informations
+            uart2_sendbuffer('E');                  //first the letter E
+            uart2_sendbuffer(13);                   //add the CR at the end
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolValPort;   //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }  
+}   //end of cmd_SOUT
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GOUT
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then send back the state of the output port 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        28.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+ * Global variable:         g_Cmd.
+ *                              - uint8_ParamPos
+ *                              - uint32_TempPara
+ *                          g_Param.
+ *                              - uint8_ErrCode
+***********************************************************************************************************************/
+void cmd_GOUT(void)
+{
+    auto unsigned char uint8_value;         //local work byte
+    
+    //get the output port by call the subroutine
+    uint8_value = funct_IOhandler(_GetPort,_Output,(g_Cmd.uint32_TempPara[1] & 0xFF));
+                   
+    //send back the needed informations
+    uart2_sendbuffer('E');                  //first the letter E
+    uart2_sendbuffer(',');                  //then the comma
+    funct_IntToAscii(uint8_value,_Active);  //add the value
+    uart2_sendbuffer(13);                   //add the CR at the end 
+}   //end of cmd_GOUT
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GINP
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then send back the state of the input port 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        28.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+ * Global variable:         g_Cmd.
+ *                              - uint8_ParamPos
+ *                              - uint32_TempPara
+ *                          g_Param.
+ *                              - uint8_ErrCode
+***********************************************************************************************************************/
+void cmd_GINP(void)
+{
+    auto unsigned char uint8_value;         //local work byte
+    
+    //get the output port by call the subroutine
+    uint8_value = funct_IOhandler(_GetPort,_Input,(g_Cmd.uint32_TempPara[1] & 0xFF));
+                   
+    //send back the needed informations
+    uart2_sendbuffer('E');                  //first the letter E
+    uart2_sendbuffer(',');                  //then the comma
+    funct_IntToAscii(uint8_value,_Active);  //add the value
+    uart2_sendbuffer(13);                   //add the CR at the end 
+}   //end of cmd_GINP
