@@ -103,6 +103,7 @@
 //error code definition
                             //general errors
 #define _GlobalLock         0               //driver detected a POR; user configuration not guaranteed
+#define _StepModeSSMOD      42              //SSMOD; step mode not defined
 #define _OutOfTolSCOILON    43              //SCOILON; received parameters out of tolerance
 #define _OutOfTolRUN        44              //RUN; received parameters out of tolerance
 #define _MotTypRUN          45              //RUN; try to execute the command with motor type = 'N'
@@ -167,8 +168,8 @@
 #define _IdGCACC            32              //-KO- get current and ON-delay for acceleration
 #define _IdSCDEC            33              //-KO- set current and OFF-delay for deceleration
 #define _IdGCDEC            34              //-KO- get current and OFF-delay for deceleration
-#define _IdSSMOD            35              //-KO- set step mode
-#define _IdGSMOD            36              //-KO- get step mode
+#define _IdSSMOD            35              //set step mode
+#define _IdGSMOD            36              //get step mode
 #define _IdSERUN            37              //-KO- set the E-running parameters with stall detection
 #define _IdGERUN            38              //get the E-running parameters
 #define _IdERUN             39              //run the motor with stall detection and free run

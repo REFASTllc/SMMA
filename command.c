@@ -31,7 +31,8 @@
  *                          - cmd_BREAK
  *                          - cmd_MUMOT
  *                          - cmd_SCOILON
- *                          - cmd_GERUN
+ *                          - cmd_SSMOD
+ *                          - cmd_GSMOD
 ***********************************************************************************************************************/
 
 
@@ -414,14 +415,12 @@ void cmd_check(void)
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
             
-                case (_IdSSMOD):        //command SSMOD (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                case (_IdSSMOD):        //command SSMOD
+                    cmd_SSMOD();        //call subroutine
                     break;
       
-                case (_IdGSMOD):        //command GSMOD (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                case (_IdGSMOD):        //command GSMOD
+                    cmd_GSMOD();        //call subroutine
                     break;
             
                 case (_IdSERUN):        //command SERUN (not used anymore)
@@ -2414,4 +2413,125 @@ void cmd_SCOILON(void)
     }
 }   //end of cmd_SCOILON
 
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SSMOD
+
+ * Description:
+ * This command can be used to define the step mode for the application. 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        28.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+ * Global variable:         g_Param.
+ *                              - uint8_StepMode
+ *                          g_Uni.
+ *                              - uint8_Settings
+ *                          g_Cmd.
+ *                              - uint8_ParamPos
+ *                              - uint32_TempPara
+ *                              - uint8_ErrCode
+***********************************************************************************************************************/
+void cmd_SSMOD(void)
+{
+    if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
+    {
+        g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
+    else
+    {
+        if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
+        {
+            switch(g_Cmd.uint32_TempPara[1])    //verify mode of step
+            {
+                case (0):       //full step one phase on
+                    g_Param.uint8_StepMode = 0;
+                    g_Uni.uint8_Settings &= 0xFB;   //enable full step
+                    g_Uni.uint8_Settings &= 0xBF;   //one phase ON for unipolar
+                    //send back the needed informations
+                    uart2_sendbuffer('E');                  //first the letter E
+                    uart2_sendbuffer(13);                   //add the CR at the end
+                    break;
+                    
+                case (1):       //full step two phase on
+                    g_Param.uint8_StepMode = 1;
+                    g_Uni.uint8_Settings &= 0xFB;   //enable full step
+                    g_Uni.uint8_Settings |= 0x40;   //two phase ON for unipolar
+                    //send back the needed informations
+                    uart2_sendbuffer('E');                  //first the letter E
+                    uart2_sendbuffer(13);                   //add the CR at the end
+                    break;
+                    
+                case (2):       //half step
+                    g_Param.uint8_StepMode = 2;
+                    g_Uni.uint8_Settings |= 0x04;   //enable half step for unipolar
+                    //send back the needed informations
+                    uart2_sendbuffer('E');                  //first the letter E
+                    uart2_sendbuffer(13);                   //add the CR at the end
+                    break;
+                    
+                case (3):       //half step current compensated
+                    g_Param.uint8_StepMode = 3;
+                    //send back the needed informations
+                    uart2_sendbuffer('E');                  //first the letter E
+                    uart2_sendbuffer(13);                   //add the CR at the end
+                    break;
+                    
+                case (4):       //micro stepping (quarter)
+                    g_Param.uint8_StepMode = 4;
+                    //send back the needed informations
+                    uart2_sendbuffer('E');                  //first the letter E
+                    uart2_sendbuffer(13);                   //add the CR at the end
+                    break;
+                    
+                case (5):       //micro stepping (sixteenth)
+                    g_Param.uint8_StepMode = 5;
+                    //send back the needed informations
+                    uart2_sendbuffer('E');                  //first the letter E
+                    uart2_sendbuffer(13);                   //add the CR at the end
+                    break;
+                    
+                default:        //not defined - error
+                    g_Param.uint8_ErrCode = _StepModeSSMOD;     //set error code
+                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                    break;
+            }
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+}   //end of cmd_SSMOD
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GSMOD
+
+ * Description:
+ * This command send back the current step mode 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        28.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+ * Global variable:         g_Param.
+ *                              - uint8_StepMode
+***********************************************************************************************************************/
+void cmd_GSMOD(void)
+{
+    uart2_sendbuffer('E');                    //first the letter E
+    uart2_sendbuffer(',');                    //then the comma
+    funct_IntToAscii(g_Param.uint8_StepMode,_Active); //add the step moe
+    uart2_sendbuffer(13);                     //add the CR at the end
+}   //end of cmd_GSMOD
 

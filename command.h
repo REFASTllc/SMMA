@@ -53,6 +53,8 @@ extern void cmd_GRUN(void);
 extern void cmd_BREAK(void);
 extern void cmd_MUMOT(void);
 extern void cmd_SCOILON(void);
+extern void cmd_SSMOD(void);
+extern void cmd_GSMOD(void);
 
 
 typedef struct                      //definitions of multiple variable for command
