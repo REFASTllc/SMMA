@@ -104,6 +104,10 @@ void system_init(void)
     timers_SetInterrupt(_TIMER2,_ENABLE);   //call subroutine and set interrupt for timer 2
     //timers_Set(_TIMER2,_ENABLE,0,10000); 
     
+//switch on the follow outputs
+    oTestLed1 = 1;                          //switch on the output for the test LED1
+    oTestLed2 = 1;                          //switch on the output for the test LED2
+    
 }   //end of system_init
 
 

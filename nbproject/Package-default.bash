@@ -10,9 +10,9 @@ CND_CONF=default
 CND_DISTDIR=dist
 TMPDIR=build/${CND_CONF}/${IMAGE_TYPE}/tmp-packaging
 TMPDIRNAME=tmp-packaging
-OUTPUT_PATH=dist/${CND_CONF}/${IMAGE_TYPE}/MC_UBD_PIC32MX360FxxxL_V-00-00.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
-OUTPUT_BASENAME=MC_UBD_PIC32MX360FxxxL_V-00-00.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
-PACKAGE_TOP_DIR=mcubdpic32mx360fxxxlv-00-00.x/
+OUTPUT_PATH=dist/${CND_CONF}/${IMAGE_TYPE}/SMMA.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+OUTPUT_BASENAME=SMMA.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+PACKAGE_TOP_DIR=smma.x/
 
 # Functions
 function checkReturnCode
@@ -57,15 +57,15 @@ mkdir -p ${TMPDIR}
 
 # Copy files and create directories and links
 cd "${TOP}"
-makeDirectory ${TMPDIR}/mcubdpic32mx360fxxxlv-00-00.x/bin
+makeDirectory ${TMPDIR}/smma.x/bin
 copyFileToTmpDir "${OUTPUT_PATH}" "${TMPDIR}/${PACKAGE_TOP_DIR}bin/${OUTPUT_BASENAME}" 0755
 
 
 # Generate tar file
 cd "${TOP}"
-rm -f ${CND_DISTDIR}/${CND_CONF}/package/mcubdpic32mx360fxxxlv-00-00.x.tar
+rm -f ${CND_DISTDIR}/${CND_CONF}/package/smma.x.tar
 cd ${TMPDIR}
-tar -vcf ../../../../${CND_DISTDIR}/${CND_CONF}/package/mcubdpic32mx360fxxxlv-00-00.x.tar *
+tar -vcf ../../../../${CND_DISTDIR}/${CND_CONF}/package/smma.x.tar *
 checkReturnCode
 
 # Cleanup

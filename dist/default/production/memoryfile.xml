@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <project>                                  
-  <executable name="dist/default/production/MC_UBD_PIC32MX360FxxxL_V-00-00.X.production.elf">                 
+  <executable name="dist/default/production/SMMA.X.production.elf">                 
     <memory name="program">                 
       <units>bytes</units>                 
       <length>531968</length>                 
-      <used>46200</used>                     
-      <free>485768</free>                     
+      <used>46064</used>                     
+      <free>485904</free>                     
     </memory>                              
     <memory name="data">              
       <units>bytes</units>                 
