@@ -42,6 +42,7 @@ extern unsigned int funct_ReadRamp(unsigned char uint8_kind,unsigned char uint8_
 extern unsigned char funct_CheckCmdSILIM(void);
 extern unsigned char funct_CheckCmdSMTYP(void);
 extern void funct_LoadDeviceInfo(void);
+extern void funct_FrontLED(unsigned char uint8_color);
 
 
 #define _Active         1           //used for variable uint8_sending
@@ -50,6 +51,10 @@ extern void funct_LoadDeviceInfo(void);
 #define _Dec            0           //deceleration used for variable uint8_kind
 #define _Step           1           //used for variable uint8_sort
 #define _Freq           0           //used for variable uint8_sort
+#define _FLEDblack      0           //front LED switched off
+#define _FLEDgreen      1           //front LED = green
+#define _FLEDred        2           //front LED = red
+#define _FLEDorange     3           //front LED = orange
 
 
 typedef struct                      //definitions of multiple variable for function

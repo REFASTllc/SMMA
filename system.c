@@ -103,6 +103,8 @@ void system_init(void)
     timers_Init(_TIMER2);                   //call subroutine and initialize timer 2
     timers_SetInterrupt(_TIMER2,_ENABLE);   //call subroutine and set interrupt for timer 2
     //timers_Set(_TIMER2,_ENABLE,0,10000); 
+//front LED = black status (off)
+    funct_FrontLED(_FLEDblack);             //call subroutine and switch on green LED
     
 //switch on the follow outputs
     oTestLed1 = 1;                          //switch on the output for the test LED1

@@ -18,7 +18,8 @@
  *                          - funct_ReadRamp
  *                          - funct_CheckCmdSILIM
  *                          - funct_CheckCmdSMTYP
- *                          - funct_LoadDeviceInfo
+ *                          - funct_LoadDeviceInfo  
+ *                          - funct_FrontLED
 ***********************************************************************************************************************/
 
 
@@ -593,35 +594,69 @@ void funct_LoadDeviceInfo(void)
 {
     uart2_sendbuffer('E');
     uart2_sendbuffer(',');
-    uart2_sendbuffer('R');                   
-    uart2_sendbuffer('E');
-    uart2_sendbuffer('F');
+    uart2_sendbuffer('S');                   
+    uart2_sendbuffer('M');
+    uart2_sendbuffer('M');
     uart2_sendbuffer('A');
-    uart2_sendbuffer('S');
-    uart2_sendbuffer('T');
-    uart2_sendbuffer(' ');
-    uart2_sendbuffer('U');
-    uart2_sendbuffer('B');
-    uart2_sendbuffer('L');
-    uart2_sendbuffer('-');
-    uart2_sendbuffer('D');
-    uart2_sendbuffer('R');
-    uart2_sendbuffer('I');
-    uart2_sendbuffer('V');
-    uart2_sendbuffer('E');
-    uart2_sendbuffer('R');
     uart2_sendbuffer(' ');
     uart2_sendbuffer('V');
-    uart2_sendbuffer('W');
-    uart2_sendbuffer('X');
+    uart2_sendbuffer('0');
+    uart2_sendbuffer('1');
     uart2_sendbuffer('.');
-    uart2_sendbuffer('Y');
-    uart2_sendbuffer('Z');
+    uart2_sendbuffer('0');
+    uart2_sendbuffer('0');
     uart2_sendbuffer(' ');
-    uart2_sendbuffer('M');
-    uart2_sendbuffer('M');
+    uart2_sendbuffer('1');
+    uart2_sendbuffer('1');
     uart2_sendbuffer('/');
-    uart2_sendbuffer('Y');
-    uart2_sendbuffer('Y');
+    uart2_sendbuffer('1');
+    uart2_sendbuffer('5');
     uart2_sendbuffer(13);
 }   //end of funct_LoadDeviceInfo
+
+
+/**********************************************************************************************************************
+ * Routine:                 funct_FrontLED
+
+ * Description:
+ * Define the color for the front LED
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        28.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint8_color
+ * Output:                  -
+ * Global variable:         -
+***********************************************************************************************************************/
+void funct_FrontLED(unsigned char uint8_color)
+{
+    switch(uint8_color)
+    {
+        case (0):   //switch off LED
+            oFrontLedGRN = 0;
+            oFrontLedRED = 0;
+            break;
+        
+        case (1):   //switch on green LED
+            oFrontLedGRN = 1;
+            oFrontLedRED = 0;
+            break;
+            
+        case (2):   //switch on red LED
+            oFrontLedGRN = 0;
+            oFrontLedRED = 1;
+            break;
+            
+        case (3):   //switch on orange LED
+            oFrontLedGRN = 1;
+            oFrontLedRED = 1;
+            break;
+            
+        default:    //not defined - switch off LED
+            oFrontLedGRN = 0;
+            oFrontLedRED = 0;
+            break;
+    }
+}   //end of funct_FrontLED
