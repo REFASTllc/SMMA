@@ -61,6 +61,7 @@ extern void cmd_GBIT(void);
 extern void cmd_SOUT(void);
 extern void cmd_GOUT(void);
 extern void cmd_GINP(void);
+extern void cmd_SMCRSTP(void);
 //new commands:
 extern void cmd_GINPB(void);
 

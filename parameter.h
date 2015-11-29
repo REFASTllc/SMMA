@@ -84,6 +84,8 @@ extern void param_init(void);
 #define _BipDecIMax         2800        //<OK> maximal chopper current for deceleration in [mA]
 #define _BipIPctMin         0           //<OK> minimal percentage for the half step compensated in [%]
 #define _BipIPctMax         100         //<OK> maximal percentage for the half step compensated in [%]
+#define _BipILevelMin       20          //<OK> minimal micro stepping current level in [mA]
+#define _BipILevelMax       2800        //<OK> maximal micro stepping current level in [mA]
 #define _BitMin             0           //<OK> minimal range in decimal for bit
 #define _BitMax             7           //<OK> maximal range in decimal for bit
 #define _ValPortMin         0           //<OK> minimal value in decimal from the I/O port 
@@ -96,8 +98,6 @@ extern void param_init(void);
 #define FreeStepCountMax  7200000     //maximal free step count
 //#define TestVoltageMin    0           //minimal test voltage for the calibration
 //#define TestVoltageMax    7           //maximal test voltage for the calibration
-#define CurrentLevelMin   20          //OK minimal current level in [mA]
-#define CurrentLevelMax   3000        //OK maximal current level in [mA]
 #define _NumStepsMin        1       //<OK> minimal number of steps for the frequency 
 #define _NumStepsMax        1000    //<OK> maximal number of steps for the frequency
 #define _FreqMin            1           //OK minimal frequency for the number of steps in [Hz]

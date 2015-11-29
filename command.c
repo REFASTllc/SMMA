@@ -39,6 +39,7 @@
  *                          - cmd_SOUT
  *                          - cmd_GOUT
  *                          - cmd_GINP
+ *                          - cmd_SMCRSTP
  *                          //new commands:
  *                          - cmd_GINPB
 ***********************************************************************************************************************/
@@ -481,11 +482,11 @@ void cmd_check(void)
                 case (_IdGINP):         //command GINP
                     cmd_GINP();         //call subroutine
                     break;
-                /*
-                case (49):  //command SMCRSTP
-                    cmd_SMCRSTP();    //call subroutine
+                
+                case (_IdSMCRSTP):      //command SMCRSTP
+                    cmd_SMCRSTP();      //call subroutine
                     break;
-      
+                /*
                 case (50):  //command GMCRSTP
                     cmd_GMCRSTP();    //call subroutine
                     break;
@@ -1297,18 +1298,16 @@ void cmd_SRACC(void)
     auto unsigned char uint8_WB1;           //local work byte for the loops
     auto unsigned char uint8_WB2;           //local work byte to store the results into the array  
   
-    if(g_Uni.uint8_Settings & 0x01)         //is motor in run mode?
+    if((g_Cmd.uint8_ParamPos > 1) && (g_Cmd.uint8_ParamPos < 102))  //number of received characters inside the range?
     {
-        g_Param.uint8_ErrCode = _MotorInRun;        //set error code
-        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-    }
-    else
-    {
-        //number of received characters inside the range?
-        if((g_Cmd.uint8_ParamPos > 1) && (g_Cmd.uint8_ParamPos < 102))
+        if(g_Cmd.uint8_ParamPos % 2)    //verify if the number of received parameters is odd-numbered (a pair) 
         {
-            //verify if the number of received parameters is odd-numbered 
-            if(g_Cmd.uint8_ParamPos % 2)
+            if(g_Uni.uint8_Settings & 0x01)         //is motor in run mode?
+            {
+                g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
+            else
             {
                 //ToDo:
                 //verify each received parameter with the tolerance (start with the 2nd parameter)
@@ -1364,20 +1363,18 @@ void cmd_SRACC(void)
                     g_Param.uint8_ErrCode = _OutOfTolSRACC;     //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                 }
-            }
-            //otherwise send back the error code
-            else
-            {
-                g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
-                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-            }  
+            }        
         }
-        //otherwise send back the error code
-        else
+        else    //otherwise send back the error code
         {
             g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   //end of cmd_SRACC
 
@@ -1433,20 +1430,17 @@ void cmd_SRDEC(void)
     auto unsigned char uint8_Result = 0;    //local work byte for the result
     auto unsigned char uint8_WB1;           //local work byte for the loops
     auto unsigned char uint8_WB2;           //local work byte to store the results into the array  
-  
     
-    if(g_Uni.uint8_Settings & 0x01)     //is motor in run mode?
+    if((g_Cmd.uint8_ParamPos > 1) && (g_Cmd.uint8_ParamPos < 102))    //number of received characters OK?
     {
-        g_Param.uint8_ErrCode = _MotorInRun;        //set error code
-        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-    }
-    else
-    {
-        //number of received characters inside the range?
-        if((g_Cmd.uint8_ParamPos > 1) && (g_Cmd.uint8_ParamPos < 102))
+        if(g_Cmd.uint8_ParamPos % 2)    //verify if the number of received parameters is odd-numbered (a pair)
         {
-            //verify if the number of received parameters is odd-numbered 
-            if(g_Cmd.uint8_ParamPos % 2)
+            if(g_Uni.uint8_Settings & 0x01)     //is motor in run mode?
+            {
+                g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
+            else
             {
                 //ToDo:
                 //verify each received parameter with the tolerance (start with the 2nd parameter)
@@ -1502,20 +1496,18 @@ void cmd_SRDEC(void)
                     g_Param.uint8_ErrCode = _OutOfTolSRDEC;     //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                 }
-            }
-            //otherwise send back the error code
-            else
-            {
-                g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
-                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-            }  
-        }
-        //otherwise send back the error code
-        else
+            }       
+        } 
+        else    //otherwise send back the error code
         {
             g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   //end of cmd_SRDEC
 
@@ -2962,6 +2954,117 @@ void cmd_GINP(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   //end of cmd_GINP
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SMCRSTP
+
+ * Description:
+ * Only allowed if the motor is not in run. First verify if the number of received parameters is inside the range.
+ * If not, then send back the error code.
+ * 
+ * Second verify if the number of received parameters is 5, 9, 17, because to have a valide result, 
+ * there must be always a current level for the microsteppint in 4th, 8th or 16th be. 
+ * 5,9 or 17 because the command ID is counted as well. 
+ * 
+ * Third verify each received parameter with the toelrance until all parameters are verified. 
+ * Update the number of received parameters with the number of verified parameters. 
+ * 
+ * Fourth verify if the result is exactly the number of parameters -1, to be sure tht each parameter is 
+ * within the tolerance. -1 because we don't count the command ID with. 
+ * 
+ * At the end, first erase the acceleration array, store the new parameters inside and send back the OK.  
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        29.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+ * Global variable:         g_Cmd.
+ *                              - uint32_Cmd2nd4
+ *                              - uint32_Cmd1st4
+ *                              - uint8_CmdID
+ *                          g_Param.
+ *                              - uint8_ErrCode
+***********************************************************************************************************************/
+void cmd_SMCRSTP(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte for the result
+    auto unsigned char uint8_WB1;           //local work byte for the loops
+    auto unsigned char uint8_WB2;           //local work byte to store the results into the array
+    
+    if((g_Cmd.uint8_ParamPos > 1) && (g_Cmd.uint8_ParamPos < 18))   //number of received characters OK?
+    {
+        //number of received characters are a pair of 4th, 8th or 17th (+1 with command ID)
+        if((g_Cmd.uint8_ParamPos == 5) || (g_Cmd.uint8_ParamPos == 9) || (g_Cmd.uint8_ParamPos == 17))
+        {
+            if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
+            {
+                g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode);  //call subroutine
+            }
+            else
+            {
+                //ToDo: 
+                //verify each received parameter with the tolerance (start with the 2nd paramter)
+                //Until:
+                //the local work byte has the same size as number of received characters
+                uint8_WB1 = 1;
+                do
+                {
+                    uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[uint8_WB1],_BipILevelMin,_BipILevelMax);
+                    uint8_WB1++;    //increment with 1 to take the next parameter
+                }
+                while(uint8_WB1 < g_Cmd.uint8_ParamPos);
+                
+                //store the actually size of the numbers of verfied characters into the ParamPos
+                //g_Cmd.uint8_ParamPos = uint8_WB1;
+                
+                //each paramter within the tolerance (uint8_WB1 - 1, because the 1st parameter is the cmd ID)?
+                if(uint8_Result == (uint8_WB1-1))
+                {
+                    //first erase the array
+                    for(uint8_WB1=0; uint8_WB1<16; uint8_WB1++)
+                    {
+                        g_Param.uint16_BipILevel[uint8_WB1] = 0;
+                    }
+                    
+                    //then store each parameter on the right place (start with the 2nd paramter)
+                    uint8_WB1 = 1;
+                    uint8_WB2 = 0;
+                    do
+                    {
+                        g_Param.uint16_BipILevel[uint8_WB2] = g_Cmd.uint32_TempPara[uint8_WB1] & 0xFFFF;
+                        uint8_WB1++;    //increment with 1 to take the next paramter
+                        uint8_WB2++;    //increment with 1 to store it on the right position of the array
+                    }
+                    while(uint8_WB1 < g_Cmd.uint8_ParamPos);
+                    
+                    //send back the OK
+                    uart2_sendbuffer('E');            //first the letter E
+                    uart2_sendbuffer(13);             //then the CR at the end
+                }
+                else
+                {
+                    g_Param.uint8_ErrCode = _OutOfTolSMCRSTP;   //set error code
+                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                }
+            }
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }  
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
+}   // end of cmd_SMCRSTP
 
 
 /**********************************************************************************************************************

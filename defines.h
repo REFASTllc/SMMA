@@ -103,14 +103,15 @@
 //error code definition
                             //general errors
 #define _GlobalLock         0               //driver detected a POR; user configuration not guaranteed
+#define _OutOfTolSMCRSTP    39              //SMCRSTP; received parameters out of tolerance 
 #define _OutOfTolValPort    40              //SOUT; value to write on the output port out of tolerance
 #define _OutOfTolBit        41              //SBIT, CBIT, GBIT, GINPB; bit value out of tolerance
 #define _StepModeSSMOD      42              //SSMOD; step mode not defined
 #define _OutOfTolSCOILON    43              //SCOILON; received parameters out of tolerance
 #define _OutOfTolRUN        44              //RUN; received parameters out of tolerance
 #define _MotTypRUN          45              //RUN; try to execute the command with motor type = 'N'
-#define _OutOfTolSRDEC      46              //SRACC; received parameters out of tolerance
-#define _OutOfTolSRACC      47              //SRDEC; received parameters out of tolerance
+#define _OutOfTolSRDEC      46              //SRDEC; received parameters out of tolerance
+#define _OutOfTolSRACC      47              //SRACC; received parameters out of tolerance
 #define _UnknownMotTyp      48              //motor type unknown
 #define _MotorInRun         49              //driver send not back an information during actuator is in run mode
                             //unipolar errors are the same for matrix errors!
