@@ -458,28 +458,28 @@ void cmd_check(void)
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
                 
-                case (43):  //command SBIT
-                    cmd_SBIT();       //call subroutine
+                case (_IdSBIT):         //command SBIT
+                    cmd_SBIT();         //call subroutine
                     break;
                 
-                case (44):  //command CBIT
-                    cmd_CBIT();       //call subroutine
+                case (_IdCBIT):         //command CBIT
+                    cmd_CBIT();         //call subroutine
                     break;
                 
-                case (45):  //command GBIT
-                    cmd_GBIT();       //call subroutine
+                case (_IdGBIT):         //command GBIT
+                    cmd_GBIT();         //call subroutine
                     break;
                 
-                case (46):  //command SOUT
-                    cmd_SOUT();       //call subroutine
+                case (_IdSOUT):         //command SOUT
+                    cmd_SOUT();         //call subroutine
                     break;
                 
-                case (47):  //command GOUT
-                    cmd_GOUT();       //call subroutine
+                case (_IdGOUT):         //command GOUT
+                    cmd_GOUT();         //call subroutine
                     break;
                 
-                case (48):  //command GINP
-                    cmd_GINP();       //call subroutine
+                case (_IdGINP):         //command GINP
+                    cmd_GINP();         //call subroutine
                     break;
                 /*
                 case (49):  //command SMCRSTP
@@ -1192,47 +1192,55 @@ void cmd_SILIM(void)
 ***********************************************************************************************************************/
 void cmd_ETESTIN(void)
 {
-    if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
     {
-        g_Param.uint8_ErrCode = _MotorInRun;        //set error code
-        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-    }
-    else
-    {
-        if(g_Param.uint8_MotTyp == 'L')         //motor type = Lin?
+        if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
         {
-            g_Param.uint8_ErrCode = _LinETESTIN;        //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine            
-        }
-        else if(g_Param.uint8_MotTyp == 'B')    //motor type = Bipolar?
-        {
-            //starts the measure
-            
-            //convert the result
-            
-            //verify if within tolerance
-            
-            //send back the result
-            g_Param.uint8_ErrCode = _BipETESTIN;        //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-        }
-        else if((g_Param.uint8_MotTyp == 'U') || (g_Param.uint8_MotTyp == 'M'))    //motor type = Unipolar or matrix?
-        {
-            //starts the measure
-            
-            //convert the result
-            
-            //verify if within tolerance
-            
-            //send back the result
-            g_Param.uint8_ErrCode = _UniETESTIN;        //set error code
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _UnknownMotTyp;        //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-        }
+            if(g_Param.uint8_MotTyp == 'L')         //motor type = Lin?
+            {
+                g_Param.uint8_ErrCode = _LinETESTIN;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine            
+            }
+            else if(g_Param.uint8_MotTyp == 'B')    //motor type = Bipolar?
+            {
+                //starts the measure
+            
+                //convert the result
+            
+                //verify if within tolerance
+            
+                //send back the result
+                g_Param.uint8_ErrCode = _BipETESTIN;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
+            else if((g_Param.uint8_MotTyp == 'U') || (g_Param.uint8_MotTyp == 'M'))    //motor type = Unipolar or matrix?
+            {
+                //starts the measure
+            
+                //convert the result
+            
+                //verify if within tolerance
+            
+                //send back the result
+                g_Param.uint8_ErrCode = _UniETESTIN;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _UnknownMotTyp;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
+        }      
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   //end of cmd_ETESTIN
 
@@ -1803,11 +1811,14 @@ void cmd_SPHC(void)
 
  * Description:
  * This subroutine sends back the information of the REFAST device.
+ * Mod. 29.11.2015:
+ * I modified the subroutine that the customer can read out the version even if the actuator
+ * is executing steps. 
  * 
  * Creator:                 A. Staub
  * Date of creation:        10.10.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    29.11.2015
+ * Modified by:             A. Staub
  * 
  * Input:                   -
  * Output:                  -
@@ -1818,14 +1829,14 @@ void cmd_SPHC(void)
 ***********************************************************************************************************************/
 void cmd_GVER(void)
 {
-    if(g_Uni.uint8_Settings & 0x01)                 //is motor in run mode?
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
     {
-        g_Param.uint8_ErrCode = _MotorInRun;        //set error code
-        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        funct_LoadDeviceInfo();     //call subroutine      
     }
     else
     {
-        funct_LoadDeviceInfo();                     //call subroutine    
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   //end of cmd_GVER
 
@@ -1851,24 +1862,31 @@ void cmd_GVER(void)
 ***********************************************************************************************************************/
 void cmd_RAZ(void)
 {
-    if(g_Uni.uint8_Settings & 0x01)                 //is motor in run mode?
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
     {
-        g_Param.uint8_ErrCode = _MotorInRun;        //set error code
-        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        if(g_Uni.uint8_Settings & 0x01)                 //is motor in run mode?
+        {
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+        else
+        {
+            //send back a first quittance
+            uart2_sendbuffer('E');
+            uart2_sendbuffer(13);
+        
+            //set all back to the default value
+        
+            //switch off the output's, etc.
+        
+            //send back the device information's
+            funct_LoadDeviceInfo();                     //call subroutine      
+        }      
     }
     else
     {
-        //send back a first quittance
-        uart2_sendbuffer('E');
-        uart2_sendbuffer(13);
-        
-        //set all back to the default value
-        
-        //switch off the output's, etc.
-        
-        //send back the device information's
-        funct_LoadDeviceInfo();                     //call subroutine
-        
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   //end of cmd_RAZ
 
@@ -1955,11 +1973,19 @@ void cmd_SMTYP(void)
  *                              - uint8_ParamPos
 ***********************************************************************************************************************/
 void cmd_GMTYP(void)
-{  
-    uart2_sendbuffer('E');                    //first the letter E
-    uart2_sendbuffer(',');                    //then the comma
-    uart2_sendbuffer(g_Param.uint8_MotTyp);   //add the motor type
-    uart2_sendbuffer(13);                     //add the CR at the end
+{
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        uart2_sendbuffer('E');                    //first the letter E
+        uart2_sendbuffer(',');                    //then the comma
+        uart2_sendbuffer(g_Param.uint8_MotTyp);   //add the motor type
+        uart2_sendbuffer(13);                     //add the CR at the end      
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
 }   //end of cmd_GMTYP
 
 
@@ -1980,10 +2006,18 @@ void cmd_GMTYP(void)
 ***********************************************************************************************************************/
 void cmd_STEST(void)
 {  
-    //to define!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        //to define!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     
-    uart2_sendbuffer('E');                    //first the letter E
-    uart2_sendbuffer(13);                     //add the CR at the end
+        uart2_sendbuffer('E');                      //first the letter E
+        uart2_sendbuffer(13);                       //add the CR at the end      
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
 }   //end of cmd_STEST
 
 
@@ -1991,12 +2025,15 @@ void cmd_STEST(void)
  * Routine:                 cmd_GILIM
 
  * Description:
- * Sends back the currently set limits if there is nothing activated, running, etc. 
+ * Sends back the currently set limits.  
+ * Mod. 29.11.2015:
+ * I changed the routine for that the customer can read out the set limits even if the actuator
+ * is executing a move. 
  * 
  * Creator:                 A. Staub
  * Date of creation:        25.10.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    29.11.2015
+ * Modified by:             A. Staub
  * 
  * Input:                   -
  * Output:                  -
@@ -2011,13 +2048,8 @@ void cmd_STEST(void)
  *                              - uint8_SCtLevel
 ***********************************************************************************************************************/
 void cmd_GILIM(void)
-{  
-    if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
-    {
-        g_Param.uint8_ErrCode = _MotorInRun;        //set error code
-        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-    }
-    else
+{
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
     {
         //send back the needed informations
         uart2_sendbuffer('E');                  //first the letter E
@@ -2041,8 +2073,13 @@ void cmd_GILIM(void)
   
         //convert the short-circuit wait time into an ascii and store it into the send buffer
         funct_IntToAscii(g_Param.uint8_SCtLevel,_Active);
-        uart2_sendbuffer(13);                   //add the CR at the end
-  }
+        uart2_sendbuffer(13);                   //add the CR at the end      
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }   
 }   //end of cmd_GILIM
 
 
@@ -2068,21 +2105,29 @@ void cmd_GILIM(void)
 ***********************************************************************************************************************/
 void cmd_GPHC(void)
 {  
-    if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
     {
-        g_Param.uint8_ErrCode = _MotorInRun;        //set error code
-        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
+        {
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+        else
+        {
+            //send back the needed informations
+            uart2_sendbuffer('E');                  //first the letter E
+            uart2_sendbuffer(',');                  //add the comma
+  
+            //convert the percentage from the half step compensation into an ascii and store it into the send buffer
+            funct_IntToAscii(g_Param.uint8_BipIPct,_Active);
+            uart2_sendbuffer(13);                   //add the CR at the end
+        }      
     }
     else
     {
-        //send back the needed informations
-        uart2_sendbuffer('E');                  //first the letter E
-        uart2_sendbuffer(',');                  //add the comma
-  
-        //convert the percentage from the half step compensation into an ascii and store it into the send buffer
-        funct_IntToAscii(g_Param.uint8_BipIPct,_Active);
-        uart2_sendbuffer(13);                   //add the CR at the end
-  }
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
 }   //end of cmd_GPHC
 
 
@@ -2117,36 +2162,44 @@ void cmd_GRACC(void)
 {  
     auto unsigned char uint8_WB;              //local work byte
     
-    if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
     {
-        g_Param.uint8_ErrCode = _MotorInRun;        //set error code
-        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
+        {
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+        else
+        {
+            //send back the needed informations
+            uart2_sendbuffer('E');                      //first the letter E
+           
+            for(uint8_WB=0; uint8_WB<50; uint8_WB++)    //read out both arrays
+            {
+                //is one of the next parameter = 0?
+                if((g_Param.uint16_AccNumbStep[uint8_WB] == 0) || (g_Param.uint16_AccFreq[uint8_WB] == 0))
+                {
+                    uint8_WB = 50;                      //then leave the loop
+                }
+                else    //otherwise send the parameter back
+                {
+                    uart2_sendbuffer(',');              //add the comma
+    
+                    //convert the number of steps into an ascii and store it into the send buffer
+                    funct_IntToAscii(g_Param.uint16_AccNumbStep[uint8_WB],_Active);
+                    uart2_sendbuffer(',');              //add the comma
+    
+                    //convert the frequency into an ascii and store it into the send buffer
+                    funct_IntToAscii(g_Param.uint16_AccFreq[uint8_WB],_Active);        
+                }
+            }
+            uart2_sendbuffer(13);                       //add the CR at the end       
+        }      
     }
     else
     {
-        //send back the needed informations
-        uart2_sendbuffer('E');                      //first the letter E
-           
-        for(uint8_WB=0; uint8_WB<50; uint8_WB++)    //read out both arrays
-        {
-            //is one of the next parameter = 0?
-            if((g_Param.uint16_AccNumbStep[uint8_WB] == 0) || (g_Param.uint16_AccFreq[uint8_WB] == 0))
-            {
-                uint8_WB = 50;                      //then leave the loop
-            }
-            else    //otherwise send the parameter back
-            {
-                uart2_sendbuffer(',');              //add the comma
-    
-                //convert the number of steps into an ascii and store it into the send buffer
-                funct_IntToAscii(g_Param.uint16_AccNumbStep[uint8_WB],_Active);
-                uart2_sendbuffer(',');              //add the comma
-    
-                //convert the frequency into an ascii and store it into the send buffer
-                funct_IntToAscii(g_Param.uint16_AccFreq[uint8_WB],_Active);        
-            }
-        }
-        uart2_sendbuffer(13);                       //add the CR at the end       
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   //end of cmd_GRACC
 
@@ -2182,36 +2235,44 @@ void cmd_GRDEC(void)
 {  
     auto unsigned char uint8_WB;              //local work byte
     
-    if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
     {
-        g_Param.uint8_ErrCode = _MotorInRun;        //set error code
-        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
+        {
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+        else
+        {
+            //send back the needed informations
+            uart2_sendbuffer('E');                      //first the letter E
+           
+            for(uint8_WB=0; uint8_WB<50; uint8_WB++)    //read out both arrays
+            {
+                //is one of the next parameter = 0?
+                if((g_Param.uint16_DecNumbStep[uint8_WB] == 0) || (g_Param.uint16_DecFreq[uint8_WB] == 0))
+                {
+                    uint8_WB = 50;                      //then leave the loop
+                }
+                else    //otherwise send the parameter back
+                {
+                    uart2_sendbuffer(',');              //add the comma
+    
+                    //convert the number of steps into an ascii and store it into the send buffer
+                    funct_IntToAscii(g_Param.uint16_DecNumbStep[uint8_WB],_Active);
+                    uart2_sendbuffer(',');              //add the comma
+    
+                    //convert the frequency into an ascii and store it into the send buffer
+                    funct_IntToAscii(g_Param.uint16_DecFreq[uint8_WB],_Active);        
+                }
+            }
+            uart2_sendbuffer(13);                       //add the CR at the end       
+        }      
     }
     else
     {
-        //send back the needed informations
-        uart2_sendbuffer('E');                      //first the letter E
-           
-        for(uint8_WB=0; uint8_WB<50; uint8_WB++)    //read out both arrays
-        {
-            //is one of the next parameter = 0?
-            if((g_Param.uint16_DecNumbStep[uint8_WB] == 0) || (g_Param.uint16_DecFreq[uint8_WB] == 0))
-            {
-                uint8_WB = 50;                      //then leave the loop
-            }
-            else    //otherwise send the parameter back
-            {
-                uart2_sendbuffer(',');              //add the comma
-    
-                //convert the number of steps into an ascii and store it into the send buffer
-                funct_IntToAscii(g_Param.uint16_DecNumbStep[uint8_WB],_Active);
-                uart2_sendbuffer(',');              //add the comma
-    
-                //convert the frequency into an ascii and store it into the send buffer
-                funct_IntToAscii(g_Param.uint16_DecFreq[uint8_WB],_Active);        
-            }
-        }
-        uart2_sendbuffer(13);                       //add the CR at the end       
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   //end of cmd_GRDEC
 
@@ -2249,63 +2310,71 @@ void cmd_GRDEC(void)
 ***********************************************************************************************************************/
 void cmd_GRUN(void)
 {  
-    //send back the needed informations
-    uart2_sendbuffer('E');                      //first the letter E
-    uart2_sendbuffer(',');                      //add the comma
-    uart2_sendbuffer(g_Param.uint8_MotTyp);     //add the motor type
-    uart2_sendbuffer(',');                      //add the comma
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        //send back the needed informations
+        uart2_sendbuffer('E');                      //first the letter E
+        uart2_sendbuffer(',');                      //add the comma
+        uart2_sendbuffer(g_Param.uint8_MotTyp);     //add the motor type
+        uart2_sendbuffer(',');                      //add the comma
   
-    //convert the step mode of the actuator into an ascii and store it into the send buffer
-    funct_IntToAscii(g_Param.uint8_StepMode,_Active);
-    uart2_sendbuffer(',');                      //add the comma
+        //convert the step mode of the actuator into an ascii and store it into the send buffer
+        funct_IntToAscii(g_Param.uint8_StepMode,_Active);
+        uart2_sendbuffer(',');                      //add the comma
   
-    //convert the step count of the actuator into an ascii and store it into the send buffer
-    funct_IntToAscii(g_Param.uint32_StepCount,_Active);
-    uart2_sendbuffer(',');                      //add the comma 
+        //convert the step count of the actuator into an ascii and store it into the send buffer
+        funct_IntToAscii(g_Param.uint32_StepCount,_Active);
+        uart2_sendbuffer(',');                      //add the comma 
   
-    //convert the speed into an ascii and store it into the send buffer
-    funct_IntToAscii(g_Param.uint16_RunFreq,_Active);
-    uart2_sendbuffer(',');                      //add the comma
+        //convert the speed into an ascii and store it into the send buffer
+        funct_IntToAscii(g_Param.uint16_RunFreq,_Active);
+        uart2_sendbuffer(',');                      //add the comma
   
-    //convert the direction into an ascii and store it into the send buffer
-    funct_IntToAscii(g_Param.uint8_Direction,_Active);
-    uart2_sendbuffer(',');                      //add the comma
+        //convert the direction into an ascii and store it into the send buffer
+        funct_IntToAscii(g_Param.uint8_Direction,_Active);
+        uart2_sendbuffer(',');                      //add the comma
   
-    //convert the coil state into an ascii and store it into the send buffer
-    funct_IntToAscii(g_Param.uint8_CoilState,_Active);
-    uart2_sendbuffer(',');                      //add the comma
+        //convert the coil state into an ascii and store it into the send buffer
+        funct_IntToAscii(g_Param.uint8_CoilState,_Active);
+        uart2_sendbuffer(',');                      //add the comma
   
-    //convert the current during move into an ascii and store it into the send buffer
-    funct_IntToAscii(g_Param.uint16_BipRunI,_Active);
-    uart2_sendbuffer(',');                      //add the comma
+        //convert the current during move into an ascii and store it into the send buffer
+        funct_IntToAscii(g_Param.uint16_BipRunI,_Active);
+        uart2_sendbuffer(',');                      //add the comma
   
-    //convert the "holding" current into an ascii and store it into the send buffer
-    funct_IntToAscii(g_Param.uint16_BipHoldI,_Active);
-    uart2_sendbuffer(',');                      //add the comma
+        //convert the "holding" current into an ascii and store it into the send buffer
+        funct_IntToAscii(g_Param.uint16_BipHoldI,_Active);
+        uart2_sendbuffer(',');                      //add the comma
   
-    //convert the selected ramp into an ascii and store it into the send buffer
-    funct_IntToAscii(g_Param.uint8_SelectRamp,_Active);
-    uart2_sendbuffer(',');                      //add the comma
+        //convert the selected ramp into an ascii and store it into the send buffer
+        funct_IntToAscii(g_Param.uint8_SelectRamp,_Active);
+        uart2_sendbuffer(',');                      //add the comma
   
-    //convert the curremt for acceleration into an ascii and store it into the send buffer
-    funct_IntToAscii(g_Param.uint16_BipAccI,_Active);
-    uart2_sendbuffer(',');                      //add the comma
+        //convert the curremt for acceleration into an ascii and store it into the send buffer
+        funct_IntToAscii(g_Param.uint16_BipAccI,_Active);
+        uart2_sendbuffer(',');                      //add the comma
   
-    //convert the curremt for deceleration into an ascii and store it into the send buffer
-    funct_IntToAscii(g_Param.uint16_BipDecI,_Active);
-    uart2_sendbuffer(',');                      //add the comma
+        //convert the curremt for deceleration into an ascii and store it into the send buffer
+        funct_IntToAscii(g_Param.uint16_BipDecI,_Active);
+        uart2_sendbuffer(',');                      //add the comma
  
-    //convert the time into an ascii and store it into the send buffer
-    funct_IntToAscii(g_Param.uint16_AccOnDelay,_Active);
-    uart2_sendbuffer(',');                      //add the comma
+        //convert the time into an ascii and store it into the send buffer
+        funct_IntToAscii(g_Param.uint16_AccOnDelay,_Active);
+        uart2_sendbuffer(',');                      //add the comma
   
-    //convert the time into an ascii and store it into the send buffer
-    funct_IntToAscii(g_Param.uint16_DecOffDelay,_Active);
-    uart2_sendbuffer(',');                      //add the comma
+        //convert the time into an ascii and store it into the send buffer
+        funct_IntToAscii(g_Param.uint16_DecOffDelay,_Active);
+        uart2_sendbuffer(',');                      //add the comma
   
-    //convert the protocol quittance into an ascii and store it into the send buffer
-    funct_IntToAscii(g_Param.uint8_Acknowledge,_Active);
-    uart2_sendbuffer(13);                       //add the CR at the end
+        //convert the protocol quittance into an ascii and store it into the send buffer
+        funct_IntToAscii(g_Param.uint8_Acknowledge,_Active);
+        uart2_sendbuffer(13);                       //add the CR at the end      
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
 }   //end of cmd_GRUN
 
 
@@ -2326,11 +2395,20 @@ void cmd_GRUN(void)
 ***********************************************************************************************************************/
 void cmd_BREAK(void)
 {  
-    //add here the conditions!!!!!
-    
-    //send back the needed informations
-    uart2_sendbuffer('E');                  //first the letter E
-    uart2_sendbuffer(13);                   //add the CR at the end  
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        //add here the conditions!!!!!
+        
+        //send back the needed informations
+        uart2_sendbuffer('E');                  //first the letter E
+        uart2_sendbuffer(13);                   //add the CR at the end
+        
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }    
 }   //end of cmd_BREAK
 
 
@@ -2352,13 +2430,21 @@ void cmd_BREAK(void)
 ***********************************************************************************************************************/
 void cmd_MUMOT(void)
 {  
-    //measure here the voltage or take the last measured parameter and send it back!
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        //measure here the voltage or take the last measured parameter and send it back!
     
-    //send back the needed informations
-    uart2_sendbuffer('E');                          //first the letter E
-    uart2_sendbuffer(',');                          //add the comma
-    funct_IntToAscii(g_Param.uint16_Ue,_Active);    //add the voltage
-    uart2_sendbuffer(13);                           //add the CR at the end
+        //send back the needed informations
+        uart2_sendbuffer('E');                          //first the letter E
+        uart2_sendbuffer(',');                          //add the comma
+        funct_IntToAscii(g_Param.uint16_Ue,_Active);    //add the voltage
+        uart2_sendbuffer(13);                           //add the CR at the end      
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
 }   //end of cmd_MUMOT
 
 
@@ -2560,10 +2646,18 @@ void cmd_SSMOD(void)
 ***********************************************************************************************************************/
 void cmd_GSMOD(void)
 {
-    uart2_sendbuffer('E');                    //first the letter E
-    uart2_sendbuffer(',');                    //then the comma
-    funct_IntToAscii(g_Param.uint8_StepMode,_Active); //add the step mode
-    uart2_sendbuffer(13);                     //add the CR at the end
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        uart2_sendbuffer('E');                    //first the letter E
+        uart2_sendbuffer(',');                    //then the comma
+        funct_IntToAscii(g_Param.uint8_StepMode,_Active); //add the step mode
+        uart2_sendbuffer(13);                     //add the CR at the end      
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
 }   //end of cmd_GSMOD
 
 
@@ -2802,14 +2896,22 @@ void cmd_GOUT(void)
 {
     auto unsigned char uint8_value;         //local work byte
     
-    //get the output port by call the subroutine
-    uint8_value = funct_IOhandler(_GetPort,_Output,(g_Cmd.uint32_TempPara[1] & 0xFF));
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        //get the output port by call the subroutine
+        uint8_value = funct_IOhandler(_GetPort,_Output,(g_Cmd.uint32_TempPara[1] & 0xFF));
                    
-    //send back the needed informations
-    uart2_sendbuffer('E');                  //first the letter E
-    uart2_sendbuffer(',');                  //then the comma
-    funct_IntToAscii(uint8_value,_Active);  //add the value
-    uart2_sendbuffer(13);                   //add the CR at the end 
+        //send back the needed informations
+        uart2_sendbuffer('E');                  //first the letter E
+        uart2_sendbuffer(',');                  //then the comma
+        funct_IntToAscii(uint8_value,_Active);  //add the value
+        uart2_sendbuffer(13);                   //add the CR at the end      
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
 }   //end of cmd_GOUT
 
 
@@ -2837,14 +2939,22 @@ void cmd_GINP(void)
 {
     auto unsigned char uint8_value;         //local work byte
     
-    //get the output port by call the subroutine
-    uint8_value = funct_IOhandler(_GetPort,_Input,(g_Cmd.uint32_TempPara[1] & 0xFF));
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        //get the output port by call the subroutine
+        uint8_value = funct_IOhandler(_GetPort,_Input,(g_Cmd.uint32_TempPara[1] & 0xFF));
                    
-    //send back the needed informations
-    uart2_sendbuffer('E');                  //first the letter E
-    uart2_sendbuffer(',');                  //then the comma
-    funct_IntToAscii(uint8_value,_Active);  //add the value
-    uart2_sendbuffer(13);                   //add the CR at the end 
+        //send back the needed informations
+        uart2_sendbuffer('E');                  //first the letter E
+        uart2_sendbuffer(',');                  //then the comma
+        funct_IntToAscii(uint8_value,_Active);  //add the value
+        uart2_sendbuffer(13);                   //add the CR at the end      
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
 }   //end of cmd_GINP
 
 

@@ -747,7 +747,7 @@ void funct_OutputHandler(unsigned char uint8_ToDo,unsigned char uint8_value)
  * Routine:                 funct_IOhandler
 
  * Description:
- * ...
+ * This subroutine handels the IO's to read out a port or read out a bit of the port.
  * 
  * Creator:                 A. Staub
  * Date of creation:        28.11.2015
