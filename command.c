@@ -1269,10 +1269,15 @@ void cmd_ETESTIN(void)
  * 
  * At the end, first erase the acceleration array. store the new parameters inside, and send back the OK.
  * 
+ * Mod. 29.11.2015:
+ * The part with the comma check "0xFFFFFFFF" does not really work like JE would at the beginning.
+ * I deleted this from the subroutine because this makes not sence to use. Ask me if you need more
+ * informations. Now the customer has always to send a pair of parameters (number of steps with a frequency).
+ * 
  * Creator:                 A. Staub
  * Date of creation:        19.10.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    29.11.2015
+ * Modified by:             A. Staub
  * 
  * Input:                   -
  * Output:                  -
@@ -1309,8 +1314,6 @@ void cmd_SRACC(void)
                 //verify each received parameter with the tolerance (start with the 2nd parameter)
                 //Until:
                 //the local work byte has the same size as number of received characters
-                //AND
-                //the actually value inside the TempPara array has the value 0xFFFFFFFF
                 uint8_WB1 = 1;
                 do
                 {
@@ -1321,7 +1324,7 @@ void cmd_SRACC(void)
                                     funct_CheckTol(g_Cmd.uint32_TempPara[uint8_WB1],_AccFreqMin,_AccFreqMax);
                     uint8_WB1++;                      //increment wiht 1 to take the next parameter
                 }
-                while((uint8_WB1 < g_Cmd.uint8_ParamPos) && (!(g_Cmd.uint32_TempPara[uint8_WB1] == 0xFFFFFFFF)));
+                while(uint8_WB1 < g_Cmd.uint8_ParamPos);
       
                 //store the actually size of the numbers of verified characters into the ParamPos
                 g_Cmd.uint8_ParamPos = uint8_WB1;
@@ -1403,10 +1406,15 @@ void cmd_SRACC(void)
  * 
  * At the end, first erase the acceleration array. store the new parameters inside, and send back the OK.
  * 
+ * Mod. 29.11.2015:
+ * The part with the comma check "0xFFFFFFFF" does not really work like JE would at the beginning.
+ * I deleted this from the subroutine because this makes not sence to use. Ask me if you need more
+ * informations. Now the customer has always to send a pair of parameters (number of steps with a frequency).
+ * 
  * Creator:                 A. Staub
  * Date of creation:        20.10.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    29.11.2015
+ * Modified by:             A. Staub
  * 
  * Input:                   -
  * Output:                  -
@@ -1444,8 +1452,6 @@ void cmd_SRDEC(void)
                 //verify each received parameter with the tolerance (start with the 2nd parameter)
                 //Until:
                 //the local work byte has the same size as number of received characters
-                //AND
-                //the actually value inside the TempPara array has the value 0xFFFFFFFF
                 uint8_WB1 = 1;
                 do
                 {
@@ -1456,7 +1462,7 @@ void cmd_SRDEC(void)
                                     funct_CheckTol(g_Cmd.uint32_TempPara[uint8_WB1],_DecFreqMin,_DecFreqMax);
                     uint8_WB1++;                      //increment wiht 1 to take the next parameter
                 }
-                while((uint8_WB1 < g_Cmd.uint8_ParamPos) && (!(g_Cmd.uint32_TempPara[uint8_WB1] == 0xFFFFFFFF)));
+                while(uint8_WB1 < g_Cmd.uint8_ParamPos);
       
                 //store the actually size of the numbers of verified characters into the ParamPos
                 g_Cmd.uint8_ParamPos = uint8_WB1;

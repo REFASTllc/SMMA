@@ -150,6 +150,7 @@ typedef struct                      //definitions of multiple variable for comma
     volatile unsigned char uint8_SelectRamp;        //select ramp option
     volatile unsigned int uint16_BipAccI;           //bipolar; chopper current for acceleration ramp in [mA]
     volatile unsigned int uint16_BipDecI;           //bipolar; chopper current for deceleration ramp in [mA]
+    volatile unsigned int uint16_BipILevel[16];     //array of: current level for the uStepping [mA]
     volatile unsigned int uint16_AccOnDelay;        //switching on time for the coils before start the move in [ms]   
     volatile unsigned int uint16_DecOffDelay;       //switching off time for the coils after the move in [ms]    
     volatile unsigned char uint8_Acknowledge;       //quittance after sending the run command
@@ -162,7 +163,6 @@ typedef struct                      //definitions of multiple variable for comma
     //volatile unsigned char uint8_ValPort;           //value in decimal from the I/O port <-- don't delte it, mybe I need it again A. Staub
     //volatile unsigned char uint8_Bit;               //bit of the I/O port <-- don't delete it, maybe I need it again A. Staub
     volatile unsigned char uint8_TestVoltage;       //known voltage reference for the calibartion 
-    volatile unsigned int uint16_CurrentLevel[16];  //array of: current level for the uStepping [mA]
     volatile unsigned int uint16_SCiLevel;          //short-circuit current limit [mA]
     volatile unsigned char uint8_SCtLevel;          //wait time before switch off by a short-circuit [ms]
     volatile unsigned long uint32_Sw1min;           //limit low of the switch position 1 in steps

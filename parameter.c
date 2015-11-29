@@ -93,22 +93,22 @@ void param_init(void)
     g_Param.uint8_TestVoltage = 0;      //range 0...7 V
   
     //define the current level array for microstepping
-    g_Param.uint16_CurrentLevel[0] = 78;    //range 20...2'500 mA
-    g_Param.uint16_CurrentLevel[1] = 156;   //range 20...2'500 mA
-    g_Param.uint16_CurrentLevel[2] = 232;   //range 20...2'500 mA
-    g_Param.uint16_CurrentLevel[3] = 306;   //range 20...2'500 mA
-    g_Param.uint16_CurrentLevel[4] = 377;   //range 20...2'500 mA
-    g_Param.uint16_CurrentLevel[5] = 444;   //range 20...2'500 mA
-    g_Param.uint16_CurrentLevel[6] = 508;   //range 20...2'500 mA
-    g_Param.uint16_CurrentLevel[7] = 566;   //range 20...2'500 mA
-    g_Param.uint16_CurrentLevel[8] = 618;   //range 20...2'500 mA
-    g_Param.uint16_CurrentLevel[9] = 665;   //range 20...2'500 mA
-    g_Param.uint16_CurrentLevel[10] = 706;  //range 20...2'500 mA
-    g_Param.uint16_CurrentLevel[11] = 739;  //range 20...2'500 mA
-    g_Param.uint16_CurrentLevel[12] = 766;  //range 20...2'500 mA
-    g_Param.uint16_CurrentLevel[13] = 785;  //range 20...2'500 mA
-    g_Param.uint16_CurrentLevel[14] = 796;  //range 20...2'500 mA
-    g_Param.uint16_CurrentLevel[15] = 800;  //range 20...2'500 mA
+    g_Param.uint16_BipILevel[0] = 78;   //range 20...2'500 mA
+    g_Param.uint16_BipILevel[1] = 156;  //range 20...2'500 mA
+    g_Param.uint16_BipILevel[2] = 232;  //range 20...2'500 mA
+    g_Param.uint16_BipILevel[3] = 306;  //range 20...2'500 mA
+    g_Param.uint16_BipILevel[4] = 377;  //range 20...2'500 mA
+    g_Param.uint16_BipILevel[5] = 444;  //range 20...2'500 mA
+    g_Param.uint16_BipILevel[6] = 508;  //range 20...2'500 mA
+    g_Param.uint16_BipILevel[7] = 566;  //range 20...2'500 mA
+    g_Param.uint16_BipILevel[8] = 618;  //range 20...2'500 mA
+    g_Param.uint16_BipILevel[9] = 665;  //range 20...2'500 mA
+    g_Param.uint16_BipILevel[10] = 706; //range 20...2'500 mA
+    g_Param.uint16_BipILevel[11] = 739; //range 20...2'500 mA
+    g_Param.uint16_BipILevel[12] = 766; //range 20...2'500 mA
+    g_Param.uint16_BipILevel[13] = 785; //range 20...2'500 mA
+    g_Param.uint16_BipILevel[14] = 796; //range 20...2'500 mA
+    g_Param.uint16_BipILevel[15] = 800; //range 20...2'500 mA
   
     g_Param.uint32_Sw1min = 200;        //range 0...300'000 
     g_Param.uint32_Sw1max = 250;        //range 0...300'000
