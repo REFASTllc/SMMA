@@ -40,6 +40,7 @@
  *                          - cmd_GOUT
  *                          - cmd_GINP
  *                          - cmd_SMCRSTP
+ *                          - cmd_GMCRSTP
  *                          //new commands:
  *                          - cmd_GINPB
 ***********************************************************************************************************************/
@@ -486,11 +487,11 @@ void cmd_check(void)
                 case (_IdSMCRSTP):      //command SMCRSTP
                     cmd_SMCRSTP();      //call subroutine
                     break;
-                /*
-                case (50):  //command GMCRSTP
-                    cmd_GMCRSTP();    //call subroutine
+                
+                case (_IdGMCRSTP):      //command GMCRSTP
+                    cmd_GMCRSTP();      //call subroutine
                     break;
-      
+                /*
                 case (51):  //command SSWLIM
                     cmd_SSWLIM();     //call subroutine
                     break;
@@ -2976,11 +2977,13 @@ void cmd_GINP(void)
  * Input:                   -
  * Output:                  -
  * Global variable:         g_Cmd.
- *                              - uint32_Cmd2nd4
- *                              - uint32_Cmd1st4
- *                              - uint8_CmdID
+ *                              - uint8_ParamPos
+ *                              - uint32_TempPara
+ *                          g_Uni.
+ *                              - uint8_Settings
  *                          g_Param.
  *                              - uint8_ErrCode
+ *                              - uint16_BipILevel
 ***********************************************************************************************************************/
 void cmd_SMCRSTP(void)
 {
@@ -3055,6 +3058,69 @@ void cmd_SMCRSTP(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   // end of cmd_SMCRSTP
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GMCRSTP
+
+ * Description:
+ * Only allowed if the motor is not in run. Send back the current level for the micro stepping.  
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        29.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+ * Global variable:         g_Cmd.
+ *                              - uint8_ParamPos
+ *                              - uint32_TempPara
+ *                          g_Uni.
+ *                              - uint8_Settings
+ *                          g_Param.
+ *                              - uint8_ErrCode
+ *                              - uint16_BipILevel
+***********************************************************************************************************************/
+void cmd_GMCRSTP(void)
+{
+    auto unsigned char uint8_WB;    //local work byte
+    
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
+        {
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode);  //call subroutine
+        }
+        else 
+        {
+            uart2_sendbuffer('E');          //first the letter E
+            
+            //read out the array
+            for(uint8_WB=0; uint8_WB<16; uint8_WB++)
+            {
+                if(g_Param.uint16_BipILevel[uint8_WB] == 0) //is the parameter = 0?
+                {
+                    uint8_WB = 16;  //leave the for loop
+                }
+                else    //otherwise send the parameter back
+                {
+                    uart2_sendbuffer(',');  //add the comma
+                    //convert the parameter and store it into the send buffer
+                    funct_IntToAscii(g_Param.uint16_BipILevel[uint8_WB],_Active);
+                }
+            }
+            
+            uart2_sendbuffer(13);           //add the <CR> at the end
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
+}   //end of cmd_GMCRSTP
 
 
 /**********************************************************************************************************************
