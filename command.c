@@ -1135,14 +1135,14 @@ void cmd_SILIM(void)
 {
     auto unsigned char uint8_Result = 0;        //local work byte for the result 
   
-    if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
+    if(g_Cmd.uint8_ParamPos == 6)   //number of received characters OK?
     {
-        g_Param.uint8_ErrCode = _MotorInRun;        //set error code
-        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-    }
-    else
-    {
-        if(g_Cmd.uint8_ParamPos == 6)           //number of received characters OK?
+        if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
+        {
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+        else
         {
             uint8_Result = funct_CheckCmdSILIM();   //call subroutine
             
@@ -1161,13 +1161,13 @@ void cmd_SILIM(void)
             else
             {
                 uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-            }                  
+            }  
         }
-        else
-        {
-            g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   //end of cmd_SILIM
 
@@ -1325,9 +1325,6 @@ void cmd_SRACC(void)
                 }
                 while(uint8_WB1 < g_Cmd.uint8_ParamPos);
       
-                //store the actually size of the numbers of verified characters into the ParamPos
-                g_Cmd.uint8_ParamPos = uint8_WB1;
-      
                 //each parameter within the tolerance (uint8_WB1 - 1, because the 1st parameter is the cmd ID)?
                 if(uint8_Result == (uint8_WB1-1))
                 {
@@ -1458,9 +1455,6 @@ void cmd_SRDEC(void)
                 }
                 while(uint8_WB1 < g_Cmd.uint8_ParamPos);
       
-                //store the actually size of the numbers of verified characters into the ParamPos
-                g_Cmd.uint8_ParamPos = uint8_WB1;
-      
                 //each parameter within the tolerance (uint8_WB1 - 1, because the 1st parameter is the cmd ID)?
                 if(uint8_Result == (uint8_WB1-1))
                 {
@@ -1585,17 +1579,16 @@ void cmd_SRDEC(void)
 void cmd_RUN(void)
 {
     auto unsigned char uint8_Result = 0;    //local work byte for the result 
-  
-    if(g_Uni.uint8_Settings & 0x01)         //is motor in run mode?
+    
+    if(g_Cmd.uint8_ParamPos == 15)  //number of received characters OK?
     {
-        g_Param.uint8_ErrCode = _MotorInRun;        //set error code
-        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-    }
-    else
-    {
-        if(g_Cmd.uint8_ParamPos == 15)      //number of received characters OK?
+        if(g_Uni.uint8_Settings & 0x01)         //is motor in run mode?
         {
-            //verify the limits if they are inside the tolerance
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+        else
+        {
             uint8_Result =  uint8_Result + 
                             funct_CheckTol(g_Cmd.uint32_TempPara[2],_StepModeUniMatMin,_StepModeUniMatMax);
             uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[3],_StepCountMin,_StepCountMax);
@@ -1744,12 +1737,12 @@ void cmd_RUN(void)
                 g_Param.uint8_ErrCode = _OutOfTolRUN;       //set error code
                 uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
             }
-        }
-        else
-        {
-            g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-        }
+        }      
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   //end of cmd_RUN
 
@@ -1918,14 +1911,14 @@ void cmd_SMTYP(void)
 {
     auto unsigned char uint8_Result = 0;        //local work byte for the result 
   
-    if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
+    if(g_Cmd.uint8_ParamPos == 2)   //number of received characters OK?
     {
-        g_Param.uint8_ErrCode = _MotorInRun;        //set error code
-        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-    }
-    else
-    {
-        if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
+        if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
+        {
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+        else
         {
             uint8_Result = funct_CheckCmdSMTYP();   //call subroutine
             
@@ -1938,12 +1931,12 @@ void cmd_SMTYP(void)
             {
                 uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
             }                  
-        }
-        else
-        {
-            g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-        }
+        }      
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   //end of cmd_SMTYP
 
@@ -2470,14 +2463,14 @@ void cmd_SCOILON(void)
 {  
     auto unsigned char uint8_Result = 0;    //local work byte
     
-    if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
+    if(g_Cmd.uint8_ParamPos == 6)   //number of received characters OK?
     {
-        g_Param.uint8_ErrCode = _MotorInRun;        //set error code
-        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-    }
-    else
-    {
-        if(g_Cmd.uint8_ParamPos == 6)       //number of received characters OK?
+        if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
+        {
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+        else
         {
             //verify the limits if they are inside the tolerance
             uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[2],0,1);
@@ -2519,12 +2512,12 @@ void cmd_SCOILON(void)
                 g_Param.uint8_ErrCode = _OutOfTolSCOILON;   //set error code
                 uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
             }
-        }
-        else
-        {
-            g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-        }
+        }      
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   //end of cmd_SCOILON
 
@@ -2553,14 +2546,14 @@ void cmd_SCOILON(void)
 ***********************************************************************************************************************/
 void cmd_SSMOD(void)
 {
-    if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
+    if(g_Cmd.uint8_ParamPos == 2)   //number of received characters OK?
     {
-        g_Param.uint8_ErrCode = _MotorInRun;        //set error code
-        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-    }
-    else
-    {
-        if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
+        if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
+        {
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+        else
         {
             switch(g_Cmd.uint32_TempPara[1])    //verify mode of step
             {
@@ -2616,12 +2609,12 @@ void cmd_SSMOD(void)
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
             }
-        }
-        else
-        {
-            g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-        }
+        }      
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   //end of cmd_SSMOD
 
@@ -3018,9 +3011,6 @@ void cmd_SMCRSTP(void)
                     uint8_WB1++;    //increment with 1 to take the next parameter
                 }
                 while(uint8_WB1 < g_Cmd.uint8_ParamPos);
-                
-                //store the actually size of the numbers of verfied characters into the ParamPos
-                //g_Cmd.uint8_ParamPos = uint8_WB1;
                 
                 //each paramter within the tolerance (uint8_WB1 - 1, because the 1st parameter is the cmd ID)?
                 if(uint8_Result == (uint8_WB1-1))

@@ -506,10 +506,11 @@ unsigned char funct_CheckCmdSMTYP(void)
     {
         //switch off each output
         g_Param.uint8_MotTyp = 'N';
+        uint8_Result = 5;   //set to 5 for that the result pass
     }
     else if ((g_Cmd.uint32_TempPara[1] == 'U') || (g_Cmd.uint32_TempPara[1] == 'M'))
     {
-        //then verify the received parameters
+        //then verify the stored parameters
         uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint16_Imin,_Imin,_Imax);
         uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint16_Imax,_Imin,_Imax);
         uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint16_Umot,_UmotMin,_UmotMax);
@@ -574,6 +575,8 @@ unsigned char funct_CheckCmdSMTYP(void)
     {
         g_Param.uint8_ErrCode = _UnknownMotTyp; //set error code
     }
+    
+    return uint8_Result;
 }   //end of funct_CheckActApplTol
 
 
