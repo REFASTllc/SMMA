@@ -104,7 +104,7 @@
                             //general errors
 #define _GlobalLock         0               //driver detected a POR; user configuration not guaranteed
 #define _OutOfTolValPort    40              //SOUT; value to write on the output port out of tolerance
-#define _OutOfTolBit        41              //SBIT, CBIT, GBIT; bit value out of tolerance
+#define _OutOfTolBit        41              //SBIT, CBIT, GBIT, GINPB; bit value out of tolerance
 #define _StepModeSSMOD      42              //SSMOD; step mode not defined
 #define _OutOfTolSCOILON    43              //SCOILON; received parameters out of tolerance
 #define _OutOfTolRUN        44              //RUN; received parameters out of tolerance
@@ -199,6 +199,8 @@
 #define _IdSPOSRUN          61              //-KO- set the P-running parameters with stop on digital input active
 #define _IdGPOSRUN          62              //get the P-running parameters
 #define _IdPOSRUN           63              //run the motor with stop on digital input active
+//new commands:
+#define _IdGINPB            64              //get (read) an input bit
 
 #endif	/* DEFINES_H */
 

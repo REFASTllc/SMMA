@@ -61,7 +61,8 @@ extern void cmd_GBIT(void);
 extern void cmd_SOUT(void);
 extern void cmd_GOUT(void);
 extern void cmd_GINP(void);
-
+//new commands:
+extern void cmd_GINPB(void);
 
 typedef struct                      //definitions of multiple variable for command
 {

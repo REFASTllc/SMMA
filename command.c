@@ -39,6 +39,8 @@
  *                          - cmd_SOUT
  *                          - cmd_GOUT
  *                          - cmd_GINP
+ *                          //new commands:
+ *                          - cmd_GINPB
 ***********************************************************************************************************************/
 
 
@@ -104,7 +106,7 @@ void cmd_init(void)
 void cmd_check(void)
 {
     auto unsigned char uint8_RxDBuffChar;       //local byte for the actually received character
-  
+    
     uint8_RxDBuffChar = uart2_receivebuffer();  //read out one byte from the receive buffer
   
     //verify the position of the parameter (is it the first, second, etc.)
@@ -536,7 +538,16 @@ void cmd_check(void)
                 case (62):  //command GPOSRUN
                     cmd_GPOSRUN();    //call subroutine
                     break;
-                */     
+                    
+                case (63):  //command POSRUN
+                    cmd_POSRUN();       //call subroutine
+                    break;
+                */    
+                case (_IdGINPB):        //command GINPB
+                    
+                    cmd_GINPB();        //call subroutine
+                    break;
+                    
                 default:    //command ID does not exist
                     //do nothing - error has to be send before this routine
                     break;
@@ -679,7 +690,7 @@ void cmd_def(void)
             //is longer then 4 letters. As we can make some groupes with the 
             //the second 4 letters, we verify first this and than again the
             //first 4 letters. 
-      
+            
             //to save time, first verify if we have something in the 2nd part
             if(g_Cmd.uint32_Cmd2nd4)
             {
@@ -849,7 +860,7 @@ void cmd_def(void)
                         }
                         break;
           
-                    case (0x4B):    //letter B?
+                    case (0x4B):    //letter K?
                         switch(g_Cmd.uint32_Cmd1st4)
                         {
                             case (0x42524541):  //cmd is = BREAK
@@ -1053,6 +1064,20 @@ void cmd_def(void)
                                 break;
             
                             default:  //error - command is not defined
+                                g_Cmd.uint8_CmdID = _IdNotAllow;        //clear the command ID
+                                g_Param.uint8_ErrCode = _UnknownCmd;    //set error code
+                                break;
+                        }
+                        break;
+                        
+                    case (0x42):    //letter B?
+                        switch(g_Cmd.uint32_Cmd1st4)
+                        {
+                            case (0x47494E50):  //cmd is = GINPB
+                                g_Cmd.uint8_CmdID = _IdGINPB;
+                                break;
+                                
+                            default:    //error - command is not defined
                                 g_Cmd.uint8_CmdID = _IdNotAllow;        //clear the command ID
                                 g_Param.uint8_ErrCode = _UnknownCmd;    //set error code
                                 break;
@@ -2821,3 +2846,58 @@ void cmd_GINP(void)
     funct_IntToAscii(uint8_value,_Active);  //add the value
     uart2_sendbuffer(13);                   //add the CR at the end 
 }   //end of cmd_GINP
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GINPB
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then send back the state of the input bit 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        29.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+ * Global variable:         g_Cmd.
+ *                              - uint8_ParamPos
+ *                              - uint32_TempPara
+ *                          g_Param.
+ *                              - uint8_ErrCode
+***********************************************************************************************************************/
+void cmd_GINPB(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    auto unsigned char uint8_value;         //local work byte
+    
+    if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[1],_BitMin,_BitMax);
+        
+        if(uint8_Result == 1)   //each parameter within the tolerance?
+        {
+            //get the corresponding bit / output by call the subroutine
+            uint8_value = funct_IOhandler(_GetBit,_Input,(g_Cmd.uint32_TempPara[1] & 0xFF));
+                   
+            //send back the needed informations
+            uart2_sendbuffer('E');                  //first the letter E
+            uart2_sendbuffer(',');                  //then the comma
+            funct_IntToAscii(uint8_value,_Active);  //add the value
+            uart2_sendbuffer(13);                   //add the CR at the end
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolBit;       //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GINPB

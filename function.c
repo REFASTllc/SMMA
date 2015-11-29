@@ -797,7 +797,44 @@ unsigned char funct_IOhandler(unsigned char uint8_ToDo,unsigned char uint8_IO,un
     {
         if(uint8_IO == _Input)          //from the input?
         {
-            //
+            switch(uint8_value)
+            {
+                case (0):   //input 0?
+                    uint8_Result = iSinkSource0;
+                    break;
+                    
+                case (1):   //input 1?
+                    uint8_Result = iSinkSource1;
+                    break;
+                    
+                case (2):   //input 2?
+                    uint8_Result = iSinkSource2;
+                    break;
+                    
+                case (3):   //input 3?
+                    uint8_Result = iSinkSource3;
+                    break;
+                    
+                case (4):   //input 4?
+                    uint8_Result = iSinkSource4;
+                    break;
+                    
+                case (5):   //input 5?
+                    uint8_Result = iSinkSource5;
+                    break;
+                    
+                case (6):   //input 6?
+                    uint8_Result = iSinkSource6;
+                    break;
+                    
+                case (7):   //input 7?
+                    uint8_Result = iSinkSource7;
+                    break;
+                    
+                default:
+                    uint8_Result = 0;
+                    break;  
+            }
         }
         else if (uint8_IO == _Output)   //from the output?
         {
