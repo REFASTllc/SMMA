@@ -103,6 +103,9 @@
 //error code definition
                             //general errors
 #define _GlobalLock         0               //driver detected a POR; user configuration not guaranteed
+#define _OutOfTolGPWMPOS    34              // GPWMPOS; parameter(s) out of range
+#define _OutOfTolSPWMLIM    35              // SPWMLIM; parameter(s) out of range
+#define _OutOfTolGSWPOS     36              // GSWPOS; parameter(s) out of range
 #define _OutOfTolSSWLIM     37              //SSWLIM; received parameters out of tolerance
 #define _MotTypSCOILON      38              //SCOILON; try to execute the command with motor type = 'N'
 #define _OutOfTolSMCRSTP    39              //SMCRSTP; received parameters out of tolerance 

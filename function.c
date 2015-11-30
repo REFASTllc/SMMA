@@ -61,7 +61,7 @@ void funct_init(void)
  * Description:
  * Converts an integer number of maximal 10 digits into an ASCII. The seperated digits/numbers are stored into the 
  * array 'uint8_ArrAscii' where the first number is on the first position and the last number on the last.
- * For example - conver the number 5689:
+ * For example - convert the number 5689:
  * Contend of the array will be from place 0 - 3: 9865 --> so the inverted way.   
  * The variable 'uint8_ArrAsciiPos' decide on which place from the array is to store the next digit. 
  * So you can use (outside this subroutine) this variable to place the numbers again into the right order by using 

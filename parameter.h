@@ -94,6 +94,13 @@ extern void param_init(void);
 #define _SW1max             300000      //<OK> maximal limit high of the switch position 1 in steps
 #define _SW2min             0           //<OK> minimal limit low of the switch position 2 in steps
 #define _SW2max             300000      //<OK> maximal limit high of the switch position 2 in steps
+#define _SWpwmMin           0           //<OK> minimal step position low by a PWM of 50% in steps
+#define _SWpwmMax           300000      //<OK> maximal step position high by a PWM of 50% in steps
+#define _SWpwmPosMin        0           //<OK> minimal position by 50% PWM of the hall-sensor in steps
+#define _SWpwmPosMax        300000      //<OK> maximal position by 50% PWM of the hall-sensor in steps
+#define _SWpwmValMin        0           //<OK> minimal % PWM of the hall-sensor 
+#define _SWpwmValMax        1000        //<OK> maximal % PWM of the hall-sensor (1000 means 100.0) 
+
 
 
 /*
@@ -107,16 +114,6 @@ extern void param_init(void);
 #define _NumStepsMax        1000    //<OK> maximal number of steps for the frequency
 #define _FreqMin            1           //OK minimal frequency for the number of steps in [Hz]
 #define _FreqMax            20000       //OK maximal frequency for the number of stpes in [Hz] 
-//#define SW1PosMin         0           //minimal switch position 1 in steps
-//#define SW1PosMax         300000      //maximal switch position 1 in steps
-//#define SW2PosMin         0           //minimal switch position 2 in steps
-//#define SW2PosMax         300000      //maximal switch position 2 in steps
-#define SWpwmMin          0           //OK minimal step position low by a PWM of 50% in steps
-#define SWpwmMax          300000      //OK maximal step position high by a PWM of 50% in steps
-#define SWpwmPosMin       0           //OK minimal position by 50% PWM of the hall-sensor in steps
-#define SWpwmPosMax       300000      //OK maximal position by 50% PWM of the hall-sensor in steps
-#define SWpwmValMin       0           //OK minimal % PWM of the hall-sensor 
-#define SWpwmValMax       1000        //OK maximal % PWM of the hall-sensor (1000 means 100.0) 
 #define SWfrqValMin       0           //OK minimal frequency (torque signal) in [Hz]
 #define SWfrqValMax       1000000     //OK maximal frequency (torque singal) in [Hz] (1000000 means 100000.0)
 #define SWtypeMin         0           //OK range for switch type --> minimum
@@ -170,10 +167,10 @@ typedef struct                      //definitions of multiple variable for comma
     volatile unsigned long uint32_Sw2max;           //limit high of the switch position 2 in steps
     volatile unsigned long uint32_Sw1pos;           //actually switch position 1 in steps
     volatile unsigned long uint32_Sw2pos;           //actually switch position 2 in steps
-    volatile unsigned long uint32_SwPwmMin;         //step position limit low by a PWM value of 50%
-    volatile unsigned long uint32_SwPwmMax;         //step position limit high by a PWM value of 50%
-    volatile unsigned long uint32_SwPwmPos;         //position in steps by 50% PWM of the Hall-Sensor
-    volatile unsigned int uint16_SwPwmVal;          //% PWM of the Hall-Sensor at the actual position 
+    volatile unsigned long uint32_SwPWMmin;         //step position limit low by a PWM value of 50%
+    volatile unsigned long uint32_SwPWMmax;         //step position limit high by a PWM value of 50%
+    volatile unsigned long uint32_SwPWMpos;         //position in steps by 50% PWM of the Hall-Sensor
+    volatile unsigned int uint16_SwPWMval;          //% PWM of the Hall-Sensor at the actual position 
     volatile unsigned char uint8_SwType;            //type of connected detection of the position
     volatile unsigned long uint32_SwFrqVal;         //frequency (torque signal) in [Hz]
     volatile unsigned int uint16_Ue;                //entry voltage in [mV]

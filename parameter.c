@@ -116,10 +116,10 @@ void param_init(void)
     g_Param.uint32_Sw2max = 450;        //range 0...300'000
     g_Param.uint32_Sw1pos = 0;          //range 0...300'000
     g_Param.uint32_Sw2pos = 0;          //range 0...300'000
-    g_Param.uint32_SwPwmMin = 9000;     //range 0...300'000
-    g_Param.uint32_SwPwmMax = 10000;    //range 0...300'000
-    g_Param.uint32_SwPwmPos = 0;        //range 0...300'000
-    g_Param.uint16_SwPwmVal = 0;        //range 0.0...100.0
+    g_Param.uint32_SwPWMmin = 9000;     //range 0...300'000
+    g_Param.uint32_SwPWMmax = 10000;    //range 0...300'000
+    g_Param.uint32_SwPWMpos = 0;        //range 0...300'000
+    g_Param.uint16_SwPWMval = 0;        //range 0.0...100.0
     g_Param.uint8_SwType = 2;           //2 (linear hall-sensor with PWM)
                                         //0 (mechanical end swithc)
                                         //1 (hall-sensor switch)

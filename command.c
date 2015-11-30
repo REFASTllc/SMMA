@@ -42,6 +42,11 @@
  *                          - cmd_SMCRSTP
  *                          - cmd_GMCRSTP
  *                          - cmd_SSWLIM
+ *                          - cmd_GSWLIM
+ *                          - cmd_GSWPOS
+ *                          - cmd_SPWMLIM
+ *                          - cmd_GPWMLIM
+ *                          - cmd_GPWMPOS
  *                          //new commands:
  *                          - cmd_GINPB
 ***********************************************************************************************************************/
@@ -496,27 +501,27 @@ void cmd_check(void)
                 case (_IdSSWLIM):       //command SSWLIM
                     cmd_SSWLIM();       //call subroutine
                     break;
-                /*
-                case (52):  //command GSWLIM
+                
+                case (_IdGSWLIM):  //command GSWLIM
                     cmd_GSWLIM();     //call subroutine
                     break;
-        
-                case (53):  //command GSWPOS
+                
+                case (_IdGSWPOS):  //command GSWPOS
                     cmd_GSWPOS();     //call subroutine
                     break;
       
-                case (54):  //command SPWMLIM
+                case (_IdSPWMLIM):  //command SPWMLIM
                     cmd_SPWMLIM();    //call subroutine
                     break;
-      
-                case (55):  //command GPWMLIM
+                
+                case (_IdGPWMLIM):  //command GPWMLIM
                     cmd_GPWMLIM();    //call subroutine
                     break;
       
-                case (56):  //command GPWMPOS
+                case (_IdGPWMPOS):  //command GPWMPOS
                     cmd_GPWMPOS();    //call subroutine
                     break;
-      
+      /*
                 case (57):  //command GPWMVAL
                     cmd_GPWMVAL();    //call subroutine
                     break;
@@ -3187,6 +3192,237 @@ void cmd_SSWLIM(void)
     }
 }   //end of cmd_SSWLIM 
 
+/**********************************************************************************************************************
+ * Routine:                 cmd_GSWLIM
+
+ * Description:
+ * Get the position limits for switch or hall-sensor switch. 
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        30.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GSWLIM(void)
+{    
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        uart2_sendbuffer('E');          //first the letter E
+            
+        uart2_sendbuffer(',');  //add the comma
+        //convert the parameter and store it into the send buffer
+        funct_IntToAscii(g_Param.uint32_Sw1min,_Active);
+        uart2_sendbuffer(',');  //add the comma
+        funct_IntToAscii(g_Param.uint32_Sw1max,_Active);
+        uart2_sendbuffer(',');  //add the comma
+        funct_IntToAscii(g_Param.uint32_Sw2min,_Active);
+        uart2_sendbuffer(',');  //add the comma
+        funct_IntToAscii(g_Param.uint32_Sw2max,_Active);
+        uart2_sendbuffer(13);   //add the CR at the end
+    } 
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
+}   //end of cmd_GSWLIM 
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GSWPOS
+
+ * Description:
+ * Get the currently switch-position for switch or hall-sensor. 
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        30.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GSWPOS(void)
+{    auto unsigned char uint8_Result = 0;
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        uint8_Result += funct_CheckTol(g_Param.uint32_Sw1pos,g_Param.uint32_Sw1min,g_Param.uint32_Sw1max);
+        uint8_Result += funct_CheckTol(g_Param.uint32_Sw2pos,g_Param.uint32_Sw2min,g_Param.uint32_Sw2max);
+        if(uint8_Result == 2)
+        {
+            uart2_sendbuffer('E');          //first the letter E
+        }
+        else
+        {
+            uart2_sendbuffer('X');  //add the comma
+            g_Param.uint8_ErrCode = _OutOfTolGSWPOS;  //set error code
+            uart2_sendbuffer(',');  //add the comma
+            funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+        }   
+        uart2_sendbuffer(',');  //add the comma
+        //convert the parameter and store it into the send buffer
+        funct_IntToAscii(g_Param.uint32_Sw1pos,_Active);
+        uart2_sendbuffer(',');  //add the comma
+        funct_IntToAscii(g_Param.uint32_Sw2pos,_Active);
+        uart2_sendbuffer(13);   //add the CR at the end
+    } 
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
+}   //end of cmd_GSWPOS 
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SPWMLIM
+
+ * Description:
+ * Set PWM limits for linear hall-detector
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        30.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SPWMLIM(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    
+    if(g_Cmd.uint8_ParamPos == 3)   //number of received characters OK?
+    {
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_SWpwmMin,_SWpwmMax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[2],_SWpwmMin,_SWpwmMax);
+        
+        if(uint8_Result == 2)   //received parameters are within the tolerance?
+        {
+            g_Param.uint32_SwPWMmin = g_Cmd.uint32_TempPara[1];
+            g_Param.uint32_SwPWMmax = g_Cmd.uint32_TempPara[2];
+            
+            //send back the needed informations
+            uart2_sendbuffer('E');                  //first the letter E
+            uart2_sendbuffer(13);                   //add the CR at the end
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSPWMLIM;  //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }   
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
+}   //end of cmd_SPWMLIM 
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GPWMLIM
+
+ * Description:
+ * Get PWM limits for linear hall-detector. 
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        30.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GPWMLIM(void)
+{    
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        uart2_sendbuffer('E');          //first the letter E
+            
+        uart2_sendbuffer(',');  //add the comma
+        //convert the parameter and store it into the send buffer
+        funct_IntToAscii(g_Param.uint32_SwPWMmin,_Active);
+        uart2_sendbuffer(',');  //add the comma
+        funct_IntToAscii(g_Param.uint32_SwPWMmax,_Active);
+        uart2_sendbuffer(13);   //add the CR at the end
+    } 
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
+}   //end of cmd_GPWMLIM
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GPWMPOS
+
+ * Description:
+ * Get position for linear hall-detector. 
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        30.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GPWMPOS(void)
+{    
+    auto unsigned char uint8_Result = 0;
+    
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        uint8_Result += funct_CheckTol(g_Param.uint32_SwPWMpos,g_Param.uint32_SwPWMmin,g_Param.uint32_SwPWMmax);
+        uint8_Result += funct_CheckTol(g_Param.uint16_SwPWMval,470,530);
+        if(uint8_Result == 2)
+        {
+            uart2_sendbuffer('E');          //first the letter E
+        }
+        else
+        {
+            uart2_sendbuffer('X');  //add the comma
+            g_Param.uint8_ErrCode = _OutOfTolGPWMPOS;  //set error code
+            uart2_sendbuffer(',');  //add the comma
+            funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+        }   
+        uart2_sendbuffer(',');  //add the comma
+        //convert the parameter and store it into the send buffer
+        funct_IntToAscii(g_Param.uint32_SwPWMpos,_Active);
+        uart2_sendbuffer(',');  //add the comma
+        funct_IntToAscii(g_Param.uint16_SwPWMval,_Inactive);
+        do{
+            g_Funct.uint8_ArrAsciiPos--;
+            uart2_sendbuffer(g_Funct.uint8_ArrAscii[g_Funct.uint8_ArrAsciiPos]);
+            if(g_Funct.uint8_ArrAsciiPos == 1)
+            {
+                uart2_sendbuffer('.');
+            }
+        }while(g_Funct.uint8_ArrAsciiPos);
+        uart2_sendbuffer(13);   //add the CR at the end
+    } 
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
+}   //end of cmd_GPWMLIM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**********************************************************************************************************************
  * Routine:                 cmd_GINPB
@@ -3202,11 +3438,6 @@ void cmd_SSWLIM(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Cmd.
- *                              - uint8_ParamPos
- *                              - uint32_TempPara
- *                          g_Param.
- *                              - uint8_ErrCode
 ***********************************************************************************************************************/
 void cmd_GINPB(void)
 {
