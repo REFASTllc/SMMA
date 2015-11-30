@@ -90,6 +90,11 @@ extern void param_init(void);
 #define _BitMax             7           //<OK> maximal range in decimal for bit
 #define _ValPortMin         0           //<OK> minimal value in decimal from the I/O port 
 #define _ValPortMax         255         //<OK> maximal value in decimal from the I/O port
+#define _SW1min             0           //<OK> minimal limit low of the switch position 1 in steps
+#define _SW1max             300000      //<OK> maximal limit high of the switch position 1 in steps
+#define _SW2min             0           //<OK> minimal limit low of the switch position 2 in steps
+#define _SW2max             300000      //<OK> maximal limit high of the switch position 2 in steps
+
 
 /*
 #define StepModeMin       0           //OK range for step mode -> minimum
@@ -101,13 +106,7 @@ extern void param_init(void);
 #define _NumStepsMin        1       //<OK> minimal number of steps for the frequency 
 #define _NumStepsMax        1000    //<OK> maximal number of steps for the frequency
 #define _FreqMin            1           //OK minimal frequency for the number of steps in [Hz]
-#define _FreqMax            20000       //OK maximal frequency for the number of stpes in [Hz]
-*/ 
-/*
-#define SW1min            0           //OK minimal limit low of the switch position 1 in steps
-#define SW1max            300000      //OK maximal limit high of the switch position 1 in steps
-#define SW2min            0           //OK minimal limit low of the switch position 2 in steps
-#define SW2max            300000      //OK maximal limit high of the switch position 2 in steps 
+#define _FreqMax            20000       //OK maximal frequency for the number of stpes in [Hz] 
 //#define SW1PosMin         0           //minimal switch position 1 in steps
 //#define SW1PosMax         300000      //maximal switch position 1 in steps
 //#define SW2PosMin         0           //minimal switch position 2 in steps

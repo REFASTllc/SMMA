@@ -41,6 +41,7 @@
  *                          - cmd_GINP
  *                          - cmd_SMCRSTP
  *                          - cmd_GMCRSTP
+ *                          - cmd_SSWLIM
  *                          //new commands:
  *                          - cmd_GINPB
 ***********************************************************************************************************************/
@@ -491,11 +492,11 @@ void cmd_check(void)
                 case (_IdGMCRSTP):      //command GMCRSTP
                     cmd_GMCRSTP();      //call subroutine
                     break;
-                /*
-                case (51):  //command SSWLIM
-                    cmd_SSWLIM();     //call subroutine
+                
+                case (_IdSSWLIM):       //command SSWLIM
+                    cmd_SSWLIM();       //call subroutine
                     break;
-      
+                /*
                 case (52):  //command GSWLIM
                     cmd_GSWLIM();     //call subroutine
                     break;
@@ -3124,7 +3125,67 @@ void cmd_GMCRSTP(void)
         g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
-}   //end of cmd_GMCRSTP
+}   //end of cmd_GMCRSTP cmd_SSWLIM
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SSWLIM
+
+ * Description:
+ * Defines the position limits for switch or hall-sensor switch. 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        30.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+ * Global variable:         g_Cmd.
+ *                              - uint8_ParamPos
+ *                              - uint32_TempPara
+ *                          g_Param.
+ *                              - uint32_Sw1min
+ *                              - uint32_Sw1max
+ *                              - uint32_Sw2min
+ *                              - uint32_Sw2max
+ *                              - uint8_ErrCode
+ *                              - uint16_BipILevel
+***********************************************************************************************************************/
+void cmd_SSWLIM(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    
+    if(g_Cmd.uint8_ParamPos == 5)   //number of received characters OK?
+    {
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_SW1min,_SW1max);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[2],_SW1min,_SW1max);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[3],_SW2min,_SW2max);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[4],_SW2min,_SW2max);
+        
+        if(uint8_Result == 4)   //received parameters are within the tolerance?
+        {
+            g_Param.uint32_Sw1min = g_Cmd.uint32_TempPara[1];
+            g_Param.uint32_Sw1max = g_Cmd.uint32_TempPara[2];
+            g_Param.uint32_Sw2min = g_Cmd.uint32_TempPara[3];
+            g_Param.uint32_Sw2max = g_Cmd.uint32_TempPara[4];
+            
+            //send back the needed informations
+            uart2_sendbuffer('E');                  //first the letter E
+            uart2_sendbuffer(13);                   //add the CR at the end
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSSWLIM;  //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }   
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
+}   //end of cmd_SSWLIM 
 
 
 /**********************************************************************************************************************

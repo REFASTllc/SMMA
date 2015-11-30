@@ -63,6 +63,7 @@ extern void cmd_GOUT(void);
 extern void cmd_GINP(void);
 extern void cmd_SMCRSTP(void);
 extern void cmd_GMCRSTP(void);
+extern void cmd_SSWLIM(void);
 //new commands:
 extern void cmd_GINPB(void);
 
