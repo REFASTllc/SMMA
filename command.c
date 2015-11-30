@@ -47,6 +47,10 @@
  *                          - cmd_SPWMLIM
  *                          - cmd_GPWMLIM
  *                          - cmd_GPWMPOS
+ *                          - cmd_GPWMVAL
+ *                          - cmd_SSWTYP
+ *                          - cmd_GSWTYP
+ *                          - cmd_GFRQVAL
  *                          //new commands:
  *                          - cmd_GINPB
 ***********************************************************************************************************************/
@@ -521,23 +525,23 @@ void cmd_check(void)
                 case (_IdGPWMPOS):  //command GPWMPOS
                     cmd_GPWMPOS();    //call subroutine
                     break;
-      /*
-                case (57):  //command GPWMVAL
+      
+                case (_IdGPWMVAL):  //command GPWMVAL
                     cmd_GPWMVAL();    //call subroutine
                     break;
       
-                case (58):  //command SSWTYP
+                case (_IdSSWTYP):  //command SSWTYP
                     cmd_SSWTYP();     //call subroutine
                     break;
       
-                case (59):  //command GSWTYP
+                case (_IdGSWTYP):  //command GSWTYP
                     cmd_GSWTYP();     //call subroutine
                     break;
       
-                case (60):  //command GFRQVAL
+                case (_IdGFRQVAL):  //command GFRQVAL
                     cmd_GFRQVAL();    //call subroutine
                     break;
-                */
+                
                 case (_IdSPOSRUN):      //command SPOSRUN (not used anymore)
                     g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
@@ -3409,12 +3413,161 @@ void cmd_GPWMPOS(void)
     }
 }   //end of cmd_GPWMLIM
 
+/**********************************************************************************************************************
+ * Routine:                 cmd_GPWMVAL
 
+ * Description:
+ * Get PWM in % duty-cycle for linear hall-detector. 
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        30.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GPWMVAL(void)
+{    
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        if(funct_CheckTol(g_Param.uint16_SwPWMval,470,530))
+        {
+            uart2_sendbuffer('E');          //first the letter E
+        }
+        else
+        {
+            uart2_sendbuffer('X');  //add the comma
+            g_Param.uint8_ErrCode = _OutOfTolGPWMVAL;  //set error code
+            uart2_sendbuffer(',');  //add the comma
+            funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+        }   
+        uart2_sendbuffer(',');  //add the comma
+        //convert the parameter and store it into the send buffer
+        funct_IntToAscii(g_Param.uint16_SwPWMval,_Inactive);
+        do{
+            g_Funct.uint8_ArrAsciiPos--;
+            uart2_sendbuffer(g_Funct.uint8_ArrAscii[g_Funct.uint8_ArrAsciiPos]);
+            if(g_Funct.uint8_ArrAsciiPos == 1)
+            {
+                uart2_sendbuffer('.');
+            }
+        }while(g_Funct.uint8_ArrAsciiPos);
+        uart2_sendbuffer(13);   //add the CR at the end
+    } 
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
+}   //end of cmd_GPWMVAL
 
+/**********************************************************************************************************************
+ * Routine:                 cmd_SSWTYP
 
+ * Description:
+ * Set type of switch (switch, hall-detector, linear hall-detector, encoder)
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        30.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SSWTYP(void)
+{
+    if(g_Cmd.uint8_ParamPos == 2)   //number of received characters OK?
+    {
+        if(funct_CheckTol(g_Cmd.uint32_TempPara[1],_SWtypeMin,_SWtypeMax))   //received parameters are within the tolerance?
+        {
+            g_Param.uint8_SwType = g_Cmd.uint32_TempPara[1];
+            
+            //send back the needed informations
+            uart2_sendbuffer('E');                  //first the letter E
+            uart2_sendbuffer(13);                   //add the CR at the end
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSSWTYP;  //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }   
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
+}   //end of cmd_SSWTYP
 
+/**********************************************************************************************************************
+ * Routine:                 cmd_GSWTYP
 
+ * Description:
+ * Get type of switch (switch, hall-detector, linear hall-detector, encoder)
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        30.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GSWTYP(void)
+{    
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        uart2_sendbuffer('E');
+        uart2_sendbuffer(',');  //add the comma
+        funct_IntToAscii(g_Param.uint8_SwType,_Active);
+        uart2_sendbuffer(13);
+    } 
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
+}   //end of cmd_GSWTYP
 
+/**********************************************************************************************************************
+ * Routine:                 cmd_GFRQVAL
+
+ * Description:
+ * Get frequency for torque measurement
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        30.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GFRQVAL(void)
+{    
+    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        uart2_sendbuffer('E');
+        uart2_sendbuffer(',');  //add the comma
+        funct_IntToAscii(g_Param.uint32_SwFrqVal,_Inactive);
+        do{
+            g_Funct.uint8_ArrAsciiPos--;
+            uart2_sendbuffer(g_Funct.uint8_ArrAscii[g_Funct.uint8_ArrAsciiPos]);
+            if(g_Funct.uint8_ArrAsciiPos == 1)
+            {
+                uart2_sendbuffer('.');
+            }
+        }while(g_Funct.uint8_ArrAsciiPos);
+        uart2_sendbuffer(13);
+    } 
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
+}   //end of cmd_GFRQVAL
 
 
 

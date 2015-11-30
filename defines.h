@@ -103,6 +103,9 @@
 //error code definition
                             //general errors
 #define _GlobalLock         0               //driver detected a POR; user configuration not guaranteed
+#define _Out
+#define _OutOfTolSSWTYP     32              // SSWTYP; parameter out of range
+#define _OutOfTolGPWMVAL    33              // GPWMVAL; parameter(s) out of range
 #define _OutOfTolGPWMPOS    34              // GPWMPOS; parameter(s) out of range
 #define _OutOfTolSPWMLIM    35              // SPWMLIM; parameter(s) out of range
 #define _OutOfTolGSWPOS     36              // GSWPOS; parameter(s) out of range

@@ -69,6 +69,10 @@ extern void cmd_GSWPOS(void);
 extern void cmd_SPWMLIM(void);
 extern void cmd_GPWMLIM(void);
 extern void cmd_GPWMPOS(void);
+extern void cmd_GPWMVAL(void);
+extern void cmd_SSWTYP(void);
+extern void cmd_GSWTYP(void);
+extern void cmd_GFRQVAL(void);
 //new commands:
 extern void cmd_GINPB(void);
 

@@ -1,11 +1,7 @@
 *.o
 *.d
 Makefile
-\build
-\nbproject
-\dist
 *.DS_Store
-/build/default_with_power/
-/dist/default_with_power/
-/build/default_without_power/
-/dist/default_without_power/
+/nbproject
+/build
+/dist

@@ -542,7 +542,8 @@ unsigned char funct_CheckCmdSMTYP(void)
         uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint16_Umot,_UmotMin,_UmotBipMax);
         uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint16_SCiLevel,_SCiLevelMin,_SCiLevelMax);
         uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint8_SCtLevel,_SCtLevelMin,_SCtLevelMax);          
-                
+               
+
         if(uint8_Result == 5)   //each parameter within the tolerance
         {
             //for security switch off each output instead the main supply and switch on "bipolar"
