@@ -103,6 +103,7 @@
 //error code definition
                             //general errors
 #define _GlobalLock         0               //driver detected a POR; user configuration not guaranteed
+#define _MotTypSCOILON      38              //SCOILON; try to execute the command with motor type = 'N'
 #define _OutOfTolSMCRSTP    39              //SMCRSTP; received parameters out of tolerance 
 #define _OutOfTolValPort    40              //SOUT; value to write on the output port out of tolerance
 #define _OutOfTolBit        41              //SBIT, CBIT, GBIT, GINPB; bit value out of tolerance
@@ -115,21 +116,21 @@
 #define _UnknownMotTyp      48              //motor type unknown
 #define _MotorInRun         49              //driver send not back an information during actuator is in run mode
                             //unipolar errors are the same for matrix errors!
-#define _UniSILIM           50              //unipolar; received parameters not within the tolerance for SILIM
-#define _UniPlausiCheck     51              //unipolar; plausibility check not passed
-#define _UniSMTYP           52              //unipolar; parameters not within tolerance to switch on unipolar
-#define _UniETESTIN         53              //unipolar; ETESTIN current measure not within the tolerance
+#define _UniSILIM           50              //received parameters not within the tolerance for SILIM
+#define _UniPlausiCheck     51              //plausibility check not passed
+#define _UniSMTYP           52              //parameters not within tolerance to switch on unipolar
+#define _UniETESTIN         53              //ETESTIN current measure not within the tolerance
                             //bipolar errors
-#define _BipSILIM           100             //bipolar; received parameters not within the tolerance for SILIM
-#define _BipSMTYP           101             //bipolar; parameters not within tolerance for switch on bipolar
-#define _BipETESTIN         102             //bipolar; ETESTIN current measure not within the tolerance
-#define _BipSPHC            103             //bipolar; SPHC parameter not within the tolerance
+#define _BipSILIM           100             //received parameters not within the tolerance for SILIM
+#define _BipSMTYP           101             //parameters not within tolerance for switch on bipolar
+#define _BipETESTIN         102             //ETESTIN current measure not within the tolerance
+#define _BipSPHC            103             //SPHC parameter not within the tolerance
                             //LIN errors
-#define _LinSILIM           150             //LIN; received parameters not within the tolerance for SILIM
-#define _LinSMTYP           151             //LIN; parameters not within tolerance for switch on LIN
-#define _LinETESTIN         152             //LIN; ETESTIN command is not allowed for LIN application's
-#define _LinRUN             153             //LIN; RUN command is not allowed for LIN application's
-#define _LinSCOILON         154             //LIN; SCOILON command is not allowed for LIN application's
+#define _LinSILIM           150             //received parameters not within the tolerance for SILIM
+#define _LinSMTYP           151             //parameters not within tolerance for switch on LIN
+#define _LinETESTIN         152             //ETESTIN command is not allowed for LIN application's
+#define _LinRUN             153             //RUN command is not allowed for LIN application's
+#define _LinSCOILON         154             //SCOILON command is not allowed for LIN application's
                             //command errors
 #define _NumbRecCharNotOK   254             //number of received characters/parameters not OK
 #define _UnknownCmd         255             //unknown or not implemented command

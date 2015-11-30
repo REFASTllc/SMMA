@@ -417,11 +417,11 @@ unsigned char funct_CheckCmdSILIM(void)
     if((g_Param.uint8_MotTyp == 'N') || (g_Param.uint8_MotTyp == 'U') || (g_Param.uint8_MotTyp == 'M'))     
     {
         //then verify the received parameters
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[1],_Imin,_Imax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[2],_Imin,_Imax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[3],_UmotMin,_UmotMax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[4],_SCiLevelMin,_SCiLevelMax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[5],_SCtLevelMin,_SCtLevelMax);          
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_Imin,_Imax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[2],_Imin,_Imax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[3],_UmotMin,_UmotMax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[4],_SCiLevelMin,_SCiLevelMax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[5],_SCtLevelMin,_SCtLevelMax);          
                 
         if(uint8_Result == 5)   //each parameter within the tolerance?
         {
@@ -434,11 +434,11 @@ unsigned char funct_CheckCmdSILIM(void)
     }
     else if(g_Param.uint8_MotTyp == 'B')    //verify limits for the bipolar application
     {
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[1],_Imin,_Imax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[2],_Imin,_Imax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[3],_UmotMin,_UmotBipMax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[4],_SCiLevelMin,_SCiLevelMax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[5],_SCtLevelMin,_SCtLevelMax);          
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_Imin,_Imax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[2],_Imin,_Imax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[3],_UmotMin,_UmotBipMax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[4],_SCiLevelMin,_SCiLevelMax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[5],_SCtLevelMin,_SCtLevelMax);          
                 
         if(uint8_Result == 5)   //each parameter within the tolerance
         {
@@ -451,11 +451,11 @@ unsigned char funct_CheckCmdSILIM(void)
     }
     else if(g_Param.uint8_MotTyp == 'L')    //verify limits for the LIN application
     {
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[1],_Imin,_ImotLinMax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[2],_Imin,_ImotLinMax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[3],_UmotMin,_UmotLinMax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[4],_SCiLevelMin,_ImotLinSCiLevelMax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[5],_SCtLevelMin,_SCtLevelMax);          
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_Imin,_ImotLinMax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[2],_Imin,_ImotLinMax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[3],_UmotMin,_UmotLinMax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[4],_SCiLevelMin,_ImotLinSCiLevelMax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[5],_SCtLevelMin,_SCtLevelMax);          
                 
         if(uint8_Result == 5)   //each parameter within the tolerance
         {
@@ -511,11 +511,11 @@ unsigned char funct_CheckCmdSMTYP(void)
     else if ((g_Cmd.uint32_TempPara[1] == 'U') || (g_Cmd.uint32_TempPara[1] == 'M'))
     {
         //then verify the stored parameters
-        uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint16_Imin,_Imin,_Imax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint16_Imax,_Imin,_Imax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint16_Umot,_UmotMin,_UmotMax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint16_SCiLevel,_SCiLevelMin,_SCiLevelMax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint8_SCtLevel,_SCtLevelMin,_SCtLevelMax);          
+        uint8_Result += funct_CheckTol(g_Param.uint16_Imin,_Imin,_Imax);
+        uint8_Result += funct_CheckTol(g_Param.uint16_Imax,_Imin,_Imax);
+        uint8_Result += funct_CheckTol(g_Param.uint16_Umot,_UmotMin,_UmotMax);
+        uint8_Result += funct_CheckTol(g_Param.uint16_SCiLevel,_SCiLevelMin,_SCiLevelMax);
+        uint8_Result += funct_CheckTol(g_Param.uint8_SCtLevel,_SCtLevelMin,_SCtLevelMax);          
                 
         if(uint8_Result == 5)   //each parameter within the tolerance?
         {

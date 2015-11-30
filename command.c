@@ -1317,11 +1317,9 @@ void cmd_SRACC(void)
                 uint8_WB1 = 1;
                 do
                 {
-                    uint8_Result =  uint8_Result + 
-                                    funct_CheckTol(g_Cmd.uint32_TempPara[uint8_WB1],_AccNumbStepMin,_AccNumbStepMax);
+                    uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[uint8_WB1],_AccNumbStepMin,_AccNumbStepMax);
                     uint8_WB1++;                      //increment with 1 to take the next parameter
-                    uint8_Result =  uint8_Result + 
-                                    funct_CheckTol(g_Cmd.uint32_TempPara[uint8_WB1],_AccFreqMin,_AccFreqMax);
+                    uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[uint8_WB1],_AccFreqMin,_AccFreqMax);
                     uint8_WB1++;                      //increment wiht 1 to take the next parameter
                 }
                 while(uint8_WB1 < g_Cmd.uint8_ParamPos);
@@ -1447,11 +1445,9 @@ void cmd_SRDEC(void)
                 uint8_WB1 = 1;
                 do
                 {
-                    uint8_Result =  uint8_Result + 
-                                    funct_CheckTol(g_Cmd.uint32_TempPara[uint8_WB1],_DecNumbStepMin,_DecNumbStepMax);
+                    uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[uint8_WB1],_DecNumbStepMin,_DecNumbStepMax);
                     uint8_WB1++;                      //increment with 1 to take the next parameter
-                    uint8_Result =  uint8_Result + 
-                                    funct_CheckTol(g_Cmd.uint32_TempPara[uint8_WB1],_DecFreqMin,_DecFreqMax);
+                    uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[uint8_WB1],_DecFreqMin,_DecFreqMax);
                     uint8_WB1++;                      //increment wiht 1 to take the next parameter
                 }
                 while(uint8_WB1 < g_Cmd.uint8_ParamPos);
@@ -1590,20 +1586,19 @@ void cmd_RUN(void)
         }
         else
         {
-            uint8_Result =  uint8_Result + 
-                            funct_CheckTol(g_Cmd.uint32_TempPara[2],_StepModeUniMatMin,_StepModeUniMatMax);
-            uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[3],_StepCountMin,_StepCountMax);
-            uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[4],_RunFreqMin,_RunFreqMax);      
-            uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[5],_DirMin,_DirMax);
-            uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[6],_CoilStateMin,_CoilStateMax);
-            uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[7],_BipRunIMin,_BipRunIMax);
-            uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[8],_BipHoldIMin,_BipHoldIMax);
-            uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[9],_SelectRampMin,_SelectRampMax);
-            uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[10],_BipAccIMin,_BipAccIMax);
-            uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[11],_BipDecIMin,_BipDecIMax);
-            uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[12],_AccOnDelayMin,_AccOnDelayMax);
-            uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[13],_DecOffDelayMin,_DecOffDelayMax);
-            uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[14],_AckMin,_AckMax);
+            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[2],_StepModeUniMatMin,_StepModeUniMatMax);
+            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[3],_StepCountMin,_StepCountMax);
+            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[4],_RunFreqMin,_RunFreqMax);      
+            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[5],_DirMin,_DirMax);
+            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[6],_CoilStateMin,_CoilStateMax);
+            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[7],_BipRunIMin,_BipRunIMax);
+            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[8],_BipHoldIMin,_BipHoldIMax);
+            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[9],_SelectRampMin,_SelectRampMax);
+            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[10],_BipAccIMin,_BipAccIMax);
+            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[11],_BipDecIMin,_BipDecIMax);
+            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[12],_AccOnDelayMin,_AccOnDelayMax);
+            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[13],_DecOffDelayMin,_DecOffDelayMax);
+            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[14],_AckMin,_AckMax);
             
             if(uint8_Result == 13)      //each parameter within the tolerance?
             {
@@ -1775,7 +1770,7 @@ void cmd_SPHC(void)
     if(g_Cmd.uint8_ParamPos == 2)   //number of received characters OK?
     {
         //then verify the received parameters
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[1],_BipIPctMin,_BipIPctMax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_BipIPctMin,_BipIPctMax);
     
         if(uint8_Result == 1)         //each parameter within the tolerance?
         {   
@@ -2463,6 +2458,7 @@ void cmd_MUMOT(void)
 void cmd_SCOILON(void)
 {  
     auto unsigned char uint8_Result = 0;    //local work byte
+    auto unsigned char uint8_WB;            //local work byte
     
     if(g_Cmd.uint8_ParamPos == 6)   //number of received characters OK?
     {
@@ -2474,18 +2470,26 @@ void cmd_SCOILON(void)
         else
         {
             //verify the limits if they are inside the tolerance
-            uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[2],0,1);
-            uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[3],0,1);
-            uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[4],0,1);      
-            uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[5],0,1);
-            uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[6],0,1);
+            uint8_WB = g_Cmd.uint32_TempPara[1];
+            if((uint8_WB == 'N') || (uint8_WB == 'B') || (uint8_WB == 'M') || (uint8_WB == 'U'))
+            {
+                uint8_Result++;
+            }
+            else
+            {
+                //do nothing
+            }
+            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[2],0,1);
+            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[3],0,1);      
+            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[4],0,1);
+            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[5],0,1);
             
             if(uint8_Result == 5)   //each parameter within the tolerance?
             {              
                 //before continue verify type of motor to know what is to do!
                 if(g_Cmd.uint32_TempPara[1] == 'N') //type of motor = None?
                 {
-                    g_Param.uint8_ErrCode = _MotTypRUN;         //set error code
+                    g_Param.uint8_ErrCode = _MotTypSCOILON;     //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                 }
                 else if(g_Cmd.uint32_TempPara[1] == 'L')    //type of motor = Lin?
@@ -2680,7 +2684,7 @@ void cmd_SBIT(void)
     if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
     {
         //verify the limits if they are inside the tolerance
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[1],_BitMin,_BitMax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_BitMin,_BitMax);
         
         if(uint8_Result == 1)   //each parameter within the tolerance?
         {
@@ -2732,7 +2736,7 @@ void cmd_CBIT(void)
     if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
     {
         //verify the limits if they are inside the tolerance
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[1],_BitMin,_BitMax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_BitMin,_BitMax);
         
         if(uint8_Result == 1)   //each parameter within the tolerance?
         {
@@ -2785,7 +2789,7 @@ void cmd_GBIT(void)
     if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
     {
         //verify the limits if they are inside the tolerance
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[1],_BitMin,_BitMax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_BitMin,_BitMax);
         
         if(uint8_Result == 1)   //each parameter within the tolerance?
         {
@@ -2839,7 +2843,7 @@ void cmd_SOUT(void)
     if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
     {
         //verify the limits if they are inside the tolerance
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[1],_ValPortMin,_ValPortMax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_ValPortMin,_ValPortMax);
         
         if(uint8_Result == 1)   //each parameter within the tolerance?
         {
@@ -3151,7 +3155,7 @@ void cmd_GINPB(void)
     if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
     {
         //verify the limits if they are inside the tolerance
-        uint8_Result = uint8_Result + funct_CheckTol(g_Cmd.uint32_TempPara[1],_BitMin,_BitMax);
+        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_BitMin,_BitMax);
         
         if(uint8_Result == 1)   //each parameter within the tolerance?
         {
