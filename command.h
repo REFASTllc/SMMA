@@ -30,9 +30,6 @@
 #ifndef COMMAND_H
 #define	COMMAND_H
 
-//extern void cmd_init(void);  
-//extern void cmd_check(void);
-//extern void cmd_def(void);
 extern void cmd_SILIM(void);
 extern void cmd_ETESTIN(void);
 extern void cmd_SRACC(void);
@@ -74,17 +71,5 @@ extern void cmd_GSWTYP(void);
 extern void cmd_GFRQVAL(void);
 //new commands:
 extern void cmd_GINPB(void);
-
-/*typedef struct                      //definitions of multiple variable for command
-{
-  volatile unsigned char uint8_ParamPos;        //parameter position of the command
-  volatile unsigned char uint8_LetterPos;       //letter position of the command
-  volatile unsigned long uint32_Cmd1st4;        //first 4 letters of the command
-  volatile unsigned long uint32_Cmd2nd4;        //second 4 letters of the command
-  volatile unsigned long uint32_TempPara[101];  //Temporary parameter registers
-  //volatile unsigned char uint8_ErrCode;         //error code
-  volatile unsigned char uint8_CmdID;           //command id
-} SCmd;                             //struct name is SCmd (S for struct)
-extern SCmd    g_Cmd;               //extern name is g_Cmd (g for global)*/
 
 #endif	/* COMMAND_H */
