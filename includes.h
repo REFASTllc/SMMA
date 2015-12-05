@@ -47,6 +47,7 @@
 #include "cmdchk.h"
 #include "parameter.h"
 #include "UART.h"
+#include "spi.h"
 
 #endif	/* INCLUDES_H */
 

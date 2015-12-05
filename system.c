@@ -90,8 +90,6 @@ void system_init(void)
     uni_init();                             //call subroutine
 //parameter initialization
     param_init();                           //call subroutine
-//command initialization
-    //cmd_init();                             //call subroutine
 //command check initialization
     cmdchk_init();                          //call subroutine
 //UART2 initialization
@@ -105,6 +103,8 @@ void system_init(void)
     //timers_Set(_TIMER2,_ENABLE,0,10000); 
 //front LED = black status (off)
     funct_FrontLED(_FLEDblack);             //call subroutine and switch on green LED
+//--- Initialization of SPI ---//
+    InitSPI(_SPI_1);
     
 //switch on the debugging LED's
     oTestLed1 = 1;                          //switch on the output for the test LED1
