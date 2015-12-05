@@ -91,7 +91,9 @@ void system_init(void)
 //parameter initialization
     param_init();                           //call subroutine
 //command initialization
-    cmd_init();                             //call subroutine
+    //cmd_init();                             //call subroutine
+//command check initialization
+    cmdchk_init();                          //call subroutine
 //UART2 initialization
     uart_init(_UART2_);                     //call subroutine
     uart_set(_UART2_,_EVEN,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,38400);   //call subroutine

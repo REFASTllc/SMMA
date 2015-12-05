@@ -57,7 +57,7 @@ void main(void)
         }
         
         if(!g_UART2rxd.uint8_BufEmpty)  //receive buffer not empty?
-            cmd_check();                //call subroutine
+            cmdchk_check();             //call subroutine
         else
         {
             //do nothing

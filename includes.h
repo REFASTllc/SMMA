@@ -44,6 +44,7 @@
 #include "INT.h"
 #include "unipolar.h"
 #include "command.h"
+#include "cmdchk.h"
 #include "parameter.h"
 #include "UART.h"
 

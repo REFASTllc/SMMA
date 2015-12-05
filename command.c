@@ -58,7 +58,7 @@
 
 #include "includes.h"
 
-SCmd g_Cmd;                 //global variables for struct  
+//SCmd g_Cmd;                 //global variables for struct  
 
 
 /**********************************************************************************************************************
@@ -75,7 +75,7 @@ SCmd g_Cmd;                 //global variables for struct
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void cmd_init(void)
+/*void cmd_init(void)
 {
 //initialize the command variables    
   g_Cmd.uint8_ParamPos = 0;     //clear the parameter position
@@ -83,7 +83,7 @@ void cmd_init(void)
   g_Cmd.uint32_Cmd1st4 = 0;     //clear the first 4 letters of the command
   g_Cmd.uint32_Cmd2nd4 = 0;     //clear the second 4 letters of the command
   g_Cmd.uint8_CmdID = 0;        //clear command id
-}   //end of cmd_init
+}   //end of cmd_init*/
 
 
 /**********************************************************************************************************************
@@ -100,7 +100,7 @@ void cmd_init(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void cmd_check(void)
+/*void cmd_check(void)
 {
     auto unsigned char uint8_RxDBuffChar;       //local byte for the actually received character
     
@@ -432,7 +432,7 @@ void cmd_check(void)
                     g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
-                /*
+                
                 case (38):  //command GERUN
                     cmd_GERUN();        //call subroutine
                     break;
@@ -444,7 +444,7 @@ void cmd_check(void)
                 case (40):  //command GO
                     cmd_GO();           //call subroutine
                     break;
-                */    
+                   
                 case (_IdSIMAN):        //command SIMAN (not used anymore)
                     g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
@@ -531,7 +531,7 @@ void cmd_check(void)
                     g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
-                /*
+                
                 case (62):  //command GPOSRUN
                     cmd_GPOSRUN();    //call subroutine
                     break;
@@ -539,7 +539,7 @@ void cmd_check(void)
                 case (63):  //command POSRUN
                     cmd_POSRUN();       //call subroutine
                     break;
-                */    
+                   
                 case (_IdGINPB):        //command GINPB
                     
                     cmd_GINPB();        //call subroutine
@@ -568,7 +568,7 @@ void cmd_check(void)
     {
         //do nothing
     }
-}   //end of cmd_check
+}   //end of cmd_check*/
 
 
 /**********************************************************************************************************************
@@ -585,7 +585,7 @@ void cmd_check(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void cmd_def(void)
+/*void cmd_def(void)
 {
     auto unsigned long uint32_WR;       //local work register
     
@@ -1090,7 +1090,7 @@ void cmd_def(void)
             
             break;
     }
-}   //end of cmd_def
+}   //end of cmd_def*/
 
 
 /**********************************************************************************************************************
@@ -1117,7 +1117,7 @@ void cmd_SILIM(void)
 {
     auto unsigned char uint8_Result = 0;        //local work byte for the result 
   
-    if(g_Cmd.uint8_ParamPos == 6)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 6)   //number of received characters OK?
     {
         if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
         {
@@ -1131,11 +1131,11 @@ void cmd_SILIM(void)
             if(uint8_Result == 5)   //each parameter within the tolerance?
             {
                 //then store the parameters and send back the OK
-                g_Param.uint16_Imin = g_Cmd.uint32_TempPara[1] & 0xFFFF;
-                g_Param.uint16_Imax = g_Cmd.uint32_TempPara[2] & 0xFFFF;
-                g_Param.uint16_Umot = g_Cmd.uint32_TempPara[3] & 0xFFFF;
-                g_Param.uint16_SCiLevel = g_Cmd.uint32_TempPara[4] & 0xFFFF;
-                g_Param.uint8_SCtLevel = g_Cmd.uint32_TempPara[5] & 0xFF;
+                g_Param.uint16_Imin = g_CmdChk.uint32_TempPara[1] & 0xFFFF;
+                g_Param.uint16_Imax = g_CmdChk.uint32_TempPara[2] & 0xFFFF;
+                g_Param.uint16_Umot = g_CmdChk.uint32_TempPara[3] & 0xFFFF;
+                g_Param.uint16_SCiLevel = g_CmdChk.uint32_TempPara[4] & 0xFFFF;
+                g_Param.uint8_SCtLevel = g_CmdChk.uint32_TempPara[5] & 0xFF;
       
                 uart2_sendbuffer('E');          //first the letter E
                 uart2_sendbuffer(13);           //with CR at the end
@@ -1171,7 +1171,7 @@ void cmd_SILIM(void)
 ***********************************************************************************************************************/
 void cmd_ETESTIN(void)
 {
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
         {
@@ -1267,9 +1267,9 @@ void cmd_SRACC(void)
     auto unsigned char uint8_WB1;           //local work byte for the loops
     auto unsigned char uint8_WB2;           //local work byte to store the results into the array  
   
-    if((g_Cmd.uint8_ParamPos > 1) && (g_Cmd.uint8_ParamPos < 102))  //number of received characters inside the range?
+    if((g_CmdChk.uint8_ParamPos > 1) && (g_CmdChk.uint8_ParamPos < 102))  //number of received characters inside the range?
     {
-        if(g_Cmd.uint8_ParamPos % 2)    //verify if the number of received parameters is odd-numbered (a pair) 
+        if(g_CmdChk.uint8_ParamPos % 2)    //verify if the number of received parameters is odd-numbered (a pair) 
         {
             if(g_Uni.uint8_Settings & 0x01)         //is motor in run mode?
             {
@@ -1285,12 +1285,12 @@ void cmd_SRACC(void)
                 uint8_WB1 = 1;
                 do
                 {
-                    uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[uint8_WB1],_AccNumbStepMin,_AccNumbStepMax);
+                    uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[uint8_WB1],_AccNumbStepMin,_AccNumbStepMax);
                     uint8_WB1++;                      //increment with 1 to take the next parameter
-                    uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[uint8_WB1],_AccFreqMin,_AccFreqMax);
+                    uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[uint8_WB1],_AccFreqMin,_AccFreqMax);
                     uint8_WB1++;                      //increment wiht 1 to take the next parameter
                 }
-                while(uint8_WB1 < g_Cmd.uint8_ParamPos);
+                while(uint8_WB1 < g_CmdChk.uint8_ParamPos);
       
                 //each parameter within the tolerance (uint8_WB1 - 1, because the 1st parameter is the cmd ID)?
                 if(uint8_Result == (uint8_WB1-1))
@@ -1306,13 +1306,13 @@ void cmd_SRACC(void)
                     uint8_WB2 = 0;
                     do
                     {
-                        g_Param.uint16_AccNumbStep[uint8_WB2] = g_Cmd.uint32_TempPara[uint8_WB1] & 0xFFFF;
+                        g_Param.uint16_AccNumbStep[uint8_WB2] = g_CmdChk.uint32_TempPara[uint8_WB1] & 0xFFFF;
                         uint8_WB1++;        //increment with 1 to take the next parameter
-                        g_Param.uint16_AccFreq[uint8_WB2] = g_Cmd.uint32_TempPara[uint8_WB1] & 0xFFFF;
+                        g_Param.uint16_AccFreq[uint8_WB2] = g_CmdChk.uint32_TempPara[uint8_WB1] & 0xFFFF;
                         uint8_WB1++;        //increment with 1 to take the next parameter
                         uint8_WB2++;        //increment with 1 to store it on the right position of the array
                     }
-                    while(uint8_WB1 < g_Cmd.uint8_ParamPos);
+                    while(uint8_WB1 < g_CmdChk.uint8_ParamPos);
         
                     //to know how many ramps are stored in the array copy the result in the follow variable
                     g_Param.uint8_AccNumbRamp = uint8_WB2;  
@@ -1386,9 +1386,9 @@ void cmd_SRDEC(void)
     auto unsigned char uint8_WB1;           //local work byte for the loops
     auto unsigned char uint8_WB2;           //local work byte to store the results into the array  
     
-    if((g_Cmd.uint8_ParamPos > 1) && (g_Cmd.uint8_ParamPos < 102))    //number of received characters OK?
+    if((g_CmdChk.uint8_ParamPos > 1) && (g_CmdChk.uint8_ParamPos < 102))    //number of received characters OK?
     {
-        if(g_Cmd.uint8_ParamPos % 2)    //verify if the number of received parameters is odd-numbered (a pair)
+        if(g_CmdChk.uint8_ParamPos % 2)    //verify if the number of received parameters is odd-numbered (a pair)
         {
             if(g_Uni.uint8_Settings & 0x01)     //is motor in run mode?
             {
@@ -1404,12 +1404,12 @@ void cmd_SRDEC(void)
                 uint8_WB1 = 1;
                 do
                 {
-                    uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[uint8_WB1],_DecNumbStepMin,_DecNumbStepMax);
+                    uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[uint8_WB1],_DecNumbStepMin,_DecNumbStepMax);
                     uint8_WB1++;                      //increment with 1 to take the next parameter
-                    uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[uint8_WB1],_DecFreqMin,_DecFreqMax);
+                    uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[uint8_WB1],_DecFreqMin,_DecFreqMax);
                     uint8_WB1++;                      //increment wiht 1 to take the next parameter
                 }
-                while(uint8_WB1 < g_Cmd.uint8_ParamPos);
+                while(uint8_WB1 < g_CmdChk.uint8_ParamPos);
       
                 //each parameter within the tolerance (uint8_WB1 - 1, because the 1st parameter is the cmd ID)?
                 if(uint8_Result == (uint8_WB1-1))
@@ -1425,13 +1425,13 @@ void cmd_SRDEC(void)
                     uint8_WB2 = 0;
                     do
                     {
-                        g_Param.uint16_DecNumbStep[uint8_WB2] = g_Cmd.uint32_TempPara[uint8_WB1] & 0xFFFF;
+                        g_Param.uint16_DecNumbStep[uint8_WB2] = g_CmdChk.uint32_TempPara[uint8_WB1] & 0xFFFF;
                         uint8_WB1++;            //increment with 1 to take the next parameter
-                        g_Param.uint16_DecFreq[uint8_WB2] = g_Cmd.uint32_TempPara[uint8_WB1] & 0xFFFF;
+                        g_Param.uint16_DecFreq[uint8_WB2] = g_CmdChk.uint32_TempPara[uint8_WB1] & 0xFFFF;
                         uint8_WB1++;            //increment with 1 to take the next parameter
                         uint8_WB2++;            //increment with 1 to store it on the right position of the array
                     }
-                    while(uint8_WB1 < g_Cmd.uint8_ParamPos);
+                    while(uint8_WB1 < g_CmdChk.uint8_ParamPos);
         
                     //to know how many ramps are stored in the array copy the result in the follow variable
                     g_Param.uint8_DecNumbRamp = uint8_WB2; 
@@ -1506,7 +1506,7 @@ void cmd_RUN(void)
 {
     auto unsigned char uint8_Result = 0;    //local work byte for the result 
     
-    if(g_Cmd.uint8_ParamPos == 15)  //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 15)  //number of received characters OK?
     {
         if(g_Uni.uint8_Settings & 0x01)         //is motor in run mode?
         {
@@ -1515,58 +1515,58 @@ void cmd_RUN(void)
         }
         else
         {
-            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[2],_StepModeUniMatMin,_StepModeUniMatMax);
-            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[3],_StepCountMin,_StepCountMax);
-            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[4],_RunFreqMin,_RunFreqMax);      
-            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[5],_DirMin,_DirMax);
-            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[6],_CoilStateMin,_CoilStateMax);
-            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[7],_BipRunIMin,_BipRunIMax);
-            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[8],_BipHoldIMin,_BipHoldIMax);
-            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[9],_SelectRampMin,_SelectRampMax);
-            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[10],_BipAccIMin,_BipAccIMax);
-            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[11],_BipDecIMin,_BipDecIMax);
-            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[12],_AccOnDelayMin,_AccOnDelayMax);
-            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[13],_DecOffDelayMin,_DecOffDelayMax);
-            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[14],_AckMin,_AckMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_StepModeUniMatMin,_StepModeUniMatMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],_StepCountMin,_StepCountMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[4],_RunFreqMin,_RunFreqMax);      
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[5],_DirMin,_DirMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[6],_CoilStateMin,_CoilStateMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[7],_BipRunIMin,_BipRunIMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[8],_BipHoldIMin,_BipHoldIMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[9],_SelectRampMin,_SelectRampMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[10],_BipAccIMin,_BipAccIMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[11],_BipDecIMin,_BipDecIMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[12],_AccOnDelayMin,_AccOnDelayMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[13],_DecOffDelayMin,_DecOffDelayMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[14],_AckMin,_AckMax);
             
             if(uint8_Result == 13)      //each parameter within the tolerance?
             {
                 //then store the parameters
-                g_Param.uint8_StepMode = g_Cmd.uint32_TempPara[2] & 0xFF;
-                g_Param.uint32_StepCount = g_Cmd.uint32_TempPara[3] & 0xFFFFFFFF;
-                g_Param.uint16_RunFreq = g_Cmd.uint32_TempPara[4] & 0xFFFF;
-                g_Param.uint8_Direction = g_Cmd.uint32_TempPara[5] & 0xFF;
-                g_Param.uint8_CoilState = g_Cmd.uint32_TempPara[6] & 0xFF;
-                g_Param.uint16_BipRunI = g_Cmd.uint32_TempPara[7] & 0xFFFF;
-                g_Param.uint16_BipHoldI = g_Cmd.uint32_TempPara[8] & 0xFFFF;
-                g_Param.uint8_SelectRamp = g_Cmd.uint32_TempPara[9] & 0xFF;
-                g_Param.uint16_BipAccI = g_Cmd.uint32_TempPara[10] & 0xFFFF;
-                g_Param.uint16_BipDecI = g_Cmd.uint32_TempPara[11] & 0xFFFF;
-                g_Param.uint16_AccOnDelay = g_Cmd.uint32_TempPara[12] & 0xFFFF;
-                g_Param.uint16_DecOffDelay = g_Cmd.uint32_TempPara[13] & 0xFFFF;
-                g_Param.uint8_Acknowledge = g_Cmd.uint32_TempPara[14] & 0xFF;
+                g_Param.uint8_StepMode = g_CmdChk.uint32_TempPara[2] & 0xFF;
+                g_Param.uint32_StepCount = g_CmdChk.uint32_TempPara[3] & 0xFFFFFFFF;
+                g_Param.uint16_RunFreq = g_CmdChk.uint32_TempPara[4] & 0xFFFF;
+                g_Param.uint8_Direction = g_CmdChk.uint32_TempPara[5] & 0xFF;
+                g_Param.uint8_CoilState = g_CmdChk.uint32_TempPara[6] & 0xFF;
+                g_Param.uint16_BipRunI = g_CmdChk.uint32_TempPara[7] & 0xFFFF;
+                g_Param.uint16_BipHoldI = g_CmdChk.uint32_TempPara[8] & 0xFFFF;
+                g_Param.uint8_SelectRamp = g_CmdChk.uint32_TempPara[9] & 0xFF;
+                g_Param.uint16_BipAccI = g_CmdChk.uint32_TempPara[10] & 0xFFFF;
+                g_Param.uint16_BipDecI = g_CmdChk.uint32_TempPara[11] & 0xFFFF;
+                g_Param.uint16_AccOnDelay = g_CmdChk.uint32_TempPara[12] & 0xFFFF;
+                g_Param.uint16_DecOffDelay = g_CmdChk.uint32_TempPara[13] & 0xFFFF;
+                g_Param.uint8_Acknowledge = g_CmdChk.uint32_TempPara[14] & 0xFF;
                 
                 //before continue verify type of motor to know what is to do!
-                if(g_Cmd.uint32_TempPara[1] == 'N') //type of motor = None?
+                if(g_CmdChk.uint32_TempPara[1] == 'N') //type of motor = None?
                 {
                     g_Param.uint8_ErrCode = _MotTypRUN;         //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                 }
-                else if(g_Cmd.uint32_TempPara[1] == 'L')    //type of motor = Lin?
+                else if(g_CmdChk.uint32_TempPara[1] == 'L')    //type of motor = Lin?
                 {
                     g_Param.uint8_ErrCode = _LinRUN;            //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine                
                 }
-                else if(g_Cmd.uint32_TempPara[1] == 'B')    //type of motor = Bipolar?
+                else if(g_CmdChk.uint32_TempPara[1] == 'B')    //type of motor = Bipolar?
                 {
                     //to decide what is to do when motor type changes
-                    g_Param.uint8_MotTyp = g_Cmd.uint32_TempPara[1] & 0xFF;
+                    g_Param.uint8_MotTyp = g_CmdChk.uint32_TempPara[1] & 0xFF;
                 }
                 //type of motor = unipolar or matrix?
-                else if((g_Cmd.uint32_TempPara[1] == 'U') || (g_Cmd.uint32_TempPara[1] == 'M'))
+                else if((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
                 {
                     //to decide what is to do when motor type changes
-                    g_Param.uint8_MotTyp = g_Cmd.uint32_TempPara[1] & 0xFF;    
+                    g_Param.uint8_MotTyp = g_CmdChk.uint32_TempPara[1] & 0xFF;    
                            
                     g_Uni.uint8_Settings |= 0x01;   //enable run bit
           
@@ -1690,15 +1690,15 @@ void cmd_SPHC(void)
 {
     auto unsigned char uint8_Result = 0;    //local work byte for the result 
     
-    if(g_Cmd.uint8_ParamPos == 2)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 2)   //number of received characters OK?
     {
         //then verify the received parameters
-        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_BipIPctMin,_BipIPctMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipIPctMin,_BipIPctMax);
     
         if(uint8_Result == 1)         //each parameter within the tolerance?
         {   
             //then store the parameters and send back the OK 
-            g_Param.uint8_BipIPct = g_Cmd.uint32_TempPara[1] & 0xFF;      
+            g_Param.uint8_BipIPct = g_CmdChk.uint32_TempPara[1] & 0xFF;      
             uart2_sendbuffer('E');
             uart2_sendbuffer(13);
         }
@@ -1735,7 +1735,7 @@ void cmd_SPHC(void)
 ***********************************************************************************************************************/
 void cmd_GVER(void)
 {
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         funct_LoadDeviceInfo();     //call subroutine      
     }
@@ -1764,7 +1764,7 @@ void cmd_GVER(void)
 ***********************************************************************************************************************/
 void cmd_RAZ(void)
 {
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         if(g_Uni.uint8_Settings & 0x01)                 //is motor in run mode?
         {
@@ -1814,7 +1814,7 @@ void cmd_SMTYP(void)
 {
     auto unsigned char uint8_Result = 0;        //local work byte for the result 
   
-    if(g_Cmd.uint8_ParamPos == 2)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 2)   //number of received characters OK?
     {
         if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
         {
@@ -1860,7 +1860,7 @@ void cmd_SMTYP(void)
 ***********************************************************************************************************************/
 void cmd_GMTYP(void)
 {
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         uart2_sendbuffer('E');                    //first the letter E
         uart2_sendbuffer(',');                    //then the comma
@@ -1891,7 +1891,7 @@ void cmd_GMTYP(void)
 ***********************************************************************************************************************/
 void cmd_STEST(void)
 {  
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         //to define!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     
@@ -1925,7 +1925,7 @@ void cmd_STEST(void)
 ***********************************************************************************************************************/
 void cmd_GILIM(void)
 {
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         //send back the needed informations
         uart2_sendbuffer('E');                  //first the letter E
@@ -1976,7 +1976,7 @@ void cmd_GILIM(void)
 ***********************************************************************************************************************/
 void cmd_GPHC(void)
 {  
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
         {
@@ -2027,7 +2027,7 @@ void cmd_GRACC(void)
 {  
     auto unsigned char uint8_WB;              //local work byte
     
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
         {
@@ -2094,7 +2094,7 @@ void cmd_GRDEC(void)
 {  
     auto unsigned char uint8_WB;              //local work byte
     
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
         {
@@ -2154,7 +2154,7 @@ void cmd_GRDEC(void)
 ***********************************************************************************************************************/
 void cmd_GRUN(void)
 {  
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         //send back the needed informations
         uart2_sendbuffer('E');                      //first the letter E
@@ -2238,7 +2238,7 @@ void cmd_GRUN(void)
 ***********************************************************************************************************************/
 void cmd_BREAK(void)
 {  
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         //add here the conditions!!!!!
         
@@ -2271,7 +2271,7 @@ void cmd_BREAK(void)
 ***********************************************************************************************************************/
 void cmd_MUMOT(void)
 {  
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         //measure here the voltage or take the last measured parameter and send it back!
     
@@ -2308,7 +2308,7 @@ void cmd_SCOILON(void)
     auto unsigned char uint8_Result = 0;    //local work byte
     auto unsigned char uint8_WB;            //local work byte
     
-    if(g_Cmd.uint8_ParamPos == 6)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 6)   //number of received characters OK?
     {
         if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
         {
@@ -2318,7 +2318,7 @@ void cmd_SCOILON(void)
         else
         {
             //verify the limits if they are inside the tolerance
-            uint8_WB = g_Cmd.uint32_TempPara[1];
+            uint8_WB = g_CmdChk.uint32_TempPara[1];
             if((uint8_WB == 'N') || (uint8_WB == 'B') || (uint8_WB == 'M') || (uint8_WB == 'U'))
             {
                 uint8_Result++;
@@ -2327,30 +2327,30 @@ void cmd_SCOILON(void)
             {
                 //do nothing
             }
-            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[2],0,1);
-            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[3],0,1);      
-            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[4],0,1);
-            uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[5],0,1);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],0,1);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],0,1);      
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[4],0,1);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[5],0,1);
             
             if(uint8_Result == 5)   //each parameter within the tolerance?
             {              
                 //before continue verify type of motor to know what is to do!
-                if(g_Cmd.uint32_TempPara[1] == 'N') //type of motor = None?
+                if(g_CmdChk.uint32_TempPara[1] == 'N') //type of motor = None?
                 {
                     g_Param.uint8_ErrCode = _MotTypSCOILON;     //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                 }
-                else if(g_Cmd.uint32_TempPara[1] == 'L')    //type of motor = Lin?
+                else if(g_CmdChk.uint32_TempPara[1] == 'L')    //type of motor = Lin?
                 {
                     g_Param.uint8_ErrCode = _LinSCOILON;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine                
                 }
-                else if(g_Cmd.uint32_TempPara[1] == 'B')    //type of motor = Bipolar?
+                else if(g_CmdChk.uint32_TempPara[1] == 'B')    //type of motor = Bipolar?
                 {
                     //switch off/on the inputs here
                 }
                 //type of motor = unipolar or matrix?
-                else if((g_Cmd.uint32_TempPara[1] == 'U') || (g_Cmd.uint32_TempPara[1] == 'M'))
+                else if((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
                 {
                     //switch off/on the inputs here
                 }
@@ -2391,7 +2391,7 @@ void cmd_SCOILON(void)
 ***********************************************************************************************************************/
 void cmd_SSMOD(void)
 {
-    if(g_Cmd.uint8_ParamPos == 2)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 2)   //number of received characters OK?
     {
         if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
         {
@@ -2400,7 +2400,7 @@ void cmd_SSMOD(void)
         }
         else
         {
-            switch(g_Cmd.uint32_TempPara[1])    //verify mode of step
+            switch(g_CmdChk.uint32_TempPara[1])    //verify mode of step
             {
                 case (0):       //full step one phase on
                     g_Param.uint8_StepMode = 0;
@@ -2480,7 +2480,7 @@ void cmd_SSMOD(void)
 ***********************************************************************************************************************/
 void cmd_GSMOD(void)
 {
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         uart2_sendbuffer('E');                    //first the letter E
         uart2_sendbuffer(',');                    //then the comma
@@ -2514,15 +2514,15 @@ void cmd_SBIT(void)
 {
     auto unsigned char uint8_Result = 0;    //local work byte
     
-    if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 2)           //number of received characters OK?
     {
         //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_BitMin,_BitMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BitMin,_BitMax);
         
         if(uint8_Result == 1)   //each parameter within the tolerance?
         {
             //set the corresponding bit / output by call the subroutine
-            funct_OutputHandler(_SetBit,(g_Cmd.uint32_TempPara[1] & 0xFF));
+            funct_OutputHandler(_SetBit,(g_CmdChk.uint32_TempPara[1] & 0xFF));
                    
             //send back the needed informations
             uart2_sendbuffer('E');                  //first the letter E
@@ -2561,15 +2561,15 @@ void cmd_CBIT(void)
 {
     auto unsigned char uint8_Result = 0;    //local work byte
     
-    if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 2)           //number of received characters OK?
     {
         //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_BitMin,_BitMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BitMin,_BitMax);
         
         if(uint8_Result == 1)   //each parameter within the tolerance?
         {
             //set the corresponding bit / output by call the subroutine
-            funct_OutputHandler(_ClrBit,(g_Cmd.uint32_TempPara[1] & 0xFF));
+            funct_OutputHandler(_ClrBit,(g_CmdChk.uint32_TempPara[1] & 0xFF));
                    
             //send back the needed informations
             uart2_sendbuffer('E');                  //first the letter E
@@ -2609,15 +2609,15 @@ void cmd_GBIT(void)
     auto unsigned char uint8_Result = 0;    //local work byte
     auto unsigned char uint8_value;         //local work byte
     
-    if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 2)           //number of received characters OK?
     {
         //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_BitMin,_BitMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BitMin,_BitMax);
         
         if(uint8_Result == 1)   //each parameter within the tolerance?
         {
             //get the corresponding bit / output by call the subroutine
-            uint8_value = funct_IOhandler(_GetBit,_Output,(g_Cmd.uint32_TempPara[1] & 0xFF));
+            uint8_value = funct_IOhandler(_GetBit,_Output,(g_CmdChk.uint32_TempPara[1] & 0xFF));
                    
             //send back the needed informations
             uart2_sendbuffer('E');                  //first the letter E
@@ -2658,15 +2658,15 @@ void cmd_SOUT(void)
 {
     auto unsigned char uint8_Result = 0;    //local work byte
     
-    if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 2)           //number of received characters OK?
     {
         //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_ValPortMin,_ValPortMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_ValPortMin,_ValPortMax);
         
         if(uint8_Result == 1)   //each parameter within the tolerance?
         {
             //set the corresponding bit / output by call the subroutine
-            funct_OutputHandler(_SetPort,(g_Cmd.uint32_TempPara[1] & 0xFF));
+            funct_OutputHandler(_SetPort,(g_CmdChk.uint32_TempPara[1] & 0xFF));
                    
             //send back the needed informations
             uart2_sendbuffer('E');                  //first the letter E
@@ -2705,10 +2705,10 @@ void cmd_GOUT(void)
 {
     auto unsigned char uint8_value;         //local work byte
     
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         //get the output port by call the subroutine
-        uint8_value = funct_IOhandler(_GetPort,_Output,(g_Cmd.uint32_TempPara[1] & 0xFF));
+        uint8_value = funct_IOhandler(_GetPort,_Output,(g_CmdChk.uint32_TempPara[1] & 0xFF));
                    
         //send back the needed informations
         uart2_sendbuffer('E');                  //first the letter E
@@ -2743,10 +2743,10 @@ void cmd_GINP(void)
 {
     auto unsigned char uint8_value;         //local work byte
     
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         //get the output port by call the subroutine
-        uint8_value = funct_IOhandler(_GetPort,_Input,(g_Cmd.uint32_TempPara[1] & 0xFF));
+        uint8_value = funct_IOhandler(_GetPort,_Input,(g_CmdChk.uint32_TempPara[1] & 0xFF));
                    
         //send back the needed informations
         uart2_sendbuffer('E');                  //first the letter E
@@ -2795,10 +2795,10 @@ void cmd_SMCRSTP(void)
     auto unsigned char uint8_WB1;           //local work byte for the loops
     auto unsigned char uint8_WB2;           //local work byte to store the results into the array
     
-    if((g_Cmd.uint8_ParamPos > 1) && (g_Cmd.uint8_ParamPos < 18))   //number of received characters OK?
+    if((g_CmdChk.uint8_ParamPos > 1) && (g_CmdChk.uint8_ParamPos < 18))   //number of received characters OK?
     {
         //number of received characters are a pair of 4th, 8th or 17th (+1 with command ID)
-        if((g_Cmd.uint8_ParamPos == 5) || (g_Cmd.uint8_ParamPos == 9) || (g_Cmd.uint8_ParamPos == 17))
+        if((g_CmdChk.uint8_ParamPos == 5) || (g_CmdChk.uint8_ParamPos == 9) || (g_CmdChk.uint8_ParamPos == 17))
         {
             if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
             {
@@ -2814,10 +2814,10 @@ void cmd_SMCRSTP(void)
                 uint8_WB1 = 1;
                 do
                 {
-                    uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[uint8_WB1],_BipILevelMin,_BipILevelMax);
+                    uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[uint8_WB1],_BipILevelMin,_BipILevelMax);
                     uint8_WB1++;    //increment with 1 to take the next parameter
                 }
-                while(uint8_WB1 < g_Cmd.uint8_ParamPos);
+                while(uint8_WB1 < g_CmdChk.uint8_ParamPos);
                 
                 //each paramter within the tolerance (uint8_WB1 - 1, because the 1st parameter is the cmd ID)?
                 if(uint8_Result == (uint8_WB1-1))
@@ -2833,11 +2833,11 @@ void cmd_SMCRSTP(void)
                     uint8_WB2 = 0;
                     do
                     {
-                        g_Param.uint16_BipILevel[uint8_WB2] = g_Cmd.uint32_TempPara[uint8_WB1] & 0xFFFF;
+                        g_Param.uint16_BipILevel[uint8_WB2] = g_CmdChk.uint32_TempPara[uint8_WB1] & 0xFFFF;
                         uint8_WB1++;    //increment with 1 to take the next paramter
                         uint8_WB2++;    //increment with 1 to store it on the right position of the array
                     }
-                    while(uint8_WB1 < g_Cmd.uint8_ParamPos);
+                    while(uint8_WB1 < g_CmdChk.uint8_ParamPos);
                     
                     //send back the OK
                     uart2_sendbuffer('E');            //first the letter E
@@ -2882,7 +2882,7 @@ void cmd_GMCRSTP(void)
 {
     auto unsigned char uint8_WB;    //local work byte
     
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
         {
@@ -2937,19 +2937,19 @@ void cmd_SSWLIM(void)
 {
     auto unsigned char uint8_Result = 0;    //local work byte
     
-    if(g_Cmd.uint8_ParamPos == 5)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 5)   //number of received characters OK?
     {
-        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_SW1min,_SW1max);
-        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[2],_SW1min,_SW1max);
-        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[3],_SW2min,_SW2max);
-        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[4],_SW2min,_SW2max);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_SW1min,_SW1max);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_SW1min,_SW1max);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],_SW2min,_SW2max);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[4],_SW2min,_SW2max);
         
         if(uint8_Result == 4)   //received parameters are within the tolerance?
         {
-            g_Param.uint32_Sw1min = g_Cmd.uint32_TempPara[1];
-            g_Param.uint32_Sw1max = g_Cmd.uint32_TempPara[2];
-            g_Param.uint32_Sw2min = g_Cmd.uint32_TempPara[3];
-            g_Param.uint32_Sw2max = g_Cmd.uint32_TempPara[4];
+            g_Param.uint32_Sw1min = g_CmdChk.uint32_TempPara[1];
+            g_Param.uint32_Sw1max = g_CmdChk.uint32_TempPara[2];
+            g_Param.uint32_Sw2min = g_CmdChk.uint32_TempPara[3];
+            g_Param.uint32_Sw2max = g_CmdChk.uint32_TempPara[4];
             
             //send back the needed informations
             uart2_sendbuffer('E');                  //first the letter E
@@ -2984,7 +2984,7 @@ void cmd_SSWLIM(void)
 ***********************************************************************************************************************/
 void cmd_GSWLIM(void)
 {    
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         uart2_sendbuffer('E');          //first the letter E
             
@@ -3022,7 +3022,7 @@ void cmd_GSWLIM(void)
 ***********************************************************************************************************************/
 void cmd_GSWPOS(void)
 {    auto unsigned char uint8_Result = 0;
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         uint8_Result += funct_CheckTol(g_Param.uint32_Sw1pos,g_Param.uint32_Sw1min,g_Param.uint32_Sw1max);
         uint8_Result += funct_CheckTol(g_Param.uint32_Sw2pos,g_Param.uint32_Sw2min,g_Param.uint32_Sw2max);
@@ -3069,15 +3069,15 @@ void cmd_SPWMLIM(void)
 {
     auto unsigned char uint8_Result = 0;    //local work byte
     
-    if(g_Cmd.uint8_ParamPos == 3)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 3)   //number of received characters OK?
     {
-        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_SWpwmMin,_SWpwmMax);
-        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[2],_SWpwmMin,_SWpwmMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_SWpwmMin,_SWpwmMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_SWpwmMin,_SWpwmMax);
         
         if(uint8_Result == 2)   //received parameters are within the tolerance?
         {
-            g_Param.uint32_SwPWMmin = g_Cmd.uint32_TempPara[1];
-            g_Param.uint32_SwPWMmax = g_Cmd.uint32_TempPara[2];
+            g_Param.uint32_SwPWMmin = g_CmdChk.uint32_TempPara[1];
+            g_Param.uint32_SwPWMmax = g_CmdChk.uint32_TempPara[2];
             
             //send back the needed informations
             uart2_sendbuffer('E');                  //first the letter E
@@ -3112,7 +3112,7 @@ void cmd_SPWMLIM(void)
 ***********************************************************************************************************************/
 void cmd_GPWMLIM(void)
 {    
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         uart2_sendbuffer('E');          //first the letter E
             
@@ -3148,7 +3148,7 @@ void cmd_GPWMPOS(void)
 {    
     auto unsigned char uint8_Result = 0;
     
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         uint8_Result += funct_CheckTol(g_Param.uint32_SwPWMpos,g_Param.uint32_SwPWMmin,g_Param.uint32_SwPWMmax);
         uint8_Result += funct_CheckTol(g_Param.uint16_SwPWMval,470,530);
@@ -3201,7 +3201,7 @@ void cmd_GPWMPOS(void)
 ***********************************************************************************************************************/
 void cmd_GPWMVAL(void)
 {    
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         if(funct_CheckTol(g_Param.uint16_SwPWMval,470,530))
         {
@@ -3250,11 +3250,11 @@ void cmd_GPWMVAL(void)
 ***********************************************************************************************************************/
 void cmd_SSWTYP(void)
 {
-    if(g_Cmd.uint8_ParamPos == 2)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 2)   //number of received characters OK?
     {
-        if(funct_CheckTol(g_Cmd.uint32_TempPara[1],_SWtypeMin,_SWtypeMax))   //received parameters are within the tolerance?
+        if(funct_CheckTol(g_CmdChk.uint32_TempPara[1],_SWtypeMin,_SWtypeMax))   //received parameters are within the tolerance?
         {
-            g_Param.uint8_SwType = g_Cmd.uint32_TempPara[1];
+            g_Param.uint8_SwType = g_CmdChk.uint32_TempPara[1];
             
             //send back the needed informations
             uart2_sendbuffer('E');                  //first the letter E
@@ -3289,7 +3289,7 @@ void cmd_SSWTYP(void)
 ***********************************************************************************************************************/
 void cmd_GSWTYP(void)
 {    
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         uart2_sendbuffer('E');
         uart2_sendbuffer(',');  //add the comma
@@ -3319,7 +3319,7 @@ void cmd_GSWTYP(void)
 ***********************************************************************************************************************/
 void cmd_GFRQVAL(void)
 {    
-    if(g_Cmd.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         uart2_sendbuffer('E');
         uart2_sendbuffer(',');  //add the comma
@@ -3362,15 +3362,15 @@ void cmd_GINPB(void)
     auto unsigned char uint8_Result = 0;    //local work byte
     auto unsigned char uint8_value;         //local work byte
     
-    if(g_Cmd.uint8_ParamPos == 2)           //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 2)           //number of received characters OK?
     {
         //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_Cmd.uint32_TempPara[1],_BitMin,_BitMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BitMin,_BitMax);
         
         if(uint8_Result == 1)   //each parameter within the tolerance?
         {
             //get the corresponding bit / output by call the subroutine
-            uint8_value = funct_IOhandler(_GetBit,_Input,(g_Cmd.uint32_TempPara[1] & 0xFF));
+            uint8_value = funct_IOhandler(_GetBit,_Input,(g_CmdChk.uint32_TempPara[1] & 0xFF));
                    
             //send back the needed informations
             uart2_sendbuffer('E');                  //first the letter E

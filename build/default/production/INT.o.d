@@ -10,5 +10,6 @@ timers.h  \
 INT.h  \
 unipolar.h  \
  command.h  \
+cmdchk.h  \
 parameter.h  \
 UART.h 

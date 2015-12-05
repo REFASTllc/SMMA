@@ -45,17 +45,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=main.c system.c timers.c INT.c function.c unipolar.c command.c parameter.c UART.c
+SOURCEFILES_QUOTED_IF_SPACED=main.c system.c timers.c INT.c function.c unipolar.c command.c parameter.c UART.c cmdchk.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/system.o ${OBJECTDIR}/timers.o ${OBJECTDIR}/INT.o ${OBJECTDIR}/function.o ${OBJECTDIR}/unipolar.o ${OBJECTDIR}/command.o ${OBJECTDIR}/parameter.o ${OBJECTDIR}/UART.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/system.o.d ${OBJECTDIR}/timers.o.d ${OBJECTDIR}/INT.o.d ${OBJECTDIR}/function.o.d ${OBJECTDIR}/unipolar.o.d ${OBJECTDIR}/command.o.d ${OBJECTDIR}/parameter.o.d ${OBJECTDIR}/UART.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/system.o ${OBJECTDIR}/timers.o ${OBJECTDIR}/INT.o ${OBJECTDIR}/function.o ${OBJECTDIR}/unipolar.o ${OBJECTDIR}/command.o ${OBJECTDIR}/parameter.o ${OBJECTDIR}/UART.o ${OBJECTDIR}/cmdchk.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/system.o.d ${OBJECTDIR}/timers.o.d ${OBJECTDIR}/INT.o.d ${OBJECTDIR}/function.o.d ${OBJECTDIR}/unipolar.o.d ${OBJECTDIR}/command.o.d ${OBJECTDIR}/parameter.o.d ${OBJECTDIR}/UART.o.d ${OBJECTDIR}/cmdchk.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/system.o ${OBJECTDIR}/timers.o ${OBJECTDIR}/INT.o ${OBJECTDIR}/function.o ${OBJECTDIR}/unipolar.o ${OBJECTDIR}/command.o ${OBJECTDIR}/parameter.o ${OBJECTDIR}/UART.o
+OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/system.o ${OBJECTDIR}/timers.o ${OBJECTDIR}/INT.o ${OBJECTDIR}/function.o ${OBJECTDIR}/unipolar.o ${OBJECTDIR}/command.o ${OBJECTDIR}/parameter.o ${OBJECTDIR}/UART.o ${OBJECTDIR}/cmdchk.o
 
 # Source Files
-SOURCEFILES=main.c system.c timers.c INT.c function.c unipolar.c command.c parameter.c UART.c
+SOURCEFILES=main.c system.c timers.c INT.c function.c unipolar.c command.c parameter.c UART.c cmdchk.c
 
 
 CFLAGS=
@@ -148,6 +148,12 @@ ${OBJECTDIR}/UART.o: UART.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/UART.o 
 	@${FIXDEPS} "${OBJECTDIR}/UART.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/UART.o.d" -o ${OBJECTDIR}/UART.o UART.c     
 	
+${OBJECTDIR}/cmdchk.o: cmdchk.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/cmdchk.o.d 
+	@${RM} ${OBJECTDIR}/cmdchk.o 
+	@${FIXDEPS} "${OBJECTDIR}/cmdchk.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/cmdchk.o.d" -o ${OBJECTDIR}/cmdchk.o cmdchk.c     
+	
 else
 ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
@@ -202,6 +208,12 @@ ${OBJECTDIR}/UART.o: UART.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/UART.o.d 
 	@${RM} ${OBJECTDIR}/UART.o 
 	@${FIXDEPS} "${OBJECTDIR}/UART.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/UART.o.d" -o ${OBJECTDIR}/UART.o UART.c     
+	
+${OBJECTDIR}/cmdchk.o: cmdchk.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/cmdchk.o.d 
+	@${RM} ${OBJECTDIR}/cmdchk.o 
+	@${FIXDEPS} "${OBJECTDIR}/cmdchk.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/cmdchk.o.d" -o ${OBJECTDIR}/cmdchk.o cmdchk.c     
 	
 endif
 
