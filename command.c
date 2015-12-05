@@ -74,7 +74,6 @@ SCmd g_Cmd;                 //global variables for struct
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void cmd_init(void)
 {
@@ -100,20 +99,6 @@ void cmd_init(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Cmd.
- *                              - uint8_ParamPos
- *                              - uint32_TempPara
- *                              - uint8_CmdID
- *                              - uint32_TempPara
- *                              - uint32_Cmd1st4
- *                              - uint32_Cmd2nd4
- *                              - uint8_LetterPos
- *                          g_Param.
- *                              - uint8_ErrCode
- *                          g_UART2rxd.
- *                              - uint16_Rch
- *                              - uint16_Wch
- *                              - uint8_BufEmpty
 ***********************************************************************************************************************/
 void cmd_check(void)
 {
@@ -599,12 +584,6 @@ void cmd_check(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Cmd.
- *                              - uint32_Cmd2nd4
- *                              - uint32_Cmd1st4
- *                              - uint8_CmdID
- *                          g_Param.
- *                              - uint8_ErrCode
 ***********************************************************************************************************************/
 void cmd_def(void)
 {
@@ -1133,14 +1112,6 @@ void cmd_def(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint8_Settings
- *                          g_Param.
- *                              - uint8_MotTyp
- *                              - uint32_TempPara
- *                              - uint8_ErrCode
- *                          g_Cmd.
- *                              - uint8_ParamPos
 ***********************************************************************************************************************/
 void cmd_SILIM(void)
 {
@@ -1197,10 +1168,6 @@ void cmd_SILIM(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint8_Settings
- *                          g_Param.
- *                              - uint8_ErrCode
 ***********************************************************************************************************************/
 void cmd_ETESTIN(void)
 {
@@ -1293,15 +1260,6 @@ void cmd_ETESTIN(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint8_Settings 
- *                          g_Param.
- *                              - uint8_ErrCode
- *                              - uint8_ParamPos
- *                              - uint32_TempPara
- *                              - uint16_AccNumbStep
- *                              - uint16_AccFreq
- *                              - uint8_AccNumbRamp
 ***********************************************************************************************************************/
 void cmd_SRACC(void)
 {
@@ -1421,15 +1379,6 @@ void cmd_SRACC(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint8_Settings 
- *                          g_Param.
- *                              - uint8_ErrCode
- *                              - uint8_ParamPos
- *                              - uint32_TempPara
- *                              - uint16_DecNumbStep
- *                              - uint16_DecFreq
- *                              - uint8_DecNumbRamp
 ***********************************************************************************************************************/
 void cmd_SRDEC(void)
 {
@@ -1552,36 +1501,6 @@ void cmd_SRDEC(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint8_Settings
- *                              - uint32_GoalPos
- *                              - uint16_RunFreq
- *                              - uint16_SwOnLastTime
- *                              - uint16_SwOnCount
- *                              - uint16_SwOffLastTime
- *                              - uint16_SwOffCount
- *                              - uint16_LastTime
- *                              - uint16_Count
- *                          g_Timer2.
- *                              - uint16_IntTime
- *                          g_Param.
- *                              - uint8_ErrCode
- *                              - uint8_StepMode 
- *                              - uint32_StepCount
- *                              - uint16_RunFreq 
- *                              - uint8_Direction 
- *                              - uint8_CoilState 
- *                              - uint16_BipRunI 
- *                              - uint16_BipHoldI 
- *                              - uint8_SelectRamp 
- *                              - uint16_BipAccI
- *                              - uint16_BipDecI 
- *                              - uint16_AccOnDelay
- *                              - uint16_DecOffDelay 
- *                              - uint8_Acknowledge 
- *                          g_Cmd.
- *                              - uint8_ParamPos
- *                              - uint32_TempPara
 ***********************************************************************************************************************/
 void cmd_RUN(void)
 {
@@ -1766,12 +1685,6 @@ void cmd_RUN(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Cmd.
- *                              - uint8_ParamPos
- *                              - uint32_TempPara
- *                          g_Param.
- *                              - uint8_BipIPct
- *                              - uint8_ErrCode
 ***********************************************************************************************************************/
 void cmd_SPHC(void)
 {
@@ -1819,10 +1732,6 @@ void cmd_SPHC(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint8_Settings
- *                          g_Param.
- *                              - uint8_ErrCode
 ***********************************************************************************************************************/
 void cmd_GVER(void)
 {
@@ -1852,10 +1761,6 @@ void cmd_GVER(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint8_Settings
- *                          g_Param.
- *                              - uint8_ErrCode
 ***********************************************************************************************************************/
 void cmd_RAZ(void)
 {
@@ -1904,14 +1809,6 @@ void cmd_RAZ(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint8_Settings
- *                          g_Param.
- *                              - uint8_MotTyp
- *                              - uint32_TempPara
- *                              - uint8_ErrCode
- *                          g_Cmd.
- *                              - uint8_ParamPos
 ***********************************************************************************************************************/
 void cmd_SMTYP(void)
 {
@@ -1960,14 +1857,6 @@ void cmd_SMTYP(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint8_Settings
- *                          g_Param.
- *                              - uint8_MotTyp
- *                              - uint32_TempPara
- *                              - uint8_ErrCode
- *                          g_Cmd.
- *                              - uint8_ParamPos
 ***********************************************************************************************************************/
 void cmd_GMTYP(void)
 {
@@ -1999,7 +1888,6 @@ void cmd_GMTYP(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void cmd_STEST(void)
 {  
@@ -2034,15 +1922,6 @@ void cmd_STEST(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni
- *                              - uint8_Settings
- *                          g_Param.
- *                              - uint8_ErrCode
- *                              - uint16_Imin
- *                              - uint16_Imax
- *                              - uint16_Umot
- *                              - uint16_SCiLevel
- *                              - uint8_SCtLevel
 ***********************************************************************************************************************/
 void cmd_GILIM(void)
 {
@@ -2094,11 +1973,6 @@ void cmd_GILIM(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni
- *                              - uint8_Settings
- *                          g_Param.
- *                              - uint8_ErrCode
- *                              - uint8_BipIPct
 ***********************************************************************************************************************/
 void cmd_GPHC(void)
 {  
@@ -2148,12 +2022,6 @@ void cmd_GPHC(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni
- *                              - uint8_Settings
- *                          g_Param.
- *                              - uint8_ErrCode
- *                              - uint16_AccNumbStep
- *                              - uint16_AccFreq
 ***********************************************************************************************************************/
 void cmd_GRACC(void)
 {  
@@ -2221,12 +2089,6 @@ void cmd_GRACC(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni
- *                              - uint8_Settings
- *                          g_Param.
- *                              - uint8_ErrCode
- *                              - uint16_DecNumbStep
- *                              - uint16_DecFreq
 ***********************************************************************************************************************/
 void cmd_GRDEC(void)
 {  
@@ -2289,21 +2151,6 @@ void cmd_GRDEC(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Param.
- *                              - uint8_MotTyp
- *                              - uint8_StepMode
- *                              - uint32_StepCount
- *                              - uint16_RunFreq
- *                              - uint8_Direction
- *                              - uint8_CoilState
- *                              - uint16_BipRunI
- *                              - uint16_BipHoldI
- *                              - uint8_SelectRamp
- *                              - uint16_BipAccI
- *                              - uint16_BipDecI
- *                              - uint16_AccOnDelay
- *                              - uint16_DecOffDelay
- *                              - uint8_Acknowledge
 ***********************************************************************************************************************/
 void cmd_GRUN(void)
 {  
@@ -2388,7 +2235,6 @@ void cmd_GRUN(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void cmd_BREAK(void)
 {  
@@ -2422,8 +2268,6 @@ void cmd_BREAK(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Param.
- *                              - uint16_Ue
 ***********************************************************************************************************************/
 void cmd_MUMOT(void)
 {  
@@ -2458,12 +2302,6 @@ void cmd_MUMOT(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint8_Settings
- *                          g_Cmd.
- *                              - uint8_ParamPos
- *                              - uint32_TempPara
- *                              - uint8_ErrCode
 ***********************************************************************************************************************/
 void cmd_SCOILON(void)
 {  
@@ -2550,14 +2388,6 @@ void cmd_SCOILON(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Param.
- *                              - uint8_StepMode
- *                              - uint8_ErrCode
- *                          g_Uni.
- *                              - uint8_Settings
- *                          g_Cmd.
- *                              - uint8_ParamPos
- *                              - uint32_TempPara
 ***********************************************************************************************************************/
 void cmd_SSMOD(void)
 {
@@ -2647,8 +2477,6 @@ void cmd_SSMOD(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Param.
- *                              - uint8_StepMode
 ***********************************************************************************************************************/
 void cmd_GSMOD(void)
 {
@@ -2681,11 +2509,6 @@ void cmd_GSMOD(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Cmd.
- *                              - uint8_ParamPos
- *                              - uint32_TempPara
- *                          g_Param.
- *                              - uint8_ErrCode
 ***********************************************************************************************************************/
 void cmd_SBIT(void)
 {
@@ -2733,11 +2556,6 @@ void cmd_SBIT(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Cmd.
- *                              - uint8_ParamPos
- *                              - uint32_TempPara
- *                          g_Param.
- *                              - uint8_ErrCode
 ***********************************************************************************************************************/
 void cmd_CBIT(void)
 {
@@ -2785,11 +2603,6 @@ void cmd_CBIT(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Cmd.
- *                              - uint8_ParamPos
- *                              - uint32_TempPara
- *                          g_Param.
- *                              - uint8_ErrCode
 ***********************************************************************************************************************/
 void cmd_GBIT(void)
 {
@@ -2840,11 +2653,6 @@ void cmd_GBIT(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Cmd.
- *                              - uint8_ParamPos
- *                              - uint32_TempPara
- *                          g_Param.
- *                              - uint8_ErrCode
 ***********************************************************************************************************************/
 void cmd_SOUT(void)
 {
@@ -2892,11 +2700,6 @@ void cmd_SOUT(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Cmd.
- *                              - uint8_ParamPos
- *                              - uint32_TempPara
- *                          g_Param.
- *                              - uint8_ErrCode
 ***********************************************************************************************************************/
 void cmd_GOUT(void)
 {
@@ -2935,11 +2738,6 @@ void cmd_GOUT(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Cmd.
- *                              - uint8_ParamPos
- *                              - uint32_TempPara
- *                          g_Param.
- *                              - uint8_ErrCode
 ***********************************************************************************************************************/
 void cmd_GINP(void)
 {
@@ -2990,14 +2788,6 @@ void cmd_GINP(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Cmd.
- *                              - uint8_ParamPos
- *                              - uint32_TempPara
- *                          g_Uni.
- *                              - uint8_Settings
- *                          g_Param.
- *                              - uint8_ErrCode
- *                              - uint16_BipILevel
 ***********************************************************************************************************************/
 void cmd_SMCRSTP(void)
 {
@@ -3087,14 +2877,6 @@ void cmd_SMCRSTP(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Cmd.
- *                              - uint8_ParamPos
- *                              - uint32_TempPara
- *                          g_Uni.
- *                              - uint8_Settings
- *                          g_Param.
- *                              - uint8_ErrCode
- *                              - uint16_BipILevel
 ***********************************************************************************************************************/
 void cmd_GMCRSTP(void)
 {
@@ -3150,16 +2932,6 @@ void cmd_GMCRSTP(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Cmd.
- *                              - uint8_ParamPos
- *                              - uint32_TempPara
- *                          g_Param.
- *                              - uint32_Sw1min
- *                              - uint32_Sw1max
- *                              - uint32_Sw2min
- *                              - uint32_Sw2max
- *                              - uint8_ErrCode
- *                              - uint16_BipILevel
 ***********************************************************************************************************************/
 void cmd_SSWLIM(void)
 {
@@ -3568,13 +3340,6 @@ void cmd_GFRQVAL(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   //end of cmd_GFRQVAL
-
-
-
-
-
-
-
 
 
 /**********************************************************************************************************************

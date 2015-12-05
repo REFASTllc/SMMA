@@ -43,7 +43,6 @@ SFunct g_Funct;       //global variables for struct
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void funct_init(void)
 {
@@ -80,9 +79,6 @@ void funct_init(void)
  * Input:                   uint32_DataByte
  *                          uint8_sending
  * Output:                  -
- * Global variable:         g_Funct.
- *                              - uint8_ArrAsciiPos
- *                              - uint8_ArrAscii
 ***********************************************************************************************************************/
 void funct_IntToAscii(unsigned long uint32_DataByte, unsigned char uint8_sending)
 {
@@ -142,9 +138,6 @@ void funct_IntToAscii(unsigned long uint32_DataByte, unsigned char uint8_sending
  * 
  * Input:                   -
  * Output:                  uint32_WR
- * Global variable:         g_Funct.
- *                              - uint8_ArrAsciiPos
- *                              - uint8_ArrAscii
 ***********************************************************************************************************************/
 unsigned long funct_AsciiToInt(void)
 {
@@ -202,7 +195,6 @@ unsigned long funct_AsciiToInt(void)
  *                          uint32_Min
  *                          uint32_Max
  * Output:                  uint8_Result
- * Global variable:         -
 ***********************************************************************************************************************/
 unsigned char funct_CheckTol(unsigned long uint32_Value, unsigned long uint32_Min, unsigned long uint32_Max)
 {
@@ -246,9 +238,6 @@ unsigned char funct_CheckTol(unsigned long uint32_Value, unsigned long uint32_Mi
  * Input:                   uint32_Freq
  *                          uint16_IntTime
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint16_LastTime
- *                              - uint16_Count
 ***********************************************************************************************************************/
 void funct_FreqToTimer2(unsigned long uint32_Freq, unsigned int uint16_IntTime)
 {
@@ -300,9 +289,6 @@ void funct_FreqToTimer2(unsigned long uint32_Freq, unsigned int uint16_IntTime)
  * Input:                   uint16_msTime
  *                          int16_IntTime
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint16_LastTime
- *                              - uint16_Count
 ***********************************************************************************************************************/
 void funct_msToTimer2(unsigned int uint16_msTime, unsigned int uint16_IntTime)
 {
@@ -355,11 +341,6 @@ void funct_msToTimer2(unsigned int uint16_msTime, unsigned int uint16_IntTime)
  * Output:                  uint32_Freq 
  *                          OR
  *                          uint32_Step
- * Global variable:         g_Param.
- *                              - uint16_AccNumbStep
- *                              - uint16_AccFreq
- *                              - uint16_DecNumbStep
- *                              - uint16_DecFreq
 ***********************************************************************************************************************/
 unsigned int funct_ReadRamp(unsigned char uint8_kind,unsigned char uint8_sort,unsigned char uint8_ArrPos)
 {
@@ -403,11 +384,6 @@ unsigned int funct_ReadRamp(unsigned char uint8_kind,unsigned char uint8_sort,un
  * 
  * Input:                   -
  * Output:                  uint8_Result
- * Global variable:         g_Param.
- *                              - uint8_MotTyp
- *                          g_Param.
- *                              uint32_TempPara
- *                              uint8_ErrCode
 ***********************************************************************************************************************/
 unsigned char funct_CheckCmdSILIM(void)
 {
@@ -492,10 +468,6 @@ unsigned char funct_CheckCmdSILIM(void)
  * 
  * Input:                   -
  * Output:                  uint8_Result
- * Global variable:         g_Param.
- *                              - uint8_MotTyp
- *                          g_Param.
- *                              uint8_ErrCode
 ***********************************************************************************************************************/
 unsigned char funct_CheckCmdSMTYP(void)
 {
@@ -594,7 +566,6 @@ unsigned char funct_CheckCmdSMTYP(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void funct_LoadDeviceInfo(void)
 {
@@ -634,7 +605,6 @@ void funct_LoadDeviceInfo(void)
  * 
  * Input:                   uint8_color
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void funct_FrontLED(unsigned char uint8_color)
 {
@@ -685,7 +655,6 @@ void funct_FrontLED(unsigned char uint8_color)
  * Input:                   uint8_ToDo
  *                          uint8_value
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void funct_OutputHandler(unsigned char uint8_ToDo,unsigned char uint8_value)
 {
@@ -762,7 +731,6 @@ void funct_OutputHandler(unsigned char uint8_ToDo,unsigned char uint8_value)
  *                          uint8_IO
  *                          uint8_value
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 unsigned char funct_IOhandler(unsigned char uint8_ToDo,unsigned char uint8_IO,unsigned char uint8_value)
 {

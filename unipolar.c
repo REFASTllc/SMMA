@@ -36,31 +36,6 @@ SUni g_Uni;                 //global variables for struct
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint32_RealPos
- *                              - uint32_GoalPos
- *                              - uint16_RunFreq
- *                              - uint8_Status
- *                              - uint8_Settings
- *                              - uint8_FsHsCount
- *                              - uint16_LastTime
- *                              - uint16_Count
- *                              - uint16_RunLastTime
- *                              - uint16_RunCount
- *                              - uint16_SwOnLastTime
- *                              - uint16_SwOnCount
- *                              - uint16_SwOffLastTime
- *                              - uint16_SwOffCount
- *                              - uint8_AccArrPos
- *                              - uint16_AccNumbStep
- *                              - uint32_AccStop
- *                              - uint8_DecArrPos
- *                              - uint16_DecNumbStep
- *                              - uint32_DecStart
- *                              - uint8_PhA1
- *                              - uint8_PhA2
- *                              - uint8_PhB1
- *                              - uint8_PhB2
 ***********************************************************************************************************************/
 void uni_init(void)
 {
@@ -153,23 +128,6 @@ void uni_init(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint8_Status
- *                              - uint8_Settings
- *                              - uint32_GoalPos
- *                              - uint32_RealPos
- *                              - uint16_LastTime
- *                              - uint16_Count
- *                              - uint16_SwOnLastTime
- *                              - uint16_SwOnCount
- *                              - uint16_SwOffLastTime
- *                              - uint16_SwOffCount
- *                              - uint8_PhA1
- *                              - uint8_PhA2
- *                              - uint8_PhB1
- *                              - uint8_PhB2
- *                          g_Timer2.
- *                              - uint16_Count
 ***********************************************************************************************************************/
 void uni_move(void)
 {
@@ -335,14 +293,6 @@ void uni_move(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint8_Status
- *                              - uint16_AccNumbStep
- *                              - uint32_RealPos
- *                              - uint32_AccStop
- *                              - uint32_DecStart
- *                              - uint32_GoalPos
- *                              - uint8_AccArrPos
 ***********************************************************************************************************************/
 void uni_acc(void)
 {
@@ -414,16 +364,6 @@ void uni_acc(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint8_Status
- *                              - uint32_RealPos
- *                              - uint32_DecStart
- *                              - uint8_Settings
- *                              - uint32_GoalPos
- *                              - uint16_LastTime
- *                              - uint16_Count
- *                              - uint16_RunLastTime
- *                              - uint16_RunCount
 ***********************************************************************************************************************/
 void uni_run(void)
 {
@@ -475,12 +415,6 @@ void uni_run(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint8_Status
- *                              - uint16_DecNumbStep
- *                              - uint32_RealPos
- *                              - uint32_GoalPos
- *                              - uint8_DecArrPos
 ***********************************************************************************************************************/
 void uni_dec(void)
 {
@@ -560,28 +494,6 @@ void uni_dec(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint32_RealPos
- *                              - uint32_AccStop
- *                              - uint32_DecStart
- *                              - uint8_AccArrPos
- *                              - uint8_DecArrPos
- *                              - uint8_Settings
- *                              - uint16_RunFreq
- *                              - uint8_Status
- *                              - uint16_RunLastTime
- *                              - uint16_RunCount
- *                              - uint16_LastTime
- *                              - uint16_Count
- *                          g_Timer2.
- *                              - uint16_IntTime
- *                          g_Param.
- *                              - uint16_AccNumbStep
- *                              - uint16_AccFreq
- *                              - uint8_AccNumbRamp
- *                              - uint16_DecNumbStep
- *                              - uint16_DecFreq
- *                              - uint8_DecNumbRamp
 ***********************************************************************************************************************/
 void uni_CheckCalc(void)
 {

@@ -30,10 +30,6 @@
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_Uni.
- *                              - uint8_Settings
- *                          g_UART2txd.
- *                              - uint8_BufEmpty
 ***********************************************************************************************************************/
 void main(void)
 {   

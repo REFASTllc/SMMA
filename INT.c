@@ -31,7 +31,6 @@
  * 
  * Input:                   timerx  (selected timer)
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void INT_init(void)
 {
@@ -112,15 +111,6 @@ void INT_init(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         g_UART2rxd.
- *                          - uint8_Bufptr    
- *                          - uint16_Wch
- *                          - uint8_BufEmpty
- *                          g_UART2txd.
- *                          - uint8_BufEmpty
- *                          - uint16_Rch
- *                          - uint16_Wch
- *                          - uint8_BufEmpty
 ***********************************************************************************************************************/
 void __ISR(_UART_2_VECTOR, IPL2AUTO) __IntUart2Handler(void)
 {
@@ -254,7 +244,6 @@ void __ISR(_TIMER_1_VECTOR, IPL1AUTO) __IntTimer1Handler(void)
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void __ISR(_TIMER_2_VECTOR, IPL1AUTO) __IntTimer2Handler(void)
 {

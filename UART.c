@@ -42,7 +42,6 @@ SUART2rxd g_UART2rxd;       //global variables for struct
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void uart_init(unsigned char uartx)
 {
@@ -382,7 +381,6 @@ void uart_init(unsigned char uartx)
  *                          baudrate (baud rate of the UART (0 if auto)
  *                          autobaud (auto bauding on the UART)
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void uart_set(unsigned char uartx, unsigned char parity, unsigned char stopBit, unsigned char polarity, unsigned char autobaud, unsigned int baudrate)
 {
@@ -482,7 +480,6 @@ void uart_set(unsigned char uartx, unsigned char parity, unsigned char stopBit, 
  * Input:                   uartx (choose of the module)
  *                          action (enable / disable interrupt)
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void uart_InitInterrupt(unsigned char uartx, unsigned char action)
 {
@@ -542,7 +539,6 @@ void uart_InitInterrupt(unsigned char uartx, unsigned char action)
  * 
  * Input:                   uartx (choose of the module)
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void uart_enable(unsigned char uartx)
 {
@@ -574,7 +570,6 @@ void uart_enable(unsigned char uartx)
  * 
  * Input:                   uartx (choose of the module)
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void uart_disable(unsigned char uartx)
 {
@@ -597,7 +592,6 @@ void uart_disable(unsigned char uartx)
  * Input:                   uartx (choose of the module)
  *                          character (char to be send)
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void uart_SendChar(unsigned char uartx, unsigned char character)
 {
@@ -637,7 +631,6 @@ void uart_SendChar(unsigned char uartx, unsigned char character)
  * 
  * Input:                   -
  * Output:                  Character readed 
- * Global variable:         -
 ***********************************************************************************************************************/
 unsigned char uart_GetChar(void)
 {
@@ -670,7 +663,6 @@ unsigned char uart_GetChar(void)
  *                              - bit 0: Overrun error 
  *                              - bit 1: Framing error
  *                              - bit 2: Parity error
- * Global variable:         -
 ***********************************************************************************************************************/
 unsigned char uart_status(unsigned char uartx)
 {
@@ -707,10 +699,6 @@ unsigned char uart_status(unsigned char uartx)
  * 
  * Input:                   uint8_DataByte
  * Output:                  -
- * Global variable:         g_UART2txd.
- *                              - uint8_Bufptr
- *                              - uint16_Wch
- *                              - uint8_BufEmpty
 ***********************************************************************************************************************/
 void uart2_sendbuffer(unsigned char uint8_DataByte)  
 {
@@ -747,11 +735,6 @@ void uart2_sendbuffer(unsigned char uint8_DataByte)
  * 
  * Input:                   -
  * Output:                  uint8_DataByte
- * Global variable:         g_UART2rxd.
- *                              - uint8_BufEmpty
- *                              - uint8_Buffer
- *                              - uint16_Rch
- *                              - uint16_Wch
 ***********************************************************************************************************************/
 unsigned char uart2_receivebuffer(void) 
 {
@@ -801,7 +784,6 @@ unsigned char uart2_receivebuffer(void)
  * 
  * Input:                   uint8_ErrorCode
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void uart2_SendErrorCode(unsigned char uint8_ErrorCode)
 { 

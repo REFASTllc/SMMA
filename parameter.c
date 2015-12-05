@@ -31,7 +31,6 @@ SParam g_Param;             //global variables for struct
  * 
  * Input:                   -
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void param_init(void)
 {

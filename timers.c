@@ -49,7 +49,6 @@ STimer2 g_Timer2;     //global variables for struct
  * 
  * Input:                   timerx  (selected timer)
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void timers_Init(unsigned char timerx)
 {
@@ -283,7 +282,6 @@ void timers_Init(unsigned char timerx)
  * Input:                   timerx  (selected timer)
  *                          action  (enable / disable interrupt)
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void timers_SetInterrupt(unsigned char timerx, unsigned char action)
 {
@@ -377,7 +375,6 @@ void timers_SetInterrupt(unsigned char timerx, unsigned char action)
  *                          valueTMRReg (init value of TMRx reg)
  *                          valuePRReg (init value of PRx reg)
  * Output:                  -
- * Global variable:         -
 ***********************************************************************************************************************/
 void timers_Set(unsigned char timer, unsigned char status, unsigned long valueTMRReg, unsigned long valuePRReg)
 {
