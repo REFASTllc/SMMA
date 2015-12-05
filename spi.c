@@ -50,64 +50,65 @@ void InitSPI(unsigned char spix)
         SPI1.bufferFull = 0;
     //--- SPI1CON ---------------------------------------------------------------------------------------------------/
         SPI1CONbits.FRMEN = 0;	    // Framed SPI Support bit
-				    // 1 = Framed SPI support is enabled (/SSx pin used as FSYNC input/output)
-				    // 0 = Framed SPI support is disabled
+                                    // 1 = Framed SPI support is enabled (/SSx pin used as FSYNC input/output)
+                                    // 0 = Framed SPI support is disabled
 
         SPI1CONbits.FRMSYNC = 0;    // Frame Sync Pulse Direction Control on /SSx pin bit (Framed SPI mode only)
-				    // 1 = Frame sync pulse input (Slave mode)
-				    // 0 = Frame sync pulse output (Master mode)
+                                    // 1 = Frame sync pulse input (Slave mode)
+                                    // 0 = Frame sync pulse output (Master mode)
 
         SPI1CONbits.FRMPOL = 0;	    // Frame Sync Polarity bit (Framed SPI mode only)
-				    // 1 = Frame pulse is active-high
-				    // 0 = Frame pulse is active-low
-        SPI1CONbits.ON = 0;	    // SPI Peripheral On bit
-				    // 1 = SPI Peripheral is enabled
-				    // 0 = SPI Peripheral is disabled
-				    // When ON = 1, DISSDO and DISSDI are the only other bits that
-				    // can be modified. When using the 1:1 PBCLK
-				    // divisor, the user?s software should not read or write the
-				    // peripheral?s SFRs in the SYSCLK cycle immediately
-				    // following the instruction that clears the module?s ON bit.
+                                    // 1 = Frame pulse is active-high
+                                    // 0 = Frame pulse is active-low
+        
+        SPI1CONbits.ON = 0;         // SPI Peripheral On bit
+                                    // 1 = SPI Peripheral is enabled
+                                    // 0 = SPI Peripheral is disabled
+                                    // When ON = 1, DISSDO and DISSDI are the only other bits that
+                                    // can be modified. When using the 1:1 PBCLK
+                                    // divisor, the user?s software should not read or write the
+                                    // peripheral?s SFRs in the SYSCLK cycle immediately
+                                    // following the instruction that clears the module?s ON bit.
 
         SPI1CONbits.SIDL = 0;	    // Stop in Idle Mode bit
-				    // 1 = Discontinue operation when CPU enters in Idle mode
-				    // 0 = Continue operation in Idle mode
+                                    // 1 = Discontinue operation when CPU enters in Idle mode
+                                    // 0 = Continue operation in Idle mode
 
         SPI1CONbits.DISSDO = 0;	    // Disable SDOx pin bit
-				    // 1 = SDOx pin is not used by the module (pin is controlled
-				    // by associated PORT register)
-				    // 0 = SDOx pin is controlled by the module
+                                    // 1 = SDOx pin is not used by the module (pin is controlled
+                                    // by associated PORT register)
+                                    // 0 = SDOx pin is controlled by the module
 
         SPI1CONbits.MODE16 = 1;	    // 32/16-bit Communication Select bits
         SPI1CONbits.MODE32 = 0;	    // When AUDEN = 1:
-				    // MODE32   MODE16  Communication
-				    // 1	    1	    24-bit Data, 32-bit FIFO, 32-bit Channel/64-bit Frame
-				    // 1	    0	    32-bit Data, 32-bit FIFO, 32-bit Channel/64-bit Frame
-				    // 0	    1	    16-bit Data, 16-bit FIFO, 32-bit Channel/64-bit Frame
-				    // 0	    0	    16-bit Data, 16-bit FIFO, 16-bit Channel/32-bit Frame
-				    // When AUDEN = 0:
-				    // MODE32   MODE16  Communication
-				    // 1	    x	    32-bit
-				    // 0	    1	    16-bit
-				    // 0	    0	    8-bit
+                                    // MODE32   MODE16  Communication
+                                    // 1	    1	    24-bit Data, 32-bit FIFO, 32-bit Channel/64-bit Frame
+                                    // 1	    0	    32-bit Data, 32-bit FIFO, 32-bit Channel/64-bit Frame
+                                    // 0	    1	    16-bit Data, 16-bit FIFO, 32-bit Channel/64-bit Frame
+                                    // 0	    0	    16-bit Data, 16-bit FIFO, 16-bit Channel/32-bit Frame
+                                    // When AUDEN = 0:
+                                    // MODE32   MODE16  Communication
+                                    // 1	    x	    32-bit
+                                    // 0	    1	    16-bit
+                                    // 0	    0	    8-bit
 
         SPI1CONbits.SMP = 1;	    // SPI Data Input Sample Phase bit
-				    // Master mode (MSTEN = 1):
-				    // 1 = Input data sampled at end of data output time
-				    // 0 = Input data sampled at middle of data output time
-				    // Slave mode (MSTEN = 0):
-				    // SMP value is ignored when SPI is used in Slave mode.
-				    // The module always uses SMP = 0.
+                                    // Master mode (MSTEN = 1):
+                                    // 1 = Input data sampled at end of data output time
+                                    // 0 = Input data sampled at middle of data output time
+                                    // Slave mode (MSTEN = 0):
+                                    // SMP value is ignored when SPI is used in Slave mode.
+                                    // The module always uses SMP = 0.
 
         SPI1CONbits.CKE = 1;        // SPI Clock Edge Select bit
-				    // 1 = Serial output data changes on transition from active clock state
-				    //	to idle clock state (see CKP bit)
-				    // 0 = Serial output data changes on transition from idle clock state
-				    //	to active clock state (see CKP bit)
+                                    // 1 = Serial output data changes on transition from active clock state
+                                    //	to idle clock state (see CKP bit)
+                                    // 0 = Serial output data changes on transition from idle clock state
+                                    //	to active clock state (see CKP bit)
                                     // The CKE bit is not used in the Framed SPI mode. The user should program
-				    // this bit to ?0? for the Framed SPI mode (FRMEN = 1).
+                                    // this bit to ?0? for the Framed SPI mode (FRMEN = 1).
 
-        SPI1CONbits.SSEN = 1;	    // Slave Select Enable (Slave mode) bit
+        SPI1CONbits.SSEN = 0;	    // Slave Select Enable (Slave mode) bit
                                     // 1 = /SSx pin used for Slave mode
                                     // 0 = /SSx pin not used for Slave mode, pin controlled by port function.
 
@@ -123,7 +124,7 @@ void InitSPI(unsigned char spix)
     //--- SPI1BUF ---------------------------------------------------------------------------------------------------/
         SPI1BUF = 0;
     //--- SPI1BRG ---------------------------------------------------------------------------------------------------/
-        SPI1BRG = 3;
+        SPI1BRG = 39;
     //--- Signal that SPI 1 is initialized ---//
         SPI1.initialized = 1;
     }
@@ -209,7 +210,7 @@ void InitSPI(unsigned char spix)
     //--- SPI2BUF ---------------------------------------------------------------------------------------------------/
         SPI2BUF = 0;
     //--- SPI2BRG ---------------------------------------------------------------------------------------------------/
-        SPI2BRG = 3;
+        SPI2BRG = 15;
     }
 }
 //--- S P I   M a s t e r   M o d e   C l o c k   F r e q u e n c y -------------------------------------------------/
@@ -321,9 +322,12 @@ void InitSPIInterrupt(unsigned char spix, unsigned char action)
 /********************************************************************************************************************/
 void SendDataSPI1(unsigned int dataToSend)
 {
-//--- Waiting that the SPI peripherial is not busy ---//
+    oBiStrnSignal = 0;
+//--- Waiting that the SPI peripheral is not busy ---//
 	while(SPI1STATbits.SPIBUSY);
 	SPI1BUF = dataToSend;
+    while(SPI1STATbits.SPIBUSY);
+    oBiStrnSignal = 1;
 }
 
 /********************************************************************************************************************/

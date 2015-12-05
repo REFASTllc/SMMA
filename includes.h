@@ -30,6 +30,8 @@
 #ifndef INCLUDES_H
 #define	INCLUDES_H
 
+#define _XTAL_FREQ 80000000
+
 //system header files
 #include "xc.h"                     
 #include "attribs.h"                                        

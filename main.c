@@ -37,7 +37,18 @@ void main(void)
       
     asm("ei");              //enable all interrupts (code in assembler)  
                             //use declaration "di" to disable all interrupts
-    
+    /* SPI test program 
+    while(1)
+    {
+        unsigned int i = 0;
+        SendDataSPI1(0b0010011100011100);
+        for(i = 0; i < 50000; i++)
+            Nop();
+        SendDataSPI1(0b0101000000100001);
+        for(i = 0; i < 50000; i++)
+            Nop();
+    }
+    */
     while(1)
     {
         if(g_Uni.uint8_Settings & 0x01) //verify if the unipolar motor has to move

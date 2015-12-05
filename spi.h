@@ -23,8 +23,8 @@
 #define _ENABLE     1
 #define _DISABLE    0
 
-#define _EnableSPI1   SPI1CONbits.ON = 1;
-#define _DisableSPI1  SPI1CONbits.ON = 0;
+#define EnableSPI1()   SPI1CONbits.ON = 1;
+#define DisableSPI1()  SPI1CONbits.ON = 0;
 
 /*
 typedef struct
