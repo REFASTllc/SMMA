@@ -183,9 +183,14 @@ void __ISR(_SPI_1_VECTOR, IPL4AUTO) __IntSPI1Handler(void)
 {
     if(IFS0bits.SPI1RXIF)
     {
+    //--- Save the new char in the buffer ---//
         SPI1.RxSPIbuffer[SPI1.RxIndex++] = SPI1BUF;
+    //--- If index bigger than 10, then set the error flag and reset index reg ---//
         if(SPI1.RxIndex >= 10)
+        {
             SPI1.RxIndex = 0;
+            SPI1.bufferFull = 1;
+        }
         SPI1.lastRxWrong = 0;
         IFS0bits.SPI1RXIF = 0;
     }

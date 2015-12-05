@@ -47,6 +47,7 @@ void InitSPI(unsigned char spix)
         SPI1.initialized = 0;
         SPI1.OK = 1;
         SPI1.lastRxWrong = 0;
+        SPI1.bufferFull = 0;
     //--- SPI1CON ---------------------------------------------------------------------------------------------------/
         SPI1CONbits.FRMEN = 0;	    // Framed SPI Support bit
 				    // 1 = Framed SPI support is enabled (/SSx pin used as FSYNC input/output)

@@ -41,6 +41,7 @@ typedef struct
     unsigned char OK:1;
     unsigned char lastRxWrong:1;
     unsigned char initialized:1;
+    unsigned char bufferFull:1;
 } T_SPI;
 
 /********************************************************************************************************************/
