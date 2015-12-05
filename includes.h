@@ -48,6 +48,7 @@
 #include "parameter.h"
 #include "UART.h"
 #include "spi.h"
+#include "i2c.h"
 
 #endif	/* INCLUDES_H */
 

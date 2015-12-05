@@ -106,6 +106,8 @@ void system_init(void)
 //--- Initialization of SPI ---//
     InitSPI(_SPI_1);
     InitSPIInterrupt(_SPI_1, _ENABLE);
+//i2c initialization
+    i2c_init(_i2c1);
     
 //switch on the debugging LED's
     oTestLed1 = 1;                          //switch on the output for the test LED1
