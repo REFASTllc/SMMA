@@ -14,6 +14,9 @@
 
 #include "includes.h" // File which contain all includes files
 
+T_SPI SPI1, SPI2;
+
+
 /********************************************************************************************************************/
 /*  Name of the function:       InitSPI										    
 /*  Purpose of the function:    Initialization of SPI module							    
@@ -36,6 +39,14 @@ void InitSPI(unsigned char spix)
 {
     if(spix == _SPI_1)
     {
+        unsigned char i = 0;
+    //--- Initialization of the SPI struct ---//
+        for(i; i < 10; i++)
+            SPI1.RxSPIbuffer[i] = 0;
+        SPI1.RxIndex = 0;
+        SPI1.initialized = 0;
+        SPI1.OK = 1;
+        SPI1.lastRxWrong = 0;
     //--- SPI1CON ---------------------------------------------------------------------------------------------------/
         SPI1CONbits.FRMEN = 0;	    // Framed SPI Support bit
 				    // 1 = Framed SPI support is enabled (/SSx pin used as FSYNC input/output)
@@ -112,6 +123,8 @@ void InitSPI(unsigned char spix)
         SPI1BUF = 0;
     //--- SPI1BRG ---------------------------------------------------------------------------------------------------/
         SPI1BRG = 3;
+    //--- Signal that SPI 1 is initialized ---//
+        SPI1.initialized = 1;
     }
     else if(spix == _SPI_2)
     {
@@ -232,7 +245,7 @@ void InitSPIInterrupt(unsigned char spix, unsigned char action)
         {
         //--- Error interrupt ---//
             IFS0bits.SPI1EIF = 0;
-            IPC5bits.SPI1IP = 7;
+            IPC5bits.SPI1IP = 4;
             IPC5bits.SPI1IS = 3;
             IEC0bits.SPI1EIE = 1;
         //--- Receive data interrupt ---//

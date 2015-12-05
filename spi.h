@@ -26,10 +26,23 @@
 #define _EnableSPI1   SPI1CONbits.ON = 1;
 #define _DisableSPI1  SPI1CONbits.ON = 0;
 
+/*
+typedef struct
+{
+    unsigned char SPI_OK:1;
+    unsigned char lastRxWrong:1;
+    unsigned char NotUsed:5;
+} SPIStatus;
+*/
+typedef struct
+{
+    volatile unsigned long RxSPIbuffer[10];
+    volatile unsigned char RxIndex;
+    unsigned char OK:1;
+    unsigned char lastRxWrong:1;
+    unsigned char initialized:1;
+} T_SPI;
 
-unsigned char temp8bSPI;
-unsigned int temp16bSPI;
-unsigned long temp32bSPI;
 /********************************************************************************************************************/
 /*  Purpose of the function:    Header of the function InitSPI                                                      */
 /*  Parameters:                                                                                                     */

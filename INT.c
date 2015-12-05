@@ -174,31 +174,30 @@ void __ISR(_UART_2_VECTOR, IPL2AUTO) __IntUart2Handler(void)
 }
 
 #ifdef SPI_H
+
+extern T_SPI SPI1;
 /****************************************************************************/
-/*  Purpose of the INT routin:  Manage RTCC alarm interrupts                */
+/*  Purpose of the INT routine:  Manage SPI 1 Rx interrupts                 */
 /****************************************************************************/
-void __ISR(_SPI_1_VECTOR, IPL7AUTO) __IntSPI1Handler(void)
+void __ISR(_SPI_1_VECTOR, IPL4AUTO) __IntSPI1Handler(void)
 {
     if(IFS0bits.SPI1RXIF)
     {
-	if(SPI1CONbits.MODE32) temp32bSPI = SPI1BUF;
-	else if(!SPI1CONbits.MODE32 && SPI1CONbits.MODE16) temp16bSPI = SPI1BUF;
-	else temp8bSPI = SPI1BUF;
-	IFS0bits.SPI1RXIF = 0;
+        SPI1.RxSPIbuffer[SPI1.RxIndex++] = SPI1BUF;
+        if(SPI1.RxIndex >= 10)
+            SPI1.RxIndex = 0;
+        SPI1.lastRxWrong = 0;
+        IFS0bits.SPI1RXIF = 0;
     }
     if(IFS0bits.SPI1EIF)
     {
-	IFS0bits.SPI1EIF = 0;
-	IEC0bits.SPI1EIE = 0;
-    }
-    if(IFS0bits.SPI1EIF)
-    {
-	IFS0bits.SPI1EIF = 0;
+        SPI1.lastRxWrong = 1;
+        IFS0bits.SPI1EIF = 0;
     }
 }
 #endif
 /****************************************************************************/
-/*  Purpose of the INT routin:  Manage RTCC alarm interrupts                */
+/*  Purpose of the INT routine:  Manage RTCC alarm interrupts               */
 /****************************************************************************/
 void __ISR(_RTCC_VECTOR, IPL3AUTO) __IntRTCCHandler(void)
 {
@@ -206,7 +205,7 @@ void __ISR(_RTCC_VECTOR, IPL3AUTO) __IntRTCCHandler(void)
 }
 
 /****************************************************************************/
-/*  Purpose of the INT routin:  Manage TIMER1 overflow interrupts           */
+/*  Purpose of the INT routine:  Manage TIMER1 overflow interrupts          */
 /****************************************************************************/
 void __ISR(_TIMER_1_VECTOR, IPL1AUTO) __IntTimer1Handler(void)
 {
@@ -444,7 +443,7 @@ void __ISR(_TIMER_2_VECTOR, IPL1AUTO) __IntTimer2Handler(void)
 
 
 /****************************************************************************/
-/*  Purpose of the INT routin:  Manage TIMER3 overflow interrupts           */
+/*  Purpose of the INT routine:  Manage TIMER3 overflow interrupts          */
 /****************************************************************************/
 void __ISR(_TIMER_3_VECTOR, IPL1AUTO) __IntTimer3Handler(void)
 {
@@ -453,7 +452,7 @@ void __ISR(_TIMER_3_VECTOR, IPL1AUTO) __IntTimer3Handler(void)
 }
 
 /****************************************************************************/
-/*  Purpose of the INT routin:  Manage PWM1 overflow interrupts             */
+/*  Purpose of the INT routine:  Manage PWM1 overflow interrupts            */
 /****************************************************************************/
 void __ISR(_OUTPUT_COMPARE_1_VECTOR, IPL3AUTO) __IntPWM1Handler(void)
 {
