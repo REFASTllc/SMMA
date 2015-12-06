@@ -13,12 +13,17 @@
  *                          - i2c_enable
  *                          - i2c_disable
  *                          - i2c_InitInterrupt
+ *                          - i2c_StartTransfer
+ *                          - i2c_SendBufWr
+ *                          - i2c_SendBufRd
+ *                          - i2c_ReceiveBufWr
+ *                          - i2c_ReceiveBufRd
 ***********************************************************************************************************************/
 
 
 #include "includes.h"
 
-Si2c g_i2c;     //global variables for struct 
+Si2c1 g_i2c1;     //global variables for struct 
 
 
 /**********************************************************************************************************************
@@ -118,7 +123,26 @@ void i2c_init(unsigned char uint8_i2cx)
         I2C1BRG = 98;                   //i2c baud rate generator register
                                         //baud rate = [PBCLK / (FSCL x 2)] - 2
                                         //PBCLK = 80 MHz
-                                        //FSCL = desired i2c bus speed = 400kHz        
+                                        //FSCL = desired i2c bus speed = 400kHz 
+        
+        //init variables
+        g_i2c1.uint8_StartCondt = 0;    //reset start condition
+        g_i2c1.uint8_ErrACK = 0;        //reset error
+        g_i2c1.uint8_Transfer = 0;      //reset transfer
+        g_i2c1.uint8_RScount = 0;       //repeat start condtion counter - set to 0 if not used
+        g_i2c1.uint8_RDcount = 0;       //reset counter 
+        g_i2c1.uint8_RdWr = 0;          //set command on write
+        g_i2c1.uint8_Direction = 0;     //direction = write
+        
+        g_i2c1.uint8_TxBufEmpty = 1;    //reset buffer empty status
+        g_i2c1.uint8_TxWch = 0;         //set write-pointer of the send ring buffer to 0
+        g_i2c1.uint8_TxRch = 0;         //set read-pointer of the send ring buffer to 0
+        g_i2c1.uint8_TxBufPtr = g_i2c1.uint8_TxBuf; //pointer on send buffer
+        
+        g_i2c1.uint8_RxBufEmpty = 1;    //reset buffer empty status
+        g_i2c1.uint8_RxWch = 0;         //set write-pointer of the receive ring buffer to 0
+        g_i2c1.uint8_RxRch = 0;         //set read-pointer of the receive ring buffer to 0
+        g_i2c1.uint8_RxBufPtr = g_i2c1.uint8_RxBuf; //pointer on receive buffer      
     }
     else if(uint8_i2cx == _i2c2)
     {
@@ -364,3 +388,253 @@ void i2c_InitInterrupt(unsigned char uint8_i2cx, unsigned char uint8_action, uns
         //do nothing
     }
 }   //end of i2c_InitInterrupt
+
+
+/**********************************************************************************************************************
+ * Routine:                 i2c_StartTransfer
+
+ * Description:
+ * This subroutine starts an I2C master communication if the bus is idle. If the bus is busy, the variable
+ * 'tranfer' will be 0. Same thing if the bus is idle but nothing in the send buffer to transfer.
+ * If the bus is idle and the send buffer not empty, first one byte will be read out from the ring buffer
+ * this must be the address with the information rad/write. 
+ * This inforamtion will be stored into the variable 'RdWr', 'Transfer' will be set to 1 and 'ErrACK' to 0.
+ * Then transmit mode and master mode must be set and a ACK must be generated, after receiving one data
+ * byte must be clear. 
+ * At the end the character from the buffer is stored into I2C1TRN to start the communication.  
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        05.05.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uin8_i2cx
+ * Output:                  -
+***********************************************************************************************************************/
+void i2c_StartTransfer(unsigned char uint8_i2cx)
+{
+    if(uint8_i2cx == _i2c1)
+    {
+        i2c_enable(_i2c1);              //enable interrupt
+        g_i2c1.uint8_Direction = 0;     //direction = write
+        I2C1CONbits.RCEN = 0;           //receive sequence not in progress
+        I2C1CONbits.ACKEN = 0;          //acknowledge sequence disable
+        I2C1CONbits.SEN = 1;            //send start condition - launch interrupt routine
+    }
+    else if(uint8_i2cx == _i2c2)
+    {
+        //not programmed yet
+    }
+    else
+    {
+        //nothing is done
+    }
+}   //end of i2c_StartTransfer
+
+
+/**********************************************************************************************************************
+ * Routine:                 i2c_SendBufWr
+
+ * Description:
+ * First the data byte which is given with the call of the subroutine is stored into the sendbuffer and the 
+ * write pointer is incremented. If the write pointer is at the end of the buffer, then it is set automatic
+ * to the position 0. At the end the 'uint8_TxBufEmpty' is set to 0 --> Buffer not more empty. 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        05.05.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint8_i2cx
+ *                          uint8_DataByte
+ * Output:                  -
+***********************************************************************************************************************/
+void i2c_SendBufWr(unsigned char uint8_i2cx, unsigned char uint8_DataByte)
+{
+    if(uint8_i2cx == _i2c1)
+    {
+        //store data byte into send buffer
+        *(g_i2c1.uint8_TxBufPtr + g_i2c1.uint8_TxWch) = uint8_DataByte;
+        
+        //increment the write pointer
+        g_i2c1.uint8_TxWch++;
+        
+        //verify if write pointer is at the end of ring buffer
+        g_i2c1.uint8_TxWch = g_i2c1.uint8_TxWch % _i2c1TxRxBuffer;
+        
+        //set buffer not empty
+        g_i2c1.uint8_TxBufEmpty = 0;
+    }
+    else if(uint8_i2cx == _i2c2)
+    {
+        //not programmed yet
+    }
+    else
+    {
+        //nothing is done
+    }
+}   //end of i2c_SendBufWr
+
+
+/**********************************************************************************************************************
+ * Routine:                 i2c_SendBufRd
+
+ * Description:
+ * First the send buffer will be verified if it is empty. If the buffer is empty, then the return value is 0.
+ * If not, then one character is read out from the send buffer, and the read pointer of the send buffer is 
+ * incremented. If the read pointer is at the end of the buffer, then it is set automaticaly to the position 0.
+ * If the read pointer is equal to the write pointer of the send buffer, then the uint8_TxBufEmpty will be set to 1.
+ * 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        05.05.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint8_i2cx
+ * Output:                  uint8_WB
+***********************************************************************************************************************/
+unsigned char i2c_SendBufRd(unsigned char uint8_i2cx)
+{
+    auto unsigned char uint8_WB;    //local work byte
+    
+    if(uint8_i2cx == _i2c1)
+    {
+        if(!g_i2c1.uint8_TxBufEmpty)     //send buffer not empty?
+        {
+            //read out one byte from the send buffer
+            uint8_WB = g_i2c1.uint8_TxBuf[g_i2c1.uint8_TxRch];
+            
+            //increment the read pointer
+            g_i2c1.uint8_TxRch++;
+            
+            //verify if read pointer and write pointer of the ring buffer are equal
+            if(g_i2c1.uint8_TxRch == g_i2c1.uint8_TxWch)
+            {
+                g_i2c1.uint8_TxBufEmpty = 1;        //send buffer empty
+            }
+            else
+            {
+                //nothing is done
+            }
+            
+            return uint8_WB;    //return the value from the buffer
+        }
+        else
+        {
+            return 0;           //return value 0
+        }
+    }
+    else if(uint8_i2cx == _i2c2)
+    {
+        //not programmed yet
+    }
+    else
+    {
+        //nothing is done
+    }
+}   //end of i2c_SendBufRd
+
+
+/**********************************************************************************************************************
+ * Routine:                 i2c_ReceiveBufWr
+
+ * Description:
+ * First the data byte which is given with the call of the subroutine is stored into the receive buffer and the 
+ * write pointer is incremented. If the write pointer is at the end of the buffer, then it is set automatic
+ * to the position 0. At the end the 'uint8_RxBufEmpty' is set to 0 --> Buffer not more empty. 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        05.05.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint8_i2cx
+ *                          uint8_DataByte
+ * Output:                  -
+***********************************************************************************************************************/
+void i2c_ReceiveBufWr(unsigned char uint8_i2cx, unsigned char uint8_DataByte)
+{
+    if(uint8_i2cx == _i2c1)
+    {
+        //store data byte into send buffer
+        *(g_i2c1.uint8_RxBufPtr + g_i2c1.uint8_RxWch) = uint8_DataByte;
+        
+        //increment the write pointer
+        g_i2c1.uint8_RxWch++;
+        
+        //verify if write pointer is at the end of ring buffer
+        g_i2c1.uint8_RxWch = g_i2c1.uint8_RxWch % _i2c1TxRxBuffer;
+        
+        //set buffer not empty
+        g_i2c1.uint8_RxBufEmpty = 0;
+    }
+    else if(uint8_i2cx == _i2c2)
+    {
+        //not programmed yet
+    }
+    else
+    {
+        //nothing is done
+    }
+}   //end of i2c_ReceiveBufWr
+
+
+/**********************************************************************************************************************
+ * Routine:                 i2c_ReceiveBufRd
+
+ * Description:
+ * First the receiver buffer will be verified if it is empty. If the buffer is empty, then the return value is 0.
+ * If not, then one character is read out from the send buffer, and the read pointer of the send buffer is 
+ * incremented. If the read pointer is at the end of the buffer, then it is set automaticaly to the position 0.
+ * If the read pointer is equal to the write pointer of the send buffer, then the uint8_RxBufEmpty will be set to 1.
+ * 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        05.05.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint8_i2cx
+ * Output:                  uint8_WB
+***********************************************************************************************************************/
+unsigned char i2c_ReceiveBufRd(unsigned char uint8_i2cx)
+{
+    auto unsigned char uint8_WB;    //local work byte
+    
+    if(uint8_i2cx == _i2c1)
+    {
+        if(g_i2c1.uint8_RxBufEmpty)     //send buffer not empty?
+        {
+            //read out one byte from the send buffer
+            uint8_WB = g_i2c1.uint8_RxBuf[g_i2c1.uint8_RxRch];
+            
+            //increment the read pointer
+            g_i2c1.uint8_RxRch++;
+            
+            //verify if read pointer and write pointer of the ring buffer are equal
+            if(g_i2c1.uint8_RxRch == g_i2c1.uint8_RxWch)
+            {
+                g_i2c1.uint8_RxBufEmpty = 1;        //send buffer empty
+            }
+            else
+            {
+                //nothing is done
+            }
+            
+            return uint8_WB;    //return the value from the buffer
+        }
+        else
+        {
+            return 0;           //return value 0
+        }
+    }
+    else if(uint8_i2cx == _i2c2)
+    {
+        //not programmed yet
+    }
+    else
+    {
+        //nothing is done
+    }
+}   //end of i2c_ReceiveBufRd

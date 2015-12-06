@@ -698,9 +698,25 @@ void cmd_SPHC(void)
 ***********************************************************************************************************************/
 void cmd_GVER(void)
 {
-    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)    //number of received characters OK?
     {
-        funct_LoadDeviceInfo();     //call subroutine      
+        //read EEPROM information for the GVER
+        g_i2c1.uint8_TxWch = 0;     
+        g_i2c1.uint8_TxRch = 0;         
+        //i2c_SendBufWr(_i2c1,0xA2);
+        //i2c_SendBufWr(_i2c1,0x00);
+        //i2c_SendBufWr(_i2c1,0x01);
+        //i2c_SendBufWr(_i2c1,0xAA);
+        i2c_SendBufWr(_i2c1,0xA3);
+        //i2c_SendBufWr(_i2c1,0xAA);
+        //uint8_WB |= 0x01;
+        //i2c_SendBufWr(_i2c1,0xAA);
+        g_i2c1.uint8_RDcount = 1;
+        g_i2c1.uint8_RScount = 0;  
+        g_i2c1.uint8_RdWr = 1;
+        i2c_StartTransfer(_i2c1);
+        
+        funct_LoadDeviceInfo();     //call subroutine           
     }
     else
     {

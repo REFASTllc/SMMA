@@ -37,7 +37,7 @@ void main(void)
       
     asm("ei");              //enable all interrupts (code in assembler)  
                             //use declaration "di" to disable all interrupts
-    
+   
     while(1)
     {
         if(g_Uni.uint8_Settings & 0x01) //verify if the unipolar motor has to move

@@ -136,7 +136,6 @@ void __ISR(_UART_2_VECTOR, IPL2AUTO) __IntUart2Handler(void)
     if(IFS1bits.U2TXIF)
     {
         IFS1bits.U2TXIF = 0;        //clear interrupt bit
-        //IEC1bits.U2TXIE = 0;
         
         if(!g_UART2txd.uint8_BufEmpty)      //send buffer not empty?
         {
@@ -462,4 +461,145 @@ void __ISR(_TIMER_3_VECTOR, IPL1AUTO) __IntTimer3Handler(void)
 void __ISR(_OUTPUT_COMPARE_1_VECTOR, IPL3AUTO) __IntPWM1Handler(void)
 {
     IFS0bits.OC1IF = 0;
+}
+
+
+/**********************************************************************************************************************
+ * Routine:                 __IntI2cHandler
+
+ * Description:
+ * Manage I2C modul 1 interrupt
+ * Master interrupt request:
+ * ...
+ * 
+ * Slave interrupt request:
+ * ...
+ * 
+ * Bus collision interrupt request:
+ * ...
+ *  
+ * Creator:                 A. Staub
+ * Date of creation:        05.12.2015
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
+{
+    auto unsigned char uint8_WB;        //local working byte
+    
+//--- Is this a master interrupt request? ---//
+    if(IFS0bits.I2C1MIF)
+    {
+        IFS0bits.I2C1MIF = 0;       //clear interrupt bit
+        
+        if(I2C1STATbits.P)          //stop condition detected?
+        {
+            i2c_disable(_i2c1);     //disable interrupt
+            I2C1CONbits.RCEN = 0;   //disable receive mode
+            oTestLed1 =! oTestLed1;
+        }
+        else
+        {
+            //do nothing
+        }
+
+        //direction on read AND every byte read && no transmit (8bits + ACK)
+        /*if((g_i2c1.uint8_Direction) && (!g_i2c1.uint8_RDcount) && (!I2C1STATbits.TRSTAT))
+        {
+            I2C1CONbits.PEN = 1;    //initiate stop condition ond SDA & SCL pins, cleared by module
+        }
+        else
+        {
+            //do nothing
+        }*/
+        
+        //SEND routine
+        //transmit not anymore in progress (test both of them) and receive mode not enable
+        if((!I2C1STATbits.TRSTAT) && (!I2C1STATbits.TBF) && (!g_i2c1.uint8_Direction))   
+        {
+            if(!I2C1STATbits.ACKSTAT)   //acknowledge received?
+            {
+                if(!g_i2c1.uint8_TxBufEmpty)    //send buffer not empty
+                {
+                    I2C1TRN = i2c_SendBufRd(_i2c1); //take out one byte from the buffer and send it
+                }
+                else                            //send buffer empty, so send stop condition
+                {
+                    if(g_i2c1.uint8_RdWr)       //was the command a read command?
+                    {
+                        I2C1CONbits.RCEN = 1;   //enables receive mode, automatic cleared 
+                                                //by module at the end of 8-bit receive data byte
+                        g_i2c1.uint8_Direction = 1; //direction = read
+                    }
+                    else                        //command was a write command
+                    {
+                        I2C1CONbits.PEN = 1;    //initiate stop condition ond SDA & SCL pins, cleared by module                        
+                    }
+                }
+            }
+            else
+            {
+                //error
+                I2C1CONbits.PEN = 1;            //initiate stop condition ond SDA & SCL pins, cleared by module
+                g_i2c1.uint8_ErrACK = 1;        //set ack error
+                g_i2c1.uint8_Transfer = 0;      //transfer finished
+                g_i2c1.uint8_StartCondt = 0;    //reset start condition
+                
+                //clear buffer
+                g_i2c1.uint8_TxRch = g_i2c1.uint8_TxWch;
+                g_i2c1.uint8_TxBufEmpty = 1;             
+            }
+        }
+        else
+        {
+            //wait...
+        }
+        
+        //RECEIVE routine
+        if(I2C1STATbits.RBF)            //receive buffer full/complete
+        {
+            i2c_ReceiveBufWr(_i2c1,I2C1RCV);    //store received byte into receive buffer
+            
+            g_i2c1.uint8_RDcount--;             //decrement the counter how many bytes are to read
+            
+            if(g_i2c1.uint8_RDcount == 0)       //last byte was read
+            {
+                I2C1CONbits.ACKDT = 1;          //NACK will be send
+                I2C1CONbits.ACKEN = 1;          //send NACK
+                I2C1CONbits.PEN = 1;            //initiate stop condition ond SDA & SCL pins, cleared by module
+            }
+            else if(g_i2c1.uint8_RDcount == 1)  //2nd last byte was read
+            {
+                I2C1CONbits.ACKDT = 0;          //ACK will be send
+                I2C1CONbits.ACKEN = 1;          //send ACK
+            }
+            else
+            {
+                //do nothing
+            }
+        }
+        else
+        {
+            //wait...
+        }
+    }
+    
+//--- Is this a slave interrupt request? ---//    
+    if(IFS0bits.I2C1SIF)
+    {
+        IFS0bits.I2C1SIF  = 0;      //clear interrupt bit
+        
+        //not programmed yet   
+    }
+    
+//--- Is this a BUS collision interrupt request? ---//
+    if(IFS0bits.I2C1BIF)
+    {
+        IFS0bits.I2C1BIF = 0;       //clear interrupt bit
+        
+        //not programmed yet
+    }
 }
