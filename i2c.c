@@ -126,13 +126,14 @@ void i2c_init(unsigned char uint8_i2cx)
                                         //FSCL = desired i2c bus speed = 400kHz 
         
         //init variables
-        g_i2c1.uint8_StartCondt = 0;    //reset start condition
+        g_i2c1.uint8_RScount = 0;       //reset repeat start condition
         g_i2c1.uint8_ErrACK = 0;        //reset error
-        g_i2c1.uint8_Transfer = 0;      //reset transfer
-        g_i2c1.uint8_RScount = 0;       //repeat start condtion counter - set to 0 if not used
+        //g_i2c1.uint8_Transfer = 0;      //reset transfer
         g_i2c1.uint8_RDcount = 0;       //reset counter 
         g_i2c1.uint8_RdWr = 0;          //set command on write
-        g_i2c1.uint8_Direction = 0;     //direction = write
+        g_i2c1.uint8_CurrDir = 0;       //direction = write
+        g_i2c1.uint8_LastNACKsend = 0;  //reset variable
+        g_i2c1.uint8_BusCollCount = 0;  //reset buss collision counter
         
         g_i2c1.uint8_TxBufEmpty = 1;    //reset buffer empty status
         g_i2c1.uint8_TxWch = 0;         //set write-pointer of the send ring buffer to 0
@@ -394,14 +395,8 @@ void i2c_InitInterrupt(unsigned char uint8_i2cx, unsigned char uint8_action, uns
  * Routine:                 i2c_StartTransfer
 
  * Description:
- * This subroutine starts an I2C master communication if the bus is idle. If the bus is busy, the variable
- * 'tranfer' will be 0. Same thing if the bus is idle but nothing in the send buffer to transfer.
- * If the bus is idle and the send buffer not empty, first one byte will be read out from the ring buffer
- * this must be the address with the information rad/write. 
- * This inforamtion will be stored into the variable 'RdWr', 'Transfer' will be set to 1 and 'ErrACK' to 0.
- * Then transmit mode and master mode must be set and a ACK must be generated, after receiving one data
- * byte must be clear. 
- * At the end the character from the buffer is stored into I2C1TRN to start the communication.  
+ * Use this subroutine to launch the I2C communication. Please note that the buffer and all needed variables
+ * must be set/defined before.   
  * 
  * Creator:                 A. Staub
  * Date of creation:        05.05.2015
@@ -416,7 +411,8 @@ void i2c_StartTransfer(unsigned char uint8_i2cx)
     if(uint8_i2cx == _i2c1)
     {
         i2c_enable(_i2c1);              //enable interrupt
-        g_i2c1.uint8_Direction = 0;     //direction = write
+        g_i2c1.uint8_LastNACKsend = 0;  //reset variable
+        g_i2c1.uint8_CurrDir = 0;       //current direction = write
         I2C1CONbits.RCEN = 0;           //receive sequence not in progress
         I2C1CONbits.ACKEN = 0;          //acknowledge sequence disable
         I2C1CONbits.SEN = 1;            //send start condition - launch interrupt routine
@@ -604,7 +600,7 @@ unsigned char i2c_ReceiveBufRd(unsigned char uint8_i2cx)
     
     if(uint8_i2cx == _i2c1)
     {
-        if(g_i2c1.uint8_RxBufEmpty)     //send buffer not empty?
+        if(!g_i2c1.uint8_RxBufEmpty)    //send buffer not empty?
         {
             //read out one byte from the send buffer
             uint8_WB = g_i2c1.uint8_RxBuf[g_i2c1.uint8_RxRch];

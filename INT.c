@@ -170,7 +170,7 @@ void __ISR(_UART_2_VECTOR, IPL2AUTO) __IntUart2Handler(void)
     {
         IFS1bits.U2EIF = 0;
     }
-}
+}   //end of __IntUart2Handler
 
 #ifdef SPI_H
 
@@ -469,14 +469,52 @@ void __ISR(_OUTPUT_COMPARE_1_VECTOR, IPL3AUTO) __IntPWM1Handler(void)
 
  * Description:
  * Manage I2C modul 1 interrupt
+ * 
  * Master interrupt request:
- * ...
+ * This routine will be called if one of the follow occurs:
+ * - Start condition executed
+ * - Repeated start condition executed
+ * - Stop condition executed
+ * - Data transfer byte received
+ * - During SEND ACK (invers) sequence
+ * - Data transfer byte transmitted
+ * - During a slave-detected stop
+ * Write explication:
+ * The external subroutine "i2c_StartTransfer" launchs the interrupt by executing a start condition on the line.
+ * So first it goes into the SEND routine, where it checks that there is no transmission on the bus and the current
+ * direction will be set to write inside the external routine "i2c_StartTransfer". 
+ * It verifies if an ACK was received from the slave, otherwise it set the error ErrACK and reset all. 
+ * A stop condition will be executed as well. If an ACK was received then it takes the next byte to send 
+ * from the array. Once there are not anymore bytes to send and like the command was a write, it send the 
+ * stop condition. 
+ * This stop condition launch again this interrupt and the first if case will be executed where we disable the 
+ * interrupt routine and reset all needed variables. 
+ * Read explication:
+ * It does exactly the same like a write at the beginning. But once the send array is empty and the command was
+ * a read, it enables the receive mode and change the current direction variable by setting to 1.
+ * The next time enter into this subroutine use now the RECEIVE routine. 
+ * Like we know in advance how much bytes we will receive by using the counter "uint8_RDcount" we know how 
+ * to react inside this case. On every received byte we send out an ACK (invers) until we received the last
+ * byte, because there we send an NACK for that the slave knows that we don't need more bytes. 
+ * We can't send the NACK and stop condition at the same time, that is the reason why we use the variable
+ * "uint8_LastNACKsend". We send the NACK and set this variable to true for that the next time we enter
+ * this routine it use the if case to send again the stop condition. 
+ * Write with Read explication:
+ * For this the variable "g_i2c1.uint8_RScount" is used. This variable you have to define before launching
+ * the I2C interrupt. This is used to generate a repeat start condition. 
+ * If you set this variable to 0 then nothing will be made, means a repeat start condition will 
+ * not generate. If for example you send the follow:
+ * Address + Data1 + Data2 --> Generate repeat start condition --> Address + RecData1 + RecData2
+ * then your variable "g_i2c1.uint8_RScount" must be set to 1. Because the master sends 4 bytes:
+ * Address + Data1 + Data2 + Address and before the second time sending the Address you want to generate
+ * this repeat start condition. That is the position 1. 
+ * 
  * 
  * Slave interrupt request:
- * ...
+ * Not programmed yet and not used for this project
  * 
  * Bus collision interrupt request:
- * ...
+ * At the moment there is just a counter that can count until 255 bus collisions. 
  *  
  * Creator:                 A. Staub
  * Date of creation:        05.12.2015
@@ -488,7 +526,7 @@ void __ISR(_OUTPUT_COMPARE_1_VECTOR, IPL3AUTO) __IntPWM1Handler(void)
 ***********************************************************************************************************************/
 void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
 {
-    auto unsigned char uint8_WB;        //local working byte
+    auto unsigned char uint8_WB;    //local work byte
     
 //--- Is this a master interrupt request? ---//
     if(IFS0bits.I2C1MIF)
@@ -497,42 +535,55 @@ void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
         
         if(I2C1STATbits.P)          //stop condition detected?
         {
-            i2c_disable(_i2c1);     //disable interrupt
-            I2C1CONbits.RCEN = 0;   //disable receive mode
-            oTestLed1 =! oTestLed1;
+            i2c_disable(_i2c1);             //disable interrupt
+            I2C1CONbits.RCEN = 0;           //disable receive mode
+            g_i2c1.uint8_LastNACKsend = 0;  //reset variable
         }
         else
         {
             //do nothing
         }
 
-        //direction on read AND every byte read && no transmit (8bits + ACK)
-        /*if((g_i2c1.uint8_Direction) && (!g_i2c1.uint8_RDcount) && (!I2C1STATbits.TRSTAT))
+        //last NACK was send
+        if(g_i2c1.uint8_LastNACKsend)
         {
             I2C1CONbits.PEN = 1;    //initiate stop condition ond SDA & SCL pins, cleared by module
         }
         else
         {
             //do nothing
-        }*/
+        }
         
         //SEND routine
         //transmit not anymore in progress (test both of them) and receive mode not enable
-        if((!I2C1STATbits.TRSTAT) && (!I2C1STATbits.TBF) && (!g_i2c1.uint8_Direction))   
-        {
+        if((!I2C1STATbits.TRSTAT) && (!I2C1STATbits.TBF) && (!g_i2c1.uint8_CurrDir))   
+        {                   
             if(!I2C1STATbits.ACKSTAT)   //acknowledge received?
             {
                 if(!g_i2c1.uint8_TxBufEmpty)    //send buffer not empty
-                {
-                    I2C1TRN = i2c_SendBufRd(_i2c1); //take out one byte from the buffer and send it
+                { 
+                    if(g_i2c1.uint8_RScount == 0)   //repeat start condition not used?
+                    {
+                        I2C1TRN = i2c_SendBufRd(_i2c1); //take out one byte from the buffer and send it
+                    }
+                    else if(g_i2c1.uint8_RScount == 1)  //sent repeat start condition?
+                    {
+                        g_i2c1.uint8_RScount--;         //decrement counter
+                        I2C1CONbits.RSEN = 1;           //sent repeat start condition
+                    }
+                    else
+                    {
+                        g_i2c1.uint8_RScount--;         //decrement counter
+                        I2C1TRN = i2c_SendBufRd(_i2c1); //take out one byte from the buffer and send it
+                    }
                 }
-                else                            //send buffer empty, so send stop condition
+                else                                //send buffer empty, so send stop condition
                 {
                     if(g_i2c1.uint8_RdWr)       //was the command a read command?
                     {
                         I2C1CONbits.RCEN = 1;   //enables receive mode, automatic cleared 
                                                 //by module at the end of 8-bit receive data byte
-                        g_i2c1.uint8_Direction = 1; //direction = read
+                        g_i2c1.uint8_CurrDir = 1; //direction = read
                     }
                     else                        //command was a write command
                     {
@@ -545,8 +596,8 @@ void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
                 //error
                 I2C1CONbits.PEN = 1;            //initiate stop condition ond SDA & SCL pins, cleared by module
                 g_i2c1.uint8_ErrACK = 1;        //set ack error
-                g_i2c1.uint8_Transfer = 0;      //transfer finished
-                g_i2c1.uint8_StartCondt = 0;    //reset start condition
+                //g_i2c1.uint8_Transfer = 0;      //transfer finished
+                //g_i2c1.uint8_StartCondt = 0;    //reset start condition
                 
                 //clear buffer
                 g_i2c1.uint8_TxRch = g_i2c1.uint8_TxWch;
@@ -569,7 +620,7 @@ void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
             {
                 I2C1CONbits.ACKDT = 1;          //NACK will be send
                 I2C1CONbits.ACKEN = 1;          //send NACK
-                I2C1CONbits.PEN = 1;            //initiate stop condition ond SDA & SCL pins, cleared by module
+                g_i2c1.uint8_LastNACKsend = 1;  //last NACK send
             }
             else if(g_i2c1.uint8_RDcount == 1)  //2nd last byte was read
             {
@@ -584,6 +635,13 @@ void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
         else
         {
             //wait...
+        }
+        
+        //acknowledge received and current direction in read?
+        if((!I2C1STATbits.ACKSTAT) && (g_i2c1.uint8_CurrDir))
+        {
+            I2C1CONbits.RCEN = 1;   //enables receive mode, automatic cleared 
+                                    //by module at the end of 8-bit receive data byte        
         }
     }
     
@@ -600,6 +658,13 @@ void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
     {
         IFS0bits.I2C1BIF = 0;       //clear interrupt bit
         
-        //not programmed yet
+        if(g_i2c1.uint8_BusCollCount == 255)    //max. of the counter
+        {
+            //do nothing
+        }
+        else
+        {
+            g_i2c1.uint8_BusCollCount++;        //increment the counter
+        }       
     }
-}
+}   //end of __IntI2cHandler
