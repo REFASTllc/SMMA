@@ -36,7 +36,7 @@ typedef struct
 */
 typedef struct
 {
-    volatile unsigned long RxSPIbuffer[10];
+    volatile unsigned int RxSPIbuffer[10];
     volatile unsigned char RxIndex;
     unsigned char OK:1;
     unsigned char lastRxWrong:1;
@@ -102,7 +102,7 @@ void InitSPIInterrupt(unsigned char spix, unsigned char action);
 /*                                                                                                                  
 /*  Remark:                     -                                                                                   
 /********************************************************************************************************************/
-void SendDataSPI1(unsigned int dataToSend);
-void SendDataSPI2(unsigned int dataToSend);
+signed char SendOneDataSPI1(unsigned int dataToSend);
+void SendOneDataSPI2(unsigned int dataToSend);
 
 #endif	/* SPI_H */

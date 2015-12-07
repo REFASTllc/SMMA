@@ -3,57 +3,32 @@
                                             UBD - Unipolar Bipolar Driver
 
 ***********************************************************************************************************************
- * File name:               includes.h
- * Creation date:           13.08.2015
- * Main creator:            A. Staub
+ * File name:               periph.c
+ * Creation date:           07.12.2015
+ * Main creator:            J. Rebetez
  * Company:                 REFAST GmbH
  *                          Copyright (c) 2015 REFAST GmbH
 ***********************************************************************************************************************
- * Content overview :       - INCLUDES
+ * Content overview:        - 
 ***********************************************************************************************************************/
 
+#include "includes.h"
+
 /**********************************************************************************************************************
- * Routine:                 INCLUDES_H
+ * Routine:                 periph_init
 
  * Description:
- * All includes are here included. In that way, there is only one file to include in all others
+ * This routine initialize all extern peripherics like RTCC, motor driver, ...
  * 
  * Creator:                 J. Rebetez
- * Date of creation:        06.08.2015
+ * Date of creation:        07.12.2015
  * Last modification on:    -
  * Modified by:             - 
  * 
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-
-#ifndef INCLUDES_H
-#define	INCLUDES_H
-
-#define _XTAL_FREQ 80000000
-
-//system header files
-#include "xc.h"                     
-#include "attribs.h"                                        
-#include "p32mx360f512l.h"
-//#include <math.h>
-
-//project related header files
-#include "defines.h"
-#include "function.h"
-#include "system.h"
-#include "timers.h"
-#include "INT.h"
-#include "unipolar.h"
-#include "command.h"
-#include "cmdchk.h"
-#include "parameter.h"
-#include "UART.h"
-#include "spi.h"
-#include "i2c.h"
-//Extern devices header files
-#include "periph.h"
-#include "A3981.h"
-
-#endif	/* INCLUDES_H */
-
+void periph_init(void)
+{
+    InitA3981();
+}
