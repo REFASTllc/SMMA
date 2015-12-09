@@ -719,23 +719,25 @@ void cmd_GVER(void)
         g_i2c1.uint8_TxRch = 0; 
         i2c_SendBufWr(_i2c1,0xA2);
         i2c_SendBufWr(_i2c1,0x00);
-        i2c_SendBufWr(_i2c1,0x01);
-        i2c_SendBufWr(_i2c1,0x11);
+        i2c_SendBufWr(_i2c1,0x03);
+        //i2c_SendBufWr(_i2c1,0x11);
+        //i2c_SendBufWr(_i2c1,0x12);
+        i2c_SendBufWr(_i2c1,0x13);
         g_i2c1.uint8_RdWr = 0;
         i2c_StartTransfer(_i2c1);*/
         
-        g_i2c1.uint8_TxWch = 0;     
+        /*g_i2c1.uint8_TxWch = 0;     
         g_i2c1.uint8_TxRch = 0; 
         g_i2c1.uint8_RxWch = 0;     
         g_i2c1.uint8_RxRch = 0;
         i2c_SendBufWr(_i2c1,0xA2);
         i2c_SendBufWr(_i2c1,0x00);
-        i2c_SendBufWr(_i2c1,0x01);
+        i2c_SendBufWr(_i2c1,0x02);
         i2c_SendBufWr(_i2c1,0xA3);
         g_i2c1.uint8_RdWr = 1;
-        g_i2c1.uint8_RDcount = 3;
+        g_i2c1.uint8_RDcount = 1;
         g_i2c1.uint8_RScount = 4;
-        i2c_StartTransfer(_i2c1);
+        i2c_StartTransfer(_i2c1);*/
               
         //RTC
         /*g_i2c1.uint8_TxWch = 0;     

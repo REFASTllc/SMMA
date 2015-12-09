@@ -612,7 +612,9 @@ void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
         //RECEIVE routine
         if(I2C1STATbits.RBF)            //receive buffer full/complete
         {
-            i2c_ReceiveBufWr(_i2c1,I2C1RCV);    //store received byte into receive buffer
+            //i2c_ReceiveBufWr(_i2c1,I2C1RCV);    //store received byte into receive buffer
+            g_i2c1.uint8_RxBuf[g_i2c1.uint8_RxWch] = I2C1RCV;
+            g_i2c1.uint8_RxWch++;
             
             g_i2c1.uint8_RDcount--;             //decrement the counter how many bytes are to read
             

@@ -589,12 +589,6 @@ void funct_LoadDeviceInfo(void)
     uart2_sendbuffer('/');
     uart2_sendbuffer('1');
     uart2_sendbuffer('5');
-/*    uart2_sendbuffer(' ');
-    uint8_WB = i2c_SendBufRd(_i2c1);
-    funct_IntToAscii(uint8_WB,_Active);
-    uart2_sendbuffer('°');
-    uart2_sendbuffer(' ');
-    funct_IntToAscii(g_i2c1.uint8_BusCollCount,_Active);*/
     uart2_sendbuffer(13);
 }   //end of funct_LoadDeviceInfo
 
