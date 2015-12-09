@@ -38,10 +38,15 @@ void main(void)
     unsigned char i = SPI1.RxIndex;
     
     system_init();          //call subroutine
-    periph_init();
-      
+          
     asm("ei");              //enable all interrupts (code in assembler)  
                             //use declaration "di" to disable all interrupts
+    
+    periph_init();
+    
+    oFrontLedGRN = 1;
+    oFrontLedRED = 1;
+    oTestLed1 = 1;
     
     while(1)
     {

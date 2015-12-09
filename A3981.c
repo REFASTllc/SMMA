@@ -1,35 +1,35 @@
 /********************************************************************************************************************/
-/*  Name of the file:       A3981.c										    */
-/*  Purpose of the file:    Definitions of all functions related to the motor driver A3981			    */
-/*  Creator:                julien_rebetez									    */
-/*  Date of creation:       12 septembre 2015									    */
-/*														    */
-/*  Last modification on:   -											    */
-/*  Modified by:            -											    */
-/*  Version:                -											    */
-/*														    */
-/*  List of functions:      -											    */
+/*  Name of the file:       A3981.c										    
+/*  Purpose of the file:    Definitions of all functions related to the motor driver A3981			    
+/*  Creator:                julien_rebetez									    
+/*  Date of creation:       12 septembre 2015									    
+/*														    
+/*  Last modification on:   -											    
+/*  Modified by:            -											    
+/*  Version:                -											    
+/*														    
+/*  List of functions:      -											    
 /* ******************************************************************************************************************/
 
 #include "includes.h" // File which contain all includes files
 
 /********************************************************************************************************************/
-/*  Name of the function:       InitA3981									    */
-/*  Purpose of the function:    Header of the function InitA3981						    */
-/*  Parameters:													    */
-/*      IN:                     -										    */
-/*      OUT:                    -										    */
-/*														    */
-/*  Used global variables:      -										    */
-/*														    */
-/*  Creator:                    julien_rebetez									    */
-/*  Date of creation:           12 septembre 2015								    */
-/*														    */
-/*  Last modified on:           -										    */
-/*  Modified by:                -										    */
-/*  Version:                    -										    */
-/*														    */
-/*  Remark:                     -										    */
+/*  Name of the function:       InitA3981									    
+/*  Purpose of the function:    Header of the function InitA3981						    
+/*  Parameters:													    
+/*      IN:                     -										    
+/*      OUT:                    -										    
+/*														    
+/*  Used global variables:      -										    
+/*														    
+/*  Creator:                    julien_rebetez									    
+/*  Date of creation:           12 septembre 2015								    
+/*														    
+/*  Last modified on:           -										    
+/*  Modified by:                -										    
+/*  Version:                    -										    
+/*														    
+/*  Remark:                     -										    
 /********************************************************************************************************************/
 void InitA3981(void)
 {
@@ -73,7 +73,7 @@ void InitA3981(void)
                 //	|+----------------- Register address
                 //	+------------------ Register address
 //--- Configuration register run ---//
-    run	    = 0b100010100100000;
+    run	    = 0b1000010100100000;
             //	|||||||||||||||+---	SC0:  Step change number
             //	||||||||||||||+----	SC1:  2?s complement format
             //	|||||||||||||+-----	SC2:  Positive value increases Step Angle Number

@@ -90,7 +90,7 @@ void InitSPI(unsigned char spix)
                                     // 1 = Idle state for clock is a high level; active state is a low level
                                     // 0 = Idle state for clock is a low level; active state is a high level
         
-        SPI1CONbits.CKE = 1;        // SPI Clock Edge Select bit
+        SPI1CONbits.CKE = 0;        // SPI Clock Edge Select bit
                                     // 1 = Serial output data changes on transition from active clock state
                                     //	to idle clock state (see CKP bit)
                                     // 0 = Serial output data changes on transition from idle clock state
