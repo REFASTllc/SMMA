@@ -53,7 +53,7 @@ extern unsigned char i2c_ReceiveBufRd(unsigned char uint8_i2cx);
 
 typedef struct                      //definitions of multiple variable for function
 {
-    //volatile unsigned char uint8_StartCondt;    //1= start condition send / 0= start condition not send
+    volatile unsigned char uint8_Busy;          //1= i2c still transfering datas / 0= i2c finish transfering datas
     volatile unsigned char uint8_RScount;       //counter for repeat start condtion - set to 0 if not used (not used)
     volatile unsigned char uint8_RDcount;       //how much byte(s) to read
     volatile unsigned char uint8_RdWr;          //1= read command / 0= write command
@@ -61,7 +61,6 @@ typedef struct                      //definitions of multiple variable for funct
     volatile unsigned char uint8_LastNACKsend;  //1= last NACK send / 0= last NACK not send
     volatile unsigned char uint8_BusCollCount;  //bus collision counter
     volatile unsigned char uint8_ErrACK;        //1= error acknowledge / 0= no acknowledge error
-    //volatile unsigned char uint8_Transfer;      //1= transfer started / 0= bus is busy / transfer finish
     volatile unsigned char uint8_TxRch;         //read-pointer of the send ring buffer
     volatile unsigned char uint8_TxWch;         //write-pointer of the send ring buffer
     volatile unsigned char *uint8_TxBufPtr;     //pointer for the send ring buffer

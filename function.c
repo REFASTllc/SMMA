@@ -569,7 +569,6 @@ unsigned char funct_CheckCmdSMTYP(void)
 ***********************************************************************************************************************/
 void funct_LoadDeviceInfo(void)
 {
-    auto unsigned char uint8_WB;    //local work byte
     uart2_sendbuffer('E');
     uart2_sendbuffer(',');
     uart2_sendbuffer('S');                   

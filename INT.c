@@ -528,18 +528,19 @@ void __ISR(_OUTPUT_COMPARE_1_VECTOR, IPL3AUTO) __IntPWM1Handler(void)
 ***********************************************************************************************************************/
 void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
 {
-    auto unsigned char uint8_WB;    //local work byte
     
 //--- Is this a master interrupt request? ---//
     if(IFS0bits.I2C1MIF)
     {
         IFS0bits.I2C1MIF = 0;       //clear interrupt bit
+        g_i2c1.uint8_Busy = 1;      //i2c still transfering datas
         
         if(I2C1STATbits.P)          //stop condition detected?
         {
             i2c_disable(_i2c1);             //disable interrupt
             I2C1CONbits.RCEN = 0;           //disable receive mode
             g_i2c1.uint8_LastNACKsend = 0;  //reset variable
+            g_i2c1.uint8_Busy = 0;          //i2c finished the transfer of the datas
         }
         else
         {
@@ -598,8 +599,6 @@ void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
                 //error
                 I2C1CONbits.PEN = 1;            //initiate stop condition ond SDA & SCL pins, cleared by module
                 g_i2c1.uint8_ErrACK = 1;        //set ack error
-                //g_i2c1.uint8_Transfer = 0;      //transfer finished
-                //g_i2c1.uint8_StartCondt = 0;    //reset start condition
                 
                 //clear buffer
                 g_i2c1.uint8_TxRch = g_i2c1.uint8_TxWch;
@@ -614,9 +613,7 @@ void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
         //RECEIVE routine
         if(I2C1STATbits.RBF)            //receive buffer full/complete
         {
-            //i2c_ReceiveBufWr(_i2c1,I2C1RCV);    //store received byte into receive buffer
-            g_i2c1.uint8_RxBuf[g_i2c1.uint8_RxWch] = I2C1RCV;
-            g_i2c1.uint8_RxWch++;
+            i2c_ReceiveBufWr(_i2c1,I2C1RCV);    //store received byte into receive buffer
             
             g_i2c1.uint8_RDcount--;             //decrement the counter how many bytes are to read
             
@@ -661,6 +658,7 @@ void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
     if(IFS0bits.I2C1BIF)
     {
         IFS0bits.I2C1BIF = 0;       //clear interrupt bit
+        g_i2c1.uint8_Busy = 0;      //i2c finished the transfer, because there was a coll. err. 
         
         if(g_i2c1.uint8_BusCollCount == 255)    //max. of the counter
         {

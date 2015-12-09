@@ -126,9 +126,9 @@ void i2c_init(unsigned char uint8_i2cx)
                                         //FSCL = desired i2c bus speed = 400kHz 
         
         //init variables
+        g_i2c1.uint8_Busy = 0;          //reset variable
         g_i2c1.uint8_RScount = 0;       //reset repeat start condition
         g_i2c1.uint8_ErrACK = 0;        //reset error
-        //g_i2c1.uint8_Transfer = 0;      //reset transfer
         g_i2c1.uint8_RDcount = 0;       //reset counter 
         g_i2c1.uint8_RdWr = 0;          //set command on write
         g_i2c1.uint8_CurrDir = 0;       //direction = write
