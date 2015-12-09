@@ -20,6 +20,15 @@
 #define _SPI_3      3
 #define _SPI_4      4
 
+// Choose the format of the data on the SPI
+//#define _SPI_1_8_BITS
+#define _SPI_1_16_BITS
+//#define _SPI_1_32_BITS
+
+//#define _SPI_2_8_BITS
+//#define _SPI_2_16_BITS
+//#define _SPI_2_32_BITS
+
 #define _ENABLE     1
 #define _DISABLE    0
 
@@ -104,5 +113,34 @@ void InitSPIInterrupt(unsigned char spix, unsigned char action);
 /********************************************************************************************************************/
 signed char SendOneDataSPI1(unsigned int dataToSend);
 void SendOneDataSPI2(unsigned int dataToSend);
+
+/********************************************************************************************************************/
+/*  Name of the function:       GetLastDataSPI1									   
+/*  Purpose of the function:    Get the last data received on SPI 1							    
+/*  Parameters:													    
+/*      IN:                     -   						    
+/*      OUT:                    data (char, int or long)
+/*                              See .h file for all definitions										    
+/*														    
+/*  Used global variables:      -										    
+/*														    
+/*  Creator:                    julien_rebetez									    
+/*  Date of creation:           09.12.2015								    
+/*														    
+/*  Last modified on:           -										    
+/*  Modified by:                -										    
+/*  Version:                    -										   
+/*														    
+/*  Remark:                     -										    
+/********************************************************************************************************************/
+#ifdef _SPI_1_32_BITS
+unsigned long GetLastDataSPI1(void);
+#endif
+#ifdef _SPI_1_16_BITS
+unsigned int GetLastDataSPI1(void);
+#endif
+#ifdef _SPI_1_8_BITS
+unsigned char GetLastDataSPI1(void);
+#endif
 
 #endif	/* SPI_H */

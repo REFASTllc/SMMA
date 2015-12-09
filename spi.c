@@ -72,11 +72,22 @@ void InitSPI(unsigned char spix)
                                     // by associated PORT register)
                                     // 0 = SDOx pin is controlled by the module
 
-        SPI1CONbits.MODE16 = 1;	    // 32/16-bit Communication Select bits
-        SPI1CONbits.MODE32 = 0;	    // MODE32   MODE16  Communication
+                                    // MODE32   MODE16  Communication
                                     // 1	    x	    32-bit
                                     // 0	    1	    16-bit
                                     // 0	    0	    8-bit
+#ifdef _SPI_1_8_BITS
+        SPI1CONbits.MODE16 = 0;
+        SPI1CONbits.MODE32 = 0;
+#endif
+#ifdef _SPI_1_16_BITS
+        SPI1CONbits.MODE16 = 1;
+        SPI1CONbits.MODE32 = 0;
+#endif
+#ifdef _SPI_1_32_BITS
+        SPI1CONbits.MODE16 = 0;
+        SPI1CONbits.MODE32 = 1;	 
+#endif
 
         SPI1CONbits.SMP = 0;	    // SPI Data Input Sample Phase bit
                                     // Master mode (MSTEN = 1):
@@ -147,20 +158,24 @@ void InitSPI(unsigned char spix)
 				    // 1 = SDOx pin is not used by the module (pin is controlled
 				    // by associated PORT register)
 				    // 0 = SDOx pin is controlled by the module
-
-        SPI2CONbits.MODE16 = 1;	    // 32/16-bit Communication Select bits
-        SPI2CONbits.MODE32 = 0;	    // When AUDEN = 1:
-				    // MODE32   MODE16  Communication
-				    // 1	    1	    24-bit Data, 32-bit FIFO, 32-bit Channel/64-bit Frame
-				    // 1	    0	    32-bit Data, 32-bit FIFO, 32-bit Channel/64-bit Frame
-				    // 0	    1	    16-bit Data, 16-bit FIFO, 32-bit Channel/64-bit Frame
-				    // 0	    0	    16-bit Data, 16-bit FIFO, 16-bit Channel/32-bit Frame
-				    // When AUDEN = 0:
-				    // MODE32   MODE16  Communication
+        
+                    // MODE32   MODE16  Communication
 				    // 1	    x	    32-bit
 				    // 0	    1	    16-bit
 				    // 0	    0	    8-bit
-
+#ifdef _SPI_2_8_BITS
+        SPI2CONbits.MODE16 = 0;
+        SPI2CONbits.MODE32 = 0;
+#endif
+#ifdef _SPI_2_16_BITS
+        SPI2CONbits.MODE16 = 1;
+        SPI2CONbits.MODE32 = 0;
+#endif
+#ifdef _SPI_2_32_BITS
+        SPI2CONbits.MODE16 = 0;
+        SPI2CONbits.MODE32 = 1;	 
+#endif
+        
         SPI2CONbits.SMP = 1;	    // SPI Data Input Sample Phase bit
 				    // Master mode (MSTEN = 1):
 				    // 1 = Input data sampled at end of data output time
@@ -342,7 +357,39 @@ signed char SendOneDataSPI1(unsigned int dataToSend)
 /********************************************************************************************************************/
 void SendOneDataSPI2(unsigned int dataToSend)
 {
-//--- Waiting that the SPI peripherial is not busy ---//
+//--- Waiting that the SPI peripheral is not busy ---//
 	while(SPI2STATbits.SPIBUSY);
 	SPI2BUF = dataToSend;
+}
+
+/********************************************************************************************************************/
+/*  Name of the function:       GetLastDataSPI1									   
+/*  Purpose of the function:    Get the last data received on SPI 1							    
+/*  Parameters:													    
+/*      IN:                     -   						    
+/*      OUT:                    data (char, int or long)
+/*                              See .h file for all definitions										    
+/*														    
+/*  Used global variables:      -										    
+/*														    
+/*  Creator:                    julien_rebetez									    
+/*  Date of creation:           09.12.2015								    
+/*														    
+/*  Last modified on:           -										    
+/*  Modified by:                -										    
+/*  Version:                    -										   
+/*														    
+/*  Remark:                     -										    
+/********************************************************************************************************************/
+#ifdef _SPI_1_32_BITS
+unsigned long GetLastDataSPI1(void)
+#endif
+#ifdef _SPI_1_16_BITS
+unsigned int GetLastDataSPI1(void)
+#endif
+#ifdef _SPI_1_8_BITS
+unsigned char GetLastDataSPI1(void)
+#endif
+{
+    return SPI1.RxSPIbuffer[SPI1.RxIndex - 1];
 }
