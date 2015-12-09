@@ -193,7 +193,9 @@ void __ISR(_SPI_1_VECTOR, IPL4AUTO) __IntSPI1Handler(void)
         SPI1.lastRxWrong = 0;
         IFS0bits.SPI1RXIF = 0;
     }
-    if(IFS0bits.SPI1EIF)
+    else if(IFS0bits.SPI1TXIF)
+        IFS0bits.SPI1TXIF = 0;
+    else if(IFS0bits.SPI1EIF)
     {
         SPI1.lastRxWrong = 1;
         IFS0bits.SPI1EIF = 0;
