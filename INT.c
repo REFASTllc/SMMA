@@ -533,7 +533,6 @@ void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
     if(IFS0bits.I2C1MIF)
     {
         IFS0bits.I2C1MIF = 0;       //clear interrupt bit
-        g_i2c1.uint8_Busy = 1;      //i2c still transfering datas
         
         if(I2C1STATbits.P)          //stop condition detected?
         {
@@ -560,7 +559,7 @@ void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
         //SEND routine
         //transmit not anymore in progress (test both of them) and receive mode not enable
         if((!I2C1STATbits.TRSTAT) && (!I2C1STATbits.TBF) && (!g_i2c1.uint8_CurrDir))   
-        {                   
+        {  
             if(!I2C1STATbits.ACKSTAT)   //acknowledge received?
             {
                 if(!g_i2c1.uint8_TxBufEmpty)    //send buffer not empty
@@ -658,6 +657,7 @@ void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
     if(IFS0bits.I2C1BIF)
     {
         IFS0bits.I2C1BIF = 0;       //clear interrupt bit
+        g_i2c1.uint8_BusColl = 1;   //set bus collision flag
         g_i2c1.uint8_Busy = 0;      //i2c finished the transfer, because there was a coll. err. 
         
         if(g_i2c1.uint8_BusCollCount == 255)    //max. of the counter

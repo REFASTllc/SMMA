@@ -50,6 +50,8 @@
  *                          - cmd_GFRQVAL
  *                          //new commands:
  *                          - cmd_GINPB
+ *                          - cmd_SROM
+ *                          - cmd_RROM
 ***********************************************************************************************************************/
 
 
@@ -699,46 +701,7 @@ void cmd_SPHC(void)
 void cmd_GVER(void)
 {
     if(g_CmdChk.uint8_ParamPos == 1)    //number of received characters OK?
-    {
-        //read EEPROM information for the GVER
-        //g_i2c1.uint8_TxWch = 0;     
-        //g_i2c1.uint8_TxRch = 0;         
-        //i2c_SendBufWr(_i2c1,0xA2);
-        //i2c_SendBufWr(_i2c1,0x00);
-        //i2c_SendBufWr(_i2c1,0x01);
-        //i2c_SendBufWr(_i2c1,0xAA);
-        
-        //i2c_SendBufWr(_i2c1,0xAA);
-        //uint8_WB |= 0x01;
-        //i2c_SendBufWr(_i2c1,0xAA);
-        //g_i2c1.uint8_RDcount = 1;  
-        //g_i2c1.uint8_RdWr = 1;
-        
-        //EEPROM
-        /*g_i2c1.uint8_TxWch = 0;     
-        g_i2c1.uint8_TxRch = 0; 
-        i2c_SendBufWr(_i2c1,0xA2);
-        i2c_SendBufWr(_i2c1,0x00);
-        i2c_SendBufWr(_i2c1,0x03);
-        //i2c_SendBufWr(_i2c1,0x11);
-        //i2c_SendBufWr(_i2c1,0x12);
-        i2c_SendBufWr(_i2c1,0x13);
-        g_i2c1.uint8_RdWr = 0;
-        i2c_StartTransfer(_i2c1);*/
-        
-        /*g_i2c1.uint8_TxWch = 0;     
-        g_i2c1.uint8_TxRch = 0; 
-        g_i2c1.uint8_RxWch = 0;     
-        g_i2c1.uint8_RxRch = 0;
-        i2c_SendBufWr(_i2c1,0xA2);
-        i2c_SendBufWr(_i2c1,0x00);
-        i2c_SendBufWr(_i2c1,0x02);
-        i2c_SendBufWr(_i2c1,0xA3);
-        g_i2c1.uint8_RdWr = 1;
-        g_i2c1.uint8_RDcount = 1;
-        g_i2c1.uint8_RScount = 4;
-        i2c_StartTransfer(_i2c1);*/
-              
+    {         
         //RTC
         /*g_i2c1.uint8_TxWch = 0;     
         g_i2c1.uint8_TxRch = 0; 
@@ -772,7 +735,7 @@ void cmd_GVER(void)
         g_i2c1.uint8_RDcount = 1;
         i2c_StartTransfer(_i2c1);*/
         
-        funct_LoadDeviceInfo();     //call subroutine           
+        funct_LoadDeviceInfo();     //call subroutine 
     }
     else
     {
@@ -2382,7 +2345,7 @@ void cmd_GFRQVAL(void)
 
  * Description:
  * Verify the received parameters of this command, if all parameters are within the tolerance.
- * If all is correct, then send back the state of the input bit 
+ * If all is correct, then send back the state of the input bit. 
  * 
  * Creator:                 A. Staub
  * Date of creation:        29.11.2015
@@ -2425,3 +2388,149 @@ void cmd_GINPB(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
 }   //end of cmd_GINPB
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SROM
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then store the byte into the EEPROM.  
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        12.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SROM(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    auto unsigned char uint8_AdrH;          //local work byte for address high
+    auto unsigned char uint8_AdrL;          //local work byte for address low
+    
+    if(g_CmdChk.uint8_ParamPos == 3)           //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_RomAddrMin,_RomAddrMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_RomValMin,_RomValMax);
+        
+        if(uint8_Result == 2)       //verify the result
+        {
+            uint8_AdrH = g_CmdChk.uint32_TempPara[1];   //store address high and low into AdrH
+            uint8_AdrH = uint8_AdrH >> 8;               //shift AdrH 8 bits to right
+            uint8_AdrH &= 0x000000FF;                   //clear all bits after the first 8
+            
+            uint8_AdrL = g_CmdChk.uint32_TempPara[1];   //store address high and low into AdrL
+            uint8_AdrL &= 0x000000FF;                   //clear all bits after the first 8
+            
+            ROM24LC256_WrByte(uint8_AdrH,uint8_AdrL,g_CmdChk.uint32_TempPara[2]);
+            
+            if(g_i2c1.uint8_ErrACK)     //error acknowledge = no answer from the slave
+            {
+                uart2_sendbuffer('X');      //first the letter X
+                uart2_sendbuffer(',');      //then the comma
+                g_Param.uint8_ErrCode = _AckSROMRROM;   //set error code
+                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+            }
+            else if(g_i2c1.uint8_BusColl)   //error bus collision 
+            {
+                uart2_sendbuffer('X');      //first the letter X
+                uart2_sendbuffer(',');      //then the comma
+                g_Param.uint8_ErrCode = _BusCollSROMRROM;   //set error code
+                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+            }
+            else
+            {
+                uart2_sendbuffer('E');      //first the letter E
+            }
+            uart2_sendbuffer(13);                   //add the CR at the end        
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSROMRROM;  //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_SROM
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_RROM
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then read out the byte from the EEPROM and send it back. 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        12.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_RROM(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    auto unsigned char uint8_AdrH;          //local work byte for address high
+    auto unsigned char uint8_AdrL;          //local work byte for address low
+    
+    if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_RomAddrMin,_RomAddrMax);
+        
+        if(uint8_Result == 1)       //verify the result
+        {
+            uint8_AdrH = g_CmdChk.uint32_TempPara[1];   //store address high and low into AdrH
+            uint8_AdrH = uint8_AdrH >> 8;               //shift AdrH 8 bits to right
+            uint8_AdrH &= 0x000000FF;                   //clear all bits after the first 8
+            
+            uint8_AdrL = g_CmdChk.uint32_TempPara[1];   //store address high and low into AdrL
+            uint8_AdrL &= 0x000000FF;                   //clear all bits after the first 8
+            
+            //read out one byte and store it into uin8_Result
+            uint8_Result = ROM24LC256_RdByte(uint8_AdrH,uint8_AdrL,1);  
+            
+            if(g_i2c1.uint8_ErrACK)     //error acknowledge = no answer from the slave
+            {
+                uart2_sendbuffer('X');      //first the letter X
+                uart2_sendbuffer(',');      //then the comma
+                g_Param.uint8_ErrCode = _AckSROMRROM;   //set error code
+                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+            }
+            else if(g_i2c1.uint8_BusColl)   //error bus collision 
+            {
+                uart2_sendbuffer('X');      //first the letter X
+                uart2_sendbuffer(',');      //then the comma
+                g_Param.uint8_ErrCode = _BusCollSROMRROM;   //set error code
+                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+            }
+            else
+            {
+                uart2_sendbuffer('E');      //first the letter E
+                uart2_sendbuffer(',');      //then the comma
+                funct_IntToAscii(uint8_Result,_Active);
+            }
+            uart2_sendbuffer(13);           //add the CR at the end
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSROMRROM;  //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_RROM

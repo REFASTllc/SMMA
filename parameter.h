@@ -101,6 +101,10 @@ extern void param_init(void);
 #define _SWpwmValMax        1000        //<OK> maximal % PWM of the hall-sensor (1000 means 100.0) 
 #define _SWtypeMin          0           //<OK> range for switch type --> minimum
 #define _SWtypeMax          3           //<OK> range for switch type --> maximum
+#define _RomAddrMin         0           //<OK> range of the EEPROM address 
+#define _RomAddrMax         32768       //<OK> range of the EEPROM adddress
+#define _RomValMin          0           //<OK> range of the data for the EEPROM
+#define _RomValMax          255         //<OK> range of the data for the EEPROM
 
 
 /*
