@@ -35,18 +35,16 @@ extern T_SPI SPI1;
 
 void main(void)
 {   
-    unsigned char i = SPI1.RxIndex;
+    unsigned int tempToggle = 0;
     
     system_init();          //call subroutine
           
-    asm("ei");              //enable all interrupts (code in assembler)  
-                            //use declaration "di" to disable all interrupts
+    asm("ei");              //enable all interrupts (code in assembler) use declaration "di" to disable all interrupts
+     
+    oVmotOnOff = 1;
+    oBiEnaVmot = 1;
     
     periph_init();
-    
-    oFrontLedGRN = 1;
-    oFrontLedRED = 1;
-    oTestLed1 = 1;
     
     while(1)
     {
@@ -70,7 +68,20 @@ void main(void)
             cmdchk_check();             //call subroutine
         else
         {
-            //do nothing
+        //--- Toggle of led (alive test) ---//
+            if(tempToggle >= 30000)
+            {
+                oTestLed1 =! oTestLed1;
+                tempToggle = 0;
+            }
+            else
+                tempToggle++;
+            if(IFS0bits.T3IF)
+            {
+                oBiStepSignal =! oBiStepSignal;
+                IFS0bits.T3IF = 0;
+                TMR3 = 0;
+            }
         }
     }   
 }   //end of main

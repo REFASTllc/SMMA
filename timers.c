@@ -127,6 +127,10 @@ void timers_Init(unsigned char timerx)
     }
     else if(timerx == _TIMER3)
     {
+        T3CON = 0x8020;
+        PR3 = 40000;
+        TMR3 = 0;
+        /*
         T3CONbits.ON = 0;       // 1 = Module is enabled
                                 // 0 = Module is disabled
 
@@ -151,7 +155,7 @@ void timers_Init(unsigned char timerx)
                                 // 0 = Internal peripheral clock
 
         TMR3 = 0;
-        PR3 = 0;
+        PR3 = 0;*/
     }
     else if(timerx == _TIMER4)
     {

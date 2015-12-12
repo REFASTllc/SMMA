@@ -80,8 +80,9 @@ void system_init(void)
 {   
 //system initialization    
     system_osc();                           //call subroutine
+    InitADModule();
     system_IOs();                           //call subroutine
-    system_NoticeModule();                  //call subroutine
+//    system_NoticeModule();                  //call subroutine
 //interrupt initialization    
     INT_init();                             //call subroutine
 //function initialization
@@ -100,7 +101,7 @@ void system_init(void)
 //timer 2 initialization for unipolar driver
     timers_Init(_TIMER2);                   //call subroutine and initialize timer 2
     timers_SetInterrupt(_TIMER2,_ENABLE);   //call subroutine and set interrupt for timer 2
-    //timers_Set(_TIMER2,_ENABLE,0,10000); 
+    timers_Init(_TIMER3);
 //front LED = black status (off)
     funct_FrontLED(_FLEDblack);             //call subroutine and switch on green LED
 //--- Initialization of SPI ---//
@@ -162,18 +163,18 @@ void system_IOs(void)
     PORTA = 0x00;               //reset PORTA0:7_9:10_14:15
   
 //Port A tris register (0= output / 1 = input)
-    TRISAbits.TRISA0 = 1;       //RA0= Detection of the SD Card
-    TRISAbits.TRISA1 = 1;       //RA1= Free
-    TRISAbits.TRISA2 = 0;       //RA2= STRn signal of bipolar driver
-    TRISAbits.TRISA3 = 0;       //RA3= RES signal of LIN driver
-    TRISAbits.TRISA4 = 0;       //RA4= SP_MODE signal of LIN driver
-    TRISAbits.TRISA5 = 0;       //RA5= Enable of LIN driver
-    TRISAbits.TRISA6 = 1;       //RA6= Sink / Source input 7
-    TRISAbits.TRISA7 = 0;       //RA7= sink / source output 0
-    TRISAbits.TRISA9 = 1;       //RA9= Free
-    TRISAbits.TRISA10 = 1;      //RA10= Vref+
-    TRISAbits.TRISA14 = 0;      //RA14= Enable of V LIN supply
-    TRISAbits.TRISA15 = 0;      //RA15= CMD_MODE signal of RF module
+    TRISAbits.TRISA0 = 1;       //RA0 = Detection of the SD Card
+    TRISAbits.TRISA1 = 1;       //RA1 = Free
+    TRISAbits.TRISA2 = 0;       //RA2 = STRn signal of bipolar driver
+    TRISAbits.TRISA3 = 0;       //RA3 = RES signal of LIN driver
+    TRISAbits.TRISA4 = 0;       //RA4 = SP_MODE signal of LIN driver
+    TRISAbits.TRISA5 = 0;       //RA5 = Enable of LIN driver
+    TRISAbits.TRISA6 = 1;       //RA6 = Sink / Source input 7
+    TRISAbits.TRISA7 = 0;       //RA7 = sink / source output 0
+    TRISAbits.TRISA9 = 1;       //RA9 = Free
+    TRISAbits.TRISA10 = 1;      //RA10 = Vref+
+    TRISAbits.TRISA14 = 0;      //RA14 = Enable of V LIN supply
+    TRISAbits.TRISA15 = 0;      //RA15 = CMD_MODE signal of RF module
     
 //Port A open drain configuration register (0= disable / 1 = enable)
     ODCAbits.ODCA0 = 0;         //RA0 open-drain disable
@@ -194,22 +195,22 @@ void system_IOs(void)
     PORTB = 0x00;               //reset PORTB0:15
     
 //Port B tris register (0= output / 1 = input)
-    TRISBbits.TRISB0 = 0;       //RB0= Front red led
-    TRISBbits.TRISB1 = 0;       //RB1= Front green led
-    TRISBbits.TRISB2 = 1;       //RB2= Measure of Icoil A2 (Unipolar)
-    TRISBbits.TRISB3 = 1;       //RB3= Measure of Icoil A1 (Unipolar)
-    TRISBbits.TRISB4 = 1;       //RB4= Measure of Icoil B2 (Unipolar)
-    TRISBbits.TRISB5 = 1;       //RB5= Measure of Icoil B1 (Unipolar)
-    TRISBbits.TRISB6 = 1;       //RB6= Measure of Icoil B (bipolar)
-    TRISBbits.TRISB7 = 1;       //RB7= Measure of voltage reference of Ref signal
-    TRISBbits.TRISB8 = 1;       //RB8= Measure of motor supply and coil resistor
-    TRISBbits.TRISB9 = 1;       //RB9= Measure of current of the motor
-    TRISBbits.TRISB10 = 1;      //RB10= Measure of Icoil A (bipolar)
-    TRISBbits.TRISB11 = 1;      //RB11= Measure of the voltage of the backup battery
-    TRISBbits.TRISB12 = 1;      //RB12= Free
-    TRISBbits.TRISB13 = 1;      //RB13= Free
-    TRISBbits.TRISB14 = 0;      //RB14= Output to switch on / off Umot
-    TRISBbits.TRISB15 = 0;      //RB15= Enable to switch the measure to coil resistor
+    TRISBbits.TRISB0 = 0;       //RB0 = Front red led
+    TRISBbits.TRISB1 = 0;       //RB1 = Front green led
+    TRISBbits.TRISB2 = 1;       //RB2 = Measure of Icoil A2 (Unipolar)
+    TRISBbits.TRISB3 = 1;       //RB3 = Measure of Icoil A1 (Unipolar)
+    TRISBbits.TRISB4 = 1;       //RB4 = Measure of Icoil B2 (Unipolar)
+    TRISBbits.TRISB5 = 1;       //RB5 = Measure of Icoil B1 (Unipolar)
+    TRISBbits.TRISB6 = 1;       //RB6 = Measure of Icoil B (bipolar)
+    TRISBbits.TRISB7 = 1;       //RB7 = Measure of voltage reference of Ref signal
+    TRISBbits.TRISB8 = 1;       //RB8 = Measure of motor supply and coil resistor
+    TRISBbits.TRISB9 = 1;       //RB9 = Measure of current of the motor
+    TRISBbits.TRISB10 = 1;      //RB10 = Measure of Icoil A (bipolar)
+    TRISBbits.TRISB11 = 1;      //RB11 = Measure of the voltage of the backup battery
+    TRISBbits.TRISB12 = 1;      //RB12 = Free
+    TRISBbits.TRISB13 = 1;      //RB13 = Free
+    TRISBbits.TRISB14 = 0;      //RB14 = Output to switch on / off Umot
+    TRISBbits.TRISB15 = 0;      //RB15 = Enable to switch the measure to coil resistor
     
 //Port B open drain configuration register (0= disable / 1 = enable)
     ODCBbits.ODCB0 = 0;         //RB0 open-drain disable
@@ -234,36 +235,36 @@ void system_IOs(void)
     PORTC = 0x00;               //reset PORTC1:4_12:15
     
 //Port C tris register (0= output / 1 = input)
-    TRISCbits.TRISC1 = 1;       //RC1= T2CK
-    TRISCbits.TRISC2 = 1;       //RC2= T3CK
-    TRISCbits.TRISC3 = 1;       //RC3= T4CK
-    TRISCbits.TRISC4 = 1;       //RC4= T5CK
-    TRISCbits.TRISC12 = 1;      //RC12= OSC1
-    TRISCbits.TRISC13 = 1;      //RC13= SOSCI
-    TRISCbits.TRISC14 = 0;      //RC14= RESET signal of bipolar driver
-    TRISCbits.TRISC15 = 0;      //RC15= Switch of the communication between LIN driver and RF module
+    TRISCbits.TRISC1 = 1;       //RC1 = T2CK
+    TRISCbits.TRISC2 = 1;       //RC2 = T3CK
+    TRISCbits.TRISC3 = 1;       //RC3 = T4CK
+    TRISCbits.TRISC4 = 1;       //RC4 = T5CK
+    TRISCbits.TRISC12 = 1;      //RC12 = OSC1
+    TRISCbits.TRISC13 = 1;      //RC13 = SOSCI
+    TRISCbits.TRISC14 = 0;      //RC14 = RESET signal of bipolar driver
+    TRISCbits.TRISC15 = 0;      //RC15 = Switch of the communication between LIN driver and RF module
     
 //+++ Port D +++   
 //Port D register
     PORTD = 0x00;               //reset PORTD0:15  
     
 //Port D tris register (0= output / 1 = input)
-    TRISDbits.TRISD0 = 0;       //RD0= Step signal of bipolar driver
-    TRISDbits.TRISD1 = 1;       //RD1= Diag signal of bipolar driver
-    TRISDbits.TRISD2 = 0;       //RD2= DIR signal of bipolar driver
-    TRISDbits.TRISD3 = 0;       //RD3= Phase current control A & B
-    TRISDbits.TRISD4 = 0;       //RD4= Output to switch on / off coil A1 from unipolar driver 
-    TRISDbits.TRISD5 = 0;       //RD5= Output to switch on / off coil A2 from unipolar driver
-    TRISDbits.TRISD6 = 0;       //RD6= Output to switch on / off coil B1 from unipolar driver
-    TRISDbits.TRISD7 = 0;       //RD7= Output to switch on / off coil B2 from unipolar driver
-    TRISDbits.TRISD8 = 1;       //RD8= sink / source input 6
-    TRISDbits.TRISD9 = 1;       //RD9= sink / source input 3
-    TRISDbits.TRISD10 = 0;      //RD10= Enable of the constant current source
-    TRISDbits.TRISD11 = 1;      //RD11= Enable of the motor supply
-    TRISDbits.TRISD12 = 0;      //RD12= Control relay for coil A
-    TRISDbits.TRISD13 = 0;      //RD13= Control relay for coil B
-    TRISDbits.TRISD14 = 1;      //RD14= UART 1 CTS
-    TRISDbits.TRISD15 = 1;      //RD15= UART 1 RTS
+    TRISDbits.TRISD0 = 0;       //RD0 = Step signal of bipolar driver
+    TRISDbits.TRISD1 = 1;       //RD1 = Diag signal of bipolar driver
+    TRISDbits.TRISD2 = 0;       //RD2 = DIR signal of bipolar driver
+    TRISDbits.TRISD3 = 0;       //RD3 = Phase current control A & B
+    TRISDbits.TRISD4 = 0;       //RD4 = Output to switch on / off coil A1 from unipolar driver 
+    TRISDbits.TRISD5 = 0;       //RD5 = Output to switch on / off coil A2 from unipolar driver
+    TRISDbits.TRISD6 = 0;       //RD6 = Output to switch on / off coil B1 from unipolar driver
+    TRISDbits.TRISD7 = 0;       //RD7 = Output to switch on / off coil B2 from unipolar driver
+    TRISDbits.TRISD8 = 1;       //RD8 = sink / source input 6
+    TRISDbits.TRISD9 = 1;       //RD9 = sink / source input 3
+    TRISDbits.TRISD10 = 0;      //RD10 = Enable of the constant current source
+    TRISDbits.TRISD11 = 0;      //RD11 = Enable of the motor supply
+    TRISDbits.TRISD12 = 0;      //RD12 = Control relay for coil A
+    TRISDbits.TRISD13 = 0;      //RD13 = Control relay for coil B
+    TRISDbits.TRISD14 = 1;      //RD14 = UART 1 CTS
+    TRISDbits.TRISD15 = 1;      //RD15 = UART 1 RTS
     
 //Port D open drain configuration register (0= disable / 1 = enable)
     ODCDbits.ODCD0 = 0;         //RD0 open-drain disable
