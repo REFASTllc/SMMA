@@ -701,7 +701,7 @@ void cmd_SPHC(void)
 void cmd_GVER(void)
 {
     if(g_CmdChk.uint8_ParamPos == 1)    //number of received characters OK?
-    {         
+    {    
         //RTC
         /*g_i2c1.uint8_TxWch = 0;     
         g_i2c1.uint8_TxRch = 0; 
