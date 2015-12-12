@@ -133,7 +133,8 @@ void i2c_init(unsigned char uint8_i2cx)
         g_i2c1.uint8_RdWr = 0;          //set command on write
         g_i2c1.uint8_CurrDir = 0;       //direction = write
         g_i2c1.uint8_LastNACKsend = 0;  //reset variable
-        g_i2c1.uint8_BusCollCount = 0;  //reset buss collision counter
+        g_i2c1.uint8_BusCollCount = 0;  //reset bus collision counter
+        g_i2c1.uint8_BusColl = 0;       //reset bus collision flag
         
         g_i2c1.uint8_TxBufEmpty = 1;    //reset buffer empty status
         g_i2c1.uint8_TxWch = 0;         //set write-pointer of the send ring buffer to 0
@@ -410,6 +411,9 @@ void i2c_StartTransfer(unsigned char uint8_i2cx)
 {
     if(uint8_i2cx == _i2c1)
     {
+        g_i2c1.uint8_Busy = 1;          //set the busy variable already
+        g_i2c1.uint8_BusColl = 0;       //reset flag bus collision
+        g_i2c1.uint8_ErrACK = 0;        //reset ack error
         i2c_enable(_i2c1);              //enable interrupt
         g_i2c1.uint8_LastNACKsend = 0;  //reset variable
         g_i2c1.uint8_CurrDir = 0;       //current direction = write
@@ -503,6 +507,9 @@ unsigned char i2c_SendBufRd(unsigned char uint8_i2cx)
             
             //increment the read pointer
             g_i2c1.uint8_TxRch++;
+            
+            //verify if read-pointer is at the end of ring buffer
+            g_i2c1.uint8_TxRch = g_i2c1.uint8_TxRch % _i2c1TxRxBuffer;
             
             //verify if read pointer and write pointer of the ring buffer are equal
             if(g_i2c1.uint8_TxRch == g_i2c1.uint8_TxWch)
@@ -607,6 +614,9 @@ unsigned char i2c_ReceiveBufRd(unsigned char uint8_i2cx)
             
             //increment the read pointer
             g_i2c1.uint8_RxRch++;
+            
+            //verify if read-pointer is at the end of ring buffer
+            g_i2c1.uint8_RxRch = g_i2c1.uint8_RxRch % _i2c1TxRxBuffer;
             
             //verify if read pointer and write pointer of the ring buffer are equal
             if(g_i2c1.uint8_RxRch == g_i2c1.uint8_RxWch)

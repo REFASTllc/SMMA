@@ -48,7 +48,7 @@ extern unsigned char i2c_ReceiveBufRd(unsigned char uint8_i2cx);
 #define _i2cDISABLE         0       //definition for the uint8_action
 #define _i2cMASTER          1       //definition for the uint8_mode
 #define _i2cSLAVE           0       //definition for the uint8_mode
-#define _i2c1TxRxBuffer      20     //size of send and receive buffer of I2C module 1
+#define _i2c1TxRxBuffer     20      //size of send and receive buffer of I2C module 1
 
 
 typedef struct                      //definitions of multiple variable for function
@@ -60,6 +60,7 @@ typedef struct                      //definitions of multiple variable for funct
     volatile unsigned char uint8_CurrDir;       //1= current direction = read / 0= current direction write
     volatile unsigned char uint8_LastNACKsend;  //1= last NACK send / 0= last NACK not send
     volatile unsigned char uint8_BusCollCount;  //bus collision counter
+    volatile unsigned char uint8_BusColl;       //1= bus collision detected / 0= no bus collision
     volatile unsigned char uint8_ErrACK;        //1= error acknowledge / 0= no acknowledge error
     volatile unsigned char uint8_TxRch;         //read-pointer of the send ring buffer
     volatile unsigned char uint8_TxWch;         //write-pointer of the send ring buffer

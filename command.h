@@ -71,5 +71,7 @@ extern void cmd_GSWTYP(void);
 extern void cmd_GFRQVAL(void);
 //new commands:
 extern void cmd_GINPB(void);
+extern void cmd_SROM(void);
+extern void cmd_RROM(void);
 
 #endif	/* COMMAND_H */

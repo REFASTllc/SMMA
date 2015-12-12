@@ -102,7 +102,9 @@
 //error code definition
                             //general errors
 #define _GlobalLock         0               //driver detected a POR; user configuration not guaranteed
-#define _Out
+#define _BusCollSROMRROM    29              //SROM,RROM; bus collision error
+#define _AckSROMRROM        30              //SROM,RROM; acknowledge error - no answer from EEPROM
+#define _OutOfTolSROMRROM   31              //SROM,RROM; received parameters out of tolerance
 #define _OutOfTolSSWTYP     32              // SSWTYP; parameter out of range
 #define _OutOfTolGPWMVAL    33              // GPWMVAL; parameter(s) out of range
 #define _OutOfTolGPWMPOS    34              // GPWMPOS; parameter(s) out of range
@@ -209,6 +211,8 @@
 #define _IdPOSRUN           63              //run the motor with stop on digital input active
 //new commands:
 #define _IdGINPB            64              //get (read) an input bit
+#define _IdSROM             65              //store byte into the EEPROM
+#define _IdRROM             66              //read out byte from the EEPROM
 
 #endif	/* DEFINES_H */
 

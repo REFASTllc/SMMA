@@ -499,11 +499,18 @@ void cmdchk_check(void)
                     cmd_POSRUN();       //call subroutine
                     break;
                 */    
-                case (_IdGINPB):        //command GINPB
-                    
+                case (_IdGINPB):        //command GINPB                  
                     cmd_GINPB();        //call subroutine
                     break;
                     
+                case (_IdSROM):         //command SROM
+                    cmd_SROM();         //call subroutine
+                    break;
+                    
+                case (_IdRROM):         //command RROM
+                    cmd_RROM();         //call subroutine
+                    break;
+                                     
                 default:    //command ID does not exist
                     //do nothing - error has to be send before this routine
                     break;
@@ -632,6 +639,14 @@ void cmdchk_def(void)
       
         case (0x47494E50):  //cmd is = GINP
             g_CmdChk.uint8_CmdID = _IdGINP;
+            break;
+            
+        case (0x53524F4D):  //cmd is = SROM
+            g_CmdChk.uint8_CmdID = _IdSROM;
+            break;
+            
+        case (0x52524F4D):  //cmd is = RROM
+            g_CmdChk.uint8_CmdID = _IdRROM;
             break;
         
         default:

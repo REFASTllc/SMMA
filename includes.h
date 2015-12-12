@@ -55,6 +55,8 @@
 //Extern devices header files
 #include "periph.h"
 #include "A3981.h"
+#include "ROM24LC256.h"
+#include "DAC7571.h"
 
 #endif	/* INCLUDES_H */
 
