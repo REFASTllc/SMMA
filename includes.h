@@ -56,6 +56,7 @@
 #include "A3981.h"
 #include "ROM24LC256.h"
 #include "DAC7571.h"
+#include "RV30xx.h"
 
 #endif	/* INCLUDES_H */
 

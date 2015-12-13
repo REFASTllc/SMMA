@@ -701,40 +701,8 @@ void cmd_SPHC(void)
 void cmd_GVER(void)
 {
     if(g_CmdChk.uint8_ParamPos == 1)    //number of received characters OK?
-    {    
-        //RTC
-        /*g_i2c1.uint8_TxWch = 0;     
-        g_i2c1.uint8_TxRch = 0; 
-        i2c_SendBufWr(_i2c1,0xAC);
-        i2c_SendBufWr(_i2c1,0x03);
-        i2c_SendBufWr(_i2c1,0x00);
-        g_i2c1.uint8_RdWr = 0;
-        i2c_StartTransfer(_i2c1);*/
-        
-        /*g_i2c1.uint8_TxWch = 0;     
-        g_i2c1.uint8_TxRch = 0; 
-        i2c_SendBufWr(_i2c1,0xAC);
-        i2c_SendBufWr(_i2c1,0x30);
-        i2c_SendBufWr(_i2c1,0x02);
-        g_i2c1.uint8_RdWr = 0;
-        i2c_StartTransfer(_i2c1);
-        
-        g_i2c1.uint8_TxWch = 0;     
-        g_i2c1.uint8_TxRch = 0; 
-        i2c_SendBufWr(_i2c1,0xAC);
-        i2c_SendBufWr(_i2c1,0x20);
-        g_i2c1.uint8_RdWr = 0;
-        i2c_StartTransfer(_i2c1);
-        
-        g_i2c1.uint8_TxWch = 0;     
-        g_i2c1.uint8_TxRch = 0;
-        g_i2c1.uint8_RxWch = 0;     
-        g_i2c1.uint8_RxRch = 0; 
-        i2c_SendBufWr(_i2c1,0xAD);
-        g_i2c1.uint8_RdWr = 1;
-        g_i2c1.uint8_RDcount = 1;
-        i2c_StartTransfer(_i2c1);*/
-        
+    {   
+        RV30xx_TempMeas();
         funct_LoadDeviceInfo();     //call subroutine 
     }
     else

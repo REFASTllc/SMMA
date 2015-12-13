@@ -38,7 +38,7 @@ void DAC7571_WrByte(unsigned char uint8_OpMode, unsigned int uint16_DACval)
     auto unsigned char uint8_WB;
     
     //fill out the send buffer
-    i2c_SendBufWr(_i2c1,_DAC7571_H);
+    i2c_SendBufWr(_i2c1,_DAC7571addr);
     uint16_WI = uint16_DACval;          //store DAV value into the local work integer
     uint16_WI = uint16_WI >> 8;         //shift value 8 bits to right
     uint8_WB  = (uint16_WI | uint8_OpMode) & 0x000000FF;    //add the information for the operation mode
