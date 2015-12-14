@@ -132,16 +132,16 @@ void RV30xx_TempMeas(void)
     
     if(g_i2c1.uint8_ErrACK)     //error acknowledge = no answer from the slave
     {
-        g_RV30xx.int16_Temp = 255;  //error value
+        g_Param.sint16_Temp = 255;  //error value
     }
     else if(g_i2c1.uint8_BusColl)   //error bus collision 
     {
-        g_RV30xx.int16_Temp = 255;  //error value
+        g_Param.sint16_Temp = 255;  //error value
     }
     else
     {
-        g_RV30xx.int16_Temp = i2c_ReceiveBufRd(_i2c1); //read out one byte from the buffer
+        g_Param.sint16_Temp = i2c_ReceiveBufRd(_i2c1); //read out one byte from the buffer
         //read value -60 to have the right 
-        g_RV30xx.int16_Temp -= 60;      
+        g_Param.sint16_Temp = -1;      
     }
 }   //end of RV30xx_TempMeas

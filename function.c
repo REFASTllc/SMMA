@@ -589,7 +589,7 @@ void funct_LoadDeviceInfo(void)
     uart2_sendbuffer('1');
     uart2_sendbuffer('5');
     uart2_sendbuffer(' ');
-    if(g_RV30xx.int16_Temp < 0)     //temp. smaller than 0°
+    if(g_Param.sint16_Temp < 0)     //temp. smaller than 0°
     {
         uart2_sendbuffer('-');
     }
@@ -597,7 +597,7 @@ void funct_LoadDeviceInfo(void)
     {
         uart2_sendbuffer('+');      //temp. greater than -1°
     }
-    funct_IntToAscii(g_RV30xx.int16_Temp,_Active);
+    funct_IntToAscii(g_Param.sint16_Temp,_Active);
     uart2_sendbuffer('°');
     uart2_sendbuffer(13);
 }   //end of funct_LoadDeviceInfo

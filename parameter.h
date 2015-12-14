@@ -174,13 +174,14 @@ typedef struct                      //definitions of multiple variable for comma
     volatile unsigned long uint32_SwPWMpos;         //position in steps by 50% PWM of the Hall-Sensor
     volatile unsigned int uint16_SwPWMval;          //% PWM of the Hall-Sensor at the actual position 
     volatile unsigned char uint8_SwType;            //type of connected detection of the position
-    volatile unsigned long uint32_SwFrqVal;         //frequency (torque signal) in [Hz]
+    volatile unsigned long uint32_SwFrqVal;     //frequency (torque signal) in [Hz]
     volatile unsigned int uint16_Ue;                //entry voltage in [mV]
     volatile unsigned int uint16_IcoilA1;           //current coil A1 in [mA]
     volatile unsigned int uint16_IcoilA2;           //current coil A2 in [mA]
     volatile unsigned int uint16_IcoilB1;           //current coil B1 in [mA]
     volatile unsigned int uint16_IcoilB2;           //current coil B2 in [mA] 
     volatile unsigned char uint8_ErrCode;           //error code which is send back to the master 
+    volatile signed short int sint16_Temp;          //temperature value in [°C]
 }   SParam;                         //struct name is SParam (S for struct)
 extern SParam    g_Param;           //extern name is g_Param (g for global)
 

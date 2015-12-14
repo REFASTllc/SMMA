@@ -49,7 +49,7 @@ void main(void)
     oTestLed1 = 1;
     
     while(1)
-    {
+    {        
         if(g_Uni.uint8_Settings & 0x01) //verify if the unipolar motor has to move
         {
             uni_move();                 //then call the subroutine

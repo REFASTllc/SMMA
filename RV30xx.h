@@ -76,7 +76,7 @@ extern void RV30xx_TempMeas(void);
 
 typedef struct                      //definitions of multiple variable for function
 {
-    volatile signed int int16_Temp;         //temperature value
+    //volatile signed int int16_Temp;         //temperature value
 } SRV30xx;                              //struct name is SRV30xx (S for struct)
 extern SRV30xx    g_RV30xx;             //extern name is g_RV30xx (g for global)
 
