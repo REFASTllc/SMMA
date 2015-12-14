@@ -102,6 +102,8 @@
 //error code definition
                             //general errors
 #define _GlobalLock         0               //driver detected a POR; user configuration not guaranteed
+#define _OutOfTolSSEC       27              //SSEC, parameter out of range
+#define _BusCollRTC         28              //General RTC chip, issue during reading temperature
 #define _BusCollSROMRROM    29              //SROM,RROM; bus collision error
 #define _AckSROMRROM        30              //SROM,RROM; acknowledge error - no answer from EEPROM
 #define _OutOfTolSROMRROM   31              //SROM,RROM; received parameters out of tolerance
@@ -213,6 +215,9 @@
 #define _IdGINPB            64              //get (read) an input bit
 #define _IdSROM             65              //store byte into the EEPROM
 #define _IdRROM             66              //read out byte from the EEPROM
+#define _IdGTEMP            67              //read out the temperature
+#define _IdSSEC             68              //set the seconds
+#define _IdGSEC             69              //get the seconds
 
 #endif	/* DEFINES_H */
 

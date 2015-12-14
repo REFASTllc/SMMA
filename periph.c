@@ -34,4 +34,5 @@ void periph_init(void)
     
     //release of the RTC chip
     RV30xx_release();       //call subroutine
+    RV30xx_init();          //call subroutine
 }

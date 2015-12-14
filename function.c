@@ -570,6 +570,8 @@ unsigned char funct_CheckCmdSMTYP(void)
 ***********************************************************************************************************************/
 void funct_LoadDeviceInfo(void)
 {
+    auto signed short int sint16_WB;    //local work integer
+    
     uart2_sendbuffer('E');
     uart2_sendbuffer(',');
     uart2_sendbuffer('S');                   
@@ -590,16 +592,20 @@ void funct_LoadDeviceInfo(void)
     uart2_sendbuffer('1');
     uart2_sendbuffer('5');
     uart2_sendbuffer(' ');
-    if(g_Param.sint16_Temp < 0)     //temp. smaller than 0°
+    sint16_WB = g_Param.sint16_Temp;
+    if(sint16_WB < 0)           //temp. smaller than 0°
     {
-        uart2_sendbuffer('-');
+        uart2_sendbuffer('-');  
+        sint16_WB ^= 0xFFFF;    //value XOR with 1         
+        
     }
     else
     {
-        uart2_sendbuffer('+');      //temp. greater than -1°
+        uart2_sendbuffer('+');  //temp. greater than -1°
     }
-    funct_IntToAscii(g_Param.sint16_Temp,_Active);
+    funct_IntToAscii(sint16_WB,_Active);
     uart2_sendbuffer('°');
+    uart2_sendbuffer('C');
     uart2_sendbuffer(13);
 }   //end of funct_LoadDeviceInfo
 

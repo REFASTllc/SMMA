@@ -511,6 +511,18 @@ void cmdchk_check(void)
                 case (_IdRROM):         //command RROM
                     cmd_RROM();         //call subroutine
                     break;
+                    
+                case (_IdGTEMP):        //command GTEMP
+                    cmd_GTEMP();        //call subroutine
+                    break;
+                    
+                case (_IdSSEC):         //command SSEC
+                    cmd_SSEC();         //call subroutine
+                    break;
+                    
+                case (_IdGSEC):         //commmand GSEC
+                    cmd_GSEC();         //call subroutine
+                    break;
                                      
                 default:    //command ID does not exist
                     //do nothing - error has to be send before this routine
@@ -649,6 +661,14 @@ void cmdchk_def(void)
         case (0x52524F4D):  //cmd is = RROM
             g_CmdChk.uint8_CmdID = _IdRROM;
             break;
+            
+        case (0x53534543):  //cmd is = SSEC
+            g_CmdChk.uint8_CmdID = _IdSSEC;
+            break;
+            
+        case (0x47534543):  //cmd is = GSEC
+            g_CmdChk.uint8_CmdID = _IdGSEC;
+            break;
         
         default:
             
@@ -749,6 +769,10 @@ void cmdchk_def(void)
             
                             case (0x474D5459):  //cmd is = GMTYP
                                 g_CmdChk.uint8_CmdID = _IdGMTYP;
+                                break;
+                                
+                            case (0x4754454D):  //cmd is = GTEMP
+                                g_CmdChk.uint8_CmdID = _IdGTEMP;
                                 break;
             
                             default:  //error - command is not defined

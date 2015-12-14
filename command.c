@@ -52,6 +52,9 @@
  *                          - cmd_GINPB
  *                          - cmd_SROM
  *                          - cmd_RROM
+ *                          - cmd_GTEMP
+ *                          - cmd_SSEC
+ *                          - cmd_GSEC
 ***********************************************************************************************************************/
 
 
@@ -2442,10 +2445,10 @@ void cmd_SROM(void)
 
  * Description:
  * Verify the received parameters of this command, if all parameters are within the tolerance.
- * If all is correct, then read out the byte from the EEPROM and send it back. 
+ * If all is correct, then read out the temperature and send it back. 
  * 
  * Creator:                 A. Staub
- * Date of creation:        12.12.2015
+ * Date of creation:        14.12.2015
  * Last modification on:    -
  * Modified by:             - 
  * 
@@ -2509,3 +2512,164 @@ void cmd_RROM(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
 }   //end of cmd_RROM
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GTEMP
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then read out the byte from the EEPROM and send it back. 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        14.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GTEMP(void)
+{
+    auto signed short int sint16_WB;        //local work int
+    
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        RV30xx_TempMeas();      //read out the temperature
+        
+        if(g_Param.sint16_Temp == 255)  //signalization of an error active
+        {
+            uart2_sendbuffer('X');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma
+            g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
+            funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+        }
+        else
+        {
+            uart2_sendbuffer('E');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma
+            sint16_WB = g_Param.sint16_Temp;
+            if(sint16_WB < 0)           //temp. smaller than 0°
+            {
+                uart2_sendbuffer('-');  
+                sint16_WB ^= 0xFFFF;    //value XOR with 1         
+        
+            }
+            else
+            {
+                uart2_sendbuffer('+');  //temp. greater than -1°
+            }
+            funct_IntToAscii(sint16_WB,_Active);
+            uart2_sendbuffer('°');
+            uart2_sendbuffer('C');
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GTEMP
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SSEC
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then set the new seconds value
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        14.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SSEC(void)
+{
+    auto unsigned char uint8_Result;        //local work byte
+    auto unsigned char uint8_WB;            //local work byte
+    
+    if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_SecMin,_SecMax);
+        
+        if(uint8_Result == 1)       //verify the result
+        {
+            uint8_WB = g_CmdChk.uint32_TempPara[1];                 //store decimal value
+            uint8_WB = (((uint8_WB / 10) << 4) | (uint8_WB % 10));  //convert to BCD
+            
+            RV30xx_SetGetSec(_Set,uint8_WB);    //call subroutine
+            
+            if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+            {
+                uart2_sendbuffer('X');      //first the letter X
+                uart2_sendbuffer(',');      //then the comma
+                g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
+                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+            }
+            else
+            {
+                uart2_sendbuffer('E');      //first the letter X
+                uart2_sendbuffer(13);       //then the CR
+            }
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSSEC;      //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_SSEC
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GSEC
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then read out the seconds value
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        14.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GSEC(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        RV30xx_SetGetSec(_Get,0);           //read out the seconds
+        
+        if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+        {
+            uart2_sendbuffer('X');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma
+            g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
+            funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+        }
+        else
+        {
+            uart2_sendbuffer('E');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma
+            funct_IntToAscii(g_Param.uint8_Sec,_Active);
+            uart2_sendbuffer(13);       //then the CR
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GSEC
