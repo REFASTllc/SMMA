@@ -24,21 +24,21 @@ typedef union
     unsigned short int REG;
     struct
     {
-        unsigned short int FaultFlag : 1;
-        unsigned short int Temp1Diag : 1;
-        unsigned short int Temp2Diag : 1;
-        unsigned short int OverVoltVBB : 1;
-        unsigned short int StallDetect : 1;
-        unsigned short int OpenLoadPhB : 1;
-        unsigned short int OpenLoadPhA : 1;
-        unsigned short int OverCurrBM_L : 1;
-        unsigned short int OverCurrBM_H : 1;
-        unsigned short int OverCurrBP_L : 1;
-        unsigned short int OverCurrBP_H : 1;
-        unsigned short int OverCurrAM_L : 1;
-        unsigned short int OverCurrAM_H : 1;
-        unsigned short int OverCurrAP_L : 1;
-        unsigned short int OverCurrAP_H : 1;
+        unsigned short int APH : 1;
+        unsigned short int APL : 1;
+        unsigned short int AMH : 1;
+        unsigned short int AML : 1;
+        unsigned short int BPH : 1;
+        unsigned short int BPL : 1;
+        unsigned short int BMH : 1;
+        unsigned short int BML : 1;
+        unsigned short int OLA : 1;
+        unsigned short int OLB : 1;
+        unsigned short int ST : 1;
+        unsigned short int UV : 1;
+        unsigned short int OV : 1;
+        unsigned short int TW : 2;
+        unsigned short int FF : 1;
     } BITS;
 } U_FAULT0;
 
@@ -47,24 +47,83 @@ typedef union
     unsigned short int REG;
     struct
     {
-        unsigned short int FaultFlag : 1;
-        unsigned short int Temp1Diag : 1;
-        unsigned short int Temp2Diag : 1;
-        unsigned short int OverVoltVBB : 1;
-        unsigned short int StallDetect : 1;
-        unsigned short int OpenLoadPhB : 1;
-        unsigned short int OpenLoadPhA : 1;
-        unsigned short int NotUsed : 2;
-        unsigned short int StepAngleNumber : 6;
+        unsigned short int SA : 6;
+        unsigned short int nu : 2;
+        unsigned short int OLA : 1;
+        unsigned short int OLB : 1;
+        unsigned short int ST : 1;
+        unsigned short int UV : 1;
+        unsigned short int OV : 1;
+        unsigned short int TW : 2;
+        unsigned short int FF : 1;
     } BITS;
 } U_FAULT1;
 
+typedef union
+{
+    unsigned short int REG;
+    struct
+    {
+        unsigned short int PWM:1;
+        unsigned short int TOF_FRQ:3;
+        unsigned short int TBK:2;
+        unsigned short int PFD:3;
+        unsigned short int MX:2;
+        unsigned short int MS:2;
+        unsigned short int SYR:1;
+        unsigned short int ADR:2;
+    } BITS;
+} T_CONFIG0;
+
+typedef union
+{
+    unsigned short int REG;
+    struct
+    {
+        unsigned short int DIAG:2;
+        unsigned short int CD:8;
+        unsigned short int nu:1;
+        unsigned short int TSC:2;
+        unsigned short int OSC:1;
+        unsigned short int ADR:2;
+    } BITS;
+} T_CONFIG1;
+
+typedef union
+{
+    unsigned short int REG;
+    struct
+    {
+        signed short int SC:6;
+        unsigned short int DCY:2;
+        unsigned short int BRK:1;
+        unsigned short int SLEW:1;
+        unsigned short int HLR:1;
+        unsigned short int OL:2;
+        unsigned short int EN:1;
+        unsigned short int ADR:2;
+    } BITS;
+} T_RUN;
+
+typedef union
+{
+    unsigned short int REG;
+    struct
+    {
+        unsigned short int PT:6;
+        unsigned short int PTP:1;
+        unsigned short int nu:5;
+        unsigned short int STS:2;
+        unsigned short int ADR:2;
+    } BITS;
+} T_TBLLD;
+
 typedef struct
 {
-    unsigned short int CONFIG0;
-    unsigned short int CONFIG1;
-    unsigned short int RUN;
-    unsigned short int TBLLD;
+    T_CONFIG0 CONFIG0;
+    T_CONFIG1 CONFIG1;
+    T_RUN RUN;
+    T_TBLLD TBLLD;
     U_FAULT0 FAULT0;
     U_FAULT1 FAULT1;
 } T_A3981;

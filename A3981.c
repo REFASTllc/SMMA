@@ -37,84 +37,45 @@ void InitA3981(void)
 {   
     oBiResetSignal = 1;
 //--- Configuration register 0 ---//
-    A3981.CONFIG0 = 0b0010011100011100;
-                //	 |||||||||||||||+---	PWM:  PWM configuration
-                //	 ||||||||||||||+----	TOF0/FRQ0: Off time (only valid when PWM bit = 0)
-                //	 |||||||||||||+-----	TOF1/FRQ1: Frequency (only valid when PWM bit = 1)
-                //	 ||||||||||||+------	TOF2/FRQ2:
-                //	 |||||||||||+-------	TBK0: Blank Time
-                //	 ||||||||||+--------	TBK1:
-                //	 |||||||||+---------	PFD0: Fast decay time for mixed decay
-                //	 ||||||||+----------	PFD1:
-                //	 |||||||+-----------	PFD2:
-                //	 ||||||+------------	MXI0: Max phase current as a percentage of ISMAX
-                //	 |||||+-------------	MXI1:
-                //	 ||||+--------------	MS0:  Microstep mode for external STEP input control
-                //	 |||+---------------	MS1:
-                //	 ||+----------------	SYR:  Synchronous rectification
-                //	 |+----------------- Register address
-                //	 +------------------ Register address
+    A3981.CONFIG0.BITS.ADR = 0;         // Register address
+    A3981.CONFIG0.BITS.SYR = 1;         // Synchronous rectification
+    A3981.CONFIG0.BITS.MS = 3;          // Microstep mode for external STEP input control
+    A3981.CONFIG0.BITS.MX = 3;          // Max phase current as a percentage of ISMAX
+    A3981.CONFIG0.BITS.PFD = 4;         // Fast decay time for mixed decay
+    A3981.CONFIG0.BITS.TBK = 1;         // Blank Time
+    A3981.CONFIG0.BITS.TOF_FRQ = 6;     // Off time (when PWM bit = 0) / Frequency (when PWM bit = 1)
+    A3981.CONFIG0.BITS.PWM = 0;         // PWM configuration
+
 //--- Configuration register 1 ---//
-    A3981.CONFIG1 = 0b0111000000100000;
-                //	 |||||||||||||||+---	DIAG0: Selects signal routed to DIAG output
-                //	 ||||||||||||||+----	DIAG1:
-                //	 |||||||||||||+-----	CD0:   PWM count difference for ST detection
-                //	 ||||||||||||+------	CD1:   Default value: 8
-                //	 |||||||||||+-------	CD2:
-                //	 ||||||||||+--------	CD3:
-                //	 |||||||||+---------	CD4:
-                //	 ||||||||+----------	CD5:
-                //	 |||||||+-----------	CD6:
-                //	 ||||||+------------	CD7:
-                //	 |||||+-------------	Empty (0)
-                //	 ||||+--------------	TSC0:  Overcurrent fault delay
-                //	 |||+---------------	TSC1:
-                //	 ||+----------------	OSC:   Selects clock source
-                //	 |+----------------- Register address
-                //	 +------------------ Register address
+    A3981.CONFIG1.BITS.ADR = 1;         // Register address
+    A3981.CONFIG1.BITS.OSC = 1;         // Selects clock source
+    A3981.CONFIG1.BITS.TSC = 2;         // Overcurrent fault delay
+    A3981.CONFIG1.BITS.CD = 2;          // PWM count difference for ST detection
+    A3981.CONFIG1.BITS.DIAG = 0;        // Selects signal routed to DIAG output
+    
 //--- Configuration register run ---//
-    A3981.RUN = 0b1011101001000001;
-            //	  |||||||||||||||+---	SC0:  Step change number
-            //	  ||||||||||||||+----	SC1:  2?s complement format
-            //	  |||||||||||||+-----	SC2:  Positive value increases Step Angle Number
-            //	  ||||||||||||+------	SC3:  Negative value decreases Step Angle Number
-            //	  |||||||||||+-------	SC4:
-            //	  ||||||||||+--------	SC5:
-            //	  |||||||||+---------	DCY0: Decay mode selection
-            //	  ||||||||+----------	DCY1:
-            //	  |||||||+-----------	BRK:  Brake enable
-            //	  ||||||+------------	SLEW: Slew rate control
-            //	  |||||+-------------	HLR:  Selects slow decay and brake recirculation path
-            //	  ||||+--------------	OL0:  Open load current threshold as a percentage of -
-            //	  |||+---------------	OL1:  maximum current defined by ISMAX and MXI[1..0]
-            //	  ||+----------------	EN:   Phase current enable OR with ENABLE pin
-            //	  |+----------------- Register address
-            //	  +------------------ Register address
+    A3981.RUN.BITS.ADR = 2;             // Register address
+    A3981.RUN.BITS.EN = 1;              // Phase current enable
+    A3981.RUN.BITS.OL = 1;              // Open load current threshold as a percentage of maximum current defined by ISMAX and MX
+    A3981.RUN.BITS.HLR = 0;             // Selects slow decay and brake recirculation path
+    A3981.RUN.BITS.SLEW = 1;            // Slew rate control
+    A3981.RUN.BITS.BRK = 0;             // Brake enable
+    A3981.RUN.BITS.DCY = 1;             // Decay mode selection
+    A3981.RUN.BITS.SC = 1;              // Step change number
+            
 //--- Configuration Phase Table Load Register ---//
-    A3981.TBLLD = 0b1100000001000101;
-                //	|||||||||||||||+---	PT0: Phase Table Value
-                //	||||||||||||||+----	PT1:
-                //	|||||||||||||+-----	PT2:
-                //	||||||||||||+------	PT3:
-                //	|||||||||||+-------	PT4:
-                //	||||||||||+--------	PTP: Parity bit (odd parity)
-                //	|||||||||+---------	Empty (0)
-                //	||||||||+----------	Empty (0)
-                //	|||||||+-----------	Empty (0)
-                //	||||||+------------	Empty (0)
-                //	|||||+-------------	Empty (0)
-                //	||||+--------------	Empty (0)
-                //	|||+---------------	STS0: Selects stall detection scheme
-                //	||+----------------	STS1:
-                //	|+----------------- Register address
-                //	+------------------ Register address
+    A3981.TBLLD.BITS.ADR = 3;           // Register address
+    A3981.TBLLD.BITS.STS = 1;           // Selects stall detection scheme
+    A3981.TBLLD.BITS.PTP = 1;           // Parity bit (odd parity)
+    A3981.TBLLD.BITS.PT = 5;            // Phase Table Value
+
 //--- Send the configuration to the chip ---//
-    SendOneDataSPI1(A3981.CONFIG0);
+    SendOneDataSPI1(A3981.CONFIG0.REG);
     A3981.FAULT0.REG = GetLastDataSPI1();
-    SendOneDataSPI1(A3981.CONFIG1);
+    SendOneDataSPI1(A3981.CONFIG1.REG);
     A3981.FAULT1.REG = GetLastDataSPI1();
-    SendOneDataSPI1(A3981.RUN);
-    SendOneDataSPI1(A3981.TBLLD);
+    SendOneDataSPI1(A3981.RUN.REG);
+    SendOneDataSPI1(A3981.TBLLD.REG);
 }
 
 

@@ -101,7 +101,6 @@ void system_init(void)
 //timer 2 initialization for unipolar driver
     timers_Init(_TIMER2);                   //call subroutine and initialize timer 2
     timers_SetInterrupt(_TIMER2,_ENABLE);   //call subroutine and set interrupt for timer 2
-    timers_Init(_TIMER3);
 //front LED = black status (off)
     funct_FrontLED(_FLEDblack);             //call subroutine and switch on green LED
 //--- Initialization of SPI ---//
