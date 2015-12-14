@@ -38,7 +38,7 @@ extern T_A3981 A3981;
 
 void main(void)
 {   
-    unsigned short int tempToggle = 0, refToggle = 2000;
+    unsigned short int tempToggle = 0;
     
     system_init();          //call subroutine
           
