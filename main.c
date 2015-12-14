@@ -19,6 +19,7 @@
 extern SUART2txd g_UART2txd;
 extern SUART2rxd g_UART2rxd;
 extern SUni g_Uni;
+
 /**********************************************************************************************************************
  * Routine:                 main
 
@@ -52,7 +53,7 @@ void main(void)
 //    oBiDirSignal = 1;
     
     while(1)
-    {        
+    {          
         if(g_Uni.uint8_Settings & 0x01) //verify if the unipolar motor has to move
         {
             uni_move();                 //then call the subroutine
@@ -73,20 +74,7 @@ void main(void)
             cmdchk_check();             //call subroutine
         else
         {
-        //--- Toggle of led (alive test) ---//
-            if(tempToggle >= 30000)
-            {
-                oTestLed1 =! oTestLed1;
-                tempToggle = 0;
-            }
-            else
-                tempToggle++;
-            if(IFS0bits.T3IF)
-            {
-                oBiStepSignal =! oBiStepSignal;
-                IFS0bits.T3IF = 0;
-                TMR3 = 0;
-            }
+            //do nothing
         }
     }   
 }   //end of main

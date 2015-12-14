@@ -105,6 +105,8 @@ extern void param_init(void);
 #define _RomAddrMax         32768       //<OK> range of the EEPROM adddress
 #define _RomValMin          0           //<OK> range of the data for the EEPROM
 #define _RomValMax          255         //<OK> range of the data for the EEPROM
+#define _SecMin             0           //range for the seconds of the RTC
+#define _SecMax             59          //range for the seconds of the RTC
 
 
 /*
@@ -182,6 +184,7 @@ typedef struct                      //definitions of multiple variable for comma
     volatile unsigned short int uint16_IcoilB2;           //current coil B2 in [mA] 
     volatile unsigned char uint8_ErrCode;           //error code which is send back to the master 
     volatile signed short int sint16_Temp;          //temperature value in [°C]
+    volatile unsigned char uint8_Sec;               //seconds in decimal
 }   SParam;                         //struct name is SParam (S for struct)
 
 #endif	/* PARAMETER_H */

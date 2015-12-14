@@ -131,4 +131,5 @@ void param_init(void)
     g_Param.uint16_IcoilB2 = 0;         //reset the result in current coil B2
     g_Param.uint8_ErrCode = 0;          //reset the error code
     g_Param.sint16_Temp = 0;            //reset the temperature
+    g_Param.uint8_Sec = 0;              //reset the seconds
 }   //end of param_init

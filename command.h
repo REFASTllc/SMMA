@@ -73,5 +73,8 @@ extern void cmd_GFRQVAL(void);
 extern void cmd_GINPB(void);
 extern void cmd_SROM(void);
 extern void cmd_RROM(void);
+extern void cmd_GTEMP(void);
+extern void cmd_SSEC(void);
+extern void cmd_GSEC(void);
 
 #endif	/* COMMAND_H */
