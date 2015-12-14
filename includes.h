@@ -51,6 +51,7 @@
 #include "UART.h"
 #include "spi.h"
 #include "i2c.h"
+#include "adc.h"
 //Extern devices header files
 #include "periph.h"
 #include "A3981.h"

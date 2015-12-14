@@ -73,7 +73,7 @@ void InitA3981(void)
                 //	 |+----------------- Register address
                 //	 +------------------ Register address
 //--- Configuration register run ---//
-    A3981.RUN = 0b1000010100100000;
+    A3981.RUN = 0b1011101001000001;
             //	  |||||||||||||||+---	SC0:  Step change number
             //	  ||||||||||||||+----	SC1:  2?s complement format
             //	  |||||||||||||+-----	SC2:  Positive value increases Step Angle Number
@@ -110,9 +110,38 @@ void InitA3981(void)
                 //	+------------------ Register address
 //--- Send the configuration to the chip ---//
     SendOneDataSPI1(A3981.CONFIG0);
-    A3981.FAULT0 = GetLastDataSPI1();
+    A3981.FAULT0.REG = GetLastDataSPI1();
     SendOneDataSPI1(A3981.CONFIG1);
-    A3981.FAULT1 = GetLastDataSPI1();
+    A3981.FAULT1.REG = GetLastDataSPI1();
     SendOneDataSPI1(A3981.RUN);
     SendOneDataSPI1(A3981.TBLLD);
+}
+
+
+/********************************************************************************************************************/
+/*  Name of the function:       SetA3981									    
+/*  Purpose of the function:    Set a register of the A3981 chip						    
+/*  Parameters:													    
+/*      IN:                     value: value to be writted in the register										    
+/*      OUT:                    status  -1: error during trying to write the configuration
+/*                                       1: no error  
+/*                              See .h file to find the related defined values
+/*														    
+/*  Used global variables:      -										    
+/*														    
+/*  Creator:                    julien_rebetez									    
+/*  Date of creation:           12.12.2015								    
+/*														    
+/*  Last modified on:           -										    
+/*  Modified by:                -										    
+/*  Version:                    -										    
+/*														    
+/*  Remark:                     -										    
+/********************************************************************************************************************/
+signed char SetA3981(unsigned int value)
+{
+    unsigned int faultReg;
+    
+    SendOneDataSPI2(value);         // then send the data to the chip
+    faultReg = GetLastDataSPI1();   // Get the corresponding fault register
 }
