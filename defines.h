@@ -52,7 +52,7 @@
 #define iBiDiagSignal       PORTDbits.RD1           // Diag signal of bipolar driver
 #define oBiStepSignal       PORTDbits.RD0           // Step signal of bipolar driver
 #define oBiDirSignal        PORTDbits.RD2           // DIR signal of bipolar driver
-#define oBiResetSignal      PORTCbits.RC4           // RESET signal of bipolar driver
+#define oBiResetSignal      PORTCbits.RC14          // RESET signal of bipolar driver
 #define oBiStrnSignal       PORTAbits.RA2           // STRn signal of bipolar driver
 #define oBiPhCurrCtrl       PORTDbits.RD3           // Phase current control A & B
 #define oBiEnaVmot          PORTDbits.RD11          // Enable of the motor supply

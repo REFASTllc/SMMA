@@ -45,6 +45,9 @@ void main(void)
     oBiEnaVmot = 1;
     
     periph_init();
+    oBiResetSignal = 1;
+    DAC7571_WrByte(_NormalMode, 1240);
+//    oBiDirSignal = 1;
     
     while(1)
     {

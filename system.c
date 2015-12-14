@@ -57,7 +57,7 @@
 
 #pragma config FPLLMUL = MUL_20, FPLLIDIV = DIV_1, FPLLODIV = DIV_1
 #pragma config POSCMOD = HS, FNOSC = PRIPLL, FPBDIV = DIV_1
-#pragma config FSOSCEN = ON, DEBUG = ON, ICESEL = ICS_PGx1 
+#pragma config FSOSCEN = OFF, DEBUG = ON, ICESEL = ICS_PGx1 
 
 //  end of configuration bits
 

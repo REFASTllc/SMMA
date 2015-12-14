@@ -73,7 +73,7 @@ void InitA3981(void)
                 //	 |+----------------- Register address
                 //	 +------------------ Register address
 //--- Configuration register run ---//
-    A3981.RUN = 0b1000010100100000;
+    A3981.RUN = 0b1011101001000001;
             //	  |||||||||||||||+---	SC0:  Step change number
             //	  ||||||||||||||+----	SC1:  2?s complement format
             //	  |||||||||||||+-----	SC2:  Positive value increases Step Angle Number
