@@ -21,8 +21,8 @@
 #include "includes.h"
 
 SUni g_Uni;                 //global variables for struct
-
-
+extern SParam g_Param;
+extern STimer2 g_Timer2;
 /**********************************************************************************************************************
  * Routine:                 uni_init
 
@@ -296,7 +296,7 @@ void uni_move(void)
 ***********************************************************************************************************************/
 void uni_acc(void)
 {
-    auto unsigned int uint16_Freq;      //local variable for the frequency
+    auto unsigned short int uint16_Freq;      //local variable for the frequency
   
     if(g_Uni.uint8_Status & 0x10)       //is the next step is allowed?
     {
@@ -418,7 +418,7 @@ void uni_run(void)
 ***********************************************************************************************************************/
 void uni_dec(void)
 {
-    auto unsigned int uint16_Freq;      //local variable for the frequency
+    auto unsigned short int uint16_Freq;      //local variable for the frequency
   
     if(g_Uni.uint8_Status & 0x10)       //if the next step is allowed?
     {
@@ -497,10 +497,10 @@ void uni_dec(void)
 ***********************************************************************************************************************/
 void uni_CheckCalc(void)
 {
-    auto unsigned int uint16_NumbStep = 0;      //local work integer for the number of steps
-    auto unsigned int uint16_Freq = 0;          //local work integer for the frequency
+    auto unsigned short int uint16_NumbStep = 0;      //local work integer for the number of steps
+    auto unsigned short int uint16_Freq = 0;          //local work integer for the frequency
     auto unsigned char uint8_loop;              //local work byte for both for loops
-    auto unsigned long uint32_PlausCheck = 0;   //local work register for the plausibility check
+    auto unsigned long int uint32_PlausCheck = 0;   //local work register for the plausibility check
   
     g_Uni.uint32_RealPos = 0;       //real position starts always by 0
     //goal position is already known and defined in the command.c by receiving the command

@@ -21,50 +21,50 @@
 
 typedef union
 {
-    unsigned int REG;
+    unsigned short int REG;
     struct
     {
-        unsigned int FaultFlag : 1;
-        unsigned int Temp1Diag : 1;
-        unsigned int Temp2Diag : 1;
-        unsigned int OverVoltVBB : 1;
-        unsigned int StallDetect : 1;
-        unsigned int OpenLoadPhB : 1;
-        unsigned int OpenLoadPhA : 1;
-        unsigned int OverCurrBM_L : 1;
-        unsigned int OverCurrBM_H : 1;
-        unsigned int OverCurrBP_L : 1;
-        unsigned int OverCurrBP_H : 1;
-        unsigned int OverCurrAM_L : 1;
-        unsigned int OverCurrAM_H : 1;
-        unsigned int OverCurrAP_L : 1;
-        unsigned int OverCurrAP_H : 1;
+        unsigned short int FaultFlag : 1;
+        unsigned short int Temp1Diag : 1;
+        unsigned short int Temp2Diag : 1;
+        unsigned short int OverVoltVBB : 1;
+        unsigned short int StallDetect : 1;
+        unsigned short int OpenLoadPhB : 1;
+        unsigned short int OpenLoadPhA : 1;
+        unsigned short int OverCurrBM_L : 1;
+        unsigned short int OverCurrBM_H : 1;
+        unsigned short int OverCurrBP_L : 1;
+        unsigned short int OverCurrBP_H : 1;
+        unsigned short int OverCurrAM_L : 1;
+        unsigned short int OverCurrAM_H : 1;
+        unsigned short int OverCurrAP_L : 1;
+        unsigned short int OverCurrAP_H : 1;
     } BITS;
 } U_FAULT0;
 
 typedef union
 {
-    unsigned int REG;
+    unsigned short int REG;
     struct
     {
-        unsigned int FaultFlag : 1;
-        unsigned int Temp1Diag : 1;
-        unsigned int Temp2Diag : 1;
-        unsigned int OverVoltVBB : 1;
-        unsigned int StallDetect : 1;
-        unsigned int OpenLoadPhB : 1;
-        unsigned int OpenLoadPhA : 1;
-        unsigned int NotUsed : 2;
-        unsigned int StepAngleNumber : 6;
+        unsigned short int FaultFlag : 1;
+        unsigned short int Temp1Diag : 1;
+        unsigned short int Temp2Diag : 1;
+        unsigned short int OverVoltVBB : 1;
+        unsigned short int StallDetect : 1;
+        unsigned short int OpenLoadPhB : 1;
+        unsigned short int OpenLoadPhA : 1;
+        unsigned short int NotUsed : 2;
+        unsigned short int StepAngleNumber : 6;
     } BITS;
 } U_FAULT1;
 
 typedef struct
 {
-    unsigned int CONFIG0;
-    unsigned int CONFIG1;
-    unsigned int RUN;
-    unsigned int TBLLD;
+    unsigned short int CONFIG0;
+    unsigned short int CONFIG1;
+    unsigned short int RUN;
+    unsigned short int TBLLD;
     U_FAULT0 FAULT0;
     U_FAULT1 FAULT1;
 } T_A3981;
@@ -108,6 +108,6 @@ void InitA3981(void);
 /*														    
 /*  Remark:                     -										    
 /********************************************************************************************************************/
-signed char SetA3981(unsigned int value);
+signed char SetA3981(unsigned short int value);
 
 #endif	/* A3981_H */

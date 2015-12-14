@@ -45,10 +45,10 @@ extern void uni_CheckCalc(void);
 
 typedef struct          //definitions of multiple variable for unipolar
 {
-    volatile unsigned long uint32_RealPos;      //real position of the motor
-    volatile unsigned long uint32_GoalPos;      //goal position of the motor
+    volatile unsigned long int uint32_RealPos;      //real position of the motor
+    volatile unsigned long int uint32_GoalPos;      //goal position of the motor
     //volatile unsigned int uint16_StepTime;            //step time (1 step = 100us, max time = 65535*100us = 6.5535s)
-    volatile unsigned int uint16_RunFreq;       //run frequency for normal run
+    volatile unsigned short int uint16_RunFreq;       //run frequency for normal run
     //volatile unsigned int uint16_RampFreqTime;        //ramp frequency and time for acceleration and deceleration
     volatile unsigned char uint8_PhA1;          //output state of phase A1
     volatile unsigned char uint8_PhA2;          //output state of phase A2
@@ -65,33 +65,30 @@ typedef struct          //definitions of multiple variable for unipolar
     //volatile unsigned char uint8_RampFreq[ArrSize];   //array for frequency of ramp
     //volatile unsigned char uint8_RampStep[ArrSize];   //array for ramp step
  //variables for timer 2
-    volatile unsigned int uint16_LastTime;      //last time to wait
-    volatile unsigned int uint16_Count;         //counter for the timer - how many time to wait the interrupt time
-    volatile unsigned int uint16_RunLastTime;   //last time to wait in run mode
-    volatile unsigned int uint16_RunCount;      //counter - how many time to wait the interrupt time run mode 
-    volatile unsigned int uint16_SwOnLastTime;  //last time to wait for one time the switch on phase
-    volatile unsigned int uint16_SwOnCount;     //counter - how many time to wait the interrupt time for switch on
-    volatile unsigned int uint16_SwOffLastTime; //last time to wait for one time the switch off phase 
-    volatile unsigned int uint16_SwOffCount;    //counter - how many time to wait the interrupt time for switch off
+    volatile unsigned short int uint16_LastTime;      //last time to wait
+    volatile unsigned short int uint16_Count;         //counter for the timer - how many time to wait the interrupt time
+    volatile unsigned short int uint16_RunLastTime;   //last time to wait in run mode
+    volatile unsigned short int uint16_RunCount;      //counter - how many time to wait the interrupt time run mode 
+    volatile unsigned short int uint16_SwOnLastTime;  //last time to wait for one time the switch on phase
+    volatile unsigned short int uint16_SwOnCount;     //counter - how many time to wait the interrupt time for switch on
+    volatile unsigned short int uint16_SwOffLastTime; //last time to wait for one time the switch off phase 
+    volatile unsigned short int uint16_SwOffCount;    //counter - how many time to wait the interrupt time for switch off
     //volatile unsigned int uint16_RampLastTime;        //last time to wait in ramp mode
     //volatile unsigned int uint16_RampCount;           //counter - how many time to wait the interrupt time ramp mode
  //variables for acceleration
     //volatile unsigned char uint8_AccNumbRamp;         //how much different ramps in acceleration are to execute 
     volatile unsigned char uint8_AccArrPos;     //used to have access on the array
-    volatile unsigned int uint16_AccNumbStep;   //how much steps are to do with this acceleration / frequency
-    volatile unsigned long uint32_AccStop;      //stop position for the acceleration
+    volatile unsigned short int uint16_AccNumbStep;   //how much steps are to do with this acceleration / frequency
+    volatile unsigned long int uint32_AccStop;      //stop position for the acceleration
     //volatile unsigned int uint16_AccLastTime;         //last time to wait before acceleration
     //volatile unsigned int uint16_AccCount;            //counter - how many time to wait the interrupt time before acceleration
 //variables for deceleration
     //volatile unsigned char uint8_DecNumbRamp;         //how much different ramps in deceleration are to execute 
     volatile unsigned char uint8_DecArrPos;     //used to have access on the array
-    volatile unsigned int uint16_DecNumbStep;   //how much steps are to do with this deceleration / frequency 
-    volatile unsigned long uint32_DecStart;     //when we have to start the deceleration
+    volatile unsigned short int uint16_DecNumbStep;   //how much steps are to do with this deceleration / frequency 
+    volatile unsigned long int uint32_DecStart;     //when we have to start the deceleration
     //volatile unsigned int uint16_DecLastTime;         //last time to wait after deceleration
     //volatile unsigned int uint16_DecCount;            //counter - how many time to wait the interrupt time after deceleration 
 } SUni;                 //struct name is SUni (S for struct)
-extern SUni   g_Uni;    //extern name is g_Uni (g for global)
-
-
 
 #endif	/* UNIPOLAR_H */

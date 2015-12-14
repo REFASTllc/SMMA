@@ -382,7 +382,7 @@ void uart_init(unsigned char uartx)
  *                          autobaud (auto bauding on the UART)
  * Output:                  -
 ***********************************************************************************************************************/
-void uart_set(unsigned char uartx, unsigned char parity, unsigned char stopBit, unsigned char polarity, unsigned char autobaud, unsigned int baudrate)
+void uart_set(unsigned char uartx, unsigned char parity, unsigned char stopBit, unsigned char polarity, unsigned char autobaud, unsigned short int baudrate)
 {
     /*  UxMODEbits.BRGH = 0                  *//*  UxMODEbits.BRGH = 1                  */
     /*  Baud Rate = FPB / (16 * (UxBRG +1))  *//*  Baud Rate = FPB / (4 * (UxBRG +1))   */

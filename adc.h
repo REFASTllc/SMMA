@@ -12,10 +12,6 @@
 #ifndef ADC_H
 #define	ADC_H
 
-
-
-#endif	/* ADC_H */
-
 /****************************************************************************/
 /*  Purpose of the function:    Header of the function InitADModule         */
 /*  Parameters:                                                             */
@@ -49,4 +45,6 @@ void InitADModule(void);
 /*  Remark:                     -                                           */
 /****************************************************************************/
 void InitADInterrupt(void);
+
+#endif	/* ADC_H */
 

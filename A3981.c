@@ -138,9 +138,9 @@ void InitA3981(void)
 /*														    
 /*  Remark:                     -										    
 /********************************************************************************************************************/
-signed char SetA3981(unsigned int value)
+signed char SetA3981(unsigned short int value)
 {
-    unsigned int faultReg;
+    unsigned short int faultReg;
     
     SendOneDataSPI2(value);         // then send the data to the chip
     faultReg = GetLastDataSPI1();   // Get the corresponding fault register

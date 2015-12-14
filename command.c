@@ -57,7 +57,12 @@
 
 #include "includes.h" 
 
-
+extern SCmdChk g_CmdChk;
+extern SFunct g_Funct;
+extern Si2c1 g_i2c1;
+extern SParam g_Param;
+extern STimer2 g_Timer2;
+extern SUni g_Uni;
 /**********************************************************************************************************************
  * Routine:                 cmd_SILIM
 
@@ -1987,7 +1992,9 @@ void cmd_GSWLIM(void)
  * Output:                  -
 ***********************************************************************************************************************/
 void cmd_GSWPOS(void)
-{    auto unsigned char uint8_Result = 0;
+{    
+    auto unsigned char uint8_Result = 0;
+
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         uint8_Result += funct_CheckTol(g_Param.uint32_Sw1pos,g_Param.uint32_Sw1min,g_Param.uint32_Sw1max);

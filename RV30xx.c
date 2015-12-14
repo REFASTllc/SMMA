@@ -16,9 +16,8 @@
 
 #include "includes.h"
 
-SRV30xx g_RV30xx;   //global variables for struct 
-
-
+extern Si2c1 g_i2c1;
+extern SParam g_Param;
 /**********************************************************************************************************************
  * Routine:                 RV30xx_release
 

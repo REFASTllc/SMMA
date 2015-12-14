@@ -38,12 +38,11 @@ typedef struct                      //definitions of multiple variable for comma
 {
   volatile unsigned char uint8_ParamPos;        //parameter position of the command
   volatile unsigned char uint8_LetterPos;       //letter position of the command
-  volatile unsigned long uint32_Cmd1st4;        //first 4 letters of the command
-  volatile unsigned long uint32_Cmd2nd4;        //second 4 letters of the command
-  volatile unsigned long uint32_TempPara[101];  //Temporary parameter registers
+  volatile unsigned long int uint32_Cmd1st4;        //first 4 letters of the command
+  volatile unsigned long int uint32_Cmd2nd4;        //second 4 letters of the command
+  volatile unsigned long int uint32_TempPara[101];  //Temporary parameter registers
   //volatile unsigned char uint8_ErrCode;         //error code
   volatile unsigned char uint8_CmdID;           //command id
 } SCmdChk;                          //struct name is SCmdChk (S for struct)
-extern SCmdChk    g_CmdChk;         //extern name is g_CmdChk (g for global)
 
 #endif	/* CMDCHK_H */

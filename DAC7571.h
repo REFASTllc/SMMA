@@ -31,7 +31,7 @@
 #define	DAC7571_H
 
 
-extern void DAC7571_WrByte(unsigned char uint8_OpMode, unsigned int uint16_DACval);
+extern void DAC7571_WrByte(unsigned char uint8_OpMode, unsigned short int uint16_DACval);
 
 
 #define _DAC7571addr    0x98    //definition of the address for the DAC

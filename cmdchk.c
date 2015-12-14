@@ -18,8 +18,9 @@
 #include "includes.h"
 
 SCmdChk g_CmdChk;           //global variables for struct  
-
-
+extern SFunct g_Funct;
+extern SParam g_Param;
+extern SUART2rxd g_UART2rxd;
 /**********************************************************************************************************************
  * Routine:                 cmdchk_init
 
@@ -553,7 +554,7 @@ void cmdchk_check(void)
 ***********************************************************************************************************************/
 void cmdchk_def(void)
 {
-    auto unsigned long uint32_WR;       //local work register
+    auto unsigned long int uint32_WR;       //local work register
     
     if(g_CmdChk.uint32_Cmd2nd4)         //second part not empty?
     {

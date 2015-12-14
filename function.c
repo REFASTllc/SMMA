@@ -28,8 +28,9 @@
 #include "includes.h"
 
 SFunct g_Funct;       //global variables for struct  
-
-
+extern SCmdChk g_CmdChk;
+extern SParam g_Param;
+extern SUni g_Uni;
 /**********************************************************************************************************************
  * Routine:                 funct_init
 
@@ -82,7 +83,7 @@ void funct_init(void)
 ***********************************************************************************************************************/
 void funct_IntToAscii(unsigned long uint32_DataByte, unsigned char uint8_sending)
 {
-    auto unsigned long uint32_WR;         //local work register
+    auto unsigned long int uint32_WR;         //local work register
    
     g_Funct.uint8_ArrAsciiPos = 0;        //clear the position of the array
   
@@ -141,8 +142,8 @@ void funct_IntToAscii(unsigned long uint32_DataByte, unsigned char uint8_sending
 ***********************************************************************************************************************/
 unsigned long funct_AsciiToInt(void)
 {
-    auto unsigned long uint32_WR = 0;     //local work register
-    auto unsigned long uint32_Mul = 1;    //local work register for multiplication
+    auto unsigned long int uint32_WR = 0;     //local work register
+    auto unsigned long int uint32_Mul = 1;    //local work register for multiplication
     auto unsigned char uint8_WB;          //local work byte for the received character 
     auto unsigned char uint8_Counter;     //local work byte
   
@@ -198,7 +199,7 @@ unsigned long funct_AsciiToInt(void)
 ***********************************************************************************************************************/
 unsigned char funct_CheckTol(unsigned long uint32_Value, unsigned long uint32_Min, unsigned long uint32_Max)
 {
-    auto unsigned long uint8_Result;        //local work byte
+    auto unsigned char uint8_Result;        //local work byte
   
     if((uint32_Value >= uint32_Min) && (uint32_Value <= uint32_Max))
     {
@@ -239,10 +240,10 @@ unsigned char funct_CheckTol(unsigned long uint32_Value, unsigned long uint32_Mi
  *                          uint16_IntTime
  * Output:                  -
 ***********************************************************************************************************************/
-void funct_FreqToTimer2(unsigned long uint32_Freq, unsigned int uint16_IntTime)
+void funct_FreqToTimer2(unsigned long int uint32_Freq, unsigned short int uint16_IntTime)
 {
-    auto unsigned long uint32_WB = 10000000;    //local work register for time base = 100ns
-    auto unsigned long uint32_WB1 = 0;          //local work register for the rest (modulo)
+    auto unsigned long int uint32_WB = 10000000;    //local work register for time base = 100ns
+    auto unsigned long int uint32_WB1 = 0;          //local work register for the rest (modulo)
     
     uint32_WB = uint32_WB / uint32_Freq;        //calculation the needed wait time
     uint32_WB1 = uint32_WB % uint16_IntTime;    //calculation the rest 
@@ -290,10 +291,10 @@ void funct_FreqToTimer2(unsigned long uint32_Freq, unsigned int uint16_IntTime)
  *                          int16_IntTime
  * Output:                  -
 ***********************************************************************************************************************/
-void funct_msToTimer2(unsigned int uint16_msTime, unsigned int uint16_IntTime)
+void funct_msToTimer2(unsigned short int uint16_msTime, unsigned short int uint16_IntTime)
 {
-    auto unsigned long uint32_WB = 10000;       //local work register for time base = 100ns
-    auto unsigned long uint32_WB1 = 0;          //local work register for the rest (modulo)
+    auto unsigned long int uint32_WB = 10000;       //local work register for time base = 100ns
+    auto unsigned long int uint32_WB1 = 0;          //local work register for the rest (modulo)
     
     uint32_WB = uint32_WB * uint16_msTime;      //multipli to the ms time the needed time base 
     uint32_WB1 = uint32_WB % uint16_IntTime;    //calculation the rest
@@ -342,7 +343,7 @@ void funct_msToTimer2(unsigned int uint16_msTime, unsigned int uint16_IntTime)
  *                          OR
  *                          uint32_Step
 ***********************************************************************************************************************/
-unsigned int funct_ReadRamp(unsigned char uint8_kind,unsigned char uint8_sort,unsigned char uint8_ArrPos)
+unsigned short int funct_ReadRamp(unsigned char uint8_kind,unsigned char uint8_sort,unsigned char uint8_ArrPos)
 {
     if(uint8_kind)                  //read out a variable from the acceleration array?
     {

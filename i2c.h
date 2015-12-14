@@ -73,7 +73,6 @@ typedef struct                      //definitions of multiple variable for funct
     volatile unsigned char uint8_RxBuf[_i2c1TxRxBuffer];    //buffer for receive characters
     volatile unsigned char uint8_RxBufEmpty;    //1= receive buffer empty / 0= receive buffer not empty
 } Si2c1;                                //struct name is Si2c1 (S for struct)
-extern Si2c1    g_i2c1;                 //extern name is g_i2c1 (g for global)
 
 #endif	/* I2C_H */
 

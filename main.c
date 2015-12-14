@@ -16,7 +16,9 @@
 
 #include "includes.h"
 
-
+extern SUART2txd g_UART2txd;
+extern SUART2rxd g_UART2rxd;
+extern SUni g_Uni;
 /**********************************************************************************************************************
  * Routine:                 main
 
@@ -35,7 +37,7 @@ extern T_SPI SPI1;
 
 void main(void)
 {   
-    unsigned int tempToggle = 0;
+    unsigned short int tempToggle = 0;
     
     system_init();          //call subroutine
           

@@ -380,7 +380,7 @@ void timers_SetInterrupt(unsigned char timerx, unsigned char action)
  *                          valuePRReg (init value of PRx reg)
  * Output:                  -
 ***********************************************************************************************************************/
-void timers_Set(unsigned char timer, unsigned char status, unsigned long valueTMRReg, unsigned long valuePRReg)
+void timers_Set(unsigned char timer, unsigned char status, unsigned long int valueTMRReg, unsigned long int valuePRReg)
 {
     switch(timer)
     {

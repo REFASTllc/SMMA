@@ -35,17 +35,9 @@
 #define EnableSPI1()   SPI1CONbits.ON = 1;
 #define DisableSPI1()  SPI1CONbits.ON = 0;
 
-/*
 typedef struct
 {
-    unsigned char SPI_OK:1;
-    unsigned char lastRxWrong:1;
-    unsigned char NotUsed:5;
-} SPIStatus;
-*/
-typedef struct
-{
-    volatile unsigned int RxSPIbuffer[10];
+    volatile unsigned short int RxSPIbuffer[10];
     volatile unsigned char RxIndex;
     unsigned char OK:1;
     unsigned char lastRxWrong:1;
@@ -111,8 +103,8 @@ void InitSPIInterrupt(unsigned char spix, unsigned char action);
 /*                                                                                                                  
 /*  Remark:                     -                                                                                   
 /********************************************************************************************************************/
-signed char SendOneDataSPI1(unsigned int dataToSend);
-void SendOneDataSPI2(unsigned int dataToSend);
+signed char SendOneDataSPI1(unsigned short int dataToSend);
+void SendOneDataSPI2(unsigned short int dataToSend);
 
 /********************************************************************************************************************/
 /*  Name of the function:       GetLastDataSPI1									   
@@ -134,10 +126,10 @@ void SendOneDataSPI2(unsigned int dataToSend);
 /*  Remark:                     -										    
 /********************************************************************************************************************/
 #ifdef _SPI_1_32_BITS
-unsigned long GetLastDataSPI1(void);
+unsigned long int GetLastDataSPI1(void);
 #endif
 #ifdef _SPI_1_16_BITS
-unsigned int GetLastDataSPI1(void);
+unsigned short int GetLastDataSPI1(void);
 #endif
 #ifdef _SPI_1_8_BITS
 unsigned char GetLastDataSPI1(void);

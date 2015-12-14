@@ -40,7 +40,7 @@ void InitSPI(unsigned char spix)
     if(spix == _SPI_1)
     {
         unsigned char i = 0;
-        int tempData;
+        int short tempData;
     //--- Initialization of the SPI struct ---//
         for(i; i < 10; i++)
             SPI1.RxSPIbuffer[i] = 0;
@@ -318,9 +318,9 @@ void InitSPIInterrupt(unsigned char spix, unsigned char action)
 /*														    
 /*  Remark:                     -										    
 /********************************************************************************************************************/
-signed char SendOneDataSPI1(unsigned int dataToSend)
+signed char SendOneDataSPI1(unsigned short int dataToSend)
 {
-    unsigned int i;
+    unsigned short int i;
     
     if(!SPI1STATbits.SPIBUSY)
     {
@@ -355,7 +355,7 @@ signed char SendOneDataSPI1(unsigned int dataToSend)
 /*														    
 /*  Remark:                     -										    
 /********************************************************************************************************************/
-void SendOneDataSPI2(unsigned int dataToSend)
+void SendOneDataSPI2(unsigned short int dataToSend)
 {
 //--- Waiting that the SPI peripheral is not busy ---//
 	while(SPI2STATbits.SPIBUSY);
@@ -385,7 +385,7 @@ void SendOneDataSPI2(unsigned int dataToSend)
 unsigned long GetLastDataSPI1(void)
 #endif
 #ifdef _SPI_1_16_BITS
-unsigned int GetLastDataSPI1(void)
+unsigned short int GetLastDataSPI1(void)
 #endif
 #ifdef _SPI_1_8_BITS
 unsigned char GetLastDataSPI1(void)

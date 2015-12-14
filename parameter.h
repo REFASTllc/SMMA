@@ -126,63 +126,62 @@ extern void param_init(void);
 typedef struct                      //definitions of multiple variable for command
 {
 //the follow parameters are used to protect the device
-    volatile unsigned int uint16_UmotGlobMin;       //minimal actuator voltage in [mV]
-    volatile unsigned int uint16_UmotGloMax;        //minimal actuator voltage in [mV]
-    volatile unsigned int uint16_IGloMax;           //maximal actuator current in [mV]
+    volatile unsigned short int uint16_UmotGlobMin;       //minimal actuator voltage in [mV]
+    volatile unsigned short int uint16_UmotGloMax;        //minimal actuator voltage in [mV]
+    volatile unsigned short int uint16_IGloMax;           //maximal actuator current in [mV]
 //the follow parameter is used for that the user knows there was a POR
     volatile unsigned char uint8_NotPOR;            //POR detection; 1 = OK no POR detected; 0 = POR detected
 //the follow parameters can be set by the customer
-    volatile unsigned int uint16_Imin;              //minimal ON current for the coils in [mA]
-    volatile unsigned int uint16_Imax;              //maximal ON current for the coils in [mA]
-    volatile unsigned int uint16_Umot;              //test voltage for the actuators in [mV]
+    volatile unsigned short int uint16_Imin;              //minimal ON current for the coils in [mA]
+    volatile unsigned short int uint16_Imax;              //maximal ON current for the coils in [mA]
+    volatile unsigned short int uint16_Umot;              //test voltage for the actuators in [mV]
     volatile unsigned char uint8_MotTyp;            //motor type in ASCII ('U', 'B', 'L' or 'N')
     volatile unsigned char uint8_StepMode;          //step mode of the actuator in decimal
-    volatile unsigned long uint32_StepCount;        //step count in decimal
-    volatile unsigned long uint32_FreeStepCount;    //free step count in decimal
-    volatile unsigned int uint16_RunFreq;           //speed [steps / seconds]
+    volatile unsigned long int uint32_StepCount;        //step count in decimal
+    volatile unsigned long int uint32_FreeStepCount;    //free step count in decimal
+    volatile unsigned short int uint16_RunFreq;           //speed [steps / seconds]
     volatile unsigned char uint8_Direction;         //direction in decimal
     volatile unsigned char uint8_CoilState;         //coil switched on or off after move
     volatile unsigned char uint8_BipIPct;           //bipolar; current percentage for half step compensated in [%]
-    volatile unsigned int uint16_BipRunI;           //bipolar; chopper current during move in [mA]
-    volatile unsigned int uint16_BipHoldI;          //bipolar; chopper hold current in [mA]
+    volatile unsigned short int uint16_BipRunI;           //bipolar; chopper current during move in [mA]
+    volatile unsigned short int uint16_BipHoldI;          //bipolar; chopper hold current in [mA]
     volatile unsigned char uint8_SelectRamp;        //select ramp option
-    volatile unsigned int uint16_BipAccI;           //bipolar; chopper current for acceleration ramp in [mA]
-    volatile unsigned int uint16_BipDecI;           //bipolar; chopper current for deceleration ramp in [mA]
-    volatile unsigned int uint16_BipILevel[16];     //array of: current level for the uStepping [mA]
-    volatile unsigned int uint16_AccOnDelay;        //switching on time for the coils before start the move in [ms]   
-    volatile unsigned int uint16_DecOffDelay;       //switching off time for the coils after the move in [ms]    
+    volatile unsigned short int uint16_BipAccI;           //bipolar; chopper current for acceleration ramp in [mA]
+    volatile unsigned short int uint16_BipDecI;           //bipolar; chopper current for deceleration ramp in [mA]
+    volatile unsigned short int uint16_BipILevel[16];     //array of: current level for the uStepping [mA]
+    volatile unsigned short int uint16_AccOnDelay;        //switching on time for the coils before start the move in [ms]   
+    volatile unsigned short int uint16_DecOffDelay;       //switching off time for the coils after the move in [ms]    
     volatile unsigned char uint8_Acknowledge;       //quittance after sending the run command
-    volatile unsigned int uint16_AccNumbStep[50];   //array of: number of steps for the acceleration
-    volatile unsigned int uint16_AccFreq[50];       //array of: frequency for the acceleration
+    volatile unsigned short int uint16_AccNumbStep[50];   //array of: number of steps for the acceleration
+    volatile unsigned short int uint16_AccFreq[50];       //array of: frequency for the acceleration
     volatile unsigned char uint8_AccNumbRamp;       //acceleration - how many ramps are stored
-    volatile unsigned int uint16_DecNumbStep[50];   //array of: number of steps for the deceleration
-    volatile unsigned int uint16_DecFreq[50];       //array of: frequency for the deceleration
+    volatile unsigned short int uint16_DecNumbStep[50];   //array of: number of steps for the deceleration
+    volatile unsigned short int uint16_DecFreq[50];       //array of: frequency for the deceleration
     volatile unsigned char uint8_DecNumbRamp;       //deceleration - how many ramps are stored  
     //volatile unsigned char uint8_ValPort;           //value in decimal from the I/O port <-- don't delte it, mybe I need it again A. Staub
     //volatile unsigned char uint8_Bit;               //bit of the I/O port <-- don't delete it, maybe I need it again A. Staub
     volatile unsigned char uint8_TestVoltage;       //known voltage reference for the calibartion 
-    volatile unsigned int uint16_SCiLevel;          //short-circuit current limit [mA]
+    volatile unsigned short int uint16_SCiLevel;          //short-circuit current limit [mA]
     volatile unsigned char uint8_SCtLevel;          //wait time before switch off by a short-circuit [ms]
-    volatile unsigned long uint32_Sw1min;           //limit low of the switch position 1 in steps
-    volatile unsigned long uint32_Sw1max;           //limit high of the switch position 1 in steps
-    volatile unsigned long uint32_Sw2min;           //limit low of the switch position 2 in steps
-    volatile unsigned long uint32_Sw2max;           //limit high of the switch position 2 in steps
-    volatile unsigned long uint32_Sw1pos;           //actually switch position 1 in steps
-    volatile unsigned long uint32_Sw2pos;           //actually switch position 2 in steps
-    volatile unsigned long uint32_SwPWMmin;         //step position limit low by a PWM value of 50%
-    volatile unsigned long uint32_SwPWMmax;         //step position limit high by a PWM value of 50%
-    volatile unsigned long uint32_SwPWMpos;         //position in steps by 50% PWM of the Hall-Sensor
-    volatile unsigned int uint16_SwPWMval;          //% PWM of the Hall-Sensor at the actual position 
+    volatile unsigned long int uint32_Sw1min;           //limit low of the switch position 1 in steps
+    volatile unsigned long int uint32_Sw1max;           //limit high of the switch position 1 in steps
+    volatile unsigned long int uint32_Sw2min;           //limit low of the switch position 2 in steps
+    volatile unsigned long int uint32_Sw2max;           //limit high of the switch position 2 in steps
+    volatile unsigned long int uint32_Sw1pos;           //actually switch position 1 in steps
+    volatile unsigned long int uint32_Sw2pos;           //actually switch position 2 in steps
+    volatile unsigned long int uint32_SwPWMmin;         //step position limit low by a PWM value of 50%
+    volatile unsigned long int uint32_SwPWMmax;         //step position limit high by a PWM value of 50%
+    volatile unsigned long int uint32_SwPWMpos;         //position in steps by 50% PWM of the Hall-Sensor
+    volatile unsigned short int uint16_SwPWMval;          //% PWM of the Hall-Sensor at the actual position 
     volatile unsigned char uint8_SwType;            //type of connected detection of the position
-    volatile unsigned long uint32_SwFrqVal;     //frequency (torque signal) in [Hz]
-    volatile unsigned int uint16_Ue;                //entry voltage in [mV]
-    volatile unsigned int uint16_IcoilA1;           //current coil A1 in [mA]
-    volatile unsigned int uint16_IcoilA2;           //current coil A2 in [mA]
-    volatile unsigned int uint16_IcoilB1;           //current coil B1 in [mA]
-    volatile unsigned int uint16_IcoilB2;           //current coil B2 in [mA] 
+    volatile unsigned long int uint32_SwFrqVal;     //frequency (torque signal) in [Hz]
+    volatile unsigned short int uint16_Ue;                //entry voltage in [mV]
+    volatile unsigned short int uint16_IcoilA1;           //current coil A1 in [mA]
+    volatile unsigned short int uint16_IcoilA2;           //current coil A2 in [mA]
+    volatile unsigned short int uint16_IcoilB1;           //current coil B1 in [mA]
+    volatile unsigned short int uint16_IcoilB2;           //current coil B2 in [mA] 
     volatile unsigned char uint8_ErrCode;           //error code which is send back to the master 
     volatile signed short int sint16_Temp;          //temperature value in [°C]
 }   SParam;                         //struct name is SParam (S for struct)
-extern SParam    g_Param;           //extern name is g_Param (g for global)
 
 #endif	/* PARAMETER_H */

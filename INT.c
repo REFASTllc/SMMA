@@ -17,7 +17,11 @@
 
 #include "includes.h" // File which contain all includes files
 
-
+extern Si2c1 g_i2c1;
+extern STimer2 g_Timer2;
+extern SUART2txd g_UART2txd;
+extern SUART2rxd g_UART2rxd;
+extern SUni g_Uni;
 /**********************************************************************************************************************
  * Routine:                 INT_init
 

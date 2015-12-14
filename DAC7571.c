@@ -15,7 +15,7 @@
 
 #include "includes.h"
 
-
+extern Si2c1 g_i2c1;
 /**********************************************************************************************************************
  * Routine:                 DAC7571_WrByte
 
@@ -32,9 +32,9 @@
  *                          uint8_DataByte
  * Output:                  -
 ***********************************************************************************************************************/
-void DAC7571_WrByte(unsigned char uint8_OpMode, unsigned int uint16_DACval)
+void DAC7571_WrByte(unsigned char uint8_OpMode, unsigned short int uint16_DACval)
 {
-    auto unsigned int uint16_WI;        //local work integer
+    auto unsigned short int uint16_WI;        //local work integer
     auto unsigned char uint8_WB;
     
     //fill out the send buffer

@@ -73,12 +73,4 @@ extern void RV30xx_TempMeas(void);
 #define _RegRAM7            0x3E    //definition of register user RAM place 7
 #define _RegRAM8            0x3F    //definition of register user RAM place 8
 
-
-typedef struct                      //definitions of multiple variable for function
-{
-    //volatile signed int int16_Temp;         //temperature value
-} SRV30xx;                              //struct name is SRV30xx (S for struct)
-extern SRV30xx    g_RV30xx;             //extern name is g_RV30xx (g for global)
-
-
 #endif	/* RV30xx_H */
