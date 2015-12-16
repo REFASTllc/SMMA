@@ -38,7 +38,7 @@ extern T_A3981 A3981;
 
 void main(void)
 {   
-    unsigned short int tempToggle = 0;
+    unsigned short int tempToggle = 0, countStall = 0;
     
     system_init();          //call subroutine
           
@@ -50,7 +50,7 @@ void main(void)
     
     periph_init();
     oBiResetSignal = 1;
-    DAC7571_WrByte(_NormalMode, 1240);
+    DAC7571_WrByte(_NormalMode, 886);
     
     while(1)
     {        
@@ -74,20 +74,18 @@ void main(void)
             cmdchk_check();             //call subroutine
         else
         {
-        //--- Toggle of led (alive test) ---//
-            if(tempToggle >= 2)
+            SendOneDataSPI1(A3981.CONFIG1.REG);
+            A3981.FAULT1.REG = GetLastDataSPI1();
+            SendOneDataSPI1(A3981.CONFIG0.REG);
+            A3981.FAULT0.REG = GetLastDataSPI1();
+            if(A3981.FAULT1.BITS.ST && A3981.FAULT0.BITS.ST)
             {
-                SendOneDataSPI1(A3981.CONFIG1.REG);
-                A3981.FAULT1.REG = GetLastDataSPI1();
-                SendOneDataSPI1(A3981.RUN.REG);
-                A3981.FAULT0.REG = GetLastDataSPI1();
-                if(A3981.FAULT1.BITS.ST)
-                {
-                    if(A3981.RUN.BITS.SC == 1)
-                        A3981.RUN.BITS.SC = -1;
-                    else
-                        A3981.RUN.BITS.SC = 1;
-                }
+                countStall++;
+                oBiDirSignal =! oBiDirSignal;
+            }
+            //--- Toggle of led (alive test) ---//
+            if(tempToggle >= 200)
+            {
                 oTestLed1 =! oTestLed1;
                 tempToggle = 0;
             }
