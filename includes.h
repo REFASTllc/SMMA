@@ -52,6 +52,7 @@
 #include "spi.h"
 #include "i2c.h"
 #include "adc.h"
+#include "outputCompare.h"
 //Extern devices header files
 #include "periph.h"
 #include "A3981.h"

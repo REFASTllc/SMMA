@@ -111,7 +111,11 @@ void system_init(void)
     i2c_init(_i2c1);                                //call subroutine
     i2c_enable(_i2c1);                              //call subroutine
     i2c_InitInterrupt(_i2c1,_i2cENABLE,_i2cMASTER); //call subroutine
-    
+// PWM initialization
+    InitPWM(_PWM1);
+    SetPWMFrequency(_PWM1, 700);
+    SetPWMDutyCycle(_PWM1, 50);
+    SetPWM(_PWM1, _ENABLE);
 //switch off the debugging LED's
     oTestLed1 = 0;                          //switch on the output for the test LED1
     oTestLed2 = 0;                          //switch on the output for the test LED2

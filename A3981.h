@@ -19,6 +19,11 @@
 #define _RUN        2
 #define _TBLLD      3
 
+#define _FULL_STEP      0
+#define _HALF_STEP      1
+#define _QUART_STEP     2
+#define _SIXTH_STEP     3
+
 typedef union
 {
     unsigned short int REG;

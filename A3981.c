@@ -38,8 +38,8 @@ void InitA3981(void)
     oBiResetSignal = 1;
 //--- Configuration register 0 ---//
     A3981.CONFIG0.BITS.ADR = 0;         // Register address
-    A3981.CONFIG0.BITS.SYR = 1;         // Synchronous rectification
-    A3981.CONFIG0.BITS.MS = 3;          // Microstep mode for external STEP input control
+    A3981.CONFIG0.BITS.SYR = 0;         // Synchronous rectification
+    A3981.CONFIG0.BITS.MS = _HALF_STEP;// Microstep mode for external STEP input control
     A3981.CONFIG0.BITS.MX = 3;          // Max phase current as a percentage of ISMAX
     A3981.CONFIG0.BITS.PFD = 4;         // Fast decay time for mixed decay
     A3981.CONFIG0.BITS.TBK = 1;         // Blank Time
@@ -50,8 +50,8 @@ void InitA3981(void)
     A3981.CONFIG1.BITS.ADR = 1;         // Register address
     A3981.CONFIG1.BITS.OSC = 1;         // Selects clock source
     A3981.CONFIG1.BITS.TSC = 2;         // Overcurrent fault delay
-    A3981.CONFIG1.BITS.CD = 2;          // PWM count difference for ST detection
-    A3981.CONFIG1.BITS.DIAG = 0;        // Selects signal routed to DIAG output
+    A3981.CONFIG1.BITS.CD = 8;          // PWM count difference for ST detection
+    A3981.CONFIG1.BITS.DIAG = 1;        // Selects signal routed to DIAG output
     
 //--- Configuration register run ---//
     A3981.RUN.BITS.ADR = 2;             // Register address
@@ -61,11 +61,11 @@ void InitA3981(void)
     A3981.RUN.BITS.SLEW = 1;            // Slew rate control
     A3981.RUN.BITS.BRK = 0;             // Brake enable
     A3981.RUN.BITS.DCY = 1;             // Decay mode selection
-    A3981.RUN.BITS.SC = 1;              // Step change number
+    A3981.RUN.BITS.SC = 0;              // Step change number
             
 //--- Configuration Phase Table Load Register ---//
     A3981.TBLLD.BITS.ADR = 3;           // Register address
-    A3981.TBLLD.BITS.STS = 1;           // Selects stall detection scheme
+    A3981.TBLLD.BITS.STS = 0;           // Selects stall detection scheme
     A3981.TBLLD.BITS.PTP = 1;           // Parity bit (odd parity)
     A3981.TBLLD.BITS.PT = 5;            // Phase Table Value
 
