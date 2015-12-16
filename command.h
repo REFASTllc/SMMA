@@ -76,5 +76,18 @@ extern void cmd_RROM(void);
 extern void cmd_GTEMP(void);
 extern void cmd_SSEC(void);
 extern void cmd_GSEC(void);
+extern void cmd_SMIN(void);
+extern void cmd_GMIN(void);
+extern void cmd_SHRS(void);
+extern void cmd_GHRS(void);
+extern void cmd_SDAY(void);
+extern void cmd_GDAY(void);
+extern void cmd_SWDAY(void);
+extern void cmd_GWDAY(void);
+extern void cmd_SMONTH(void);
+extern void cmd_GMONTH(void);
+extern void cmd_SYEAR(void);
+extern void cmd_GYEAR(void);
+extern void cmd_GTIME(void);
 
 #endif	/* COMMAND_H */

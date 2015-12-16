@@ -12,6 +12,12 @@
  * Content overview:        - RV30xx_release
  *                          - RV30xx_init
  *                          - RV30xx_TempMeas
+ *                          - RV30xx_SetGetSec
+ *                          - RV30xx_SetGetMin
+ *                          - RV30xx_SetGetHrs
+ *                          - RV30xx_SetGetDay
+ *                          - RV30xx_SetGetWday
+ *                          - RV30xx_SetGetMonth
 ***********************************************************************************************************************/
 
 
@@ -215,8 +221,8 @@ void RV30xx_TempMeas(void)
  * Routine:                 RV30xx_SetGetSec
 
  * Description:
- * This command read out the temperature. First it sets the register that we want to read and then 
- * it reads out the temperature register. 
+ * This subroutine can be used to read out or set the seconds. The set value must be given in BCD format.
+ * By reading back the seconds you receive it in decimal. 
  * 
  * Creator:                 A. Staub
  * Date of creation:        13.12.2015
@@ -224,6 +230,7 @@ void RV30xx_TempMeas(void)
  * Modified by:             - 
  * 
  * Input:                   uint8_SetGet
+ *                          uint8_DataByte
  * Output:                  -
 ***********************************************************************************************************************/
 void RV30xx_SetGetSec(unsigned char uint8_SetGet,unsigned char uint8_DataByte)
@@ -290,3 +297,489 @@ void RV30xx_SetGetSec(unsigned char uint8_SetGet,unsigned char uint8_DataByte)
         g_Param.uint8_Sec = (((g_Param.uint8_Sec & 0xF0) >> 4) * 10) + (g_Param.uint8_Sec & 0x0F);
     }
 }   //end of RV30xx_SetGetSec
+
+
+/**********************************************************************************************************************
+ * Routine:                 RV30xx_SetGetMin
+
+ * Description:
+ * This subroutine can be used to read out or set the minutes. The set value must be given in BCD format.
+ * By reading back the minutes you receive it in decimal.  
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint8_SetGet
+ *                          uint8_DataByte
+ * Output:                  -
+***********************************************************************************************************************/
+void RV30xx_SetGetMin(unsigned char uint8_SetGet,unsigned char uint8_DataByte)
+{
+    auto unsigned char uint8_WB;        //local work byte
+    
+    if(uint8_SetGet)                    //write?
+    {
+        //fill out the send buffer
+        i2c_SendBufWr(_i2c1,_RV30xxAddr);
+        i2c_SendBufWr(_i2c1,_RegMinutes);
+        i2c_SendBufWr(_i2c1,uint8_DataByte);
+
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 0;                  //command will be a write
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished
+    }
+    else                                //read?
+    {
+        //fill out the send buffer
+        i2c_SendBufWr(_i2c1,_RV30xxAddr);
+        i2c_SendBufWr(_i2c1,_RegMinutes);
+
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 0;                  //command will be a write
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished
+        
+        
+        //fill out the send buffer
+        uint8_WB = _RV30xxAddr | 0x01;
+        i2c_SendBufWr(_i2c1,uint8_WB);
+    
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 1;                  //command will be a read
+        g_i2c1.uint8_RDcount = 1;               //how much byte(s) to read
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished  
+        
+        g_Param.uint8_Min = i2c_ReceiveBufRd(_i2c1);  //read out one byte from the buffer 
+        //convert value into decimal
+        g_Param.uint8_Min = (((g_Param.uint8_Min & 0xF0) >> 4) * 10) + (g_Param.uint8_Min & 0x0F);
+    }
+}   //end of RV30xx_SetGetMin
+
+
+/**********************************************************************************************************************
+ * Routine:                 RV30xx_SetGetHrs
+
+ * Description:
+ * This subroutine can be used to read out or set the hours. The set value must be given in BCD format.
+ * By reading back the hours you receive it in decimal. 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint8_SetGet
+ *                          uint8_DataByte
+ * Output:                  -
+***********************************************************************************************************************/
+void RV30xx_SetGetHrs(unsigned char uint8_SetGet,unsigned char uint8_DataByte)
+{
+    auto unsigned char uint8_WB;        //local work byte
+    
+    if(uint8_SetGet)                    //write?
+    {
+        //fill out the send buffer
+        i2c_SendBufWr(_i2c1,_RV30xxAddr);
+        i2c_SendBufWr(_i2c1,_RegHours);
+        i2c_SendBufWr(_i2c1,uint8_DataByte);
+
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 0;                  //command will be a write
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished
+    }
+    else                                //read?
+    {
+        //fill out the send buffer
+        i2c_SendBufWr(_i2c1,_RV30xxAddr);
+        i2c_SendBufWr(_i2c1,_RegHours);
+
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 0;                  //command will be a write
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished
+        
+        
+        //fill out the send buffer
+        uint8_WB = _RV30xxAddr | 0x01;
+        i2c_SendBufWr(_i2c1,uint8_WB);
+    
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 1;                  //command will be a read
+        g_i2c1.uint8_RDcount = 1;               //how much byte(s) to read
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished  
+        
+        g_Param.uint8_Hrs = i2c_ReceiveBufRd(_i2c1);  //read out one byte from the buffer 
+        //convert value into decimal
+        g_Param.uint8_Hrs = (((g_Param.uint8_Hrs & 0xF0) >> 4) * 10) + (g_Param.uint8_Hrs & 0x0F);
+    }
+}   //end of RV30xx_SetGetHrs
+
+
+/**********************************************************************************************************************
+ * Routine:                 RV30xx_SetGetDay
+
+ * Description:
+ * This subroutine can be used to read out or set the day. The set value must be given in BCD format.
+ * By reading back the day you receive it in decimal. 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint8_SetGet
+ *                          uint8_DataByte
+ * Output:                  -
+***********************************************************************************************************************/
+void RV30xx_SetGetDay(unsigned char uint8_SetGet,unsigned char uint8_DataByte)
+{
+    auto unsigned char uint8_WB;        //local work byte
+    
+    if(uint8_SetGet)                    //write?
+    {
+        //fill out the send buffer
+        i2c_SendBufWr(_i2c1,_RV30xxAddr);
+        i2c_SendBufWr(_i2c1,_RegDays);
+        i2c_SendBufWr(_i2c1,uint8_DataByte);
+
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 0;                  //command will be a write
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished
+    }
+    else                                //read?
+    {
+        //fill out the send buffer
+        i2c_SendBufWr(_i2c1,_RV30xxAddr);
+        i2c_SendBufWr(_i2c1,_RegDays);
+
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 0;                  //command will be a write
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished
+        
+        
+        //fill out the send buffer
+        uint8_WB = _RV30xxAddr | 0x01;
+        i2c_SendBufWr(_i2c1,uint8_WB);
+    
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 1;                  //command will be a read
+        g_i2c1.uint8_RDcount = 1;               //how much byte(s) to read
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished  
+        
+        g_Param.uint8_Day = i2c_ReceiveBufRd(_i2c1);  //read out one byte from the buffer 
+        //convert value into decimal
+        g_Param.uint8_Day = (((g_Param.uint8_Day & 0xF0) >> 4) * 10) + (g_Param.uint8_Day & 0x0F);
+    }
+}   //end of RV30xx_SetGetDay
+
+
+/**********************************************************************************************************************
+ * Routine:                 RV30xx_SetGetWday
+
+ * Description:
+ * This subroutine can be used to read out or set the weekday. 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint8_SetGet
+ *                          uint8_DataByte
+ * Output:                  -
+***********************************************************************************************************************/
+void RV30xx_SetGetWday(unsigned char uint8_SetGet,unsigned char uint8_DataByte)
+{
+    auto unsigned char uint8_WB;        //local work byte
+    
+    if(uint8_SetGet)                    //write?
+    {
+        //fill out the send buffer
+        i2c_SendBufWr(_i2c1,_RV30xxAddr);
+        i2c_SendBufWr(_i2c1,_RegWeekdays);
+        i2c_SendBufWr(_i2c1,uint8_DataByte);
+
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 0;                  //command will be a write
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished
+    }
+    else                                //read?
+    {
+        //fill out the send buffer
+        i2c_SendBufWr(_i2c1,_RV30xxAddr);
+        i2c_SendBufWr(_i2c1,_RegWeekdays);
+
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 0;                  //command will be a write
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished
+        
+        
+        //fill out the send buffer
+        uint8_WB = _RV30xxAddr | 0x01;
+        i2c_SendBufWr(_i2c1,uint8_WB);
+    
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 1;                  //command will be a read
+        g_i2c1.uint8_RDcount = 1;               //how much byte(s) to read
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished  
+        
+        g_Param.uint8_Wday = i2c_ReceiveBufRd(_i2c1);  //read out one byte from the buffer 
+    }
+}   //end of RV30xx_SetGetWday
+
+
+/**********************************************************************************************************************
+ * Routine:                 RV30xx_SetGetMonth
+
+ * Description:
+ * This subroutine can be used to read out or set the month.  
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint8_SetGet
+ *                          uint8_DataByte
+ * Output:                  -
+***********************************************************************************************************************/
+void RV30xx_SetGetMonth(unsigned char uint8_SetGet,unsigned char uint8_DataByte)
+{
+    auto unsigned char uint8_WB;        //local work byte
+    
+    if(uint8_SetGet)                    //write?
+    {
+        //fill out the send buffer
+        i2c_SendBufWr(_i2c1,_RV30xxAddr);
+        i2c_SendBufWr(_i2c1,_RegMonths);
+        i2c_SendBufWr(_i2c1,uint8_DataByte);
+
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 0;                  //command will be a write
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished
+    }
+    else                                //read?
+    {
+        //fill out the send buffer
+        i2c_SendBufWr(_i2c1,_RV30xxAddr);
+        i2c_SendBufWr(_i2c1,_RegMonths);
+
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 0;                  //command will be a write
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished
+        
+        
+        //fill out the send buffer
+        uint8_WB = _RV30xxAddr | 0x01;
+        i2c_SendBufWr(_i2c1,uint8_WB);
+    
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 1;                  //command will be a read
+        g_i2c1.uint8_RDcount = 1;               //how much byte(s) to read
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished  
+        
+        g_Param.uint8_Month = i2c_ReceiveBufRd(_i2c1);  //read out one byte from the buffer 
+    }
+}   //end of RV30xx_SetGetMonth
+
+
+/**********************************************************************************************************************
+ * Routine:                 RV30xx_SetGetYear
+
+ * Description:
+ * This subroutine can be used to read out or set the year. The set value must be given in BCD format.
+ * By reading back the day you receive it in decimal. 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint8_SetGet
+ *                          uint8_DataByte
+ * Output:                  -
+***********************************************************************************************************************/
+void RV30xx_SetGetYear(unsigned char uint8_SetGet,unsigned char uint8_DataByte)
+{
+    auto unsigned char uint8_WB;        //local work byte
+    
+    if(uint8_SetGet)                    //write?
+    {
+        //fill out the send buffer
+        i2c_SendBufWr(_i2c1,_RV30xxAddr);
+        i2c_SendBufWr(_i2c1,_RegYears);
+        i2c_SendBufWr(_i2c1,uint8_DataByte);
+
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 0;                  //command will be a write
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished
+    }
+    else                                //read?
+    {
+        //fill out the send buffer
+        i2c_SendBufWr(_i2c1,_RV30xxAddr);
+        i2c_SendBufWr(_i2c1,_RegYears);
+
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 0;                  //command will be a write
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished
+        
+        
+        //fill out the send buffer
+        uint8_WB = _RV30xxAddr | 0x01;
+        i2c_SendBufWr(_i2c1,uint8_WB);
+    
+        //define some important variables for the transfer
+        g_i2c1.uint8_RdWr = 1;                  //command will be a read
+        g_i2c1.uint8_RDcount = 1;               //how much byte(s) to read
+        g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+        i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+        do
+        {
+            //do nothing...
+        }
+        while(g_i2c1.uint8_Busy);   //until the transfer is finished  
+        
+        g_Param.uint8_Year = i2c_ReceiveBufRd(_i2c1);  //read out one byte from the buffer 
+        //convert value into decimal
+        g_Param.uint8_Year = (((g_Param.uint8_Year & 0xF0) >> 4) * 10) + (g_Param.uint8_Year & 0x0F);
+    }
+}   //end of RV30xx_SetGetYear

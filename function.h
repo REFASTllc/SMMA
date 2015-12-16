@@ -44,6 +44,8 @@ extern void funct_LoadDeviceInfo(void);
 extern void funct_FrontLED(unsigned char uint8_color);
 extern void funct_OutputHandler(unsigned char uint8_ToDo,unsigned char uint8_value);
 extern unsigned char funct_IOhandler(unsigned char uint8_ToDo,unsigned char uint8_IO,unsigned char uint8_value);
+extern void funct_StoreWdayIntoRSbuffer(void);
+extern void funct_StoreMonthIntoRSbuffer(void);
 
 #define _Active         1           //used for variable uint8_sending
 #define _Inactive       0           //used for variable uint8_sending

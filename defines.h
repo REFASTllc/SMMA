@@ -102,6 +102,12 @@
 //error code definition
                             //general errors
 #define _GlobalLock         0               //driver detected a POR; user configuration not guaranteed
+#define _OutOfTolSYEAR      21              //SYEAR, parameter out of range
+#define _OutOfTolSMONTH     22              //SMONTH, parameter out of range
+#define _OutOfTolSWDAY      23              //SWDAY, parameter out of range
+#define _OutOfTolSDAY       24              //SDAY, parameter out of range
+#define _OutOfTolSHRS       25              //SHRS, parameter out of range
+#define _OutOfTolSMIN       26              //SMIN, parameter out of range
 #define _OutOfTolSSEC       27              //SSEC, parameter out of range
 #define _BusCollRTC         28              //General RTC chip, issue during reading temperature
 #define _BusCollSROMRROM    29              //SROM,RROM; bus collision error
@@ -218,6 +224,19 @@
 #define _IdGTEMP            67              //read out the temperature
 #define _IdSSEC             68              //set the seconds
 #define _IdGSEC             69              //get the seconds
+#define _IdSMIN             70              //set the minutes
+#define _IdGMIN             71              //get the minutes
+#define _IdSHRS             72              //set the hours
+#define _IdGHRS             73              //get the hours
+#define _IdSDAY             74              //set the day
+#define _IdGDAY             75              //get the day
+#define _IdSWDAY            76              //set the workday
+#define _IdGWDAY            77              //get the workday
+#define _IdSMONTH           78              //set the month
+#define _IdGMONTH           79              //get the month
+#define _IdSYEAR            80              //set the year
+#define _IdGYEAR            81              //get the year
+#define _IdGTIME            82              //get the time
 
 #endif	/* DEFINES_H */
 

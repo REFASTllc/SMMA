@@ -132,4 +132,10 @@ void param_init(void)
     g_Param.uint8_ErrCode = 0;          //reset the error code
     g_Param.sint16_Temp = 0;            //reset the temperature
     g_Param.uint8_Sec = 0;              //reset the seconds
+    g_Param.uint8_Min = 0;              //reset the minutes
+    g_Param.uint8_Hrs = 0;              //reset the hours
+    g_Param.uint8_Day = 1;              //reset the day
+    g_Param.uint8_Wday = 1;             //reset the weekday
+    g_Param.uint8_Month = 1;            //reset the weekday
+    g_Param.uint8_Year = 0;             //reset the year
 }   //end of param_init

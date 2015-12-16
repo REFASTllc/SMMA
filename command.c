@@ -55,6 +55,18 @@
  *                          - cmd_GTEMP
  *                          - cmd_SSEC
  *                          - cmd_GSEC
+ *                          - cmd_SMIN
+ *                          - cmd_GMIN
+ *                          - cmd_SHRS
+ *                          - cmd_SDAY
+ *                          - cmd_GDAY
+ *                          - cmd_SWDAY
+ *                          - cmd_GWDAY
+ *                          - cmd_SMONTH
+ *                          - cmd_GMONTH
+ *                          - cmd_SYEAR
+ *                          - cmd_GYEAR
+ *                          - cmd_GTIME
 ***********************************************************************************************************************/
 
 
@@ -2543,6 +2555,7 @@ void cmd_GTEMP(void)
             uart2_sendbuffer(',');      //then the comma
             g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
             funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+            uart2_sendbuffer(13);       //then the CR
         }
         else
         {
@@ -2589,7 +2602,7 @@ void cmd_GTEMP(void)
 ***********************************************************************************************************************/
 void cmd_SSEC(void)
 {
-    auto unsigned char uint8_Result;        //local work byte
+    auto unsigned char uint8_Result = 0;    //local work byte
     auto unsigned char uint8_WB;            //local work byte
     
     if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
@@ -2610,6 +2623,7 @@ void cmd_SSEC(void)
                 uart2_sendbuffer(',');      //then the comma
                 g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
                 funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+                uart2_sendbuffer(13);       //then the CR
             }
             else
             {
@@ -2658,6 +2672,7 @@ void cmd_GSEC(void)
             uart2_sendbuffer(',');      //then the comma
             g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
             funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+            uart2_sendbuffer(13);       //then the CR
         }
         else
         {
@@ -2673,3 +2688,854 @@ void cmd_GSEC(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
 }   //end of cmd_GSEC
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SMIN
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then set the new minutes value.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SMIN(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    auto unsigned char uint8_WB;            //local work byte
+    
+    if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_MinMin,_MinMax);
+        
+        if(uint8_Result == 1)       //verify the result
+        {
+            uint8_WB = g_CmdChk.uint32_TempPara[1];                 //store decimal value
+            uint8_WB = (((uint8_WB / 10) << 4) | (uint8_WB % 10));  //convert to BCD
+            
+            RV30xx_SetGetMin(_Set,uint8_WB);    //call subroutine
+            
+            if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+            {
+                uart2_sendbuffer('X');      //first the letter X
+                uart2_sendbuffer(',');      //then the comma
+                g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
+                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                uart2_sendbuffer('E');      //first the letter X
+                uart2_sendbuffer(13);       //then the CR
+            }
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSMIN;      //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_SMIN
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GMIN
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then read out the minutes value.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GMIN(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        RV30xx_SetGetMin(_Get,0);           //read out the minutes
+        
+        if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+        {
+            uart2_sendbuffer('X');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma
+            g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
+            funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            uart2_sendbuffer('E');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma
+            funct_IntToAscii(g_Param.uint8_Min,_Active);
+            uart2_sendbuffer(13);       //then the CR
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GSEC
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SHRS
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then set the new hours value.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SHRS(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    auto unsigned char uint8_WB;            //local work byte
+    
+    if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_HrsMin,_HrsMax);
+        
+        if(uint8_Result == 1)       //verify the result
+        {
+            uint8_WB = g_CmdChk.uint32_TempPara[1];                 //store decimal value
+            uint8_WB = (((uint8_WB / 10) << 4) | (uint8_WB % 10));  //convert to BCD
+            uint8_WB &= 0x1F;                                       //clear bit 7...5 to use 24h system
+            
+            RV30xx_SetGetHrs(_Set,uint8_WB);    //call subroutine
+            
+            if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+            {
+                uart2_sendbuffer('X');      //first the letter X
+                uart2_sendbuffer(',');      //then the comma
+                g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
+                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                uart2_sendbuffer('E');      //first the letter X
+                uart2_sendbuffer(13);       //then the CR
+            }
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSHRS;      //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_SHRS
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GHRS
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then read out the hours value.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GHRS(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        RV30xx_SetGetHrs(_Get,0);           //read out the hours
+        
+        if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+        {
+            uart2_sendbuffer('X');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma
+            g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
+            funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            uart2_sendbuffer('E');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma
+            funct_IntToAscii(g_Param.uint8_Hrs,_Active);
+            uart2_sendbuffer(13);       //then the CR
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GHRS
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SDAY
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then set the new day value.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SDAY(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    auto unsigned char uint8_WB;            //local work byte
+    
+    if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_DayMin,_DayMax);
+        
+        if(uint8_Result == 1)       //verify the result
+        {
+            uint8_WB = g_CmdChk.uint32_TempPara[1];                 //store decimal value
+            uint8_WB = (((uint8_WB / 10) << 4) | (uint8_WB % 10));  //convert to BCD
+            
+            RV30xx_SetGetDay(_Set,uint8_WB);    //call subroutine
+            
+            if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+            {
+                uart2_sendbuffer('X');      //first the letter X
+                uart2_sendbuffer(',');      //then the comma
+                g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
+                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                uart2_sendbuffer('E');      //first the letter X
+                uart2_sendbuffer(13);       //then the CR
+            }
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSDAY;      //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_SDAY
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GDAY
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then read out the day value.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GDAY(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        RV30xx_SetGetDay(_Get,0);           //read out the hours
+        
+        if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+        {
+            uart2_sendbuffer('X');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma
+            g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
+            funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            uart2_sendbuffer('E');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma
+            funct_IntToAscii(g_Param.uint8_Day,_Active);
+            uart2_sendbuffer(13);       //then the CR
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GDAY
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SWDAY
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then set the new weekday value.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SWDAY(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    auto unsigned short int uint16_WI;      //local work integer
+    
+    if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_WdayMon,_WdayMon);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_WdayTue,_WdayTue);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_WdayWed,_WdayWed);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_WdayThu,_WdayThu);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_WdayFri,_WdayFri);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_WdaySat,_WdaySat);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_WdaySun,_WdaySun);
+        
+        if(uint8_Result == 1)       //verify the result
+        {
+            uint16_WI = g_CmdChk.uint32_TempPara[1];                 //store decimal value
+            
+            switch(uint16_WI)
+            {
+                case (_WdayMon):
+                    RV30xx_SetGetWday(_Set,2);   //call subroutine
+                    break;
+                    
+                case (_WdayTue):
+                    RV30xx_SetGetWday(_Set,3);   //call subroutine
+                    break;
+                    
+                case (_WdayWed):
+                    RV30xx_SetGetWday(_Set,4);   //call subroutine
+                    break;
+                    
+                case (_WdayThu):
+                    RV30xx_SetGetWday(_Set,5);   //call subroutine
+                    break;
+                    
+                case (_WdayFri):
+                    RV30xx_SetGetWday(_Set,6);   //call subroutine
+                    break;
+                    
+                case (_WdaySat):
+                    RV30xx_SetGetWday(_Set,7);   //call subroutine
+                    break;
+                    
+                case (_WdaySun):
+                    RV30xx_SetGetWday(_Set,1);   //call subroutine
+                    break;
+                    
+                default:
+                    //do nothing, this case will never called, because the value is verified 
+                    //already at the beginning
+                    break;
+            }
+            
+            if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+            {
+                uart2_sendbuffer('X');      //first the letter X
+                uart2_sendbuffer(',');      //then the comma
+                g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
+                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                uart2_sendbuffer('E');      //first the letter X
+                uart2_sendbuffer(13);       //then the CR
+            }
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSWDAY;     //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_SWDAY
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GWDAY
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then read out the weekday value.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GWDAY(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        RV30xx_SetGetWday(_Get,0);          //read out the hours
+        
+        if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+        {
+            uart2_sendbuffer('X');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma
+            g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
+            funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            uart2_sendbuffer('E');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma         
+            funct_StoreWdayIntoRSbuffer();  //call subroutine
+            uart2_sendbuffer(13);       //then the CR
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GWDAY
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SMONTH
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then set the new month value.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SMONTH(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    auto unsigned short int uint16_WI;      //local work integer
+    
+    if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_MoJan,_MoJan);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_MoFeb,_MoFeb);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_MoMar,_MoMar);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_MoApr,_MoApr);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_MoMay,_MoMay);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_MoJun,_MoJun);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_MoJul,_MoJul);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_MoAug,_MoAug);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_MoSep,_MoSep);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_MoOct,_MoOct);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_MoNov,_MoNov);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_MoDec,_MoDec);
+        
+        if(uint8_Result == 1)       //verify the result
+        {
+            uint16_WI = g_CmdChk.uint32_TempPara[1];                 //store decimal value
+            
+            switch(uint16_WI)
+            {
+                case (_MoJan):
+                    RV30xx_SetGetMonth(_Set,1);   //call subroutine
+                    break;
+                    
+                case (_MoFeb):
+                    RV30xx_SetGetMonth(_Set,2);   //call subroutine
+                    break;
+                    
+                case (_MoMar):
+                    RV30xx_SetGetMonth(_Set,3);   //call subroutine
+                    break;
+                    
+                case (_MoApr):
+                    RV30xx_SetGetMonth(_Set,4);   //call subroutine
+                    break;
+                    
+                case (_MoMay):
+                    RV30xx_SetGetMonth(_Set,5);   //call subroutine
+                    break;
+                    
+                case (_MoJun):
+                    RV30xx_SetGetMonth(_Set,6);   //call subroutine
+                    break;
+                    
+                case (_MoJul):
+                    RV30xx_SetGetMonth(_Set,7);   //call subroutine
+                    break;
+                    
+                case (_MoAug):
+                    RV30xx_SetGetMonth(_Set,8);   //call subroutine
+                    break;
+                    
+                case (_MoSep):
+                    RV30xx_SetGetMonth(_Set,9);   //call subroutine
+                    break;
+                    
+                case (_MoOct):
+                    RV30xx_SetGetMonth(_Set,16);   //call subroutine
+                    break;
+                    
+                case (_MoNov):
+                    RV30xx_SetGetMonth(_Set,17);   //call subroutine
+                    break;
+                    
+                case (_MoDec):
+                    RV30xx_SetGetMonth(_Set,18);   //call subroutine
+                    break;
+                    
+                default:
+                    //do nothing, this case will never called, because the value is verified 
+                    //already at the beginning
+                    break;
+            }
+            
+            if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+            {
+                uart2_sendbuffer('X');      //first the letter X
+                uart2_sendbuffer(',');      //then the comma
+                g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
+                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                uart2_sendbuffer('E');      //first the letter X
+                uart2_sendbuffer(13);       //then the CR
+            }
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSMONTH;    //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_SMONTH
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GMONTH
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then read out the month value.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GMONTH(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        RV30xx_SetGetMonth(_Get,0);         //read out the hours
+        
+        if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+        {
+            uart2_sendbuffer('X');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma
+            g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
+            funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            uart2_sendbuffer('E');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma            
+            funct_StoreMonthIntoRSbuffer(); //call subroutine
+            uart2_sendbuffer(13);       //then the CR
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GMONTH
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SYEAR
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then set the new year value.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SYEAR(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    auto unsigned char uint8_WB;            //local work byte
+    
+    if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_YearMin,_YearMax);
+        
+        if(uint8_Result == 1)       //verify the result
+        {
+            uint8_WB = g_CmdChk.uint32_TempPara[1];                 //store decimal value
+            uint8_WB = (((uint8_WB / 10) << 4) | (uint8_WB % 10));  //convert to BCD
+            
+            RV30xx_SetGetYear(_Set,uint8_WB);    //call subroutine
+            
+            if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+            {
+                uart2_sendbuffer('X');      //first the letter X
+                uart2_sendbuffer(',');      //then the comma
+                g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
+                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                uart2_sendbuffer('E');      //first the letter X
+                uart2_sendbuffer(13);       //then the CR
+            }
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSYEAR;     //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_SYEAR
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GYEAR
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then read out the year value.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GYEAR(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        RV30xx_SetGetYear(_Get,0);           //read out the hours
+        
+        if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+        {
+            uart2_sendbuffer('X');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma
+            g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
+            funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            uart2_sendbuffer('E');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma
+            uart2_sendbuffer('2');      //then the comma
+            uart2_sendbuffer('0');      //then the comma
+            funct_IntToAscii(g_Param.uint8_Year,_Active);
+            uart2_sendbuffer(13);       //then the CR
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GYEAR
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GTIME
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then read out all time parameters.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GTIME(void)
+{
+    auto unsigned char uint8_WB;        //local work byte
+    
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        uint8_WB = 7;                       //counter for do while
+        
+        do
+        {
+            switch (uint8_WB)
+            {
+                case 7:
+                    RV30xx_SetGetWday(_Get,0);      //read out the weekday
+                    break;
+                    
+                case 6:
+                    RV30xx_SetGetDay(_Get,0);       //read out the day
+                    break;
+                    
+                case 5:
+                    RV30xx_SetGetMonth(_Get,0);     //read out the month
+                    break;
+                    
+                case 4:
+                    RV30xx_SetGetYear(_Get,0);      //read out the year
+                    break;
+                    
+                case 3:
+                    RV30xx_SetGetHrs(_Get,0);       //read out the hours
+                    break;
+                    
+                case 2:
+                    RV30xx_SetGetMin(_Get,0);       //read out the minutes
+                    break;
+                    
+                case 1:
+                    RV30xx_SetGetSec(_Get,0);       //read out the seconds
+                    break;
+                    
+                default:
+                    //do nothing
+                    break;
+            }
+            
+            uint8_WB--;
+            
+            if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+            {
+                //error occured, exit the while loop
+                uint8_WB = 0;
+            }
+            else
+            {
+                //do nothing
+            }
+        }
+        while(uint8_WB);    //until counter is not 0
+        
+        if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+        {
+            uart2_sendbuffer('X');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma
+            g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
+            funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            uart2_sendbuffer('E');      //first the letter X
+            uart2_sendbuffer(',');      //then the comma
+            funct_StoreWdayIntoRSbuffer();  //call subroutine
+            uart2_sendbuffer(' ');      //then the space
+            funct_IntToAscii(g_Param.uint8_Day,_Active);
+            uart2_sendbuffer('t');      //then the t
+            uart2_sendbuffer('h');      //then the h
+            uart2_sendbuffer(' ');      //then the space
+            funct_StoreMonthIntoRSbuffer(); //call subroutine
+            uart2_sendbuffer(' ');      //then the space
+            uart2_sendbuffer('2');      //then the 2
+            uart2_sendbuffer('0');      //then the 0
+            funct_IntToAscii(g_Param.uint8_Year,_Active);
+            uart2_sendbuffer(',');      //then the comma
+            uart2_sendbuffer(' ');      //then the space
+            funct_IntToAscii(g_Param.uint8_Hrs,_Active);
+            uart2_sendbuffer(':');      //then the double point
+            funct_IntToAscii(g_Param.uint8_Min,_Active);
+            uart2_sendbuffer(':');      //then the double point
+            funct_IntToAscii(g_Param.uint8_Sec,_Active);
+            uart2_sendbuffer(13);       //then the CR
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GTIME

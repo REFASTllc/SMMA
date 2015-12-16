@@ -22,6 +22,8 @@
  *                          - funct_FrontLED
  *                          - funct_OutputHandler
  *                          - funct_IOhandler
+ *                          - funct_StoreWdayIntoRSbuffer
+ *                          - funct_StoreMonthIntoRSbuffer
 ***********************************************************************************************************************/
 
 
@@ -879,3 +881,173 @@ unsigned char funct_IOhandler(unsigned char uint8_ToDo,unsigned char uint8_IO,un
     
     return uint8_Result;
 }   //end of funct_IOhandler
+
+
+/**********************************************************************************************************************
+ * Routine:                 funct_WdayFillBuffer
+
+ * Description:
+ * Store weekday into RS232 buffer
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        28.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint8_ToDo
+ *                          uint8_IO
+ *                          uint8_value
+ * Output:                  -
+***********************************************************************************************************************/
+void funct_StoreWdayIntoRSbuffer(void)
+{
+    switch (g_Param.uint8_Wday)
+    {
+        case 1:
+            uart2_sendbuffer('S');      //then the comma
+            uart2_sendbuffer('u');      //then the comma
+            uart2_sendbuffer('n');      //then the comma
+            break;
+                    
+        case 2:
+            uart2_sendbuffer('M');      //then the comma
+            uart2_sendbuffer('o');      //then the comma
+            uart2_sendbuffer('n');      //then the comma
+            break;
+                    
+        case 3:
+            uart2_sendbuffer('T');      //then the comma
+            uart2_sendbuffer('u');      //then the comma
+            uart2_sendbuffer('e');      //then the comma
+            break;
+                    
+        case 4:
+            uart2_sendbuffer('W');      //then the comma
+            uart2_sendbuffer('e');      //then the comma
+            uart2_sendbuffer('d');      //then the comma
+            break;
+                    
+        case 5:
+            uart2_sendbuffer('T');      //then the comma
+            uart2_sendbuffer('h');      //then the comma
+            uart2_sendbuffer('u');      //then the comma
+            break;
+                    
+        case 6:
+            uart2_sendbuffer('F');      //then the comma
+            uart2_sendbuffer('r');      //then the comma
+            uart2_sendbuffer('i');      //then the comma
+            break;
+                    
+        case 7:
+            uart2_sendbuffer('S');      //then the comma
+            uart2_sendbuffer('a');      //then the comma
+            uart2_sendbuffer('t');      //then the comma
+            break;
+                    
+        default:
+            //do nothing, this case will never called, because the value is verified 
+            //already at the beginning
+            break;
+    }
+}   //end of funct_WdayFillBuffer
+
+
+/**********************************************************************************************************************
+ * Routine:                 funct_StoreMonthIntoRSbuffer
+
+ * Description:
+ * Store month into RS232 buffer
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        28.11.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint8_ToDo
+ *                          uint8_IO
+ *                          uint8_value
+ * Output:                  -
+***********************************************************************************************************************/
+void funct_StoreMonthIntoRSbuffer(void)
+{
+    switch (g_Param.uint8_Month)
+    {
+        case 1:
+            uart2_sendbuffer('J');      //then the comma
+            uart2_sendbuffer('a');      //then the comma
+            uart2_sendbuffer('n');      //then the comma
+            break;
+                    
+        case 2:
+            uart2_sendbuffer('F');      //then the comma
+            uart2_sendbuffer('e');      //then the comma
+            uart2_sendbuffer('b');      //then the comma
+            break;
+                    
+        case 3:
+            uart2_sendbuffer('M');      //then the comma
+            uart2_sendbuffer('a');      //then the comma
+            uart2_sendbuffer('r');      //then the comma
+            break;
+                    
+        case 4:
+            uart2_sendbuffer('A');      //then the comma
+            uart2_sendbuffer('p');      //then the comma
+            uart2_sendbuffer('r');      //then the comma
+            break;
+                    
+        case 5:
+            uart2_sendbuffer('M');      //then the comma
+            uart2_sendbuffer('a');      //then the comma
+            uart2_sendbuffer('y');      //then the comma
+            break;
+                    
+        case 6:
+            uart2_sendbuffer('J');      //then the comma
+            uart2_sendbuffer('u');      //then the comma
+            uart2_sendbuffer('n');      //then the comma
+            break;
+                    
+        case 7:
+            uart2_sendbuffer('J');      //then the comma
+            uart2_sendbuffer('u');      //then the comma
+            uart2_sendbuffer('l');      //then the comma
+            break;
+                    
+        case 8:
+            uart2_sendbuffer('A');      //then the comma
+            uart2_sendbuffer('u');      //then the comma
+            uart2_sendbuffer('g');      //then the comma
+            break;
+                    
+        case 9:
+            uart2_sendbuffer('S');      //then the comma
+            uart2_sendbuffer('e');      //then the comma
+            uart2_sendbuffer('p');      //then the comma
+            break;
+                    
+        case 16:
+            uart2_sendbuffer('O');      //then the comma
+            uart2_sendbuffer('c');      //then the comma
+            uart2_sendbuffer('t');      //then the comma
+            break;
+                    
+        case 17:
+            uart2_sendbuffer('N');      //then the comma
+            uart2_sendbuffer('o');      //then the comma
+            uart2_sendbuffer('v');      //then the comma
+            break;
+                    
+        case 18:
+            uart2_sendbuffer('D');      //then the comma
+            uart2_sendbuffer('e');      //then the comma
+            uart2_sendbuffer('c');      //then the comma
+            break;
+                    
+        default:
+            //do nothing, this case will never called, because the value is verified 
+            //already at the beginning
+            break;
+    }
+}   //end of funct_StoreMonthIntoRSbuffer

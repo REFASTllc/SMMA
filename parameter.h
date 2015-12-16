@@ -107,6 +107,33 @@ extern void param_init(void);
 #define _RomValMax          255         //<OK> range of the data for the EEPROM
 #define _SecMin             0           //range for the seconds of the RTC
 #define _SecMax             59          //range for the seconds of the RTC
+#define _MinMin             0           //range for the minutes of the RTC
+#define _MinMax             59          //range for the minutes of the RTC
+#define _HrsMin             0           //range for the hours of the RTC
+#define _HrsMax             23          //range for the hours of the RTC
+#define _DayMin             1           //range for the days of the RTC
+#define _DayMax             31          //range for the days of the RTC
+#define _WdayMon            3592        //range for the weekday monday of the RTC
+#define _WdayTue            4343        //range for the weekday tuesday of the RTC
+#define _WdayWed            4482        //range for the weekday wednesday of the RTC
+#define _WdayThu            4229        //range for the weekday thusday of the RTC
+#define _WdayFri            2917        //range for the weekday friday of the RTC
+#define _WdaySat            4058        //range for the weekday saturday of the RTC
+#define _WdaySun            4252        //range for the weekday sunday of the RTC
+#define _MoJan              3152        //range for the month january
+#define _MoFeb              2780        //range for the month february
+#define _MoMar              3456        //range for the month march
+#define _MoApr              2406        //range for the month april
+#define _MoMay              3463        //range for the month may
+#define _MoJun              3352        //range for the month june
+#define _MoJul              3350        //range for the month july
+#define _MoAug              2445        //range for the month august
+#define _MoSep              4094        //range for the month september
+#define _MoOct              3678        //range for the month october
+#define _MoNov              3700        //range for the month november
+#define _MoDec              2581        //range for the month december
+#define _YearMin            0           //range for the year
+#define _YearMax            79          //range for the year
 
 
 /*
@@ -185,6 +212,12 @@ typedef struct                      //definitions of multiple variable for comma
     volatile unsigned char uint8_ErrCode;           //error code which is send back to the master 
     volatile signed short int sint16_Temp;          //temperature value in [°C]
     volatile unsigned char uint8_Sec;               //seconds in decimal
+    volatile unsigned char uint8_Min;               //minutes in decimal
+    volatile unsigned char uint8_Hrs;               //hours in decimal
+    volatile unsigned char uint8_Day;               //day in decimal 
+    volatile unsigned char uint8_Wday;              //weekday in decimal 
+    volatile unsigned char uint8_Month;             //month in decimal
+    volatile unsigned char uint8_Year;              //year in decimal
 }   SParam;                         //struct name is SParam (S for struct)
 
 #endif	/* PARAMETER_H */

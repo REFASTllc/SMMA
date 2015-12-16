@@ -523,6 +523,58 @@ void cmdchk_check(void)
                 case (_IdGSEC):         //commmand GSEC
                     cmd_GSEC();         //call subroutine
                     break;
+                    
+                case (_IdSMIN):         //command SMIN
+                    cmd_SMIN();         //call subroutine
+                    break;
+                    
+                case (_IdGMIN):         //command GMIN
+                    cmd_GMIN();         //call subroutine
+                    break;
+                    
+                case (_IdSHRS):         //command SHRS
+                    cmd_SHRS();         //call subroutine
+                    break;   
+                    
+                case (_IdGHRS):         //command GHRS
+                    cmd_GHRS();         //call subroutine
+                    break;
+                    
+                case (_IdSDAY):         //command SDAY
+                    cmd_SDAY();         //call subroutine
+                    break;
+                    
+                case (_IdGDAY):         //command GDAY
+                    cmd_GDAY();         //call subroutine
+                    break;
+                    
+                case (_IdSWDAY):        //command SWDAY
+                    cmd_SWDAY();        //call subroutine
+                    break;
+                    
+                case (_IdGWDAY):        //command GWDAY
+                    cmd_GWDAY();        //call subroutine
+                    break;
+                    
+                case (_IdSMONTH):       //command SMONTH
+                    cmd_SMONTH();       //call subroutine
+                    break;
+                    
+                case (_IdGMONTH):       //command GMONTH
+                    cmd_GMONTH();       //call subroutine 
+                    break;
+                    
+                case (_IdSYEAR):        //command SYEAR
+                    cmd_SYEAR();        //call subroutine
+                    break;
+                    
+                case (_IdGYEAR):        //command GYEAR
+                    cmd_GYEAR();        //call subroutine
+                    break;
+                    
+                case (_IdGTIME):        //command GTIME
+                    cmd_GTIME();        //call subroutine
+                    break;
                                      
                 default:    //command ID does not exist
                     //do nothing - error has to be send before this routine
@@ -668,6 +720,30 @@ void cmdchk_def(void)
             
         case (0x47534543):  //cmd is = GSEC
             g_CmdChk.uint8_CmdID = _IdGSEC;
+            break;
+            
+        case (0x534D494E):  //cmd is = SMIN
+            g_CmdChk.uint8_CmdID = _IdSMIN;
+            break;
+            
+        case (0x474D494E):  //cmd is = GMIN
+            g_CmdChk.uint8_CmdID = _IdGMIN;
+            break;
+            
+        case (0x53485253):  //cmd is = SHRS
+            g_CmdChk.uint8_CmdID = _IdSHRS;
+            break;
+            
+        case (0x47485253):  //cmd is = GHRS
+            g_CmdChk.uint8_CmdID = _IdGHRS;
+            break;
+            
+        case (0x53444159):  //cmd is = SDAY
+            g_CmdChk.uint8_CmdID = _IdSDAY;
+            break;
+            
+        case (0x47444159):  //cmd is = GDAY
+            g_CmdChk.uint8_CmdID = _IdGDAY;
             break;
         
         default:
@@ -1065,6 +1141,74 @@ void cmdchk_def(void)
                         {
                             case (0x47494E50):  //cmd is = GINPB
                                 g_CmdChk.uint8_CmdID = _IdGINPB;
+                                break;
+                                
+                            default:    //error - command is not defined
+                                g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID
+                                g_Param.uint8_ErrCode = _UnknownCmd;    //set error code
+                                break;
+                        }
+                        break;
+                        
+                    case (0x59):    //letter Y?
+                        switch(g_CmdChk.uint32_Cmd1st4)
+                        {
+                            case (0x53574441):  //cmd is = SWDAY
+                                g_CmdChk.uint8_CmdID = _IdSWDAY;
+                                break;
+                                
+                            case (0x47574441):  //cmd is = GWDAY
+                                g_CmdChk.uint8_CmdID = _IdGWDAY;
+                                break;
+                                
+                            default:    //error - command is not defined
+                                g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID
+                                g_Param.uint8_ErrCode = _UnknownCmd;    //set error code
+                                break;
+                        }
+                        break;
+                        
+                    case (0x5448):  //letter TH?
+                        switch(g_CmdChk.uint32_Cmd1st4)
+                        {
+                            case (0x534D4F4E):  //cmd is = SMONTH
+                                g_CmdChk.uint8_CmdID = _IdSMONTH;
+                                break;
+                                
+                            case (0x474D4F4E):  //cmd is = GMONTH
+                                g_CmdChk.uint8_CmdID = _IdGMONTH;
+                                break;
+                                
+                            default:    //error - command is not defined
+                                g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID
+                                g_Param.uint8_ErrCode = _UnknownCmd;    //set error code
+                                break;
+                        }
+                        break;
+                        
+                    case (0x52):    //letter R?
+                        switch(g_CmdChk.uint32_Cmd1st4)
+                        {
+                            case (0x53594541):  //cmd is = SYEAR
+                                g_CmdChk.uint8_CmdID = _IdSYEAR;
+                                break;
+                                
+                            case (0x47594541):  //cmd is = GYEAR
+                                g_CmdChk.uint8_CmdID = _IdGYEAR;
+                                break;
+                                
+                            default:    //error - command is not defined
+                                g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID
+                                g_Param.uint8_ErrCode = _UnknownCmd;    //set error code
+                                break;
+                        }
+                        break;
+                        
+                    case (0x45):    //letter E?
+                        switch(g_CmdChk.uint32_Cmd1st4)
+                        {
+                            case (0x4754494D):  //cmd is = GTIME
+                                g_CmdChk.uint8_CmdID = _IdGTIME;
                                 break;
                                 
                             default:    //error - command is not defined
