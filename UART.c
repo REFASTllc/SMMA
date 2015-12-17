@@ -20,6 +20,8 @@
  *                          - uart2_sendbuffer
  *                          - uart2_receivebuffer
  *                          - uart2_SendErrorCode
+ *                          - uart1_sendbuffer
+ *                          - uart1_receivebuffer
 ***********************************************************************************************************************/
 
 
@@ -27,6 +29,8 @@
 
 SUART2txd g_UART2txd;       //global variables for struct  
 SUART2rxd g_UART2rxd;       //global variables for struct
+SUART1txd g_UART1txd;       //global variables for struct
+SUART1rxd g_UART1rxd;       //global variables for struct
 
 
 /**********************************************************************************************************************
@@ -70,7 +74,7 @@ void uart_init(unsigned char uartx)
                                 // 01 = UxTX, UxRX and UxRTS pins are enabled and used; UxCTS pin is controlled by corresponding bits in the PORTx register
                                 // 00 = UxTX and UxRX pins are enabled and used; UxCTS and UxRTS/UxBCLK pins are controlled by corresponding bits in the PORTx register
 
-        U1MODEbits.WAKE = 1;    // Enable Wake-up on Start bit Detect During Sleep Mode bit
+        U1MODEbits.WAKE = 0;    // Enable Wake-up on Start bit Detect During Sleep Mode bit
                                 // 1 = Wake-up enabled
                                 // 0 = Wake-up disabled
 
@@ -107,8 +111,8 @@ void uart_init(unsigned char uartx)
         U1STAbits.ADDR = 0xff;  // Automatic Address Mask bits
                                 // When the ADM_EN bit is "1", this value defines the address character to use for automatic address detection.
 
-        U1STAbits.UTXISEL1 = 1; // UTXISEL<1:0>: TX Interrupt Mode Selection bits(4)
-        U1STAbits.UTXISEL0 = 0; // For 4-level deep FIFO UART modules:
+        U1STAbits.UTXISEL1 = 0; // UTXISEL<1:0>: TX Interrupt Mode Selection bits(4)
+        U1STAbits.UTXISEL0 = 1; // For 4-level deep FIFO UART modules:
                                 // 11 = Reserved, do not use
                                 // 10 = Interrupt is generated when the transmit buffer becomes empty
                                 // 01 = Interrupt is generated when all characters have been transmitted
@@ -350,7 +354,7 @@ void uart_init(unsigned char uartx)
     /*  (calculated baud rate - desired baud rate) / desired baud rate = xy%            */
     }
     
-//initialize the customer variables 
+//initialize the variables for UART2
     g_UART2txd.uint8_BufEmpty = 1;        //send buffer empty
     g_UART2txd.uint16_Wch = 0;            //write-pointer of the ring buffer at position 0
     g_UART2txd.uint16_Rch = 0;            //read-pointer of the ring buffer at position 0
@@ -360,6 +364,18 @@ void uart_init(unsigned char uartx)
     g_UART2rxd.uint16_Wch = 0;             //write-pointer of the ring buffer at position 0
     g_UART2rxd.uint16_Rch = 0;             //read-pointer of the ring buffer at position 0
     g_UART2rxd.uint8_Bufptr = g_UART2rxd.uint8_Buffer;   //pointer on buffer 
+    
+    
+//initialize the variables for UART1
+    g_UART1txd.uint8_BufEmpty = 1;        //send buffer empty
+    g_UART1txd.uint16_Wch = 0;            //write-pointer of the ring buffer at position 0
+    g_UART1txd.uint16_Rch = 0;            //read-pointer of the ring buffer at position 0
+    g_UART1txd.uint8_Bufptr = g_UART1txd.uint8_Buffer;  //pointer on buffer
+  
+    g_UART1rxd.uint8_BufEmpty = 1;         //receive buffer empty
+    g_UART1rxd.uint16_Wch = 0;             //write-pointer of the ring buffer at position 0
+    g_UART1rxd.uint16_Rch = 0;             //read-pointer of the ring buffer at position 0
+    g_UART1rxd.uint8_Bufptr = g_UART1rxd.uint8_Buffer;   //pointer on buffer 
 }
 
 
@@ -486,14 +502,14 @@ void uart_InitInterrupt(unsigned char uartx, unsigned char action)
     if(uartx == _UART1_)
     {
         IFS0bits.U1RXIF = 0;
-        IFS0bits.U1TXIF = 0;
+        IFS0bits.U1TXIF = 1;    //this must be set for the first time - don't set it to 0
         IFS0bits.U1EIF = 0;
         if(action == _ENABLE)
         {
-            IPC6bits.U1IP = 7;
+            IPC6bits.U1IP = 2;
             IPC6bits.U1IS = 3;
             IEC0bits.U1RXIE = 1;
-            IEC0bits.U1TXIE = 1;
+            IEC0bits.U1TXIE = 1;   
             IEC0bits.U1EIE = 1;
         }
         else
@@ -793,3 +809,89 @@ void uart2_SendErrorCode(unsigned char uint8_ErrorCode)
     funct_IntToAscii(uint8_ErrorCode,_Active);      //the error code
     uart2_sendbuffer(13);                           //with CR at the end
 }   //end of uart2_SendErrorCode
+
+
+/**********************************************************************************************************************
+ * Routine:                 uart1_sendbuffer
+
+ * Description:
+ * Store the data byte that is given to this routine into the send buffer. 
+ * Increment the write-pointer of the send buffer.
+ * Set the write-pointer of the send buffer to 0 if it is on the end position.
+ * Clear BufEmpty to 0 --> Send buffer not more empty.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        17.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint8_DataByte
+ * Output:                  -
+***********************************************************************************************************************/
+void uart1_sendbuffer(unsigned char uint8_DataByte)  
+{
+    //store data byte into send buffer
+    *(g_UART1txd.uint8_Bufptr + g_UART1txd.uint16_Wch) = uint8_DataByte;
+  
+    //increment the write-pointer of the ring buffer
+    g_UART1txd.uint16_Wch++;
+  
+    //verify if write-pointer is at the end of ring buffer
+    g_UART1txd.uint16_Wch = g_UART1txd.uint16_Wch % _TxDRxD_BUFSIZE;
+  
+    //send buffer not empty
+    g_UART1txd.uint8_BufEmpty = 0;    
+}   //end of uart1_sendbuffer
+
+
+/**********************************************************************************************************************
+ * Routine:                 uart1_receivebuffer
+
+ * Description:
+ * Verify if the receive buffer is not empty. Buffer not empty:
+ * Read out one byte from the receive buffer
+ * Increment the read-pointer of the receive buffer
+ * Set the read-pointer of the receive buffer to 0 if it is on the end position.
+ * If the read-pointer is equal to write-pointer of the receive buffer, then set BufEmpty to 1.
+ * Buffer empty:
+ * Send back 'return' the value 0.  
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        17.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  uint8_DataByte
+***********************************************************************************************************************/
+unsigned char uart1_receivebuffer(void) 
+{
+    auto unsigned char uint8_DataByte;  //local variable uint8_DataByte
+  
+    if(!g_UART1rxd.uint8_BufEmpty)      //receive buffer not empty?
+    {
+        //read out one byte from the receive buffer
+        uint8_DataByte = g_UART1rxd.uint8_Buffer[g_UART1rxd.uint16_Rch];
+    
+        //increment the read-pointer of the ring buffer
+        g_UART1rxd.uint16_Rch++;
+    
+        //verify if read-pointer is at the end of ring buffer
+        g_UART1rxd.uint16_Rch = g_UART1rxd.uint16_Rch % _TxDRxD_BUFSIZE;
+    
+        //verify if read-pointer and write-pointer of the ring buffer are equal
+        if(g_UART1rxd.uint16_Rch == g_UART1rxd.uint16_Wch)
+        {
+            g_UART1rxd.uint8_BufEmpty = 1;  //receive buffer = empty
+        }
+        else
+        {
+            //do nothing
+        }   
+        return uint8_DataByte;            //return the value from the receive buffer        
+    }
+    else
+    {
+        return 0;                         //return value 0
+    } 
+}   //end of uart1_receivebuffer

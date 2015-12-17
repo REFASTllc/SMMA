@@ -116,6 +116,10 @@ void system_init(void)
     SetPWMFrequency(_PWM1, 700);
     SetPWMDutyCycle(_PWM1, 50);
     SetPWM(_PWM1, _ENABLE);
+//UART1 initialization
+    uart_init(_UART1_);                     //call subroutine
+    uart_set(_UART1_,_NONE,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,38400);   //call subroutine
+    timers_SetInterrupt(_TIMER2,_DISABLE);   //call subroutine and set interrupt for timer 2
 //switch off the debugging LED's
     oTestLed1 = 0;                          //switch on the output for the test LED1
     oTestLed2 = 0;                          //switch on the output for the test LED2
