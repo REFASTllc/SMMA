@@ -41,28 +41,12 @@ extern SParam g_Param;
  * Output:                  -
 ***********************************************************************************************************************/
 void RV30xx_release(void)
-{
-    auto unsigned char uint8_WB;        //local work byte
-    
-    uint8_WB = 0x90;    //variable is used for the control status register
-                        //0 = disable / 1 = enable
-                        //bit7 =    Clk/Int, applies CLKOUT function CLKOUT pin (1)
-                        //          applies INT function on INT CLKOUT pin (0)
-                        //bit6..5 = TD1, TDO, select source for internal countdown timer
-                        //          00= 32Hz
-                        //          01= 8Hz
-                        //          10= 1Hz
-                        //          11= 0.5Hz
-                        //bit4 =    SROn, en/di self recovery function
-                        //bit3 =    EERE, en/di automatic EEPROM refresh every hour
-                        //bit2 =    TAR, en/di countdown timer auto-reload mode 
-                        //bit1 =    TE, en/di countdown timer
-                        //bit0 =    WE, en/di 1Hz clock source for watch
-    
+{    
+//CONTROL_STATUS: release the chip by writing the PON to 0
     //fill out the send buffer
     i2c_SendBufWr(_i2c1,_RV30xxAddr);
     i2c_SendBufWr(_i2c1,_RegControlStatus);
-    i2c_SendBufWr(_i2c1,uint8_WB);      
+    i2c_SendBufWr(_i2c1,0);     //clear all flags to release the chip
 
     //define some important variables for the transfer
     g_i2c1.uint8_RdWr = 0;                  //command will be a write
@@ -77,6 +61,7 @@ void RV30xx_release(void)
     while(g_i2c1.uint8_Busy);   //until the transfer is finished
     
     
+//EEPROM CONTROL: enable the temperature measure  
     //fill out the send buffer
     i2c_SendBufWr(_i2c1,_RV30xxAddr);
     i2c_SendBufWr(_i2c1,_RegROMcontrol);
@@ -117,7 +102,8 @@ void RV30xx_release(void)
 void RV30xx_init(void)
 {
     auto unsigned char uint8_WB;    //local work byte
-    
+  
+//define the CONTROL_INT register
     uint8_WB = 0x10;    //variable is used for the control int register
                         //0 = disable / 1 = enable
                         //bit7..5 = unused
@@ -142,9 +128,80 @@ void RV30xx_init(void)
     {
         //do nothing...
     }
-    while(g_i2c1.uint8_Busy);   //until the transfer is finished
+    while(g_i2c1.uint8_Busy);   //until the transfer is finished 
     
+    
+//define the CONTROL_1 register
+    uint8_WB = 0x91;    //variable is used for the control status register
+                        //0 = disable / 1 = enable
+                        //bit7 =    Clk/Int, applies CLKOUT function CLKOUT pin (1)
+                        //          applies INT function on INT CLKOUT pin (0)
+                        //bit6..5 = TD1, TDO, select source for internal countdown timer
+                        //          00= 32Hz
+                        //          01= 8Hz
+                        //          10= 1Hz
+                        //          11= 0.5Hz
+                        //bit4 =    SROn, en/di self recovery function
+                        //bit3 =    EERE, en/di automatic EEPROM refresh every hour
+                        //bit2 =    TAR, en/di countdown timer auto-reload mode 
+                        //bit1 =    TE, en/di countdown timer
+                        //bit0 =    WE, en/di 1Hz clock source for watch
+    
+    //fill out the send buffer
+    i2c_SendBufWr(_i2c1,_RV30xxAddr);
+    i2c_SendBufWr(_i2c1,_RegControl1);
+    i2c_SendBufWr(_i2c1,uint8_WB);
+
+    //define some important variables for the transfer
+    g_i2c1.uint8_RdWr = 0;                  //command will be a write
+    g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+    i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+    do
+    {
+        //do nothing...
+    }
+    while(g_i2c1.uint8_Busy);   //until the transfer is finished 
 }   //end of RV30xx_init
+
+
+/**********************************************************************************************************************
+ * Routine:                 RV30xx_InitInterrupt
+
+ * Description:
+ * Initialization of the interrupt and in same time enable or disable it.  
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void RV30xx_InitInterrupt(unsigned char uint8_action)
+{
+    INTCONbits.INT2EP = 0;  // External Interrupt 2 Edge Polarity Control bit
+                            // used for the RV30xx on fallingedge
+                            // 1= Risingedge 
+                            // 0= Fallingedge
+    
+    IFS0bits.INT2IF = 0;    //clear the interrupt flag
+    
+    IPC2bits.INT2IP = 3;    //interrupt priority = 3
+    IPC2bits.INT2IS = 3;    //interrupt subpriority = 3
+    
+    if(uint8_action)        //enable interrupt?
+    {
+        IEC0bits.INT2IE = 1;    
+    }
+    else                    //disable interrupt?
+    {
+        IEC0bits.INT2IE = 0;  
+    }
+    
+}   //end of RV30xx_InitInterrupt
 
 
 /**********************************************************************************************************************

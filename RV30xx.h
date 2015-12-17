@@ -33,6 +33,7 @@
 
 extern void RV30xx_release(void);
 extern void RV30xx_init(void);
+extern void RV30xx_InitInterrupt(unsigned char uint8_action);
 extern void RV30xx_TempMeas(void);
 extern void RV30xx_SetGetSec(unsigned char uint8_SetGet,unsigned char uint8_DataByte);
 extern void RV30xx_SetGetMin(unsigned char uint8_SetGet,unsigned char uint8_DataByte);
@@ -44,6 +45,8 @@ extern void RV30xx_SetGetYear(unsigned char uint8_SetGet,unsigned char uint8_Dat
 
 
 #define _RV30xxAddr         0xAC    //definition of the address for the RTC
+#define _Rv30xxENABLE       1       //definition for the uint8_action
+#define _Rv30xxDISABLE      0       //definition for the uint8_action
 #define _Set                1       //definition for uint8_SetGet
 #define _Get                0       //definition for uint8_SetGet
 #define _RegControl1        0x00    //definition of register control 1

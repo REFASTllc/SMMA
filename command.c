@@ -3530,7 +3530,7 @@ void cmd_GTIME(void)
             funct_IntToAscii(g_Param.uint8_Min,_Active);
             uart2_sendbuffer(':');      //then the double point
             funct_IntToAscii(g_Param.uint8_Sec,_Active);
-            uart2_sendbuffer(13);       //then the CR
+            uart2_sendbuffer(13);       //then the CR         
         }
     }
     else

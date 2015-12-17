@@ -674,3 +674,54 @@ void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
         }       
     }
 }   //end of __IntI2cHandler
+
+
+/**********************************************************************************************************************
+ * Routine:                 __IntINT2handler
+
+ * Description:
+ * This interrupt occurs if the external output signal from the RV30xx changes from high to low. 
+ * This means that a system reset occured, because of an internal error.
+ * This routine tries to start a re-initialization of the chip. 
+ * At the moment the this error is not stored somewhere. That we should to, still an open point and noted
+ * into the PCDA list. 
+ *   
+ * Creator:                 A. Staub
+ * Date of creation:        17.12.2015
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void __ISR(_EXTERNAL_2_VECTOR, IPL3AUTO) __IntINT2handler(void)
+{
+    IFS0bits.INT2IF = 0;    //clear the interrupt flag
+    
+    //add here an alarm!!!
+    
+//first enable again the RV30xx chip because the interrupt signaled a "system reset detection"
+    //fill out the buffer
+    RV30xx_release();       //call subroutine
+    RV30xx_init();          //call subroutine
+    RV30xx_InitInterrupt(_Rv30xxENABLE);    //call subroutine
+    
+    //clear the SRF bit from the control_int flag register
+    i2c_SendBufWr(_i2c1,_RV30xxAddr);
+    i2c_SendBufWr(_i2c1,_RegControlIntFlag);
+    i2c_SendBufWr(_i2c1,0);                 //clear all flag
+
+    //define some important variables for the transfer
+    g_i2c1.uint8_RdWr = 0;                  //command will be a write
+    g_i2c1.uint8_RScount = 0;               //repeat start condition not used
+    
+    i2c_StartTransfer(_i2c1);   //launch the transfer
+    
+    do
+    {
+        //do nothing...
+    }
+    while(g_i2c1.uint8_Busy);   //until the transfer is finished
+    
+    
+}   //end of __IntINT2handler
