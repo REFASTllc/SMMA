@@ -57,7 +57,7 @@
 
 #pragma config FPLLMUL = MUL_20, FPLLIDIV = DIV_1, FPLLODIV = DIV_1
 #pragma config POSCMOD = HS, FNOSC = PRIPLL, FPBDIV = DIV_1, OSCIOFNC = OFF
-#pragma config FSOSCEN = OFF, DEBUG = ON, ICESEL = ICS_PGx1 
+#pragma config FSOSCEN = ON, DEBUG = ON, ICESEL = ICS_PGx1 
 
 //  end of configuration bits
 
@@ -120,6 +120,10 @@ void system_init(void)
     uart_init(_UART1_);                     //call subroutine
     uart_set(_UART1_,_NONE,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,38400);   //call subroutine
     timers_SetInterrupt(_TIMER2,_DISABLE);   //call subroutine and set interrupt for timer 2
+//timer 1 initialization for 1ms interrupts
+    timers_Init(_TIMER1);                   //call subroutine
+    timers_SetInterrupt(_TIMER1,_ENABLE);   //call subroutine
+    timers_Set(_TIMER1,_ENABLE,0,312);      //generates every 1ms (theory) an interrupt
 //switch off the debugging LED's
     oTestLed1 = 0;                          //switch on the output for the test LED1
     oTestLed2 = 0;                          //switch on the output for the test LED2

@@ -17,6 +17,7 @@
 
 #include "includes.h" // File which contain all includes files
 
+STimer1 g_Timer1;     //global variables for struct
 STimer2 g_Timer2;     //global variables for struct
 
 
@@ -25,10 +26,11 @@ STimer2 g_Timer2;     //global variables for struct
 
  * Description:
  * Initialization of the timers of the microcontroller.
- * Timer 1: not used
+ * Timer 1: used 
+ * Clock source = PBCLK = 80MHz with prescaler 256 = 1 / (80MHz / 256) = 3.2us time base 
  * 
  * Timer 2: used
- * Clock source = PBCLK = 80MHz with prescaler 8 = 1 / [(1 / 80MHz) / 8] = 100ns time base
+ * Clock source = PBCLK = 80MHz with prescaler 8 = 1 / (80MHz / 8) = 100ns time base
  * Used for the unipolar driver - DON'T USE THIS TIMER FOR SOMETHING OTHERS!!!
  * 
  * Timer 3: not used
@@ -73,7 +75,7 @@ void timers_Init(unsigned char timerx)
                                 //    1 = Gated time accumulation is enabled
                                 //    0 = Gated time accumulation is disabled
 
-        T1CONbits.TCKPS1 = 0;   // 11 = 1:256 prescale value
+        T1CONbits.TCKPS1 = 1;   // 11 = 1:256 prescale value
         T1CONbits.TCKPS0 = 1;   // 10 = 1:64 prescale value
                                 // 01 = 1:8 prescale value
                                 // 00 = 1:1 prescale value
@@ -263,10 +265,13 @@ void timers_Init(unsigned char timerx)
 
  * Description:
  * Initialization of the interrupts of the selected timer.
- * Timer 1: not used
+ * Timer 1: used
+ * Priority = 5
+ * Subpriority = 3
  * 
  * Timer 2: used
- * Priority = ???
+ * Priority = 1
+ * Subpriority = 3
  * 
  * Timer 3: not used
  * 
@@ -292,7 +297,7 @@ void timers_SetInterrupt(unsigned char timerx, unsigned char action)
     if(timerx == _TIMER1)
     {
         IFS0bits.T1IF = 0;
-        IPC1bits.T1IP = 1;
+        IPC1bits.T1IP = 5;
         IPC1bits.T1IS = 3;
         if(action == _ENABLE) IEC0bits.T1IE = 1;
         else IEC0bits.T1IE = 0;
@@ -354,7 +359,7 @@ void timers_SetInterrupt(unsigned char timerx, unsigned char action)
 
  * Description:
  * Start / stop and choose time for each 16bits timers.
- * Timer 1: not used
+ * Timer 1: used
  * 
  * Timer 2: used
  * DON'T USE THIS SUBROUTINE FOR TIMER 2! This timer is used in a special way for the unipolar driver.

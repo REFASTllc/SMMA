@@ -18,6 +18,7 @@
 #include "includes.h" // File which contain all includes files
 
 extern Si2c1 g_i2c1;
+extern STimer1 g_Timer1;
 extern STimer2 g_Timer2;
 extern SUART2txd g_UART2txd;
 extern SUART2rxd g_UART2rxd;
@@ -212,15 +213,6 @@ void __ISR(_SPI_1_VECTOR, IPL4AUTO) __IntSPI1Handler(void)
 void __ISR(_RTCC_VECTOR, IPL3AUTO) __IntRTCCHandler(void)
 {
     IFS1bits.RTCCIF = 0;
-}
-
-/****************************************************************************/
-/*  Purpose of the INT routine:  Manage TIMER1 overflow interrupts          */
-/****************************************************************************/
-void __ISR(_TIMER_1_VECTOR, IPL1AUTO) __IntTimer1Handler(void)
-{
-    TMR1 = 0;
-    IFS0bits.T1IF = 0;
 }
 
 
@@ -725,3 +717,26 @@ void __ISR(_EXTERNAL_2_VECTOR, IPL3AUTO) __IntINT2handler(void)
     
     
 }   //end of __IntINT2handler
+
+
+/**********************************************************************************************************************
+ * Routine:                 __IntTimer1Handler
+
+ * Description:
+ * This interrupt occurs every 1ms and can be used for a timeout or something other. 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        18.12.2015
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void __ISR(_TIMER_1_VECTOR, IPL5AUTO) __IntTimer1Handler(void)
+{    
+    TMR1 = 0;               //reset counter
+    IFS0bits.T1IF = 0;      //clear interrupt flag
+    
+    g_Timer1.uint16_LinTimeout++;
+}   //end of __IntTimer1Handler

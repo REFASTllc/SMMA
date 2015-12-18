@@ -45,6 +45,11 @@ extern void timers_Set(unsigned char timer, unsigned char status, unsigned long 
 #define _ENABLE		1
 #define	_DISABLE	0
 
+typedef struct                  //definitions of multiple variable for timer1
+{
+  volatile unsigned short int uint16_LinTimeout;            //test counter for the 1ms interrupt
+} STimer1;                      //struct name is STimer1 (S for struct)
+
 
 typedef struct                  //definitions of multiple variable for timer2
 {
