@@ -75,7 +75,7 @@
 #define oEnaVLINSupply      PORTAbits.RA14          // Enable of V LIN supply
 #define oEnaLINDriver       PORTAbits.RA5           // Enable of LIN driver
 #define oSPModeSignalLIN    PORTAbits.RA4           // SP_MODE signal of LIN driver
-#define iNRESSignalLIN      PORTAbits.RA3           // RES signal of LIN driver
+#define iNRESSignalLIN      PORTAbits.RA3           // NRES signal of LIN driver
 // RF Module
 #define oCMDModeSignal      PORTAbits.RA15          // CMD_MODE signal of RF module
 // Communication
@@ -237,6 +237,7 @@
 #define _IdSYEAR            80              //set the year
 #define _IdGYEAR            81              //get the year
 #define _IdGTIME            82              //get the time
+#define _IdGSTALIN          83              //get the LIN bus driver status
 
 #endif	/* DEFINES_H */
 

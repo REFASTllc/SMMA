@@ -43,10 +43,22 @@ void main(void)
     system_init();          //call subroutine
           
     asm("ei");              //enable all interrupts (code in assembler) use declaration "di" to disable all interrupts
-     
+    
+    
+ //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!
+ //we both play with the switch for the supply. I am still testing the LIN bus driver.
+ //please inform me if you increase the voltage higher than 24V!!!
+ //otherwise I think nothing will happen if we switch on both supplies (bipolar & lin)
+ //but I switched off your supply to be sure! 
+    //bipolar
     oVmotOnOff = 1;
-    oBiEnaVmot = 1;
+    oBiEnaVmot = 0;
     oBiDirSignal = 0;
+    //lin
+    oEnaVLINSupply = 1;
+    oEnaLINDriver = 1;
+    oSPModeSignalLIN = 1;
+ //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!   
     
     periph_init();
     oBiResetSignal = 1;

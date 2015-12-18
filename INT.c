@@ -10,8 +10,16 @@
  *                          Copyright (c) 2015 REFAST GmbH
 ***********************************************************************************************************************
  * Content overview:        - INT_init
- *                          - __IntTimer2Handler
  *                          - __IntUart2Handler
+ *                          - __IntSPI1Handler
+ *                          - __IntRTCCHandler
+ *                          - __IntTimer2Handler
+ *                          - __IntTimer3Handler
+ *                          - __IntPWM1Handler
+ *                          - __IntI2cHandler
+ *                          - __IntINT2handler
+ *                          - __IntTimer1Handler
+ *                          - __IntUart1Handler
 ***********************************************************************************************************************/
 
 
@@ -170,7 +178,7 @@ void __ISR(_UART_2_VECTOR, IPL2AUTO) __IntUart2Handler(void)
         }     
     }
     
-//--- Is this an ??? interrupt? ---//
+//--- Is this an error request interrupt? ---//
     if(IFS1bits.U2EIF)
     {
         IFS1bits.U2EIF = 0;
@@ -740,3 +748,91 @@ void __ISR(_TIMER_1_VECTOR, IPL5AUTO) __IntTimer1Handler(void)
     
     g_Timer1.uint16_LinTimeout++;
 }   //end of __IntTimer1Handler
+
+
+/**********************************************************************************************************************
+ * Routine:                 __IntUart1Handler
+
+ * Description:
+ * Manage Rx and Tx interrupts on UART2 
+ * Rx:
+ * Store received data byte into the receive buffer. Set the write-pointer of the receive buffer to 0 if it is 
+ * on the end position. Clear BufEmpty to 0 --> Receive buffer not more empty. Otherwise check out 'uart1_error'
+ * 
+ * Tx:
+ * If bit U2TXIF are set, then verify if the send buffer is empty. Buffer empty:
+ * Disable the interrupt
+ * Buffer not empty:
+ * Read out one character from the send buffer.
+ * Send this character over the TxD-Line.
+ * Increment the read-pointer of the send buffer.
+ * Set the read-pointer of the send buffer to 0 if it is on the end position.
+ * If the read-pointer is equal to write-pointer of the send buffer, then set BufEmpty to 1. 
+ *  
+ * Creator:                 A. Staub
+ * Date of creation:        18.12.2015
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
+{
+//--- Is this an RX interrupt? ---//
+    if(IFS0bits.U1RXIF)
+    {
+        IFS0bits.U1RXIF = 0;        //clear interrupt bit
+        
+        /*//store received data byte into receive buffer
+        *(g_UART2rxd.uint8_Bufptr + g_UART2rxd.uint16_Wch) = U2RXREG;
+       
+        //increment the write-pointer of the ring buffer
+        g_UART2rxd.uint16_Wch++;
+    
+        //verify if write-pointer is at the end of ring buffer
+        g_UART2rxd.uint16_Wch = g_UART2rxd.uint16_Wch % _RxD2_BUFSIZE;
+    
+        //receive buffer not empty
+        g_UART2rxd.uint8_BufEmpty = 0; */       
+    }
+    
+//--- Is this an Tx interrupt? ---//    
+    if(IFS0bits.U1TXIF)
+    {
+        IFS0bits.U1TXIF = 0;        //clear interrupt bit
+        
+        /*if(!g_UART2txd.uint8_BufEmpty)      //send buffer not empty?
+        {
+            //read out one byte from the send buffer and send it directly
+            U2TXREG = g_UART2txd.uint8_Buffer[g_UART2txd.uint16_Rch];
+            
+            //increment the read-pointer of the ring buffer
+            g_UART2txd.uint16_Rch++;
+      
+            //verify if read-pointer is at the end of ring buffer
+            g_UART2txd.uint16_Rch = g_UART2txd.uint16_Rch % _TxD2_BUFSIZE;
+            
+            //verify if read-pointer and write-pointer of the ring buffer are equal
+            if(g_UART2txd.uint16_Rch == g_UART2txd.uint16_Wch)
+            {
+                g_UART2txd.uint8_BufEmpty = 1;  //send buffer = empty
+            }
+            else
+            {
+                //do nothing
+            }
+        }
+        else
+        {
+            IEC1bits.U2TXIE = 0;    //disable the send interrupt
+            IFS1bits.U2TXIF = 1;    //enable interrupt flag for the next time
+        }  */   
+    }
+    
+//--- Is this an error request interrupt? ---//
+    if(IFS0bits.U1EIF)
+    {
+        IFS0bits.U1EIF = 0;
+    }
+}   //end of __IntUart1Handler

@@ -575,6 +575,10 @@ void cmdchk_check(void)
                 case (_IdGTIME):        //command GTIME
                     cmd_GTIME();        //call subroutine
                     break;
+                    
+                case (_IdGSTALIN):      //command GSTALIN
+                    cmd_GSTALIN();      //call subroutine
+                    break;
                                      
                 default:    //command ID does not exist
                     //do nothing - error has to be send before this routine
@@ -1209,6 +1213,20 @@ void cmdchk_def(void)
                         {
                             case (0x4754494D):  //cmd is = GTIME
                                 g_CmdChk.uint8_CmdID = _IdGTIME;
+                                break;
+                                
+                            default:    //error - command is not defined
+                                g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID
+                                g_Param.uint8_ErrCode = _UnknownCmd;    //set error code
+                                break;
+                        }
+                        break;
+                        
+                    case (0x4C494E):    //letter LIN?
+                        switch(g_CmdChk.uint32_Cmd1st4)
+                        {
+                            case (0x47535441):  //cmd is = GSTALIN
+                                g_CmdChk.uint8_CmdID = _IdGSTALIN;
                                 break;
                                 
                             default:    //error - command is not defined

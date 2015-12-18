@@ -157,10 +157,18 @@ void system_osc(void)
  * Description:
  * Initialization of all IOs of the microcontroller.
  * 
+ * Modification:
+ * 1)
+ * Cleared the bit "JTAGEN" in the register DDPCON because JTAG is multiplexed with port pins 
+ * RA0, RA1, RA4 and RA5. At reset these pins are controlled by the JTAG port. 
+ * To have full control over these pins we have to clear this bit, means to disable this function. 
+ * 2)
+ * TRISA3 (RA3) changed to input. 
+ * 
  * Creator:                 A. Staub
  * Date of creation:        30.07.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    18.12.2015
+ * Modified by:             A. Staub
  * 
  * Input:                   -
  * Output:                  -
@@ -168,6 +176,9 @@ void system_osc(void)
 void system_IOs(void)
 {
     //AD1PCFG = 0xffffffff;
+    
+//DDPCON register (debug data port control register)
+    DDPCON &= 0xFFFFFFF7;       //disable JTAG port to have full access on PORT A
     
 //+++ Port A +++
 //Port A register
@@ -177,7 +188,7 @@ void system_IOs(void)
     TRISAbits.TRISA0 = 1;       //RA0 = Detection of the SD Card
     TRISAbits.TRISA1 = 1;       //RA1 = Free
     TRISAbits.TRISA2 = 0;       //RA2 = STRn signal of bipolar driver
-    TRISAbits.TRISA3 = 0;       //RA3 = RES signal of LIN driver
+    TRISAbits.TRISA3 = 1;       //RA3 = NRES signal of LIN driver
     TRISAbits.TRISA4 = 0;       //RA4 = SP_MODE signal of LIN driver
     TRISAbits.TRISA5 = 0;       //RA5 = Enable of LIN driver
     TRISAbits.TRISA6 = 1;       //RA6 = Sink / Source input 7

@@ -67,6 +67,7 @@
  *                          - cmd_SYEAR
  *                          - cmd_GYEAR
  *                          - cmd_GTIME
+ *                          - cmd_GLINSTA
 ***********************************************************************************************************************/
 
 
@@ -3539,3 +3540,38 @@ void cmd_GTIME(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
 }   //end of cmd_GTIME
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GSTALIN
+
+ * Description:
+ * Read the status (input pin) of the lin bus driver (NRES) and send it back.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        18.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GSTALIN(void)
+{
+    auto unsigned char uint8_WB = 0;    //local work byte
+    
+    if(g_CmdChk.uint8_ParamPos == 1)    //number of received characters OK?
+    {
+        uint8_WB = iNRESSignalLIN;      //read input
+        
+        uart2_sendbuffer('E');      //first the letter E
+        uart2_sendbuffer(',');      //then the comma
+        funct_IntToAscii(uint8_WB,_Active);
+        uart2_sendbuffer(13);       //then the CR
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GSTALIN

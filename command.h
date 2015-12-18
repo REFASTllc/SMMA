@@ -89,5 +89,6 @@ extern void cmd_GMONTH(void);
 extern void cmd_SYEAR(void);
 extern void cmd_GYEAR(void);
 extern void cmd_GTIME(void);
+extern void cmd_GSTALIN(void);
 
 #endif	/* COMMAND_H */
