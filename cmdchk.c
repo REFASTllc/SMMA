@@ -587,6 +587,14 @@ void cmdchk_check(void)
                 case (_IdGSPDLIN):      //command GSPDLIN
                     cmd_GSPDLIN();      //call subroutine
                     break;
+                    
+                case (_IdSTOLIN):       //command STOLIN
+                    cmd_STOLIN();       //call subroutine
+                    break;
+                    
+                case (_IdGTOLIN):       //command GTOLIN
+                    cmd_GTOLIN();       //call subroutine
+                    break;
                                      
                 default:    //command ID does not exist
                     //do nothing - error has to be send before this routine
@@ -1244,6 +1252,24 @@ void cmdchk_def(void)
                             case (0x47535044):  //cmd is = GSPDLIN
                                 g_CmdChk.uint8_CmdID = _IdGSPDLIN;
                                 break;
+                                
+                            default:    //error - command is not defined
+                                g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID
+                                g_Param.uint8_ErrCode = _UnknownCmd;    //set error code
+                                break;
+                        }
+                        break;
+                        
+                    case (0x494E):  //letter IN?
+                        switch(g_CmdChk.uint32_Cmd1st4)
+                        {
+                            case (0x53544F4C):  //cmd is = STOLIN
+                                g_CmdChk.uint8_CmdID = _IdSTOLIN;
+                                break;    
+                                
+                            case (0x47544F4C):  //cmd is = GTOLIN
+                                g_CmdChk.uint8_CmdID = _IdGTOLIN;
+                                break;  
                                 
                             default:    //error - command is not defined
                                 g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID

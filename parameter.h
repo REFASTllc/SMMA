@@ -136,6 +136,8 @@ extern void param_init(void);
 #define _YearMax            79          //range for the year
 #define _LinSpdMin          100         //range for the lin speed communication
 #define _LinSpdMax          200000      //range for the lin speed communication
+#define _LinToMin           2           //range for the lin timeout communication
+#define _LinToMax           10000       //range for the lin timeout communication
 
 
 /*
@@ -221,7 +223,8 @@ typedef struct                      //definitions of multiple variable for comma
     volatile unsigned char uint8_Month;             //month in decimal
     volatile unsigned char uint8_Year;              //year in decimal
     volatile unsigned char uint8_LinStatus;         //status of the lin driver
-    volatile unsigned short int uint16_LinSpd;      //speed (baud rate) of the lin driver
+    volatile unsigned long int uint32_LinSpd;       //speed (baud rate) of the lin driver
+    volatile unsigned short int uint16_LinTO;       //timeout for the lin bus communication
 }   SParam;                         //struct name is SParam (S for struct)
 
 #endif	/* PARAMETER_H */

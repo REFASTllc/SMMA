@@ -70,6 +70,8 @@
  *                          - cmd_GLINSTA
  *                          - cmd_SSPDLIN
  *                          - cmd_GSPDLIN
+ *                          - cmd_STOLIN
+ *                          - cmd_GTOLIN
 ***********************************************************************************************************************/
 
 
@@ -3612,7 +3614,7 @@ void cmd_SSPDLIN(void)
             uart_set(_UART1_,_NONE,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,g_CmdChk.uint32_TempPara[1]);
             
             //store the baud rate
-            g_Param.uint16_LinSpd = g_CmdChk.uint32_TempPara[1];
+            g_Param.uint32_LinSpd = g_CmdChk.uint32_TempPara[1];
             
             //calculation of the error 
             uint32_WLI1 = _FREQ_OSC / (16 * (U1BRG + 1)); //calculate the effective baud rage
@@ -3663,7 +3665,7 @@ void cmd_GSPDLIN(void)
     {
         uart2_sendbuffer('E');      //first the letter E
         uart2_sendbuffer(',');      //then the comma
-        funct_IntToAscii(g_Param.uint16_LinSpd,_Active);
+        funct_IntToAscii(g_Param.uint32_LinSpd,_Active);
         uart2_sendbuffer(13);       //then the CR
     }
     else
@@ -3672,3 +3674,81 @@ void cmd_GSPDLIN(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
 }   //end of cmd_GSPDLIN
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_STOLIN
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance then set
+ * up the new timeout for the lin bus communication
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        19.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_STOLIN(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    
+    if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_LinToMin,_LinToMax);
+        
+        if(uint8_Result == 1)       //verify the result
+        {
+            //store the new timeout
+            g_Param.uint16_LinTO = g_CmdChk.uint32_TempPara[1];
+            
+            uart2_sendbuffer('E');      //first the letter E
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSTOLIN;     //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_STOLIN
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GTOLIN
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance then
+ * send back the actuall LIN communication timeout. 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        19.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GTOLIN(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        uart2_sendbuffer('E');      //first the letter E
+        uart2_sendbuffer(',');      //then the comma
+        funct_IntToAscii(g_Param.uint16_LinTO,_Active);
+        uart2_sendbuffer(13);       //then the CR
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GTOLIN

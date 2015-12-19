@@ -26,11 +26,12 @@
 #include "includes.h" // File which contain all includes files
 
 extern Si2c1 g_i2c1;
-extern STimer1 g_Timer1;
 extern STimer2 g_Timer2;
 extern SUART2txd g_UART2txd;
 extern SUART2rxd g_UART2rxd;
 extern SUni g_Uni;
+extern SLin g_LIN; 
+
 /**********************************************************************************************************************
  * Routine:                 INT_init
 
@@ -746,7 +747,7 @@ void __ISR(_TIMER_1_VECTOR, IPL5AUTO) __IntTimer1Handler(void)
     TMR1 = 0;               //reset counter
     IFS0bits.T1IF = 0;      //clear interrupt flag
     
-    g_Timer1.uint16_LinTimeout++;
+    g_LIN.uint16_TimeoutCounter++;
 }   //end of __IntTimer1Handler
 
 

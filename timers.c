@@ -17,7 +17,6 @@
 
 #include "includes.h" // File which contain all includes files
 
-STimer1 g_Timer1;     //global variables for struct
 STimer2 g_Timer2;     //global variables for struct
 
 

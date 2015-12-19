@@ -139,5 +139,6 @@ void param_init(void)
     g_Param.uint8_Month = 1;            //reset the weekday
     g_Param.uint8_Year = 0;             //reset the year
     g_Param.uint8_LinStatus = 0;        //reset the lin bus status
-    g_Param.uint16_LinSpd = 9600;       //baud rate of the lin bus
+    g_Param.uint32_LinSpd = 9600;       //baud rate of the lin bus
+    g_Param.uint16_LinTO = 500;         //timeout for the communication = 500ms
 }   //end of param_init

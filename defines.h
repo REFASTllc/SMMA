@@ -102,7 +102,6 @@
 //error code definition
                             //general errors
 #define _GlobalLock         0               //driver detected a POR; user configuration not guaranteed
-#define _OutOfTolSSPDLIN    20              //SSPDLIN, parameter out of range
 #define _OutOfTolSYEAR      21              //SYEAR, parameter out of range
 #define _OutOfTolSMONTH     22              //SMONTH, parameter out of range
 #define _OutOfTolSWDAY      23              //SWDAY, parameter out of range
@@ -148,6 +147,8 @@
 #define _LinETESTIN         152             //ETESTIN command is not allowed for LIN application's
 #define _LinRUN             153             //RUN command is not allowed for LIN application's
 #define _LinSCOILON         154             //SCOILON command is not allowed for LIN application's
+#define _OutOfTolSSPDLIN    155             //SSPDLIN, parameter out of range
+#define _OutOfTolSTOLIN     156             //STOLIN, parameter out of range
                             //command errors
 #define _NumbRecCharNotOK   254             //number of received characters/parameters not OK
 #define _UnknownCmd         255             //unknown or not implemented command
@@ -241,6 +242,8 @@
 #define _IdGSTALIN          83              //get the LIN bus driver status
 #define _IdSSPDLIN          84              //set the speed of the LIN communication
 #define _IdGSPDLIN          85              //get the speed of the LIN communication
+#define _IdSTOLIN           86              //set the timeout of the LIN communication
+#define _IdGTOLIN           87              //get the timeout of the LIN communication
 
 #endif	/* DEFINES_H */
 

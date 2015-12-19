@@ -92,5 +92,7 @@ extern void cmd_GTIME(void);
 extern void cmd_GSTALIN(void);
 extern void cmd_SSPDLIN(void);
 extern void cmd_GSPDLIN(void);
+extern void cmd_STOLIN(void);
+extern void cmd_GTOLIN(void);
 
 #endif	/* COMMAND_H */
