@@ -72,6 +72,7 @@
  *                          - cmd_GSPDLIN
  *                          - cmd_STOLIN
  *                          - cmd_GTOLIN
+ *                          - cmd_SLIN
 ***********************************************************************************************************************/
 
 
@@ -3761,3 +3762,50 @@ void cmd_GTOLIN(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
 }   //end of cmd_GTOLIN
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SLIN
+
+ * Description:
+ * ...explain
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        19.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SLIN(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        uart2_sendbuffer('E');      //first the letter E
+        uart2_sendbuffer(13);       //then the CR
+        /*//verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_LinToMin,_LinToMax);
+        
+        if(uint8_Result == 1)       //verify the result
+        {
+            //store the new timeout
+            g_Param.uint16_LinTO = g_CmdChk.uint32_TempPara[1];
+            
+            uart2_sendbuffer('E');      //first the letter E
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSLIN;     //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }*/
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_SLIN

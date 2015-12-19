@@ -149,6 +149,8 @@
 #define _LinSCOILON         154             //SCOILON command is not allowed for LIN application's
 #define _OutOfTolSSPDLIN    155             //SSPDLIN, parameter out of range
 #define _OutOfTolSTOLIN     156             //STOLIN, parameter out of range
+#define _OutOfTolSLIN       157             //SLIN, parameter out of range
+#define _LinTO              158             //SLIN (indirect), timeout, no answer from slave
                             //command errors
 #define _NumbRecCharNotOK   254             //number of received characters/parameters not OK
 #define _UnknownCmd         255             //unknown or not implemented command
@@ -244,6 +246,7 @@
 #define _IdGSPDLIN          85              //get the speed of the LIN communication
 #define _IdSTOLIN           86              //set the timeout of the LIN communication
 #define _IdGTOLIN           87              //get the timeout of the LIN communication
+#define _IdSLIN             88              //send parameters over the LIN bus
 
 #endif	/* DEFINES_H */
 

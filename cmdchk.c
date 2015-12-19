@@ -595,6 +595,10 @@ void cmdchk_check(void)
                 case (_IdGTOLIN):       //command GTOLIN
                     cmd_GTOLIN();       //call subroutine
                     break;
+                    
+                case (_IdSLIN):         //command SLIN
+                    cmd_SLIN();         //call subroutine
+                    break;
                                      
                 default:    //command ID does not exist
                     //do nothing - error has to be send before this routine
@@ -764,6 +768,10 @@ void cmdchk_def(void)
             
         case (0x47444159):  //cmd is = GDAY
             g_CmdChk.uint8_CmdID = _IdGDAY;
+            break;
+            
+        case (0x534C494E):  //cmd is = SLIN
+            g_CmdChk.uint8_CmdID = _IdSLIN;
             break;
         
         default:

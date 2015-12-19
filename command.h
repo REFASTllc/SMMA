@@ -94,5 +94,6 @@ extern void cmd_SSPDLIN(void);
 extern void cmd_GSPDLIN(void);
 extern void cmd_STOLIN(void);
 extern void cmd_GTOLIN(void);
+extern void cmd_SLIN(void);
 
 #endif	/* COMMAND_H */
