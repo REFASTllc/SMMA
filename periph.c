@@ -36,4 +36,6 @@ void periph_init(void)
     RV30xx_release();       //call subroutine
     RV30xx_init();          //call subroutine
     RV30xx_InitInterrupt(_Rv30xxENABLE);    //call subroutine
+    
+    LINATA6628_init();      //initialization of the ATA6628
 }

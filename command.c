@@ -3616,6 +3616,15 @@ void cmd_SSPDLIN(void)
             //store the baud rate
             g_Param.uint32_LinSpd = g_CmdChk.uint32_TempPara[1];
             
+            if(g_Param.uint32_LinSpd <= 20000)  //baud rate smaller than 20kBaud
+            {
+                oSPModeSignalLIN = 0;   //disable high speed mode
+            }
+            else
+            {
+                oSPModeSignalLIN = 1;   //enable high speed mode
+            }
+            
             //calculation of the error 
             uint32_WLI1 = _FREQ_OSC / (16 * (U1BRG + 1)); //calculate the effective baud rage
             uint32_WLI1 = uint32_WLI1 * 10000;                      

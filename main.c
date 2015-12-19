@@ -56,8 +56,6 @@ void main(void)
     oBiDirSignal = 0;
     //lin
     oEnaVLINSupply = 1;
-    oEnaLINDriver = 1;
-    oSPModeSignalLIN = 1;
  //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!   
     
     periph_init();

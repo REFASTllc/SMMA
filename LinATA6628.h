@@ -30,9 +30,7 @@
 #ifndef LINATA6628_H
 #define	LINATA6628_H
 
-//extern void timers_Init(unsigned char timerx);
-//extern void timers_SetInterrupt(unsigned char timerx, unsigned char action);
-//extern void timers_Set(unsigned char timer, unsigned char status, unsigned long int valueTMRReg, unsigned long int valuePRReg);
+extern void LINATA6628_init(void);
 
 typedef struct                  //definitions of multiple variable for timer1
 {
