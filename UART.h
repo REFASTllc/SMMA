@@ -32,7 +32,7 @@
 
 
 extern void uart_init(unsigned char uartx);
-extern void uart_set(unsigned char uartx, unsigned char parity, unsigned char stopBit, unsigned char polarity, unsigned char autobaud, unsigned short int baudrate);
+extern void uart_set(unsigned char uartx, unsigned char parity, unsigned char stopBit, unsigned char polarity, unsigned char autobaud, unsigned long int baudrate);
 extern void uart_InitInterrupt(unsigned char uartx, unsigned char action);
 extern void uart_enable(unsigned char uartx);
 extern void uart_disable(unsigned char uartx);

@@ -134,6 +134,8 @@ extern void param_init(void);
 #define _MoDec              2581        //range for the month december
 #define _YearMin            0           //range for the year
 #define _YearMax            79          //range for the year
+#define _LinSpdMin          100         //range for the lin speed communication
+#define _LinSpdMax          200000      //range for the lin speed communication
 
 
 /*
@@ -218,6 +220,8 @@ typedef struct                      //definitions of multiple variable for comma
     volatile unsigned char uint8_Wday;              //weekday in decimal 
     volatile unsigned char uint8_Month;             //month in decimal
     volatile unsigned char uint8_Year;              //year in decimal
+    volatile unsigned char uint8_LinStatus;         //status of the lin driver
+    volatile unsigned short int uint16_LinSpd;      //speed (baud rate) of the lin driver
 }   SParam;                         //struct name is SParam (S for struct)
 
 #endif	/* PARAMETER_H */

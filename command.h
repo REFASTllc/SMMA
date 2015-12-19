@@ -90,5 +90,7 @@ extern void cmd_SYEAR(void);
 extern void cmd_GYEAR(void);
 extern void cmd_GTIME(void);
 extern void cmd_GSTALIN(void);
+extern void cmd_SSPDLIN(void);
+extern void cmd_GSPDLIN(void);
 
 #endif	/* COMMAND_H */

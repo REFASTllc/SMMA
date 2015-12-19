@@ -118,7 +118,10 @@ void system_init(void)
     SetPWM(_PWM1, _ENABLE);
 //UART1 initialization
     uart_init(_UART1_);                     //call subroutine
-    uart_set(_UART1_,_NONE,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,38400);   //call subroutine
+    uart_set(_UART1_,_NONE,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,9600);   //call subroutine
+    uart_InitInterrupt(_UART2_,_ENABLE);    //call subroutine
+    
+    //???why is timer2 here on disable???
     timers_SetInterrupt(_TIMER2,_DISABLE);   //call subroutine and set interrupt for timer 2
 //timer 1 initialization for 1ms interrupts
     timers_Init(_TIMER1);                   //call subroutine

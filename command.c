@@ -68,6 +68,8 @@
  *                          - cmd_GYEAR
  *                          - cmd_GTIME
  *                          - cmd_GLINSTA
+ *                          - cmd_SSPDLIN
+ *                          - cmd_GSPDLIN
 ***********************************************************************************************************************/
 
 
@@ -3558,15 +3560,13 @@ void cmd_GTIME(void)
 ***********************************************************************************************************************/
 void cmd_GSTALIN(void)
 {
-    auto unsigned char uint8_WB = 0;    //local work byte
-    
     if(g_CmdChk.uint8_ParamPos == 1)    //number of received characters OK?
     {
-        uint8_WB = iNRESSignalLIN;      //read input
+        g_Param.uint8_LinStatus = iNRESSignalLIN;   //read input
         
         uart2_sendbuffer('E');      //first the letter E
         uart2_sendbuffer(',');      //then the comma
-        funct_IntToAscii(uint8_WB,_Active);
+        funct_IntToAscii(g_Param.uint8_LinStatus,_Active);
         uart2_sendbuffer(13);       //then the CR
     }
     else
@@ -3575,3 +3575,100 @@ void cmd_GSTALIN(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
 }   //end of cmd_GSTALIN
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SSPDLIN
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance then set
+ * up the new baud rate for the lin communication. 
+ * Calculate the error between the desired baud rate and the effective baud rate and send this
+ * error back. 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        19.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SSPDLIN(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    auto unsigned char uint8_Err;           //local work byte for the error
+    auto unsigned long int uint32_WLI1;     //local work long integer 1
+    auto unsigned long int uint32_WLI2;     //local work long integer 2
+    
+    if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_LinSpdMin,_LinSpdMax);
+        
+        if(uint8_Result == 1)       //verify the result
+        {
+            //set up the new baud rate
+            uart_set(_UART1_,_NONE,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,g_CmdChk.uint32_TempPara[1]);
+            
+            //store the baud rate
+            g_Param.uint16_LinSpd = g_CmdChk.uint32_TempPara[1];
+            
+            //calculation of the error 
+            uint32_WLI1 = _FREQ_OSC / (16 * (U1BRG + 1)); //calculate the effective baud rage
+            uint32_WLI1 = uint32_WLI1 * 10000;                      
+            uint32_WLI2 = g_CmdChk.uint32_TempPara[1] * 10000;
+            //calculate the error between the desired and the effective baud rate
+            uint8_Err = (uint32_WLI1 - uint32_WLI2) / g_CmdChk.uint32_TempPara[1];
+            
+            uart2_sendbuffer('E');      //first the letter E
+            uart2_sendbuffer(',');      //add a comma
+            uart2_sendbuffer('0');      //add a 0
+            uart2_sendbuffer('.');      //add a point
+            funct_IntToAscii(uint8_Err,_Active);
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSSPDLIN;     //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_SSPDLIN
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GSPDLIN
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance then
+ * send back the actuall LIN communication baud rate. 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        19.12.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GSPDLIN(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        uart2_sendbuffer('E');      //first the letter E
+        uart2_sendbuffer(',');      //then the comma
+        funct_IntToAscii(g_Param.uint16_LinSpd,_Active);
+        uart2_sendbuffer(13);       //then the CR
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GSPDLIN

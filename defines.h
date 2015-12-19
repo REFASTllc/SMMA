@@ -102,6 +102,7 @@
 //error code definition
                             //general errors
 #define _GlobalLock         0               //driver detected a POR; user configuration not guaranteed
+#define _OutOfTolSSPDLIN    20              //SSPDLIN, parameter out of range
 #define _OutOfTolSYEAR      21              //SYEAR, parameter out of range
 #define _OutOfTolSMONTH     22              //SMONTH, parameter out of range
 #define _OutOfTolSWDAY      23              //SWDAY, parameter out of range
@@ -238,6 +239,8 @@
 #define _IdGYEAR            81              //get the year
 #define _IdGTIME            82              //get the time
 #define _IdGSTALIN          83              //get the LIN bus driver status
+#define _IdSSPDLIN          84              //set the speed of the LIN communication
+#define _IdGSPDLIN          85              //get the speed of the LIN communication
 
 #endif	/* DEFINES_H */
 
