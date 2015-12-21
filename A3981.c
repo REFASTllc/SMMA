@@ -49,7 +49,7 @@ void InitA3981(void)
     A3981.CONFIG1.BITS.ADR = 1;         // Register address
     A3981.CONFIG1.BITS.OSC = 1;         // Selects clock source
     A3981.CONFIG1.BITS.TSC = 2;         // Overcurrent fault delay
-    A3981.CONFIG1.BITS.CD = 8;          // PWM count difference for ST detection
+    A3981.CONFIG1.BITS.CD = 127;          // PWM count difference for ST detection
     A3981.CONFIG1.BITS.DIAG = 1;        // Selects signal routed to DIAG output
     
 //--- Configuration register run ---//
@@ -64,7 +64,7 @@ void InitA3981(void)
             
 //--- Configuration Phase Table Load Register ---//
     A3981.TBLLD.BITS.ADR = 3;           // Register address
-    A3981.TBLLD.BITS.STS = 0;           // Selects stall detection scheme
+    A3981.TBLLD.BITS.STS = 3;           // Selects stall detection scheme
     A3981.TBLLD.BITS.PTP = 1;           // Parity bit (odd parity)
     A3981.TBLLD.BITS.PT = 5;            // Phase Table Value
 

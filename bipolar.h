@@ -72,6 +72,7 @@ typedef struct          //definitions of multiple variable for unipolar
     volatile unsigned char uint1_IsDecNeeded:1;     // Is deceleration phase needed?
     volatile unsigned char uint1_CurrInCoilAtTheEnd:1; // Is current still needed after the last step?
     volatile unsigned char uint1_ErrConfig:1;           // Error flag of motor configuration
+    volatile unsigned char uint1_isBipolEnabled:1;      
 } Sbipol;                 //struct name is SUni (S for struct)
 
 #endif	/* UNIPOLAR_H */

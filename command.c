@@ -589,7 +589,7 @@ void cmd_RUN(void)
                                 g_Bipol.uint1_NextStepIsRamp = 1;
                         break;
                         case 2: g_Bipol.uint1_IsDecNeeded = 1;      // Increase and decrease ramp
-                        g_Bipol.uint1_NextStepIsRamp = 1;
+                                g_Bipol.uint1_NextStepIsRamp = 1;
                         break;
                         default:g_Bipol.uint1_ErrConfig = 1;        // Error case
                         break;
@@ -606,7 +606,10 @@ void cmd_RUN(void)
                     
                     if(!g_Bipol.uint1_ErrConfig)
                     {
+                        SendOneDataSPI1(A3981.CONFIG0.REG);
+                        SendOneDataSPI1(A3981.CONFIG1.REG);
                         A3981.RUN.BITS.EN = 1;
+                        g_Bipol.uint1_isBipolEnabled = 1;
                     }
                     else
                     {

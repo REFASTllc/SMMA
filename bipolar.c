@@ -48,7 +48,7 @@ void bi_init(void)
     A3981.RUN.REG = 0b1000101001000000;
     A3981.CONFIG0.REG = 0b0010011100011100;
     A3981.CONFIG1.REG = 0b0111000000100000;
-    A3981.TBLLD.REG = 0b1100000001000101;
+    A3981.TBLLD.REG = 0b1111000001000101;
     
     g_Bipol.uint8_Status = 0b00000001;        //status byte - set bit 'FS' and clear the other bits
     //                     ||||||||
@@ -132,10 +132,8 @@ void bi_move(void)
             }
             else
             {
-                g_Bipol.uint32_GoalPos = g_Bipol.uint32_RealPos;    //otherwise set the goal to the real position
-     //           g_Bipol.uint8_Settings = 0;       //erase settings         
+                g_Bipol.uint32_GoalPos = g_Bipol.uint32_RealPos;    //otherwise set the goal to the real position     
                 g_Bipol.uint8_Status |= 0x01;     //set the bit 'FS - first step'
-        
                 //and stop the timer2 
                 T2CONbits.ON = 0;               //switch off timer 2
                 TMR2 = 0;                       //reset counter
@@ -143,6 +141,7 @@ void bi_move(void)
                 g_Timer2.uint16_Count = 0;      //force the interrupt routine to load the new time
                 A3981.RUN.BITS.EN = 0;
                 SendOneDataSPI1(A3981.RUN.REG);
+                g_Bipol.uint1_isBipolEnabled = 0;
             }     
         }
         else
@@ -178,6 +177,7 @@ void bi_move(void)
         
                 if(g_Bipol.uint8_Status & 0x02)   //is this the last step?
                 {
+                    g_Bipol.uint1_isBipolEnabled = 0;   // Signal the end of the command
                     //then stop the timer 
                     T2CONbits.ON = 0;               //switch off the timer
                     TMR2 = 0;                       //reset counter
@@ -186,6 +186,7 @@ void bi_move(void)
           
                     if(g_Bipol.uint1_CurrInCoilAtTheEnd == 1) //coils current active after move?
                     {
+                        
                         //then nothing is to do
                     }
                     else

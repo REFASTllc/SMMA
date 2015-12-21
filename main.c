@@ -19,6 +19,7 @@
 extern SUART2txd g_UART2txd;
 extern SUART2rxd g_UART2rxd;
 extern SUni g_Uni;
+extern Sbipol g_Bipol;
 /**********************************************************************************************************************
  * Routine:                 main
 
@@ -76,7 +77,7 @@ void main(void)
             //otherwise do nothing
         }     
         
-        if(A3981.RUN.BITS.EN)
+        if(g_Bipol.uint1_isBipolEnabled)
         {
             bi_move();
         }
@@ -101,5 +102,5 @@ void main(void)
             else
                 tempToggle++;
         }
-    }   
+    }  
 }   //end of main
