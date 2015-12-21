@@ -38,7 +38,7 @@ extern T_A3981 A3981;
 
 void main(void)
 {   
-    unsigned short int tempToggle = 0, countStall = 0;
+    unsigned short int tempToggle = 0;
     
     system_init();          //call subroutine
           
@@ -51,15 +51,18 @@ void main(void)
  //otherwise I think nothing will happen if we switch on both supplies (bipolar & lin)
  //but I switched off your supply to be sure! 
     //bipolar
+#ifdef _BIPOLAR
+    oBiResetSignal = 1;
     oVmotOnOff = 1;
-    oBiEnaVmot = 0;
-    oBiDirSignal = 0;
+    oBiEnaVmot = 1;
+#endif
+#ifdef _LIN
     //lin
-    oEnaVLINSupply = 1;
+    oEnaVLINSupply = 0;
+#endif
  //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!   
     
     periph_init();
-    oBiResetSignal = 1;
     DAC7571_WrByte(_NormalMode, 886);
     
     while(1)
@@ -73,6 +76,11 @@ void main(void)
             //otherwise do nothing
         }     
         
+        if(A3981.RUN.BITS.EN)
+        {
+            bi_move();
+        }
+        
         if(!g_UART2txd.uint8_BufEmpty)  //send buffer not empty?
             IEC1bits.U2TXIE = 1;        //enable the send interrupt
         else
@@ -84,15 +92,6 @@ void main(void)
             cmdchk_check();             //call subroutine
         else
         {
-            SendOneDataSPI1(A3981.CONFIG1.REG);
-            A3981.FAULT1.REG = GetLastDataSPI1();
-            SendOneDataSPI1(A3981.CONFIG0.REG);
-            A3981.FAULT0.REG = GetLastDataSPI1();
-            if(A3981.FAULT1.BITS.ST && A3981.FAULT0.BITS.ST)
-            {
-                countStall++;
-                oBiDirSignal =! oBiDirSignal;
-            }
             //--- Toggle of led (alive test) ---//
             if(tempToggle >= 200)
             {
@@ -101,12 +100,6 @@ void main(void)
             }
             else
                 tempToggle++;
-            if(IFS0bits.T3IF)
-            {
-                oBiStepSignal =! oBiStepSignal;
-                IFS0bits.T3IF = 0;
-                TMR3 = 0;
-            }
         }
     }   
 }   //end of main

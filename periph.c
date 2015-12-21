@@ -31,7 +31,6 @@
 void periph_init(void)
 {
     InitA3981();
-    
     //release of the RTC chip
     RV30xx_release();       //call subroutine
     RV30xx_init();          //call subroutine

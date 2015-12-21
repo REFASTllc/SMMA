@@ -84,6 +84,8 @@ extern Si2c1 g_i2c1;
 extern SParam g_Param;
 extern STimer2 g_Timer2;
 extern SUni g_Uni;
+extern Sbipol g_Bipol;
+extern T_A3981 A3981;
 /**********************************************************************************************************************
  * Routine:                 cmd_SILIM
 
@@ -497,6 +499,8 @@ void cmd_RUN(void)
 {
     auto unsigned char uint8_Result = 0;    //local work byte for the result 
     
+    g_Bipol.uint1_ErrConfig = 0;
+    
     if(g_CmdChk.uint8_ParamPos == 15)  //number of received characters OK?
     {
         if(g_Uni.uint8_Settings & 0x01)         //is motor in run mode?
@@ -552,6 +556,63 @@ void cmd_RUN(void)
                 {
                     //to decide what is to do when motor type changes
                     g_Param.uint8_MotTyp = g_CmdChk.uint32_TempPara[1] & 0xFF;
+                    // Set the micro stepping mode
+                    switch(g_Param.uint8_StepMode)
+                    {
+                        case 0: g_Bipol.uint1_ErrConfig = 1;    // Mode Full step one phase on is not supported by the A3981 driver ==> error
+                        break;
+                        case 1: A3981.CONFIG0.BITS.MS = 0;      // Mode Full step
+                        break;
+                        case 2: // TODO: Check the current compensated config
+                        case 3: A3981.CONFIG0.BITS.MS = 1;      // Mode Half step
+                        break;
+                        case 4: A3981.CONFIG0.BITS.MS = 2;      // Mode quarter step
+                        break;
+                        case 5: A3981.CONFIG0.BITS.MS = 3;      // Mode sixteenth step
+                        break;
+                        default:g_Bipol.uint1_ErrConfig = 1;    // default ==> error
+                        break;
+                    }
+                    g_Bipol.uint32_GoalPos = g_Param.uint32_StepCount;    //store step count into goal position         
+                    g_Bipol.uint16_RunFreq = g_Param.uint16_RunFreq;      //store the run frequency
+                    // Set the running direction
+                    oBiDirSignal = !g_Param.uint8_Direction;
+                    // State of supply after the end of the running
+                    g_Bipol.uint1_CurrInCoilAtTheEnd = g_Param.uint8_CoilState;
+
+                    switch(g_Param.uint8_SelectRamp)
+                    {
+                        case 0: g_Bipol.uint1_IsDecNeeded = 0;      // No ramp
+                                g_Bipol.uint1_NextStepIsRamp = 0;
+                        break;
+                        case 1: g_Bipol.uint1_IsDecNeeded = 0;      // Increase ramp only
+                                g_Bipol.uint1_NextStepIsRamp = 1;
+                        break;
+                        case 2: g_Bipol.uint1_IsDecNeeded = 1;      // Increase and decrease ramp
+                        g_Bipol.uint1_NextStepIsRamp = 1;
+                        break;
+                        default:g_Bipol.uint1_ErrConfig = 1;        // Error case
+                        break;
+                    }
+                    //define switch ON time - first convert and then store it
+                    funct_msToTimer2(g_Param.uint16_AccOnDelay,g_Timer2.uint16_IntTime);
+                    g_Bipol.uint16_SwOnLastTime = g_Bipol.uint16_LastTime;
+                    g_Bipol.uint16_SwOnCount = g_Bipol.uint16_Count;
+          
+                    //define switch OFF time - first convert and then store it
+                    funct_msToTimer2(g_Param.uint16_DecOffDelay,g_Timer2.uint16_IntTime);
+                    g_Bipol.uint16_SwOffLastTime = g_Bipol.uint16_LastTime;
+                    g_Bipol.uint16_SwOffCount = g_Bipol.uint16_Count;
+                    
+                    if(!g_Bipol.uint1_ErrConfig)
+                    {
+                        A3981.RUN.BITS.EN = 1;
+                    }
+                    else
+                    {
+                        g_Param.uint8_ErrCode = _OutOfTolRUN;       //set error code
+                        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                    }     
                 }
                 //type of motor = unipolar or matrix?
                 else if((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
@@ -621,6 +682,8 @@ void cmd_RUN(void)
                         //error - definition is unknown send error later
                         g_Uni.uint8_Settings = 0;   //erase settings
                     }
+                    // TODO: test to do
+                    
           
                     //define switch ON time - first convert and then store it
                     funct_msToTimer2(g_Param.uint16_AccOnDelay,g_Timer2.uint16_IntTime);

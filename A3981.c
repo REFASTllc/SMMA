@@ -35,7 +35,6 @@ T_A3981 A3981;
 /********************************************************************************************************************/
 void InitA3981(void)
 {   
-    oBiResetSignal = 1;
 //--- Configuration register 0 ---//
     A3981.CONFIG0.BITS.ADR = 0;         // Register address
     A3981.CONFIG0.BITS.SYR = 0;         // Synchronous rectification
@@ -55,7 +54,7 @@ void InitA3981(void)
     
 //--- Configuration register run ---//
     A3981.RUN.BITS.ADR = 2;             // Register address
-    A3981.RUN.BITS.EN = 1;              // Phase current enable
+    A3981.RUN.BITS.EN = 0;              // Phase current enable
     A3981.RUN.BITS.OL = 1;              // Open load current threshold as a percentage of maximum current defined by ISMAX and MX
     A3981.RUN.BITS.HLR = 0;             // Selects slow decay and brake recirculation path
     A3981.RUN.BITS.SLEW = 1;            // Slew rate control
@@ -76,6 +75,8 @@ void InitA3981(void)
     A3981.FAULT1.REG = GetLastDataSPI1();
     SendOneDataSPI1(A3981.RUN.REG);
     SendOneDataSPI1(A3981.TBLLD.REG);
+    
+    oBiResetSignal = 1;
 }
 
 

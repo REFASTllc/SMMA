@@ -45,6 +45,7 @@
 #include "timers.h"
 #include "INT.h"
 #include "unipolar.h"
+#include "bipolar.h"
 #include "command.h"
 #include "cmdchk.h"
 #include "parameter.h"

@@ -89,6 +89,8 @@ void system_init(void)
     funct_init();                           //call subroutine
 //unipolar initialization
     uni_init();                             //call subroutine
+//bipolar initialization
+    bi_init();
 //parameter initialization
     param_init();                           //call subroutine
 //command check initialization
@@ -111,18 +113,13 @@ void system_init(void)
     i2c_init(_i2c1);                                //call subroutine
     i2c_enable(_i2c1);                              //call subroutine
     i2c_InitInterrupt(_i2c1,_i2cENABLE,_i2cMASTER); //call subroutine
-// PWM initialization
-    InitPWM(_PWM1);
-    SetPWMFrequency(_PWM1, 700);
-    SetPWMDutyCycle(_PWM1, 50);
-    SetPWM(_PWM1, _ENABLE);
 //UART1 initialization
     uart_init(_UART1_);                     //call subroutine
     uart_set(_UART1_,_NONE,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,9600);   //call subroutine
     uart_InitInterrupt(_UART2_,_ENABLE);    //call subroutine
     
-    //???why is timer2 here on disable???
-    timers_SetInterrupt(_TIMER2,_DISABLE);   //call subroutine and set interrupt for timer 2
+
+   
 //timer 1 initialization for 1ms interrupts
     timers_Init(_TIMER1);                   //call subroutine
     timers_SetInterrupt(_TIMER1,_ENABLE);   //call subroutine
@@ -266,7 +263,7 @@ void system_IOs(void)
     TRISCbits.TRISC4 = 1;       //RC4 = T5CK
     TRISCbits.TRISC12 = 1;      //RC12 = OSC1
     TRISCbits.TRISC13 = 1;      //RC13 = SOSCI
-    TRISCbits.TRISC14 = 0;      //RC14 = RESET signal of bipolar driver
+    TRISCbits.TRISC14 = 0;      //RC14 = DO NOT USE
     TRISCbits.TRISC15 = 0;      //RC15 = Switch of the communication between LIN driver and RF module
     
 //+++ Port D +++   
@@ -318,7 +315,7 @@ void system_IOs(void)
     TRISEbits.TRISE1 = 0;       //RE1= sink / source output 2
     TRISEbits.TRISE2 = 0;       //RE2= sink / source output 6
     TRISEbits.TRISE3 = 0;       //RE3= sink / source output 7
-    TRISEbits.TRISE4 = 1;       //RE4= Free
+    TRISEbits.TRISE4 = 0;       //RE4= RESET signal of bipolar driver
     TRISEbits.TRISE5 = 0;       //RE5= Test LED 1
     TRISEbits.TRISE6 = 0;       //RE6= Test LED 2
     TRISEbits.TRISE7 = 1;       //RE7= Free

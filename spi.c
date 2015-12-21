@@ -329,6 +329,8 @@ signed char SendOneDataSPI1(unsigned short int dataToSend)
             Nop();
         SPI1BUF = dataToSend;
         while(SPI1STATbits.SPIBUSY);
+        for(i = 0; i < 1000; i++)
+            Nop();
         oBiStrnSignal = 1;
         return 1;
     }
