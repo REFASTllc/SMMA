@@ -37,6 +37,8 @@ extern unsigned long int funct_AsciiToInt(void);
 extern unsigned char funct_CheckTol(unsigned long int uint32_Value,unsigned long int uint32_Min,unsigned long int uint32_Max);
 extern void funct_FreqToTimer2(unsigned long int uint32_Freq, unsigned short int uint16_IntTime);
 extern void funct_msToTimer2(unsigned short int uint16_msTime, unsigned short int uint16_IntTime);
+extern unsigned long int funct_FreqToTimer23(unsigned long int uint32_Freq);
+extern unsigned long int funct_msToTimer23(unsigned long int uint32_msTime);
 extern unsigned short int funct_ReadRamp(unsigned char uint8_kind,unsigned char uint8_sort,unsigned char uint8_ArrPos);
 extern unsigned char funct_CheckCmdSILIM(void);
 extern unsigned char funct_CheckCmdSMTYP(void);

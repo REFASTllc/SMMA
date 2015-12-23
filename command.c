@@ -595,14 +595,16 @@ void cmd_RUN(void)
                         break;
                     }
                     //define switch ON time - first convert and then store it
-                    funct_msToTimer2(g_Param.uint16_AccOnDelay,g_Timer2.uint16_IntTime);
-                    g_Bipol.uint16_SwOnLastTime = g_Bipol.uint16_LastTime;
-                    g_Bipol.uint16_SwOnCount = g_Bipol.uint16_Count;
+                    //funct_msToTimer2(g_Param.uint16_AccOnDelay,g_Timer2.uint16_IntTime);
+                    g_Bipol.uint32_SwOnTime = funct_msToTimer23(g_Param.uint16_AccOnDelay);
+                    //g_Bipol.uint16_SwOnLastTime = g_Bipol.uint16_LastTime;
+                    //g_Bipol.uint16_SwOnCount = g_Bipol.uint16_Count;
           
                     //define switch OFF time - first convert and then store it
-                    funct_msToTimer2(g_Param.uint16_DecOffDelay,g_Timer2.uint16_IntTime);
-                    g_Bipol.uint16_SwOffLastTime = g_Bipol.uint16_LastTime;
-                    g_Bipol.uint16_SwOffCount = g_Bipol.uint16_Count;
+                    //funct_msToTimer2(g_Param.uint16_DecOffDelay,g_Timer2.uint16_IntTime);
+                    g_Bipol.uint32_SwOffTime = funct_msToTimer23(g_Param.uint16_DecOffDelay);
+                    //g_Bipol.uint16_SwOffLastTime = g_Bipol.uint16_LastTime;
+                    //g_Bipol.uint16_SwOffCount = g_Bipol.uint16_Count;
                     
                     if(!g_Bipol.uint1_ErrConfig)
                     {
@@ -689,14 +691,16 @@ void cmd_RUN(void)
                     
           
                     //define switch ON time - first convert and then store it
-                    funct_msToTimer2(g_Param.uint16_AccOnDelay,g_Timer2.uint16_IntTime);
-                    g_Uni.uint16_SwOnLastTime = g_Uni.uint16_LastTime;
-                    g_Uni.uint16_SwOnCount = g_Uni.uint16_Count;
+                    g_Uni.uint32_SwOnTime = funct_msToTimer23(g_Param.uint16_AccOnDelay);
+                    //funct_msToTimer2(g_Param.uint16_AccOnDelay,g_Timer2.uint16_IntTime);
+                    //g_Uni.uint16_SwOnLastTime = g_Uni.uint16_LastTime;
+                    //g_Uni.uint16_SwOnCount = g_Uni.uint16_Count;
           
                     //define switch OFF time - first convert and then store it
-                    funct_msToTimer2(g_Param.uint16_DecOffDelay,g_Timer2.uint16_IntTime);
-                    g_Uni.uint16_SwOffLastTime = g_Uni.uint16_LastTime;
-                    g_Uni.uint16_SwOffCount = g_Uni.uint16_Count;
+                    g_Uni.uint32_SwOffTime = funct_msToTimer23(g_Param.uint16_DecOffDelay);
+                    //funct_msToTimer2(g_Param.uint16_DecOffDelay,g_Timer2.uint16_IntTime);
+                    //g_Uni.uint16_SwOffLastTime = g_Uni.uint16_LastTime;
+                    //g_Uni.uint16_SwOffCount = g_Uni.uint16_Count;
           
                     if(g_Uni.uint8_Settings)    //verify if settings are 0, this means there was something wrong
                     {

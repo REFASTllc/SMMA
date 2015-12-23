@@ -28,25 +28,33 @@ STimer2 g_Timer2;     //global variables for struct
  * Timer 1: used 
  * Clock source = PBCLK = 80MHz with prescaler 256 = 1 / (80MHz / 256) = 3.2us time base 
  * 
- * Timer 2: used
+ * Timer 2: used in combination; see Timer 23
  * Clock source = PBCLK = 80MHz with prescaler 8 = 1 / (80MHz / 8) = 100ns time base
  * Used for the unipolar driver - DON'T USE THIS TIMER FOR SOMETHING OTHERS!!!
+ * See modification from (23.12.2015) at the bottom. 
+ * Since this mod. the time base is = 1 / (80MHz / 2) = 25ns. 
+ * See case "_TIMER23"
  * 
- * Timer 3: not used
+ * Timer 3: used in combination; see Timer 23
  * 
  * Timer 4: not used
  * 
  * Timer 5: not used
  * 
  * Timer 23 (timer 2 in 32-bit): not used
+ * Clock source = PBCLK = 80MHz with prescaler 2 = 1 / (80MHz / 2) = 25ns time base
+ * Used for the unipolar driver - DON'T USE THIS TIMER FOR SOMETHING OTHERS!!!
  * 
  * Timer 45 (timer 4 in 32-bit): not used 
+ * 
+ * Modification (23.12.2015):
+ * Timer 2 and 3 combined to an 32-bit timer. Time base changed to 25ns. 
  * 
  * 
  * Creator:                 J. Rebetez
  * Date of creation:        08.08.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    23.12.2015
+ * Modified by:             A. Staub
  * 
  * Input:                   timerx  (selected timer)
  * Output:                  -
@@ -118,8 +126,8 @@ void timers_Init(unsigned char timerx)
         T2CONbits.TCS = 0;      // 1 = External clock from TxCK pin
                                 // 0 = Internal peripheral clock
 
-        TMR2 = 0;
-        PR2 = 100;
+        TMR2 = 0;               //clear counter
+        PR2 = 100;              //set comperator to 10us (100 * 100ns)
         
         g_Timer2.uint16_LastTime = 0;       //clear last time
         g_Timer2.uint16_Count = 0;          //reset counter
@@ -225,17 +233,17 @@ void timers_Init(unsigned char timerx)
 
         T2CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
         T2CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
-        T2CONbits.TCKPS0 = 0;   // 101 = 1:32 prescale value
+        T2CONbits.TCKPS0 = 1;   // 101 = 1:32 prescale value
                                 // 100 = 1:16 prescale value
                                 // 011 = 1:8 prescale value
                                 // 010 = 1:4 prescale value
                                 // 001 = 1:2 prescale value
                                 // 000 = 1:1 prescale value
 
-        TMR2 = 0;           // LSB
-        TMR3 = 0;           // MSB
-        PR2 = 0;            // LSB
-        PR3 = 0;            // MSB
+        TMR2 = 0;           // LSB --> clear counter
+        TMR3 = 0;           // MSB --> clear counter
+        PR2 = 400;          // LSB --> set to 10us
+        PR3 = 0;            // MSB --> (400 * 25ns)
     }
     else if(timerx == _TIMER45)
     {
@@ -268,17 +276,19 @@ void timers_Init(unsigned char timerx)
  * Priority = 5
  * Subpriority = 3
  * 
- * Timer 2: used
+ * Timer 2: used in combination; see Timer 23
  * Priority = 1
  * Subpriority = 3
  * 
- * Timer 3: not used
+ * Timer 3: used in combination; see Timer 23
  * 
  * Timer 4: not used
  * 
  * Timer 5: not used
  * 
- * Timer 23 (timer 2 in 32-bit): not used
+ * Timer 23 (timer 2 in 32-bit): used for bipolar and unipolar actuator
+ * Priority = 1
+ * Subpriority = 3
  * 
  * Timer 45 (timer 4 in 32-bit): not used 
  * 
@@ -335,6 +345,7 @@ void timers_SetInterrupt(unsigned char timerx, unsigned char action)
     }
     else if(timerx == _TIMER23)
     {
+        IFS0bits.T2IF = 0;  //just to be safe
         IFS0bits.T3IF = 0;
         IPC3bits.T3IP = 1;
         IPC3bits.T3IS = 3;
@@ -343,6 +354,7 @@ void timers_SetInterrupt(unsigned char timerx, unsigned char action)
     }
     else if(timerx == _TIMER45)
     {
+        IFS0bits.T4IF = 0;  //just to be safe
         IFS0bits.T5IF = 0;
         IPC5bits.T5IP = 7;
         IPC5bits.T5IS = 3;
@@ -360,16 +372,18 @@ void timers_SetInterrupt(unsigned char timerx, unsigned char action)
  * Start / stop and choose time for each 16bits timers.
  * Timer 1: used
  * 
- * Timer 2: used
+ * Timer 2: used in combination; see Timer 23
  * DON'T USE THIS SUBROUTINE FOR TIMER 2! This timer is used in a special way for the unipolar driver.
  * 
- * Timer 3: not used
+ * Timer 3: used in combination; see Timer 23
+ * DON'T USE THIS SUBROUTINE FOR TIMER 2! This timer is used in a special way for the unipolar driver.
  * 
  * Timer 4: not used
  * 
  * Timer 5: not used
  * 
- * Timer 23 (timer 2 in 32-bit): not used
+ * Timer 23 (timer 2 in 32-bit): used for bipolar and unipolar driver
+ * DON'T USE THIS SUBROUTINE FOR TIMER 23! This timer is used in a special way for the unipolar driver.
  * 
  * Timer 45 (timer 4 in 32-bit): not used  
  * 

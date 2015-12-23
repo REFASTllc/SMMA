@@ -14,7 +14,9 @@
  *                          - funct_AsciiToInt
  *                          - funct_CheckTol
  *                          - funct_FreqToTimer2
+ *                          - funct_FreqToTimer23
  *                          - funct_msToTimer2
+ *                          - funct_msToTimer23
  *                          - funct_ReadRamp
  *                          - funct_CheckCmdSILIM
  *                          - funct_CheckCmdSMTYP
@@ -254,6 +256,71 @@ void funct_FreqToTimer2(unsigned long int uint32_Freq, unsigned short int uint16
    
     if(uint32_WB1)                              //is a rest available?
     {
+        //g_Uni.uint16_LastTime = uint32_WB1;     //then load the last time with the rest time
+        //g_Bipol.uint16_LastTime = uint32_WB1;
+        uint32_WB = uint32_WB - uint32_WB1;     //subtract the last time from the total time
+    
+        if(uint32_WB)                           //result not 0?
+        {
+            //then verify how many times it must wait the interrupt time
+            //g_Uni.uint16_Count = uint32_WB / uint16_IntTime;  
+            //g_Bipol.uint16_Count =uint32_WB / uint16_IntTime;  
+            //g_Uni.uint16_Count++;               //and add plus 1, because the last time is different 
+            //g_Bipol.uint16_Count++;             //and not the interrupt time
+        }
+        else
+        {
+            //g_Uni.uint16_Count = 1;             //otherwise set it fix to 1
+            //g_Bipol.uint16_Count = 1;
+        }   
+    }
+    else
+    {
+        //g_Uni.uint16_LastTime = uint16_IntTime; //otherwise load the last time with the interrupt time
+        //g_Bipol.uint16_LastTime = uint16_IntTime; 
+        //verify how many times more this interrupt time must be wait
+        //g_Uni.uint16_Count = uint32_WB / uint16_IntTime;   
+        //g_Bipol.uint16_Count = uint32_WB / uint16_IntTime;   
+    }   
+}   //end of funct_FreqToTimer2
+
+
+/**********************************************************************************************************************
+ * Routine:                 funct_FreqToTimer23
+
+ * Description:
+ * ...
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        23.12.2015
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   uint32_Freq
+ * Output:                  uint32_WB
+***********************************************************************************************************************/
+unsigned long int funct_FreqToTimer23(unsigned long int uint32_Freq)
+{
+    auto unsigned long int uint32_WB = 40000000;    //local work register for time base = 25ns
+                                                    //calculated with 1 / 25ns = 40MHz
+    //auto unsigned long int uint32_WB1 = 0;          //local work register for the rest (modulo)
+    
+    uint32_WB = uint32_WB / uint32_Freq;            //calculation the needed wait time
+                                                    //for example by 400 Hz (2.5ms):
+                                                    //40'000'000 / 400 = 100k
+                                                    //100k * 25ns time base = 2.5ms
+                                                    //error of = 0%
+                                                    //for example by 759 Hz (1.3175231ms):
+                                                    //40'000'000 / 759 = 52k700
+                                                    //52k7 * 25ns time base = 1.3175ms
+                                                    //error of = 0.00175%
+    
+    return uint32_WB;       //send back the result
+    
+    //uint32_WB1 = uint32_WB % uint16_IntTime;    //calculation the rest 
+   
+    /*if(uint32_WB1)                              //is a rest available?
+    {
         g_Uni.uint16_LastTime = uint32_WB1;     //then load the last time with the rest time
         g_Bipol.uint16_LastTime = uint32_WB1;
         uint32_WB = uint32_WB - uint32_WB1;     //subtract the last time from the total time
@@ -279,8 +346,8 @@ void funct_FreqToTimer2(unsigned long int uint32_Freq, unsigned short int uint16
         //verify how many times more this interrupt time must be wait
         g_Uni.uint16_Count = uint32_WB / uint16_IntTime;   
         g_Bipol.uint16_Count = uint32_WB / uint16_IntTime;   
-    }   
-}   //end of funct_FreqToTimer2
+    }*/ 
+}   //end of funct_FreqToTimer23
 
 
 /**********************************************************************************************************************
@@ -311,6 +378,73 @@ void funct_msToTimer2(unsigned short int uint16_msTime, unsigned short int uint1
    
     if(uint32_WB1)                              //is a rest available?
     {
+        //g_Uni.uint16_LastTime = uint32_WB1;     //then load the last time with the rest time
+        //g_Bipol.uint16_LastTime = uint32_WB1;     
+        uint32_WB = uint32_WB - uint32_WB1;     //subtract the last time from the total time
+    
+        if(uint32_WB)                           //result not 0?
+        {
+            //then verify how many times it must wait the interrupt time
+            //g_Uni.uint16_Count = uint32_WB / uint16_IntTime;    
+            //g_Bipol.uint16_Count = uint32_WB / uint16_IntTime;    
+            //and add plus 1, because the last time is different and not the interrupt time
+            //g_Uni.uint16_Count++;
+            //g_Bipol.uint16_Count++;
+        }
+        else
+        {
+            //g_Uni.uint16_Count = 1;             //otherwise set it fix to 1
+            //g_Bipol.uint16_Count = 1; 
+        }   
+    }
+    else
+    {
+        //g_Uni.uint16_LastTime = uint16_IntTime; //otherwise load the last time with the interrupt time
+        //g_Bipol.uint16_LastTime = uint16_IntTime;
+        //verify how many times more this interrupt time must be wait
+        //g_Uni.uint16_Count = uint32_WB / uint16_IntTime;
+        //g_Bipol.uint16_Count = uint32_WB / uint16_IntTime;
+    }   
+}   //end of funct_msToTimer2
+
+
+/**********************************************************************************************************************
+ * Routine:                 funct_msToTimer23
+
+ * Description:
+ * ...
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        23.12.2015
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   uint32_msTime
+ * Output:                  uint32_WB
+***********************************************************************************************************************/
+unsigned long int funct_msToTimer23(unsigned long int uint32_msTime)
+{
+    auto unsigned long int uint32_WB = 40000;       //local work register for time base = 25ns
+                                                    //calculated with 40MHz / 1000 (for ms) = 40kHz
+    //auto unsigned long int uint32_WB1 = 0;          //local work register for the rest (modulo)
+    
+    uint32_WB = uint32_WB * uint32_msTime;          //calculation the needed wait time
+                                                    //for example by 50ms:
+                                                    //40'000 * 50 = 2M
+                                                    //2M * 25ns time base = 50ms
+                                                    //error of = 0%
+                                                    //for example by 23ms:
+                                                    //40'000 * 23 = 920k
+                                                    //920 * 25ns time base = 23ms
+                                                    //error of = 0%
+    
+    return uint32_WB;       //send back the result
+    
+    
+    //uint32_WB1 = uint32_WB % uint16_IntTime;    //calculation the rest
+   
+    /*if(uint32_WB1)                              //is a rest available?
+    {
         g_Uni.uint16_LastTime = uint32_WB1;     //then load the last time with the rest time
         g_Bipol.uint16_LastTime = uint32_WB1;     
         uint32_WB = uint32_WB - uint32_WB1;     //subtract the last time from the total time
@@ -337,8 +471,8 @@ void funct_msToTimer2(unsigned short int uint16_msTime, unsigned short int uint1
         //verify how many times more this interrupt time must be wait
         g_Uni.uint16_Count = uint32_WB / uint16_IntTime;
         g_Bipol.uint16_Count = uint32_WB / uint16_IntTime;
-    }   
-}   //end of funct_msToTimer2
+    }*/   
+}   //end of funct_msToTimer23
 
 
 /**********************************************************************************************************************
