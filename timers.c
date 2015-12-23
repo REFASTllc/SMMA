@@ -123,7 +123,7 @@ void timers_Init(unsigned char timerx)
         
         g_Timer2.uint16_LastTime = 0;       //clear last time
         g_Timer2.uint16_Count = 0;          //reset counter
-        g_Timer2.uint16_IntTime = 25000;    //interrupt time = 2.5ms (25000 * 100ns)
+        g_Timer2.uint16_IntTime = 50000;    //interrupt time = 2.5ms (25000 * 100ns)
         
     }
     else if(timerx == _TIMER3)

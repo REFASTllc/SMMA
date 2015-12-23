@@ -266,7 +266,7 @@ void __ISR(_TIMER_2_VECTOR, IPL1AUTO) __IntTimer2Handler(void)
     IFS0bits.T2IF = 0;          //clear interrupt flag
     TMR2 = 0;                   //reset counter 
     
-    if(g_Param.uint8_MotTyp == 'U')
+    if((g_Param.uint8_MotTyp == 'U') || (g_Param.uint8_MotTyp == 'M'))
     {
         switch (g_Timer2.uint16_Count)      //verify the value of the counter
         {
@@ -455,10 +455,42 @@ void __ISR(_TIMER_2_VECTOR, IPL1AUTO) __IntTimer2Handler(void)
     }
     else    // Case for bipolar motor
     {
+        if(g_Bipol.uint1_IntTimeExpiredFlag)    //interrupt time expired?
+        {
+            g_Bipol.uint1_IntTimeExpiredFlag = 0;   //clear the flag
+            oBiStepSignal = 0;                      //reset output
+            
+            //load the new time for the next step - how many times to wait the interrupt time
+            g_Timer2.uint16_Count = g_Bipol.uint16_Count;
+
+            //load the last time for the next step
+            g_Timer2.uint16_LastTime = g_Bipol.uint16_LastTime;
+
+            //verify if the counter is 1, because in this case the last time must be directly used 
+            if(g_Timer2.uint16_Count == 1)
+            {
+                //then load PR2 with the last time
+                PR2 = g_Timer2.uint16_LastTime;
+            }
+            else
+            {
+                //otherwise load it with the interrupt time
+                PR2 = g_Timer2.uint16_IntTime;
+            }
+            PR2 -= 100;     //subtract the already waited time from case (0)
+        }
+        else
+        {
+            //do nothing
+        }
+        
         switch (g_Timer2.uint16_Count)      //verify the value of the counter
         {
-            case (0): //time expired 
-                //load the new time for the next step - how many times to wait the interrupt time
+            case (0): //time expired
+                PR2 = 100;                  //load interrupt time with 10us
+                g_Bipol.uint1_IntTimeExpiredFlag = 1;   //set flag
+                
+                /*//load the new time for the next step - how many times to wait the interrupt time
                 g_Timer2.uint16_Count = g_Bipol.uint16_Count;
 
                 //load the last time for the next step
@@ -474,7 +506,7 @@ void __ISR(_TIMER_2_VECTOR, IPL1AUTO) __IntTimer2Handler(void)
                 {
                     //otherwise load it with the interrupt time
                     PR2 = g_Timer2.uint16_IntTime;
-                } 
+                }*/ 
 
                 //allow next step
                 g_Bipol.uint8_Status |= 0x10;
