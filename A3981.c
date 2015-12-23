@@ -64,7 +64,7 @@ void InitA3981(void)
             
 //--- Configuration Phase Table Load Register ---//
     A3981.TBLLD.BITS.ADR = 3;           // Register address
-    A3981.TBLLD.BITS.STS = 0;           // Selects stall detection scheme
+    A3981.TBLLD.BITS.STS = 3;           // Selects stall detection scheme
     A3981.TBLLD.BITS.PTP = 1;           // Parity bit (odd parity)
     A3981.TBLLD.BITS.PT = 5;            // Phase Table Value
 

@@ -19,6 +19,9 @@
 extern SUART2txd g_UART2txd;
 extern SUART2rxd g_UART2rxd;
 extern SUni g_Uni;
+extern Sbipol g_Bipol;
+extern T_SPI SPI1;
+extern T_A3981 A3981;
 /**********************************************************************************************************************
  * Routine:                 main
 
@@ -33,9 +36,6 @@ extern SUni g_Uni;
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-extern T_SPI SPI1;
-extern T_A3981 A3981;
-
 void main(void)
 {   
     unsigned short int tempToggle = 0;
@@ -76,7 +76,7 @@ void main(void)
             //otherwise do nothing
         }     
         
-        if(A3981.RUN.BITS.EN)
+        if(g_Bipol.uint1_IsBipolEnabled)
         {
             bi_move();
         }

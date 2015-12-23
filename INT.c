@@ -488,7 +488,7 @@ void __ISR(_TIMER_2_VECTOR, IPL1AUTO) __IntTimer2Handler(void)
         {
             case (0): //time expired
                 PR2 = 100;                  //load interrupt time with 10us
-                g_Bipol.uint1_IntTimeExpiredFlag = 1;   //set flag
+                g_Bipol.uint1_IntTimeExpiredFlag = 1;    //force the interrupt routine to load the new time (next time)
                 
                 /*//load the new time for the next step - how many times to wait the interrupt time
                 g_Timer2.uint16_Count = g_Bipol.uint16_Count;
@@ -510,7 +510,7 @@ void __ISR(_TIMER_2_VECTOR, IPL1AUTO) __IntTimer2Handler(void)
 
                 //allow next step
                 g_Bipol.uint8_Status |= 0x10;
-
+                oTestLed2 =! oTestLed2;
                 //for security - be sure that the motor is in run
                 if(A3981.RUN.BITS.EN == 1)
                 {

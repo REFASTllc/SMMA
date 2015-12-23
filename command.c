@@ -510,7 +510,7 @@ void cmd_RUN(void)
         }
         else
         {
-            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_StepModeUniMatMin,_StepModeUniMatMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_StepModeMin,_StepModeMax);
             uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],_StepCountMin,_StepCountMax);
             uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[4],_RunFreqMin,_RunFreqMax);      
             uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[5],_DirMin,_DirMax);
@@ -556,7 +556,7 @@ void cmd_RUN(void)
                 {
                     //to decide what is to do when motor type changes
                     g_Param.uint8_MotTyp = g_CmdChk.uint32_TempPara[1] & 0xFF;
-                    // Set the micro stepping mode
+                    // Set the step mode
                     switch(g_Param.uint8_StepMode)
                     {
                         case 0: g_Bipol.uint1_ErrConfig = 1;    // Mode Full step one phase on is not supported by the A3981 driver ==> error
@@ -589,7 +589,7 @@ void cmd_RUN(void)
                                 g_Bipol.uint1_NextStepIsRamp = 1;
                         break;
                         case 2: g_Bipol.uint1_IsDecNeeded = 1;      // Increase and decrease ramp
-                        g_Bipol.uint1_NextStepIsRamp = 1;
+                                g_Bipol.uint1_NextStepIsRamp = 1;
                         break;
                         default:g_Bipol.uint1_ErrConfig = 1;        // Error case
                         break;
@@ -606,7 +606,10 @@ void cmd_RUN(void)
                     
                     if(!g_Bipol.uint1_ErrConfig)
                     {
+                        SendOneDataSPI1(A3981.CONFIG0.REG);
+                        SendOneDataSPI1(A3981.CONFIG1.REG);
                         A3981.RUN.BITS.EN = 1;
+                        g_Bipol.uint1_IsBipolEnabled = 1;
                     }
                     else
                     {

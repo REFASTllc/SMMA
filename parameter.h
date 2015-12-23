@@ -55,8 +55,8 @@ extern void param_init(void);
 #define _DecNumbStepMax     1000        //<OK> maximal number of steps for the frequency for deceleration
 #define _DecFreqMin         1           //<OK> minimal frequency for the number of steps in [Hz] for deceleration
 #define _DecFreqMax         1000        //<OK> maximal frequency for the number of stpes in [Hz] for deceleration
-#define _StepModeUniMatMin  0           //<OK> supported or minimal step mode for unipolar and matrix actuators
-#define _StepModeUniMatMax  2           //<OK> supported or maximal step mode for unipolar and matrix actuators
+#define _StepModeMin        0           //<OK> supported or minimal step mode for unipolar and matrix actuators
+#define _StepModeMax        5           //<OK> supported or maximal step mode for unipolar and matrix actuators
 #define _StepCountMin       0           //<OK> minimal step count 
 #define _StepCountMax       10000000    //<OK> maximal step count
 #define _RunFreqMin         1           //<OK> minimal run speed in [Hz]

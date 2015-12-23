@@ -48,7 +48,7 @@ void bi_init(void)
     A3981.RUN.REG = 0b1000101001000000;
     A3981.CONFIG0.REG = 0b0010011100011100;
     A3981.CONFIG1.REG = 0b0111000000100000;
-    A3981.TBLLD.REG = 0b1100000001000101;
+    A3981.TBLLD.REG = 0b1111000001000101;
     
     g_Bipol.uint8_Status = 0b00000001;        //status byte - set bit 'FS' and clear the other bits
     //                     ||||||||
@@ -87,7 +87,7 @@ void bi_init(void)
     g_Bipol.uint8_DecArrPos = 0;              //clear the deceleration array position
     g_Bipol.uint16_DecNumbStep = 0;           //clear the deceleration number of steps
     g_Bipol.uint32_DecStart = 0;              //clear the deceleration start position
-    g_Bipol.uint1_IntTimeExpiredFlag = 0;     //clear the interrupt time expired flag
+    g_Bipol.uint1_IntTimeExpiredFlag = 1;     //force the interrupt routine to load the new time
 }   //end of uni_init
 
 
@@ -142,15 +142,16 @@ void bi_move(void)
                 TMR2 = 0;                       //reset counter
                 PR2 = 100;                      //load timer with start condition
                 g_Timer2.uint16_Count = 0;      //force the interrupt routine to load the new time
-                g_Bipol.uint1_IntTimeExpiredFlag = 0;   //clear the interrupt time expired flag
+                g_Bipol.uint1_IntTimeExpiredFlag = 1;   //force the interrupt routine to load the new time
                 A3981.RUN.BITS.EN = 0;
                 SendOneDataSPI1(A3981.RUN.REG);
+                g_Bipol.uint1_IsBipolEnabled = 0;
             }     
         }
         else
         {
         //It is a must have to load the modulo timer already with a number. This number must be higher then 0, and 
-        //should be not to small. Is this time is to short, then the interrupt will be called to much time before it 
+        //should be not to small. Is this time is to short, then the interrupt will be called too much time before it 
         //has time to load the new switch on delay. The delay should be 100 * 100ns (timebase) that give us 10us
         //this means on a switch on wait time of 1ms, the real time is 1.01ms. Now it is important to know, that you 
         //cannot load this modulo timer in this else case, because this case could be executed more then 1 time 
@@ -166,7 +167,6 @@ void bi_move(void)
       
         g_Bipol.uint8_Status &= 0x7F;             //clear error
       
-        g_Bipol.uint1_IntTimeExpiredFlag = 0;   //clear the interrupt time expired flag
         T2CONbits.ON = 1;                       //enable the timer 2
         }
     }
@@ -182,11 +182,12 @@ void bi_move(void)
                 if(g_Bipol.uint8_Status & 0x02)   //is this the last step?
                 {
                     //then stop the timer 
+                    g_Bipol.uint1_IsBipolEnabled = 0;
                     T2CONbits.ON = 0;               //switch off the timer
                     TMR2 = 0;                       //reset counter
                     PR2 = 100;                      //load timer with the start condition
                     g_Timer2.uint16_Count = 0;      //force the interrupt routine to load the new time
-                    g_Bipol.uint1_IntTimeExpiredFlag = 0;   //clear the interrupt time expired flag
+                    g_Bipol.uint1_IntTimeExpiredFlag = 1;    //force the interrupt routine to load the new time
           
                     if(g_Bipol.uint1_CurrInCoilAtTheEnd == 1) //coils current active after move?
                     {
