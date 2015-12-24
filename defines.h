@@ -148,6 +148,7 @@
 #define _BipSMTYP           101             //parameters not within tolerance for switch on bipolar
 #define _BipETESTIN         102             //ETESTIN current measure not within the tolerance
 #define _BipSPHC            103             //SPHC parameter not within the tolerance
+#define _BipPlausiCheck     104             //plausibility check not passed
                             //LIN errors
 #define _LinSILIM           150             //received parameters not within the tolerance for SILIM
 #define _LinSMTYP           151             //parameters not within tolerance for switch on LIN
