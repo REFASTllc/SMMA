@@ -55,15 +55,6 @@ typedef struct          //definitions of multiple variable for unipolar
     volatile unsigned char uint8_Status;        //motor status - definition see uni_init()
     volatile unsigned char uint8_Settings;      //motor status - definition see uni_init()
     volatile unsigned char uint8_FsHsCount;     //full or half step counter
- //variables for timer 2
-    //volatile unsigned short int uint16_LastTime;      //last time to wait
-    //volatile unsigned short int uint16_Count;         //counter for the timer - how many time to wait the interrupt time
-    //volatile unsigned short int uint16_RunLastTime;   //last time to wait in run mode
-    //volatile unsigned short int uint16_RunCount;      //counter - how many time to wait the interrupt time run mode 
-    //volatile unsigned short int uint16_SwOnLastTime;  //last time to wait for one time the switch on phase
-    //volatile unsigned short int uint16_SwOnCount;     //counter - how many time to wait the interrupt time for switch on
-    //volatile unsigned short int uint16_SwOffLastTime; //last time to wait for one time the switch off phase 
-    //volatile unsigned short int uint16_SwOffCount;    //counter - how many time to wait the interrupt time for switch off
 //variables for timer 23
     volatile unsigned long int uint32_IntTime;      //effective interrupt time
     volatile unsigned long int uint32_RunTime;      //run time for interrupt

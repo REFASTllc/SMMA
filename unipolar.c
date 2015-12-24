@@ -67,14 +67,6 @@ void uni_init(void)
     //                       +-------- 7:        - not used / free
     
     g_Uni.uint8_FsHsCount = 0;              //clear the full or half step counter
-    //g_Uni.uint16_LastTime = 0;              //clear the last time
-    //g_Uni.uint16_Count = 0;                 //clear the counter
-    //g_Uni.uint16_RunLastTime = 0;           //clear the run last time
-    //g_Uni.uint16_RunCount = 0;              //clear the run counter
-    //g_Uni.uint16_SwOnLastTime = 0;          //clear the switch on last time
-    //g_Uni.uint16_SwOnCount = 0;             //clear the switch on counter
-    //g_Uni.uint16_SwOffLastTime = 0;         //clear the switch off last time
-    //g_Uni.uint16_SwOffCount = 0;            //clear the switch off counter
     g_Uni.uint32_IntTime = 0;                 //clear effective interrupt time
     g_Uni.uint32_RunTime = 0;                 //clear run time for interrupt
     g_Uni.uint32_SwOnTime = 0;                //clear switch on time for interrupt
@@ -151,8 +143,7 @@ void uni_move(void)
                 TMR2 = 0;                       //reset LSB counter
                 TMR3 = 0;                       //reset MSB counter
                 PR2 = 400;                      //load LSB register with start condition
-                PR3 = 0;                        //load MSB register with 0
-                //g_Timer2.uint16_Count = 0;      //force the interrupt routine to load the new time 
+                PR3 = 0;                        //load MSB register with 0 
                 
                 //and switch off all outputs
                 oUniCoilA1 = _UniPhOFF;                 //output PhA1 = off
@@ -174,8 +165,6 @@ void uni_move(void)
       
         //load the first switch on delay 
         g_Uni.uint32_IntTime = g_Uni.uint32_SwOnTime;
-        //g_Uni.uint16_LastTime = g_Uni.uint16_SwOnLastTime;
-        //g_Uni.uint16_Count = g_Uni.uint16_SwOnCount; 
       
         //prepare the start sequency
         oUniCoilA1 = g_Uni.uint8_PhA1;
@@ -205,7 +194,6 @@ void uni_move(void)
                     TMR3 = 0;                       //reset MSB counter
                     PR2 = 400;                      //load LSB register with start condition
                     PR3 = 0;                        //load MSB register with 0
-                    //g_Timer2.uint16_Count = 0;      //force the interrupt routine to load the new time
           
                     if(g_Uni.uint8_Settings & 0x08) //coils current active after move?
                     {
@@ -243,8 +231,6 @@ void uni_move(void)
             {
                 //otherwise load the last switch off delay 
                 g_Uni.uint32_IntTime = g_Uni.uint32_SwOffTime;
-                //g_Uni.uint16_LastTime = g_Uni.uint16_SwOffLastTime;
-                //g_Uni.uint16_Count = g_Uni.uint16_SwOffCount;
             }
         }
         else
@@ -331,10 +317,6 @@ void uni_acc(void)
             uint16_Freq = funct_ReadRamp(_Acc,_Freq,g_Uni.uint8_AccArrPos);
             g_Uni.uint32_IntTime = funct_FreqToTimer23(uint16_Freq);
       
-            //and load the new time from the frequency
-            //uint16_Freq = funct_ReadRamp(_Acc,_Freq,g_Uni.uint8_AccArrPos);
-            //funct_FreqToTimer2(uint16_Freq,g_Timer2.uint16_IntTime);
-            
             //increment position for the array
             g_Uni.uint8_AccArrPos++;       
         }
@@ -390,11 +372,7 @@ void uni_run(void)
     else
     { 
         //otherwise load always the run time
-        g_Uni.uint32_IntTime = g_Uni.uint32_RunTime;
-        
-        //otherwise load always the run time
-        //g_Uni.uint16_LastTime = g_Uni.uint16_RunLastTime;
-        //g_Uni.uint16_Count = g_Uni.uint16_RunCount;      
+        g_Uni.uint32_IntTime = g_Uni.uint32_RunTime;     
     }   
 }   //end of uni_run
 
@@ -451,10 +429,6 @@ void uni_dec(void)
             uint16_Freq = funct_ReadRamp(_Dec,_Freq,g_Uni.uint8_DecArrPos);
             g_Uni.uint32_IntTime = funct_FreqToTimer23(uint16_Freq);
       
-            //and load the new time from the frequency
-            //uint16_Freq = funct_ReadRamp(_Dec,_Freq,g_Uni.uint8_DecArrPos);
-            //funct_FreqToTimer2(uint16_Freq,g_Timer2.uint16_IntTime);
-            
             //decrement the array for the next parameter
             g_Uni.uint8_DecArrPos--;       
         }
@@ -650,7 +624,7 @@ void uni_CheckCalc(void)
         }
         else
         {
-        //otherwise there is nothing to do
+            //otherwise there is nothing to do
         }
     } 
     else
@@ -665,12 +639,7 @@ void uni_CheckCalc(void)
     }
     else
     {
-        //otherwise the run frequency is correct, so calculate already the run time
-        //funct_FreqToTimer2(g_Uni.uint16_RunFreq,g_Timer2.uint16_IntTime);
-        
-        //store the result to use it later
-        //g_Uni.uint16_RunLastTime = g_Uni.uint16_LastTime;
-        //g_Uni.uint16_RunCount = g_Uni.uint16_Count;
+        //otherwise do nothing
     }
    
     //-------------------------PLAUSIBILITY CHECK-------------------------
@@ -705,8 +674,8 @@ void uni_CheckCalc(void)
         {
             //then signale an error and send back the error code
             g_Uni.uint8_Status |= 0x80;
-            //g_Cmd.uint8_ErrorCode = 49;             //set error code
-            //cmd_sendError(g_Cmd.uint8_ErrorCode);   //call subroutine
+            g_Param.uint8_ErrCode = _UniPlausiCheck;    //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
@@ -717,7 +686,6 @@ void uni_CheckCalc(void)
                 //load the firt ACC time
                 uint16_Freq = funct_ReadRamp(_Acc,_Freq,0);
                 g_Uni.uint32_IntTime = funct_FreqToTimer23(uint16_Freq);
-                //funct_FreqToTimer2(uint16_Freq,g_Timer2.uint16_IntTime);
         
                 //load the number of steps that are to do with this frequency
                 g_Uni.uint16_AccNumbStep = funct_ReadRamp(_Acc,_Step,0);
@@ -728,8 +696,6 @@ void uni_CheckCalc(void)
             else
             {
                 //otherwise convert the run time and store it
-                //g_Uni.uint16_LastTime = g_Uni.uint16_RunLastTime;
-                //g_Uni.uint16_Count = g_Uni.uint16_RunCount;    
                 g_Uni.uint32_RunTime = funct_FreqToTimer23(g_Uni.uint16_RunFreq);
                 g_Uni.uint32_IntTime = g_Uni.uint32_RunTime;
             }

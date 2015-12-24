@@ -472,7 +472,7 @@ void cmd_SRDEC(void)
  * Once all parameters are verified we store every received parameter into the corresponding register or 
  * set the corresponding bit for the actuator move. If some definitions are not OK then we send back an error. 
  * All parameters are verified before but if for example the customer wants to execute micro stepping with an 
- * unipolar driver this is still not possible. 
+ * unipolar driver then this is still not possible. 
  * The follow parameter are not used for these type of actuators:
  * - BipRunI
  * - BipRunI
@@ -485,9 +485,15 @@ void cmd_SRDEC(void)
  * A second 'ack' will be send back if the 'ack' bit is set true and the actuator reached his position. 
  * 
  * Bipolar:
- * ...
+ * The bipolar part does quite the same like the unipolar / matrix part. But here we use now the parameters:
+ * - BipRunI
+ * - BipRunI
+ * - BipHoldI
+ * - BipAccI
+ * - BipDecI
+ * And in the same time we have an SPI communication to set up the external driver. 
  * 
- * Creator:                 A. Staub
+ * Creator:                 A. Staub / J. Rebetez
  * Date of creation:        22.10.2015
  * Last modification on:    -
  * Modified by:             - 
@@ -498,6 +504,7 @@ void cmd_SRDEC(void)
 void cmd_RUN(void)
 {
     auto unsigned char uint8_Result = 0;    //local work byte for the result 
+    auto unsigned char uint1_UniErrConfig = 0;  //local bool for error configuration unipolar
     
     g_Bipol.uint1_ErrConfig = 0;
     
@@ -595,16 +602,9 @@ void cmd_RUN(void)
                         break;
                     }
                     //define switch ON time - first convert and then store it
-                    //funct_msToTimer2(g_Param.uint16_AccOnDelay,g_Timer2.uint16_IntTime);
                     g_Bipol.uint32_SwOnTime = funct_msToTimer23(g_Param.uint16_AccOnDelay);
-                    //g_Bipol.uint16_SwOnLastTime = g_Bipol.uint16_LastTime;
-                    //g_Bipol.uint16_SwOnCount = g_Bipol.uint16_Count;
-          
                     //define switch OFF time - first convert and then store it
-                    //funct_msToTimer2(g_Param.uint16_DecOffDelay,g_Timer2.uint16_IntTime);
                     g_Bipol.uint32_SwOffTime = funct_msToTimer23(g_Param.uint16_DecOffDelay);
-                    //g_Bipol.uint16_SwOffLastTime = g_Bipol.uint16_LastTime;
-                    //g_Bipol.uint16_SwOffCount = g_Bipol.uint16_Count;
                     
                     if(!g_Bipol.uint1_ErrConfig)
                     {
@@ -644,6 +644,7 @@ void cmd_RUN(void)
                     else
                     {
                         //error - definition is half step compensated or micro step send error later
+                        uint1_UniErrConfig = 1;     //set error
                         g_Uni.uint8_Settings = 0;   //erase settings
                     }
           
@@ -685,6 +686,7 @@ void cmd_RUN(void)
                     else
                     {
                         //error - definition is unknown send error later
+                        uint1_UniErrConfig = 1;     //set error
                         g_Uni.uint8_Settings = 0;   //erase settings
                     }
                     // TODO: test to do
@@ -692,17 +694,10 @@ void cmd_RUN(void)
           
                     //define switch ON time - first convert and then store it
                     g_Uni.uint32_SwOnTime = funct_msToTimer23(g_Param.uint16_AccOnDelay);
-                    //funct_msToTimer2(g_Param.uint16_AccOnDelay,g_Timer2.uint16_IntTime);
-                    //g_Uni.uint16_SwOnLastTime = g_Uni.uint16_LastTime;
-                    //g_Uni.uint16_SwOnCount = g_Uni.uint16_Count;
-          
                     //define switch OFF time - first convert and then store it
                     g_Uni.uint32_SwOffTime = funct_msToTimer23(g_Param.uint16_DecOffDelay);
-                    //funct_msToTimer2(g_Param.uint16_DecOffDelay,g_Timer2.uint16_IntTime);
-                    //g_Uni.uint16_SwOffLastTime = g_Uni.uint16_LastTime;
-                    //g_Uni.uint16_SwOffCount = g_Uni.uint16_Count;
           
-                    if(g_Uni.uint8_Settings)    //verify if settings are 0, this means there was something wrong
+                    if(uint1_UniErrConfig)  //verify if we had an configuration error
                     {
                         //nothing wrong, nothing to do
                     }

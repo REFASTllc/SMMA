@@ -61,26 +61,6 @@ void bi_init(void)
     //                     |+------- 6:       - not used / free       
     //                     +-------- 7: Error - Error; 1: active / 0: not active 
     
-    //g_Bipol.uint8_Settings = 0b00000000;      //set settings to default value
-    //                       ||||||||
-    //                       |||||||+- 0: RUN    - Motor; 1: running / 0: not running 
-    //                       ||||||+-- 1: RAMP   - Ramp; 1: active / 0: not active
-    //                       |||||+--- 2: SMODE  - Step mode; 1: Halfstep / 0: Fullstep
-    //                       ||||+---- 3: CC     - Coils current; 1: active / 0: not active
-    //                       |||+----- 4: CW_CCW - Direction; 1: CW / 0: CCW
-    //                       ||+------ 5: SRAMP  - Select ramp; 1: both ACC&DEC / 0: only ACC
-    //                       |+------- 6: SMODE2 - Step mode; 1: Sixteenth step / 0: Quarter step
-    //                       +-------- 7:        - not used / free
-    
- //   g_Bipol.uint8_FsHsCount = 0;              //clear the full or half step counter
-    //g_Bipol.uint16_LastTime = 0;              //clear the last time
-    //g_Bipol.uint16_Count = 0;                 //clear the counter
-    //g_Bipol.uint16_RunLastTime = 0;           //clear the run last time
-    //g_Bipol.uint16_RunCount = 0;              //clear the run counter
-    //g_Bipol.uint16_SwOnLastTime = 0;          //clear the switch on last time
-    //g_Bipol.uint16_SwOnCount = 0;             //clear the switch on counter
-    //g_Bipol.uint16_SwOffLastTime = 0;         //clear the switch off last time
-    //g_Bipol.uint16_SwOffCount = 0;            //clear the switch off counter
     g_Bipol.uint32_IntTime = 0;                 //clear effective interrupt time
     g_Bipol.uint32_RunTime = 0;                 //clear run time for interrupt
     g_Bipol.uint32_SwOnTime = 0;                //clear switch on time for interrupt
@@ -140,8 +120,7 @@ void bi_move(void)
             }
             else
             {
-                g_Bipol.uint32_GoalPos = g_Bipol.uint32_RealPos;    //otherwise set the goal to the real position
-     //           g_Bipol.uint8_Settings = 0;       //erase settings         
+                g_Bipol.uint32_GoalPos = g_Bipol.uint32_RealPos;    //otherwise set the goal to the real position       
                 g_Bipol.uint8_Status |= 0x01;     //set the bit 'FS - first step'
         
                 //and stop the timer2 
@@ -150,7 +129,6 @@ void bi_move(void)
                 TMR3 = 0;                       //reset MSB counter
                 PR2 = 400;                      //load LSB register with start condition
                 PR3 = 0;                        //load MSB register with 0
-                //g_Timer2.uint16_Count = 0;      //force the interrupt routine to load the new time
                 g_Bipol.uint1_IntTimeExpiredFlag = 1;   //force the interrupt routine to load the new time
                 A3981.RUN.BITS.EN = 0;
                 SendOneDataSPI1(A3981.RUN.REG);
@@ -170,8 +148,6 @@ void bi_move(void)
       
         //load the first switch on delay
         g_Bipol.uint32_IntTime = g_Bipol.uint32_SwOnTime;
-        //g_Bipol.uint16_LastTime = g_Bipol.uint16_SwOnLastTime;
-        //g_Bipol.uint16_Count = g_Bipol.uint16_SwOnCount; 
       
         SendOneDataSPI1(A3981.RUN.REG);
       
@@ -198,7 +174,6 @@ void bi_move(void)
                     TMR3 = 0;                       //reset MSB counter
                     PR2 = 400;                      //load LSB register with start condition
                     PR3 = 0;                        //load MSB register with 0
-                    //g_Timer2.uint16_Count = 0;      //force the interrupt routine to load the new time
                     g_Bipol.uint1_IntTimeExpiredFlag = 1;    //force the interrupt routine to load the new time
           
                     if(g_Bipol.uint1_CurrInCoilAtTheEnd == 1) //coils current active after move?
@@ -212,7 +187,6 @@ void bi_move(void)
                         SendOneDataSPI1(A3981.RUN.REG);
                     }
                  
-                 //   g_Bipol.uint8_Settings &= 0xFE;   //clear the 'RUN' bit
                     g_Bipol.uint8_Status &= 0xC1;     //clear 'NS', 'DEC', 'ACC', 'GOAL' and 'LS' bit
                     g_Bipol.uint8_Status |= 0x01;     //set the bit 'FS'
                     
@@ -235,8 +209,6 @@ void bi_move(void)
             {
                 //otherwise load the last switch off delay 
                 g_Bipol.uint32_IntTime = g_Bipol.uint32_SwOffTime;
-                //g_Bipol.uint16_LastTime = g_Bipol.uint16_SwOffLastTime;
-                //g_Bipol.uint16_Count = g_Bipol.uint16_SwOffCount;
             }
         }
         else
@@ -378,11 +350,7 @@ void bi_run(void)
     else
     { 
         //otherwise load always the run time
-        g_Bipol.uint32_IntTime = g_Bipol.uint32_RunTime;
-        
-        //otherwise load always the run time
-        //g_Bipol.uint16_LastTime = g_Bipol.uint16_RunLastTime;
-        //g_Bipol.uint16_Count = g_Bipol.uint16_RunCount;      
+        g_Bipol.uint32_IntTime = g_Bipol.uint32_RunTime;    
     }   
 }   //end of uni_run
 
@@ -438,10 +406,6 @@ void bi_dec(void)
             //load the new DEC time, convert and store it
             uint16_Freq = funct_ReadRamp(_Dec,_Freq,g_Bipol.uint8_DecArrPos);
             g_Bipol.uint32_IntTime = funct_FreqToTimer23(uint16_Freq);
-            
-            //and load the new time from the frequency
-            //uint16_Freq = funct_ReadRamp(_Dec,_Freq,g_Bipol.uint8_DecArrPos);
-            //funct_FreqToTimer2(uint16_Freq,g_Timer2.uint16_IntTime);
             
             //decrement the array for the next parameter
             g_Bipol.uint8_DecArrPos--;       
@@ -653,14 +617,7 @@ void bi_CheckCalc(void)
     }
     else
     {
-        //otherwise the run frequency is correct, so calculate already the run time
-        //funct_FreqToTimer2(g_Bipol.uint16_RunFreq,g_Timer2.uint16_IntTime);
-        //g_Bipol.uint32_RunTime = funct_FreqToTimer23(g_Bipol.uint16_RunFreq);
-        
-        //store the result to use it later
-        //g_Bipol.uint32_IntTime = g_Bipol.uint32_RunTime;
-        //g_Bipol.uint16_RunLastTime = g_Bipol.uint16_LastTime;
-        //g_Bipol.uint16_RunCount = g_Bipol.uint16_Count;
+        //otherwise do nothing
     }
    
     //-------------------------PLAUSIBILITY CHECK-------------------------
@@ -702,8 +659,8 @@ void bi_CheckCalc(void)
         {
             //then signale an error and send back the error code
             g_Bipol.uint8_Status |= 0x80;
-            //g_Cmd.uint8_ErrorCode = 49;             //set error code
-            //cmd_sendError(g_Cmd.uint8_ErrorCode);   //call subroutine
+            g_Param.uint8_ErrCode = _BipPlausiCheck;    //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
@@ -714,7 +671,6 @@ void bi_CheckCalc(void)
                 //load the first ACC time, convert and store it
                 uint16_Freq = funct_ReadRamp(_Acc,_Freq,0);
                 g_Bipol.uint32_IntTime = funct_FreqToTimer23(uint16_Freq);
-                //funct_FreqToTimer2(uint16_Freq,g_Timer2.uint16_IntTime);
         
                 //load the number of steps that are to do with this frequency
                 g_Bipol.uint16_AccNumbStep = funct_ReadRamp(_Acc,_Step,0);
@@ -725,8 +681,6 @@ void bi_CheckCalc(void)
             else
             {
                 //otherwise convert the run time and store it
-                //g_Bipol.uint16_LastTime = g_Bipol.uint16_RunLastTime;
-                //g_Bipol.uint16_Count = g_Bipol.uint16_RunCount; 
                 g_Bipol.uint32_RunTime = funct_FreqToTimer23(g_Bipol.uint16_RunFreq);
                 g_Bipol.uint32_IntTime = g_Bipol.uint32_RunTime;
             }
