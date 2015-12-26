@@ -414,7 +414,7 @@ void uart_set(unsigned char uartx, unsigned char parity, unsigned char stopBit, 
     //--- Set the parity ---//
         switch(parity)
         {
-            case _NONE: U1MODEbits.PDSEL = 3;
+            case _NONE: U1MODEbits.PDSEL = 0;
                         break;
             case _EVEN: U1MODEbits.PDSEL = 1;
                         break;
@@ -448,7 +448,7 @@ void uart_set(unsigned char uartx, unsigned char parity, unsigned char stopBit, 
     //--- Set the parity ---//
         switch(parity)
         {
-            case _NONE: U2MODEbits.PDSEL = 3;
+            case _NONE: U2MODEbits.PDSEL = 0;
                         break;
             case _EVEN: U2MODEbits.PDSEL = 1;
                         break;
