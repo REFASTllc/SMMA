@@ -80,8 +80,10 @@ void system_init(void)
 {   
 //system initialization    
     system_osc();                           //call subroutine
-    InitADModule();
     system_IOs();                           //call subroutine
+    //AD module must be initialize  after the system_IOs because we define here which pin is used 
+    //in analog mode
+    InitADModule(); 
 //    system_NoticeModule();                  //call subroutine
 //interrupt initialization    
     INT_init();                             //call subroutine
@@ -104,7 +106,7 @@ void system_init(void)
     timers_Init(_TIMER23);                  //call subroutine and initialize timer 2 & 3
     timers_SetInterrupt(_TIMER23,_ENABLE);  //call subroutine and set interrupt for timer 2 & 3
 //front LED = black status (off)
-    funct_FrontLED(_FLEDblack);             //call subroutine and switch on green LED
+    funct_FrontLED(_FLEDgreen);             //call subroutine and switch on green LED
 //--- Initialization of SPI ---//
     InitSPI(_SPI_1);
     InitSPIInterrupt(_SPI_1, _ENABLE);
@@ -171,11 +173,12 @@ void system_osc(void)
  * Output:                  -
 ***********************************************************************************************************************/
 void system_IOs(void)
-{
-    //AD1PCFG = 0xffffffff;
-    
+{   
 //DDPCON register (debug data port control register)
     DDPCON &= 0xFFFFFFF7;       //disable JTAG port to have full access on PORT A
+    
+//set every analog pin to digital function; analog functions are defined later
+    AD1PCFG = 0xFFFF;
     
 //+++ Port A +++
 //Port A register
