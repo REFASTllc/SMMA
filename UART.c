@@ -385,10 +385,16 @@ void uart_init(unsigned char uartx)
  * Description:
  * Setting of the UART module.
  * 
+ * Modification (26.12.2015 / A. Staub)
+ * The follow code:
+ *      case _NONE: U1MODEbits.PDSEL = 3; 
+ * was wrong. By using 8 data bits without parity it has to be set to 0 not to 3. 
+ * I corrected the code for both UART moduls. 
+ * 
  * Creator:                 J. Rebetez
  * Date of creation:        05.10.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    26.12.2015
+ * Modified by:             A. Staub
  * 
  * Input:                   uartx (choose of the module)
  *                          parity (choose of the parity)
