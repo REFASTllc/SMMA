@@ -33,6 +33,7 @@
 extern void timers_Init(unsigned char timerx);
 extern void timers_SetInterrupt(unsigned char timerx, unsigned char action);
 extern void timers_Set(unsigned char timer, unsigned char status, unsigned long int valueTMRReg, unsigned long int valuePRReg);
+extern void timer1_LaunchMsTime(unsigned short int uint16_time);
 
 #define	_TIMER1		1
 #define	_TIMER2		2
@@ -47,10 +48,9 @@ extern void timers_Set(unsigned char timer, unsigned char status, unsigned long 
 
 typedef struct                  //definitions of multiple variable for timer2
 {
-  volatile unsigned short int uint16_LastTime;                //last time to wait
-  volatile unsigned short int uint16_Count;                   //counter, how many time the interrupt time
-  volatile unsigned short int uint16_IntTime;                 //interrupt time in 100ns steps  
-} STimer2;                      //struct name is STimer2 (S for struct)
+    volatile unsigned char uint8_Timer1SafFlag;         //timer 1 safety flag: 1 = enabled / 0 = disabled
+    volatile unsigned char uint8_200msCount;            //how much time the 200ms are to wait (51s max. wait time)
+} STimer1;                      //struct name is STimer1 (S for struct)
 
 #endif	/* TIMERS_H */
 

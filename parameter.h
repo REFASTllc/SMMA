@@ -136,8 +136,12 @@ extern void param_init(void);
 #define _YearMax            79          //range for the year
 #define _LinSpdMin          100         //range for the lin speed communication
 #define _LinSpdMax          200000      //range for the lin speed communication
-#define _LinToMin           2           //range for the lin timeout communication
+#define _LinToMin           1           //range for the lin timeout communication
 #define _LinToMax           10000       //range for the lin timeout communication
+#define _LinLengthMin       0           //range for the lin slave answer
+#define _LinLengthMax       40          //range for the lin slave answer
+#define _LinParaMin         0           //range for the lin parameter
+#define _LinParaMax         255         //range for the lin parameter
 
 
 /*

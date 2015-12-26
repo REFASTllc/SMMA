@@ -58,8 +58,8 @@ void main(void)
     oBiEnaVmot = 1;
 #endif
 #ifdef _LIN
-    //lin
-    oEnaVLINSupply = 0;
+    oVmotOnOff = 1;
+    oEnaVLINSupply = 1;
 #endif
  //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!   
     

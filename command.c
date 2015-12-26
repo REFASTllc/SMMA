@@ -82,10 +82,13 @@ extern SCmdChk g_CmdChk;
 extern SFunct g_Funct;
 extern Si2c1 g_i2c1;
 extern SParam g_Param;
-extern STimer2 g_Timer2;
 extern SUni g_Uni;
 extern Sbipol g_Bipol;
 extern T_A3981 A3981;
+extern SLin g_LIN;
+extern SUART1txd g_UART1txd;  
+extern SUART1rxd g_UART1rxd;
+
 /**********************************************************************************************************************
  * Routine:                 cmd_SILIM
 
@@ -3846,27 +3849,44 @@ void cmd_GTOLIN(void)
 void cmd_SLIN(void)
 {
     auto unsigned char uint8_Result = 0;    //local work byte
+    auto unsigned char uint8_WB;            //local work byte
     
-    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    //number of received characters OK?
+    if((g_CmdChk.uint8_ParamPos >= 3) && (g_CmdChk.uint8_ParamPos <= 42))        
     {
-        uart2_sendbuffer('E');      //first the letter E
-        uart2_sendbuffer(13);       //then the CR
-        /*//verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_LinToMin,_LinToMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_LinLengthMin,_LinLengthMax);
         
-        if(uint8_Result == 1)       //verify the result
+        //ToDo:
+        //verify each received parameter with the tolerance (start with the 3rd parameter)
+        //store directly the characters into the sendbuffer
+        //Until:
+        //the local work byte has the same size as number of received characters
+        uint8_WB = 2;   //start with the first parameter to verify  
+        do
         {
-            //store the new timeout
-            g_Param.uint16_LinTO = g_CmdChk.uint32_TempPara[1];
-            
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[uint8_WB],_LinParaMin,_LinParaMax);
+            uart1_sendbuffer(g_CmdChk.uint32_TempPara[uint8_WB]);
+            uint8_WB++; //increment with 1 to take out the next parameter
+        }
+        while(uint8_WB < g_CmdChk.uint8_ParamPos);
+        
+        //each parameter within the tolerance (uint8_WB - 1), because the 1st parameter is teh cmd ID)?
+        if(uint8_Result == (uint8_WB-1))
+        {
+            g_LIN.uint8_LinBreakToSend = 1;             //enable LIN break to send
+            IEC0bits.U1TXIE = 1;                        //enable the send interrupt
+            //send back a first result
             uart2_sendbuffer('E');      //first the letter E
             uart2_sendbuffer(13);       //then the CR
         }
         else
         {
-            g_Param.uint8_ErrCode = _OutOfTolSLIN;     //set error code
+            g_Param.uint8_ErrCode = _OutOfTolSLIN;      //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-        }*/
+            g_UART1txd.uint8_BufEmpty = 1;              //send buffer empty
+            g_UART1txd.uint16_Rch = 0;                  //read pointer = 0
+            g_UART1txd.uint16_Wch = 0;                  //write pointer = 0
+        }
     }
     else
     {

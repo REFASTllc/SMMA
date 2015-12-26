@@ -25,7 +25,7 @@
 #include "includes.h" // File which contain all includes files
 
 extern Si2c1 g_i2c1;
-extern STimer2 g_Timer2;
+extern STimer1 g_Timer1;
 extern SUART2txd g_UART2txd;
 extern SUART2rxd g_UART2rxd;
 extern SUni g_Uni;
@@ -33,6 +33,9 @@ extern SLin g_LIN;
 extern Sbipol g_Bipol;
 extern T_A3981 A3981;
 extern SParam g_Param;
+extern SLin g_LIN; 
+extern SUART1txd g_UART1txd;      
+extern SUART1rxd g_UART1rxd;
 
 /**********************************************************************************************************************
  * Routine:                 INT_init
@@ -482,7 +485,6 @@ void __ISR(_TIMER_3_VECTOR, IPL1AUTO) __IntTimer23Handler(void)
         }
     }
     
-    g_Timer2.uint16_Count--;    //decrement the counter by 1 
     T2CONbits.ON = 1;           //enable interrupt module    
 }   //end of __IntTimer2Handler
 
@@ -757,7 +759,10 @@ void __ISR(_EXTERNAL_2_VECTOR, IPL3AUTO) __IntINT2handler(void)
  * Routine:                 __IntTimer1Handler
 
  * Description:
- * This interrupt occurs every 1ms and can be used for a timeout or something other. 
+ * First we reset the interrupt flag and disable the interrupt as well.
+ * If the counter (how much time we have to wait the 200ms is not empty then we load again 200ms for the
+ * interrupt and enable it. 
+ * Once the counter is empty (0) we disable the interrupt and the safety flag. 
  * 
  * Creator:                 A. Staub
  * Date of creation:        18.12.2015
@@ -768,11 +773,28 @@ void __ISR(_EXTERNAL_2_VECTOR, IPL3AUTO) __IntINT2handler(void)
  * Output:                  -
 ***********************************************************************************************************************/
 void __ISR(_TIMER_1_VECTOR, IPL5AUTO) __IntTimer1Handler(void)
-{    
+{ 
+    T1CONbits.ON = 0;       //disable timer 1
     TMR1 = 0;               //reset counter
     IFS0bits.T1IF = 0;      //clear interrupt flag
     
-    g_LIN.uint16_TimeoutCounter++;
+    switch (g_Timer1.uint8_200msCount)  //verify the value of how much time we have to wait the 200ms
+    {
+        case (0):   //time expired?
+            g_Timer1.uint8_Timer1SafFlag = 0;   //disable the safety flag
+            T1CONbits.ON = 0;                   //disable timer 1
+            
+            //add here some flags / register for your application (LIN, etc. )
+            //...
+            oTestLed2 =! oTestLed2;
+            break;
+            
+        default:
+            PR1 = 312 * 200;    //load PR1 with 312 (1ms) * 200 to have a wait time of 200ms
+            g_Timer1.uint8_200msCount--;    //decrement the counter for the 200ms 
+            T1CONbits.ON = 1;               //enable timer 1
+            break;
+    }
 }   //end of __IntTimer1Handler
 
 
@@ -828,32 +850,41 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
     {
         IFS0bits.U1TXIF = 0;        //clear interrupt bit
         
-        /*if(!g_UART2txd.uint8_BufEmpty)      //send buffer not empty?
+        if(!g_UART1txd.uint8_BufEmpty)  //send buffer is not empty
         {
-            //read out one byte from the send buffer and send it directly
-            U2TXREG = g_UART2txd.uint8_Buffer[g_UART2txd.uint16_Rch];
-            
-            //increment the read-pointer of the ring buffer
-            g_UART2txd.uint16_Rch++;
-      
-            //verify if read-pointer is at the end of ring buffer
-            g_UART2txd.uint16_Rch = g_UART2txd.uint16_Rch % _TxD2_BUFSIZE;
-            
-            //verify if read-pointer and write-pointer of the ring buffer are equal
-            if(g_UART2txd.uint16_Rch == g_UART2txd.uint16_Wch)
+            if(g_LIN.uint8_LinBreakToSend)  //lin break to send
             {
-                g_UART2txd.uint8_BufEmpty = 1;  //send buffer = empty
+                U1STAbits.UTXBRK = 1;       //set transmit break bit
+                U1TXREG = 0;                //load register with dummy character (value is ignored)
+                g_LIN.uint8_LinBreakToSend = 0; //reset the flag for the lin break to send
             }
-            else
+            else    //normal characters to send
             {
-                //do nothing
+                //read out one byte from the send buffer and send it directly
+                U1TXREG = g_UART1txd.uint8_Buffer[g_UART1txd.uint16_Rch];
+                
+                //increment the read-pointer of the ring buffer
+                g_UART1txd.uint16_Rch++;
+                
+                //verify if read-pointer is at the end of ring buffer
+                g_UART1txd.uint16_Rch = g_UART1txd.uint16_Rch % _TxDRxD_BUFSIZE;
+                
+                //verify if read-pointer and write-pointer of the ring buffer are equal
+                if(g_UART1txd.uint16_Rch == g_UART1txd.uint16_Wch)
+                {
+                    g_UART1txd.uint8_BufEmpty = 1;  //send buffer = empty
+                }
+                else
+                {
+                    //do nothing
+                }
             }
         }
-        else
+        else        //send buffer is empty
         {
-            IEC1bits.U2TXIE = 0;    //disable the send interrupt
-            IFS1bits.U2TXIF = 1;    //enable interrupt flag for the next time
-        }  */   
+            IEC0bits.U1TXIE = 0;    //disable the send interrupt
+            IFS0bits.U1TXIF = 1;    //enable interrupt flag for the next time
+        }
     }
     
 //--- Is this an error request interrupt? ---//

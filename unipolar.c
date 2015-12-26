@@ -22,7 +22,7 @@
 
 SUni g_Uni;                 //global variables for struct
 extern SParam g_Param;
-extern STimer2 g_Timer2;
+
 /**********************************************************************************************************************
  * Routine:                 uni_init
 

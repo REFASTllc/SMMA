@@ -116,11 +116,11 @@ void system_init(void)
 //UART1 initialization
     uart_init(_UART1_);                     //call subroutine
     uart_set(_UART1_,_NONE,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,9600);   //call subroutine
-    uart_InitInterrupt(_UART2_,_ENABLE);    //call subroutine
+    uart_InitInterrupt(_UART1_,_ENABLE);    //call subroutine
+    uart_enable(_UART1_);                   //call subroutine
 //timer 1 initialization for 1ms interrupts
     timers_Init(_TIMER1);                   //call subroutine
     timers_SetInterrupt(_TIMER1,_ENABLE);   //call subroutine
-    timers_Set(_TIMER1,_DISABLE,0,312);      //generates every 1ms (theory) an interrupt
 //switch off the debugging LED's
     oTestLed1 = 0;                          //switch on the output for the test LED1
     oTestLed2 = 0;                          //switch on the output for the test LED2

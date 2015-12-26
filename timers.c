@@ -17,7 +17,7 @@
 
 #include "includes.h" // File which contain all includes files
 
-STimer2 g_Timer2;     //global variables for struct
+STimer1 g_Timer1;     //global variables for struct
 
 
 /**********************************************************************************************************************
@@ -97,6 +97,7 @@ void timers_Init(unsigned char timerx)
 
         TMR1 = 0;
         PR1 = 0;
+        g_Timer1.uint8_Timer1SafFlag = 0;   //reset safety flag
     }
     else if(timerx == _TIMER2)
     {
@@ -128,11 +129,6 @@ void timers_Init(unsigned char timerx)
 
         TMR2 = 0;               //clear counter
         PR2 = 100;              //set comperator to 10us (100 * 100ns)
-        
-        g_Timer2.uint16_LastTime = 0;       //clear last time
-        g_Timer2.uint16_Count = 0;          //reset counter
-        g_Timer2.uint16_IntTime = 50000;    //interrupt time = 2.5ms (25000 * 100ns)
-        
     }
     else if(timerx == _TIMER3)
     {
@@ -370,7 +366,7 @@ void timers_SetInterrupt(unsigned char timerx, unsigned char action)
 
  * Description:
  * Start / stop and choose time for each 16bits timers.
- * Timer 1: used
+ * Timer 1: used with a time base of 3.2us
  * 
  * Timer 2: used in combination; see Timer 23
  * DON'T USE THIS SUBROUTINE FOR TIMER 2! This timer is used in a special way for the unipolar driver.
@@ -387,10 +383,22 @@ void timers_SetInterrupt(unsigned char timerx, unsigned char action)
  * 
  * Timer 45 (timer 4 in 32-bit): not used  
  * 
+ * Modification (26.12.2015 / A. Staub):
+ * We use the timer 1 to apply waiting times in ms. So the given value "valuePRReg" has to be in ms.
+ * It doesn't matter what you send for valueTMRReg, this
+ * register is always set to 0 by using timer 1. 
+ * For the waiting time; first we look how much time we can divide the wait time (ms) with 200ms
+ * to know how much time we have to wait this time of 200ms. 
+ * Then in a second step we load the rest of the time into the PR1, multiply it with 312 to have the time 
+ * in ms and this time will be the first interrupt time. 
+ * Important to know; once the safety flag is set the configuration can't be change, because this waiting
+ * time have the first priority. This flag is reset to zero automatic if the waiting time occured 
+ * (inside the interrupt routine).
+ * 
  * Creator:                 J. Rebetez
  * Date of creation:        08.08.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    26.12.2015
+ * Modified by:             A. Staub
  * 
  * Input:                   timer (choose of the timer)
  *                          status (enable or disable)
@@ -402,14 +410,36 @@ void timers_Set(unsigned char timer, unsigned char status, unsigned long int val
 {
     switch(timer)
     {
-	case _TIMER1:	if(status)
-        		{
-                            TMR1 = valueTMRReg;
-                            PR1 = valuePRReg;
-                            T1CONbits.ON = 1;
-			}
-			else T1CONbits.ON = 0;
-			break;
+	case _TIMER1:
+        if(!g_Timer1.uint8_Timer1SafFlag)   //safety flag not set?
+        {
+            if(status)
+            {
+                g_Timer1.uint8_200msCount = valuePRReg / 200;  //divide the wait time (ms) with 200 ms 
+                PR1 = valuePRReg % 200; //load the PR1 with the rest of the time
+                if(PR1 == 0)            //rest time = 0?
+                {
+                    PR1 = 312 * 200;    //load PR1 with 312 (1ms) * 200 to have a wait time of 200ms
+                    g_Timer1.uint8_200msCount--;  //decrement counter                    
+                }
+                else
+                {
+                    PR1 = PR1 * 312;    //multiply with 312 to have the time in ms
+                }
+                TMR1 = 0;               //start by 0 with counting 
+                T1CONbits.ON = 1;       //enable timer 1
+            }
+            else 
+            {
+                T1CONbits.ON = 0;       //disable timer 1
+            } 
+        }
+        else
+        {
+            //do nothing because if the safety flag is set then it is not allowed to change 
+            //this interrupt configuration 
+        }
+		break;
 	case _TIMER2:	if(status)
 			{
                             TMR2 = valueTMRReg;

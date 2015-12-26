@@ -22,7 +22,6 @@
 
 Sbipol g_Bipol;                 //global variables for struct
 extern SParam g_Param;
-extern STimer2 g_Timer2;
 extern T_A3981 A3981;
 /**********************************************************************************************************************
  * Routine:                 bi_init
