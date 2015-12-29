@@ -22,6 +22,7 @@ extern SUni g_Uni;
 extern Sbipol g_Bipol;
 extern T_SPI SPI1;
 extern T_A3981 A3981;
+extern SLin g_LIN;
 
 /**********************************************************************************************************************
  * Routine:                 main
@@ -102,5 +103,24 @@ void main(void)
             else
                 tempToggle++;
         }
+        
+        if(g_LIN.uint8_SlaveAnswerRequested)    //answer from LIN slave requested
+        {
+            //timeout or slave answer received
+            if((g_LIN.uint8_SlaveTimeout) || (g_LIN.uint8_SlaveAnswerFinish))  
+            {
+                oTestLed2 = 0;
+                LINATA6629_SendBackSlaveAnswer();
+            }
+            else
+            {
+                //do nothing
+            }
+        }
+        else
+        {
+            //do nothing
+        }
+        
     }   
 }   //end of main

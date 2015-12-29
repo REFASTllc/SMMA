@@ -784,9 +784,11 @@ void __ISR(_TIMER_1_VECTOR, IPL5AUTO) __IntTimer1Handler(void)
             g_Timer1.uint8_Timer1SafFlag = 0;   //disable the safety flag
             T1CONbits.ON = 0;                   //disable timer 1
             
-            //add here some flags / register for your application (LIN, etc. )
-            //...
-            oTestLed2 =! oTestLed2;
+//add here some flags / register for your application (LIN, etc. )
+            //LIN:
+            g_LIN.uint8_SlaveTimeout = 1;   //timeout occured
+            
+            
             break;
             
         default:
@@ -832,17 +834,27 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
     {
         IFS0bits.U1RXIF = 0;        //clear interrupt bit
         
-        /*//store received data byte into receive buffer
-        *(g_UART2rxd.uint8_Bufptr + g_UART2rxd.uint16_Wch) = U2RXREG;
+        //store received data byte into receive buffer
+        *(g_UART1rxd.uint8_Bufptr + g_UART1rxd.uint16_Wch) = U1RXREG;
        
         //increment the write-pointer of the ring buffer
-        g_UART2rxd.uint16_Wch++;
+        g_UART1rxd.uint16_Wch++;
     
         //verify if write-pointer is at the end of ring buffer
-        g_UART2rxd.uint16_Wch = g_UART2rxd.uint16_Wch % _RxD2_BUFSIZE;
+        g_UART1rxd.uint16_Wch = g_UART1rxd.uint16_Wch % _TxDRxD_BUFSIZE;
     
         //receive buffer not empty
-        g_UART2rxd.uint8_BufEmpty = 0; */       
+        g_UART1rxd.uint8_BufEmpty = 0;  
+        
+        g_LIN.uint8_SlaveReceiveCounter--;  //decrement counter
+        if(g_LIN.uint8_SlaveReceiveCounter) //not all bytes received?
+        {
+            g_LIN.uint8_SlaveAnswerFinish = 0;      //slave still sending
+        }
+        else
+        {
+            g_LIN.uint8_SlaveAnswerFinish = 1;      //slave answer finish
+        }
     }
     
 //--- Is this an Tx interrupt? ---//    
@@ -884,6 +896,16 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
         {
             IEC0bits.U1TXIE = 0;    //disable the send interrupt
             IFS0bits.U1TXIF = 1;    //enable interrupt flag for the next time
+            //enable timeout for slave answer if needed
+            if(g_LIN.uint8_SlaveAnswerRequested)
+            {
+                timers_Set(_TIMER1,_ENABLE,0,g_Param.uint16_LinTO);
+                oTestLed2 = 1;
+            }
+            else
+            {
+                //do nothing
+            }
         }
     }
     
@@ -891,5 +913,6 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
     if(IFS0bits.U1EIF)
     {
         IFS0bits.U1EIF = 0;
+        //at the moment we do nothing by an error, just clear the interrupt flag
     }
 }   //end of __IntUart1Handler

@@ -3855,18 +3855,36 @@ void cmd_SLIN(void)
     if((g_CmdChk.uint8_ParamPos >= 3) && (g_CmdChk.uint8_ParamPos <= 42))        
     {
         uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_LinLengthMin,_LinLengthMax);
+        g_LIN.uint8_SlaveReceiveCounter = g_CmdChk.uint32_TempPara[1];  //store lenght of the lin answer
+        if(g_LIN.uint8_SlaveReceiveCounter) //answer from slave requested
+        {
+            g_LIN.uint8_SlaveAnswerRequested = 1;
+        }
+        else
+        {
+            g_LIN.uint8_SlaveAnswerRequested = 0;
+        }
+        
+        g_LIN.uint8_SlaveAnswerFinish = 0;      //reset variable
+        g_LIN.uint8_SlaveTimeout = 0;           //reset variable
+        g_UART1rxd.uint8_BufEmpty = 1;          //receive buffer empty
+        g_UART1rxd.uint16_Wch = 0;              //write-pointer of the ring buffer at position 0
+        g_UART1rxd.uint16_Rch = 0;              //read-pointer of the ring buffer at position 0
         
         //ToDo:
         //verify each received parameter with the tolerance (start with the 3rd parameter)
         //store directly the characters into the sendbuffer
         //Until:
         //the local work byte has the same size as number of received characters
-        uint8_WB = 2;   //start with the first parameter to verify  
+        uint8_WB = 2;   //start with the first parameter to verify 
+        g_LIN.uint8_MasterSendCounter = 1;  //1 because the first parameter is the start break
+        g_LIN.uint8_MasterSendCounter = 0;  //reset the counter
         do
         {
             uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[uint8_WB],_LinParaMin,_LinParaMax);
             uart1_sendbuffer(g_CmdChk.uint32_TempPara[uint8_WB]);
             uint8_WB++; //increment with 1 to take out the next parameter
+            g_LIN.uint8_MasterSendCounter++;    //increment the counter
         }
         while(uint8_WB < g_CmdChk.uint8_ParamPos);
         
