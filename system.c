@@ -102,9 +102,9 @@ void system_init(void)
     uart_set(_UART2_,_EVEN,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,38400);   //call subroutine
     uart_InitInterrupt(_UART2_,_ENABLE);    //call subroutine
     uart_enable(_UART2_);                   //call subroutine
-//timer 2 & 3 initialization for unipolar and bipolar driver
-    timers_Init(_TIMER23);                  //call subroutine and initialize timer 2 & 3
-    timers_SetInterrupt(_TIMER23,_ENABLE);  //call subroutine and set interrupt for timer 2 & 3
+//timer 4 & 5 initialization for unipolar and bipolar driver
+    timers_Init(_TIMER45);                  //call subroutine and initialize timer 4 & 5
+    timers_SetInterrupt(_TIMER45,_ENABLE);  //call subroutine and set interrupt for timer 4 & 5
 //front LED = black status (off)
     funct_FrontLED(_FLEDgreen);             //call subroutine and switch on green LED
 //--- Initialization of SPI ---//

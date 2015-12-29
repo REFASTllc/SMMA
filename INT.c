@@ -13,7 +13,7 @@
  *                          - __IntUart2Handler
  *                          - __IntSPI1Handler
  *                          - __IntRTCCHandler
- *                          - __IntTimer23Handler
+ *                          - __IntTimer45Handler
  *                          - __IntPWM1Handler
  *                          - __IntI2cHandler
  *                          - __IntINT2handler
@@ -231,7 +231,7 @@ void __ISR(_RTCC_VECTOR, IPL3AUTO) __IntRTCCHandler(void)
 
 
 /**********************************************************************************************************************
- * Routine:                 __IntTimer23Handler
+ * Routine:                 __IntTimer45Handler
 
  * Description:
  * -old text deleted- 
@@ -265,28 +265,32 @@ void __ISR(_RTCC_VECTOR, IPL3AUTO) __IntRTCCHandler(void)
  * set the flag allow next step, increment the real position and switch on the output step as well. 
  * We also have a condition for the first, or last, or error or real = goal position.  
  * 
+ * 
+ * Modification (29.12.2015 / A. Staub)
+ * Timer changed from timer 2 and 3 to 4 and 5. 
+ * 
  * Creator:                 J. Rebetez
  * Date of creation:        08.08.2015
- * Last modification on:    24.12.2015
+ * Last modification on:    29.12.2015
  * Modified by:             A. Staub
  * 
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void __ISR(_TIMER_3_VECTOR, IPL1AUTO) __IntTimer23Handler(void)
+void __ISR(_TIMER_5_VECTOR, IPL1AUTO) __IntTimer45Handler(void)
 {
     auto unsigned char uint8_WB1;       //local variabel 'WorkByte1'
     
-    T2CONbits.ON = 0;           //disable interrupt module
-    IFS0bits.T3IF = 0;          //clear interrupt flag of timer 3
-    TMR2 = 0;                   //reset LSB counter
-    TMR3 = 0;                   //reset MSB counter
+    T4CONbits.ON = 0;           //disable interrupt module
+    IFS0bits.T5IF = 0;          //clear interrupt flag of timer 5
+    TMR4 = 0;                   //reset LSB counter
+    TMR5 = 0;                   //reset MSB counter
     
     if((g_Param.uint8_MotTyp == 'U') || (g_Param.uint8_MotTyp == 'M'))
     {
         //load the new interrupt time
-        PR2 = g_Uni.uint32_IntTime & 0x0000FFFF;  //first the LSB
-        PR3 = g_Uni.uint32_IntTime >> 16;         //second the MSB
+        PR4 = g_Uni.uint32_IntTime & 0x0000FFFF;  //first the LSB
+        PR5 = g_Uni.uint32_IntTime >> 16;         //second the MSB
 
         g_Uni.uint8_Status |= 0x10;     //allow next step
 
@@ -435,8 +439,8 @@ void __ISR(_TIMER_3_VECTOR, IPL1AUTO) __IntTimer23Handler(void)
         {
             //otherwise load the modulo timer with around 0.5s 
             //for that it executes not too much <-- error
-            PR2 = 0xFFFF;
-            PR3 = 0x00FF;
+            PR4 = 0xFFFF;
+            PR5 = 0x00FF;
         }
     }
     else    //motor is a bipolar
@@ -447,13 +451,13 @@ void __ISR(_TIMER_3_VECTOR, IPL1AUTO) __IntTimer23Handler(void)
             oBiStepSignal = 0;                      //reset output
             
             //load the new interrupt time
-            PR2 = g_Bipol.uint32_IntTime & 0x0000FFFF;  //first the LSB
-            PR3 = g_Bipol.uint32_IntTime >> 16;         //second the MSB
-            PR2 -=400;  //to correct the already waited time of 10us from the step impuls (output)
+            PR4 = g_Bipol.uint32_IntTime & 0x0000FFFF;  //first the LSB
+            PR5 = g_Bipol.uint32_IntTime >> 16;         //second the MSB
+            PR4 -=400;  //to correct the already waited time of 10us from the step impuls (output)
         }
         else
         {
-            PR2 = 400;  //load interrupt time with 10us
+            PR4 = 400;  //load interrupt time with 10us
             //force the interrupt routine to load the correct time (next time)
             g_Bipol.uint1_IntTimeExpiredFlag = 1;   
                 
@@ -479,13 +483,13 @@ void __ISR(_TIMER_3_VECTOR, IPL1AUTO) __IntTimer23Handler(void)
             {
                 //otherwise load the modulo timer with around 0.5s 
                 //for that it executes not too much <-- error
-                PR2 = 0xFFFF;
-                PR3 = 0x00FF;
+                PR4 = 0xFFFF;
+                PR5 = 0x00FF;
             }
         }
     }
     
-    T2CONbits.ON = 1;           //enable interrupt module    
+    T4CONbits.ON = 1;           //enable interrupt module    
 }   //end of __IntTimer2Handler
 
 
@@ -784,9 +788,11 @@ void __ISR(_TIMER_1_VECTOR, IPL5AUTO) __IntTimer1Handler(void)
             g_Timer1.uint8_Timer1SafFlag = 0;   //disable the safety flag
             T1CONbits.ON = 0;                   //disable timer 1
             
-            //add here some flags / register for your application (LIN, etc. )
-            //...
-            oTestLed2 =! oTestLed2;
+//add here some flags / register for your application (LIN, etc. )
+            //LIN:
+            g_LIN.uint8_SlaveTimeout = 1;   //timeout occured
+            
+            
             break;
             
         default:
@@ -832,17 +838,27 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
     {
         IFS0bits.U1RXIF = 0;        //clear interrupt bit
         
-        /*//store received data byte into receive buffer
-        *(g_UART2rxd.uint8_Bufptr + g_UART2rxd.uint16_Wch) = U2RXREG;
+        //store received data byte into receive buffer
+        *(g_UART1rxd.uint8_Bufptr + g_UART1rxd.uint16_Wch) = U1RXREG;
        
         //increment the write-pointer of the ring buffer
-        g_UART2rxd.uint16_Wch++;
+        g_UART1rxd.uint16_Wch++;
     
         //verify if write-pointer is at the end of ring buffer
-        g_UART2rxd.uint16_Wch = g_UART2rxd.uint16_Wch % _RxD2_BUFSIZE;
+        g_UART1rxd.uint16_Wch = g_UART1rxd.uint16_Wch % _TxDRxD_BUFSIZE;
     
         //receive buffer not empty
-        g_UART2rxd.uint8_BufEmpty = 0; */       
+        g_UART1rxd.uint8_BufEmpty = 0;  
+        
+        g_LIN.uint8_SlaveReceiveCounter--;  //decrement counter
+        if(g_LIN.uint8_SlaveReceiveCounter) //not all bytes received?
+        {
+            g_LIN.uint8_SlaveAnswerFinish = 0;      //slave still sending
+        }
+        else
+        {
+            g_LIN.uint8_SlaveAnswerFinish = 1;      //slave answer finish
+        }
     }
     
 //--- Is this an Tx interrupt? ---//    
@@ -884,6 +900,16 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
         {
             IEC0bits.U1TXIE = 0;    //disable the send interrupt
             IFS0bits.U1TXIF = 1;    //enable interrupt flag for the next time
+            //enable timeout for slave answer if needed
+            if(g_LIN.uint8_SlaveAnswerRequested)
+            {
+                timers_Set(_TIMER1,_ENABLE,0,g_Param.uint16_LinTO);
+                oTestLed2 = 1;
+            }
+            else
+            {
+                //do nothing
+            }
         }
     }
     
@@ -891,5 +917,6 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
     if(IFS0bits.U1EIF)
     {
         IFS0bits.U1EIF = 0;
+        //at the moment we do nothing by an error, just clear the interrupt flag
     }
 }   //end of __IntUart1Handler

@@ -44,16 +44,23 @@ STimer1 g_Timer1;     //global variables for struct
  * Timer 23 (timer 2 in 32-bit): not used
  * Clock source = PBCLK = 80MHz with prescaler 2 = 1 / (80MHz / 2) = 25ns time base
  * Used for the unipolar driver - DON'T USE THIS TIMER FOR SOMETHING OTHERS!!!
+ * See modification (29.12.2015)
  * 
- * Timer 45 (timer 4 in 32-bit): not used 
+ * Timer 45 (timer 4 in 32-bit): used 
+ * Clock source = PBCLK = 80MHz with prescaler 2 = 1 / (80MHz / 2) = 25ns time base
+ * Used for the unipolar driver - DON'T USE THIS TIMER FOR SOMETHING OTHERS!!!
  * 
- * Modification (23.12.2015):
+ * 
+ * Modification (23.12.2015 / A. Staub):
  * Timer 2 and 3 combined to an 32-bit timer. Time base changed to 25ns. 
+ * 
+ * Modification (29.12.2015 / A. Staub):
+ * Timer 2 and 3 changed to timer 4 and 5, because of the input capture issue. 
  * 
  * 
  * Creator:                 J. Rebetez
  * Date of creation:        08.08.2015
- * Last modification on:    23.12.2015
+ * Last modification on:    29.12.2015
  * Modified by:             A. Staub
  * 
  * Input:                   timerx  (selected timer)
@@ -249,17 +256,17 @@ void timers_Init(unsigned char timerx)
 
         T4CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
         T4CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
-        T4CONbits.TCKPS0 = 0;   // 101 = 1:32 prescale value
+        T4CONbits.TCKPS0 = 1;   // 101 = 1:32 prescale value
                                 // 100 = 1:16 prescale value
                                 // 011 = 1:8 prescale value
                                 // 010 = 1:4 prescale value
                                 // 001 = 1:2 prescale value
                                 // 000 = 1:1 prescale value
 
-        TMR4 = 0;           // LSB
-        TMR5 = 0;           // MSB
-        PR4 = 0;            // LSB
-        PR5 = 0;            // MSB
+        TMR4 = 0;           // LSB --> clear counter
+        TMR5 = 0;           // MSB --> clear counter
+        PR4 = 400;          // LSB --> set to 10us
+        PR5 = 0;            // MSB --> (400 * 25ns)
     }
 }
 
@@ -282,16 +289,20 @@ void timers_Init(unsigned char timerx)
  * 
  * Timer 5: not used
  * 
- * Timer 23 (timer 2 in 32-bit): used for bipolar and unipolar actuator
+ * Timer 23 (timer 2 in 32-bit): not used
+ * 
+ * Timer 45 (timer 4 in 32-bit): used for bipolar and unipolar actuator
  * Priority = 1
  * Subpriority = 3
  * 
- * Timer 45 (timer 4 in 32-bit): not used 
+ * 
+ * Modification (29.12.2015 / A. Staub):
+ * Changed timer 2 and 3 to 4 and 5
  * 
  * Creator:                 J. Rebetez
  * Date of creation:        08.08.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    29.12.2015
+ * Modified by:             A. Staub
  * 
  * Input:                   timerx  (selected timer)
  *                          action  (enable / disable interrupt)
@@ -352,7 +363,7 @@ void timers_SetInterrupt(unsigned char timerx, unsigned char action)
     {
         IFS0bits.T4IF = 0;  //just to be safe
         IFS0bits.T5IF = 0;
-        IPC5bits.T5IP = 7;
+        IPC5bits.T5IP = 1;
         IPC5bits.T5IS = 3;
         if(action == _ENABLE) IEC0bits.T5IE = 1;
         else IEC0bits.T5IE = 0;
@@ -378,10 +389,10 @@ void timers_SetInterrupt(unsigned char timerx, unsigned char action)
  * 
  * Timer 5: not used
  * 
- * Timer 23 (timer 2 in 32-bit): used for bipolar and unipolar driver
- * DON'T USE THIS SUBROUTINE FOR TIMER 23! This timer is used in a special way for the unipolar driver.
+ * Timer 23 (timer 2 in 32-bit): not used
  * 
- * Timer 45 (timer 4 in 32-bit): not used  
+ * Timer 45 (timer 4 in 32-bit): used for bipolar and unipolar driver
+ * DON'T USE THIS SUBROUTINE FOR TIMER 23! This timer is used in a special way for the unipolar driver.  
  * 
  * Modification (26.12.2015 / A. Staub):
  * We use the timer 1 to apply waiting times in ms. So the given value "valuePRReg" has to be in ms.
@@ -395,9 +406,12 @@ void timers_SetInterrupt(unsigned char timerx, unsigned char action)
  * time have the first priority. This flag is reset to zero automatic if the waiting time occured 
  * (inside the interrupt routine).
  * 
+ * Modification (29.12.2015 / A. Staub):
+ * Timer 2 and 3 changed to timer 4 and 5. 
+ * 
  * Creator:                 J. Rebetez
  * Date of creation:        08.08.2015
- * Last modification on:    26.12.2015
+ * Last modification on:    29.12.2015
  * Modified by:             A. Staub
  * 
  * Input:                   timer (choose of the timer)

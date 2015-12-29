@@ -138,12 +138,12 @@ void uni_move(void)
                 g_Uni.uint8_Settings = 0;       //erase settings         
                 g_Uni.uint8_Status |= 0x01;     //set the bit 'FS - first step'
         
-                //and stop the timer2 
-                T2CONbits.ON = 0;               //switch off timer 2
-                TMR2 = 0;                       //reset LSB counter
-                TMR3 = 0;                       //reset MSB counter
-                PR2 = 400;                      //load LSB register with start condition
-                PR3 = 0;                        //load MSB register with 0 
+                //and stop the timer4 
+                T4CONbits.ON = 0;               //switch off timer 4
+                TMR4 = 0;                       //reset LSB counter
+                TMR5 = 0;                       //reset MSB counter
+                PR4 = 400;                      //load LSB register with start condition
+                PR5 = 0;                        //load MSB register with 0 
                 
                 //and switch off all outputs
                 oUniCoilA1 = _UniPhOFF;                 //output PhA1 = off
@@ -161,7 +161,7 @@ void uni_move(void)
         //cannot load this modulo timer in this else case, because this case could be executed more then 1 time 
         //(depending on main charge routine). Writing more then 1 time on this modulo timer inhibits the interrupt bit. 
         //So you have to load this modulo timer during the initialization phase and to set it again at the end 
-        //of the move! PR2 = 400;
+        //of the move! PR4 = 400;
       
         //load the first switch on delay 
         g_Uni.uint32_IntTime = g_Uni.uint32_SwOnTime;
@@ -174,7 +174,7 @@ void uni_move(void)
       
         g_Uni.uint8_Status &= 0x7F;             //clear error
       
-        T2CONbits.ON = 1;                       //enable the timer 2
+        T4CONbits.ON = 1;                       //enable the timer 4
         }
     }
     else
@@ -189,11 +189,11 @@ void uni_move(void)
                 if(g_Uni.uint8_Status & 0x02)   //is this the last step?
                 {
                     //then stop the timer 
-                    T2CONbits.ON = 0;               //switch off the timer
-                    TMR2 = 0;                       //reset LSB counter
-                    TMR3 = 0;                       //reset MSB counter
-                    PR2 = 400;                      //load LSB register with start condition
-                    PR3 = 0;                        //load MSB register with 0
+                    T4CONbits.ON = 0;               //switch off the timer
+                    TMR4 = 0;                       //reset LSB counter
+                    TMR5 = 0;                       //reset MSB counter
+                    PR4 = 400;                      //load LSB register with start condition
+                    PR5 = 0;                        //load MSB register with 0
           
                     if(g_Uni.uint8_Settings & 0x08) //coils current active after move?
                     {

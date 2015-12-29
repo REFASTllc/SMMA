@@ -31,11 +31,16 @@
 #define	LINATA6628_H
 
 extern void LINATA6628_init(void);
+extern void LINATA6629_SendBackSlaveAnswer(void);
 
 typedef struct                  //definitions of multiple variable for timer1
 {
-  volatile unsigned short int uint16_TimeoutCounter;    //LIN counter for timeout (time base 1ms)
   volatile unsigned char uint8_LinBreakToSend;          //1 = Lin break to send / 0 = No Lin break to send
+  volatile unsigned char uint8_MasterSendCounter;       //counts how much byte was send from the master
+  volatile unsigned char uint8_SlaveReceiveCounter;     //counts how much byte will be received from slave 
+  volatile unsigned char uint8_SlaveAnswerRequested;    //1 = slave answer requested / 0 = No slave answer requested 
+  volatile unsigned char uint8_SlaveAnswerFinish;       //1 = slave answer finish / 0 = slave still sending
+  volatile unsigned char uint8_SlaveTimeout;            //1 = timeout occured / 0 = all ok
 } SLin;                         //struct name is SLin (S for struct)
 
 
