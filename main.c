@@ -60,7 +60,7 @@ void main(void)
 #endif
 #ifdef _LIN
     oVmotOnOff = 1;
-    oEnaVLINSupply = 1;
+    //oEnaVLINSupply = 1;
 #endif
  //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!   
     

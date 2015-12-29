@@ -628,7 +628,7 @@ void cmd_RUN(void)
                     //to decide what is to do when motor type changes
                     g_Param.uint8_MotTyp = g_CmdChk.uint32_TempPara[1] & 0xFF;    
                            
-                    g_Uni.uint8_Settings |= 0x01;   //enable run bit
+                    //g_Uni.uint8_Settings |= 0x01;   //enable run bit
           
                     if(g_Param.uint8_StepMode == 0) //which step mode?
                     {
@@ -702,12 +702,22 @@ void cmd_RUN(void)
           
                     if(uint1_UniErrConfig)  //verify if we had an configuration error
                     {
-                        //nothing wrong, nothing to do
+                        //error detected, send error code
+                        g_Param.uint8_ErrCode = _OutOfTolRUN;       //set error code
+                        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                        
+                        g_Uni.uint8_Settings &= 0xFE;   //disable run bit
+                        
+                        //switch off output's
+                        oUniCoilA1 = _UniPhOFF;     //output PhA1 = off
+                        oUniCoilA2 = _UniPhOFF;     //output PhA2 = off
+                        oUniCoilB1 = _UniPhOFF;     //output PhB1 = off
+                        oUniCoilB2 = _UniPhOFF;     //output PhB2 = off
                     }
                     else
                     {
-                        g_Param.uint8_ErrCode = _OutOfTolRUN;       //set error code
-                        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                        //nothing wrong, set the run bit
+                        g_Uni.uint8_Settings |= 0x01;   //enable run bit
                     }      
                 }
                 else
