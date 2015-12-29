@@ -49,7 +49,7 @@ void bi_init(void)
     A3981.CONFIG1.REG = 0b0111000000100000;
     A3981.TBLLD.REG = 0b1111000001000101;
     
-    g_Bipol.uint8_Status = 0b00000001;        //status byte - set bit 'FS' and clear the other bits
+    g_Bipol.status.REG = 0b00000001;        //status byte - set bit 'FS' and clear the other bits
     //                     ||||||||
     //                     |||||||+- 0: FS    - First step; 1: active / 0: not active 
     //                     ||||||+-- 1: LS    - Last step; 1: active / 0: not active
@@ -98,29 +98,28 @@ void bi_init(void)
 ***********************************************************************************************************************/
 void bi_move(void)
 {
-    if(g_Bipol.uint8_Status & 0x01)               //is this the first step?
+    if(g_Bipol.status.BITS.firstStepIsActived)               //is this the first step?
     {
-        if(g_Bipol.uint8_Status & 0x10)           //and is the next step allowed?
+        if(g_Bipol.status.BITS.nextStepIsAllowed)           //and is the next step allowed?
         {
-            g_Bipol.uint8_Status &= 0xEF;         //then clear the bit 'NS - next step'
+            g_Bipol.status.BITS.nextStepIsAllowed = 0;         //then clear the bit 'NS - next step'
             bi_CheckCalc();                    //subroutine to verify all parameters and calculate different pos.       
-            g_Bipol.uint8_Status &= 0xFE;         //clear the bit 'FS - first step'
+            g_Bipol.status.BITS.firstStepIsActived = 0;         //clear the bit 'FS - first step'
       
-            if(!(g_Bipol.uint8_Status & 0x80))    //no error detected during the check from the subroutine
+            if(!g_Bipol.status.BITS.error)    //no error detected during the check from the subroutine
             {
                 if(g_Bipol.uint1_NextStepIsRamp == 1) //then verify as next if the acceleration ramp is active?
-                {
-                    g_Bipol.uint8_Status |= 0x04; //set bit 'ACCEL - acceleration'
-                }
+                    g_Bipol.status.BITS.accelerationIsActived = 1; //set bit 'ACCEL - acceleration'
                 else
                 {
-                    g_Bipol.uint8_Status &= 0xF3; //if not active then clear for security the bit 'ACC and DEC'
+                    g_Bipol.status.BITS.accelerationIsActived = 0; //if not active then clear for security the bit 'ACC and DEC'
+                    g_Bipol.status.BITS.decelerationIsActived = 0;
                 }
             }
             else
             {
                 g_Bipol.uint32_GoalPos = g_Bipol.uint32_RealPos;    //otherwise set the goal to the real position       
-                g_Bipol.uint8_Status |= 0x01;     //set the bit 'FS - first step'
+                g_Bipol.status.BITS.firstStepIsActived = 1;     //set the bit 'FS - first step'
         
                 //and stop the timer4 
                 T4CONbits.ON = 0;               //switch off timer 4
@@ -150,21 +149,21 @@ void bi_move(void)
       
         SendOneDataSPI1(A3981.RUN.REG);
       
-        g_Bipol.uint8_Status &= 0x7F;             //clear error
+        g_Bipol.status.BITS.error = 0;             //clear error
       
         T4CONbits.ON = 1;                       //enable the timer 4
         }
     }
     else
     {
-        if(g_Bipol.uint8_Status & 0x20)         //otherwise verify if the motor arrived at his goal position
+        if(g_Bipol.status.BITS.goalIsReached)         //otherwise verify if the motor arrived at his goal position
         {
-            if(g_Bipol.uint8_Status & 0x10)     //if true - motor arrived at his goal position, 
+            if(g_Bipol.status.BITS.nextStepIsAllowed)     //if true - motor arrived at his goal position, 
                                                 //verify if the next step is allowed
             {
-                g_Bipol.uint8_Status &= 0xEF;     //then clear the bit 'NS - next step'
+                g_Bipol.status.BITS.nextStepIsAllowed = 0;     //then clear the bit 'NS - next step'
         
-                if(g_Bipol.uint8_Status & 0x02)   //is this the last step?
+                if(g_Bipol.status.BITS.lastStepIsActived)   //is this the last step?
                 {
                     //then stop the timer 
                     g_Bipol.uint1_IsBipolEnabled = 0;
@@ -175,57 +174,43 @@ void bi_move(void)
                     PR5 = 0;                        //load MSB register with 0
                     g_Bipol.uint1_IntTimeExpiredFlag = 1;    //force the interrupt routine to load the new time
           
-                    if(g_Bipol.uint1_CurrInCoilAtTheEnd == 1) //coils current active after move?
+                    if(!g_Bipol.uint1_CurrInCoilAtTheEnd) //coils current active after move?
                     {
-                        //then nothing is to do
-                    }
-                    else
-                    {
-                        //otherwise switch off all outputs
+                        //switch off all outputs
                         A3981.RUN.BITS.EN = 0;
                         SendOneDataSPI1(A3981.RUN.REG);
                     }
                  
-                    g_Bipol.uint8_Status &= 0xC1;     //clear 'NS', 'DEC', 'ACC', 'GOAL' and 'LS' bit
-                    g_Bipol.uint8_Status |= 0x01;     //set the bit 'FS'
+                    g_Bipol.status.BITS.nextStepIsAllowed = 0;     //clear 'NS', 'DEC', 'ACC', 'GOAL' and 'LS' bit
+                    g_Bipol.status.BITS.decelerationIsActived = 0;
+                    g_Bipol.status.BITS.accelerationIsActived = 0;
+                    g_Bipol.status.BITS.accelerationIsActived = 0;
+                    g_Bipol.status.BITS.goalIsReached = 0;
+                    g_Bipol.status.BITS.lastStepIsActived = 0;
+                    g_Bipol.status.BITS.firstStepIsActived = 1;     //set the bit 'FS'
                     
                     if(g_Param.uint8_Acknowledge)           //verify if we have to send back a second ack
                     {
                         uart2_sendbuffer('E');              //first the letter E
                         uart2_sendbuffer(13);               //with CR at the end
-                    }
-                    else
-                    {
-                        //nothing to send back
-                    }               
+                    }             
                 }
                 else
-                {
-                    g_Bipol.uint8_Status |= 0x02;     //otherwise set the bit 'LS'
-                }
+                    g_Bipol.status.BITS.lastStepIsActived = 1;     //otherwise set the bit 'LS'
             }
-            else
-            {
-                //otherwise load the last switch off delay 
+            else //otherwise load the last switch off delay 
                 g_Bipol.uint32_IntTime = g_Bipol.uint32_SwOffTime;
-            }
         }
         else
         {
             //not arrived at the goal position, so verify if the acceleration ramp is still active
-            if(g_Bipol.uint8_Status & 0x04)           
-            {  
+            if(g_Bipol.status.BITS.accelerationIsActived)           
                 bi_acc();                      //then call the subroutine acceleration
-            }
             //or if the deceleration ramp is still active
-            else if(g_Bipol.uint8_Status & 0x08)
-            {
+            else if(g_Bipol.status.BITS.decelerationIsActived)
                 bi_dec();                     //then call the subroutine deceleration
-            }
             else
-            {
                 bi_run();                     //otherwise call the subroutine run
-            }
         }
     }  
 }   //end of unipolar_move
@@ -257,30 +242,20 @@ void bi_acc(void)
 {
     auto unsigned short int uint16_Freq;      //local variable for the frequency
   
-    if(g_Bipol.uint8_Status & 0x10)       //is the next step is allowed?
+    if(g_Bipol.status.BITS.nextStepIsAllowed)       //is the next step is allowed?
     {
-        g_Bipol.uint8_Status &= 0xEF;     //then clear the bit 'NS - next step'
+        g_Bipol.status.BITS.nextStepIsAllowed = 0;     //then clear the bit 'NS - next step'
         g_Bipol.uint16_AccNumbStep--;     //decrement the number of steps
     
         //verify if real position is equal to acceleration stop position
         if(g_Bipol.uint32_RealPos == g_Bipol.uint32_AccStop)
-        {
-            g_Bipol.uint8_Status &= 0xFB; //then clear bit 'ACCEL - acceleration'
-        }
+            g_Bipol.status.BITS.accelerationIsActived = 0; //then clear bit 'ACCEL - acceleration'
         //or if real position is equal to deceleration start position
         else if(g_Bipol.uint32_RealPos == g_Bipol.uint32_DecStart)
-        {
-            g_Bipol.uint8_Status |= 0x08; //then set bit 'DECEL - deceleration'
-        }
+            g_Bipol.status.BITS.decelerationIsActived = 1; //then set bit 'DECEL - deceleration'
         //or if real position is equal to goal position
         else if(g_Bipol.uint32_RealPos == g_Bipol.uint32_GoalPos)
-        {
-            g_Bipol.uint8_Status |= 0x20; //then set bit 'GOAL'
-        }
-        else
-        {
-        //nothing is to do, because it was a normal step
-        }     
+            g_Bipol.status.BITS.goalIsReached = 1; //then set bit 'GOAL'
     }
     else
     {
@@ -296,12 +271,7 @@ void bi_acc(void)
                        
             //increment position for the array
             g_Bipol.uint8_AccArrPos++;       
-        }
-        else
-        {
-            //otherwise do nothing, because the timer loads automatically 
-            //again the same time from the already defined variable g_Bipol.uint32_IntTime
-        }      
+        }   
     } 
 }   //end of bi_acc
 
@@ -327,30 +297,19 @@ void bi_acc(void)
 ***********************************************************************************************************************/
 void bi_run(void)
 {
-    if(g_Bipol.uint8_Status & 0x10)           //if the next step is allowed?
+    if(g_Bipol.status.BITS.nextStepIsAllowed)           //if the next step is allowed?
     {
-        g_Bipol.uint8_Status &= 0xEF;         //then clear the bit 'NS - next step'
+        g_Bipol.status.BITS.nextStepIsAllowed = 0;         //then clear the bit 'NS - next step'
         
         //verify if deceleration has to start if deceleration ramp is active
         if((g_Bipol.uint32_RealPos == g_Bipol.uint32_DecStart) && (g_Bipol.uint1_NextStepIsRamp == 1))
-        {
-            g_Bipol.uint8_Status |= 0x08;     //then set bit 'DECEL - deceleration'
-        }
+            g_Bipol.status.BITS.decelerationIsActived = 1;     //then set bit 'DECEL - deceleration'
         //or if real position is equal to goal position
         else if(g_Bipol.uint32_RealPos == g_Bipol.uint32_GoalPos)
-        {
-            g_Bipol.uint8_Status |= 0x20;     //then set bit 'GOAL'
-        }
-        else
-        {
-            //nothing is to do, because it was a normal step
-        }     
+            g_Bipol.status.BITS.goalIsReached = 1;     //then set bit 'GOAL'
     }
-    else
-    { 
-        //otherwise load always the run time
+    else //otherwise load always the run time
         g_Bipol.uint32_IntTime = g_Bipol.uint32_RunTime;    
-    }   
 }   //end of uni_run
 
 
@@ -379,24 +338,18 @@ void bi_dec(void)
 {
     auto unsigned short int uint16_Freq;      //local variable for the frequency
   
-    if(g_Bipol.uint8_Status & 0x10)       //if the next step is allowed?
+    if(g_Bipol.status.BITS.nextStepIsAllowed)       //if the next step is allowed?
     {
-        g_Bipol.uint8_Status &= 0xEF;     //then clear the bit 'NS - next step'
+        g_Bipol.status.BITS.nextStepIsAllowed = 0;     //then clear the bit 'NS - next step'
         g_Bipol.uint16_DecNumbStep--;     //decrement the number of steps
     
         //verify if real position is equal to goal position
         if(g_Bipol.uint32_RealPos == g_Bipol.uint32_GoalPos)
-        {
-            g_Bipol.uint8_Status |= 0x20; //then set bit 'GOAL'
-        }
-        else
-        {
-            //nothing is to do, because it was a normal step
-        }     
+            g_Bipol.status.BITS.goalIsReached = 1; //then set bit 'GOAL'
     }
     else
     {
-        //othewise, if there are all steps done with the actually frequency?
+        //otherwise, if there are all steps done with the actually frequency?
         if(g_Bipol.uint16_DecNumbStep == 0)
         {
             //then load the new number of steps from the array
@@ -409,11 +362,6 @@ void bi_dec(void)
             //decrement the array for the next parameter
             g_Bipol.uint8_DecArrPos--;       
         }
-        else
-        {
-            //otherwise do nothing, because the timer loads automatically 
-            //again the same time from the already defined variable g_Bipol.uint32_IntTime
-        }    
     }
 }   //end of bi_dec
 
@@ -426,13 +374,13 @@ void bi_dec(void)
  * move not so much to verify and of course not to start a move if we see that there is already a problem with the 
  * parameters.
  * A move will be not executed if we have one of these situations:
- * - the run or ramp frequency is higger then allowed (see definiton in unipolar.h)
+ * - the run or ramp frequency is higher then allowed (see definiton in unipolar.h)
  * - ramp active but first parameter is not correct
- * - ramp active but frequency is higger then allowed (see definition in unipolar.h)
+ * - ramp active but frequency is higher then allowed (see definition in unipolar.h)
  * - are there enough steps to execute the ramp(s) (if enable) and at the minimum one cycle that means 4 steps 
  *   in fullstep and 8 steps in halfsteps (run mode)
  * So first we check if the ramps are enabled and if true we verify each parameter. If there are 20 parameters and 
- * for example the frequency in the 10th parameter is higger then the run frequency then we stop with the ramp at 
+ * for example the frequency in the 10th parameter is higher then the run frequency then we stop with the ramp at 
  * this position. This is a protection to ensure for that we jump not for example from 800 Hz ramp frequency to a 
  * 400 Hz run frequency. 
  * 
@@ -486,7 +434,7 @@ void bi_CheckCalc(void)
             if((uint8_loop == 0) && (uint16_NumbStep == 0))
             {
                 //then signal an error, because ramp is active but there is nothing in the buffer
-                g_Bipol.uint8_Status |= 0x80;
+                g_Bipol.status.BITS.error = 1;
                 //leave the for loop
                 uint8_loop = g_Param.uint8_AccNumbRamp;
             }
@@ -494,36 +442,26 @@ void bi_CheckCalc(void)
             else if((uint8_loop == 0) && (uint16_Freq > g_Bipol.uint16_RunFreq))
             {
                 //then signal an error, because ramp is active but the first frequency is to high
-                g_Bipol.uint8_Status |= 0x80;
+                g_Bipol.status.BITS.error = 1;
                 //leave the for loop
                 uint8_loop = g_Param.uint8_AccNumbRamp;
             }
             //is another value in the array for the number of steps = 0?
-            else if(uint16_NumbStep == 0)
-            {
-                //then we have nothing more to read out and we can leave the for loop
+            else if(uint16_NumbStep == 0) //then we have nothing more to read out and we can leave the for loop
                 uint8_loop = g_Param.uint8_AccNumbRamp;
-            }
-            //is the frequency higger then allowed?
+            //is the frequency higher then allowed?
             else if(uint16_Freq > _BiFreqMax)
             {
                 //then signal an error
-                g_Bipol.uint8_Status |= 0x80;
+                g_Bipol.status.BITS.error = 1;
                 //leave the for loop
                 uint8_loop = g_Param.uint8_AccNumbRamp;
             }
             //is the actually frequency higher than the run frequency?
-            else if(uint16_Freq > g_Bipol.uint16_RunFreq)
-            {
-                //then we have nothing more to read out and we can leave the for loop
+            else if(uint16_Freq > g_Bipol.uint16_RunFreq) //then we have nothing more to read out and we can leave the for loop
                 uint8_loop = g_Param.uint8_AccNumbRamp;
-            }
-            else
-            {
-                //otherwise all parameters are right, so add the number of steps
-                //into acceleration stop position
+            else //otherwise all parameters are right, so add the number of steps into acceleration stop position
                 g_Bipol.uint32_AccStop += uint16_NumbStep;
-            }
         }
     //-----------------------------DECELERATION-----------------------------
         //start the array position with 255, because 0 is already a place in the array
@@ -541,7 +479,7 @@ void bi_CheckCalc(void)
                 if((uint8_loop == 0) && (uint16_NumbStep == 0))
                 {
                     //then signal an error, because ramp is active but there is nothing in the buffer
-                    g_Bipol.uint8_Status |= 0x80;
+                    g_Bipol.status.BITS.error = 1;
                     //leave the for loop
                     uint8_loop = g_Param.uint8_DecNumbRamp;
                 }   
@@ -549,30 +487,24 @@ void bi_CheckCalc(void)
                 else if((uint8_loop == 0) && (uint16_Freq > g_Bipol.uint16_RunFreq))
                 {
                     //then signal an error, because ramp is active but the first frequency is to high
-                    g_Bipol.uint8_Status |= 0x80;
+                    g_Bipol.status.BITS.error = 1;
                     //leave the for loop
                     uint8_loop = g_Param.uint8_DecNumbRamp;
                 }
                 //is another value in the array for the number of steps = 0?
-                else if(uint16_NumbStep == 0)
-                {
-                    //then we have nothing more to read out and we can leave the for loop
+                else if(uint16_NumbStep == 0) //then we have nothing more to read out and we can leave the for loop
                     uint8_loop = g_Param.uint8_DecNumbRamp;
-                }
-                //is the frequency higger then allowed?
+                //is the frequency higher then allowed?
                 else if(uint16_Freq > _BiFreqMax)
                 {
                     //then signal an error
-                    g_Bipol.uint8_Status |= 0x80;
+                    g_Bipol.status.BITS.error = 1;
                     //leave the for loop
                     uint8_loop = g_Param.uint8_DecNumbRamp;
                 }
                 //is the actually frequency higher than the run frequency?
-                else if(uint16_Freq > g_Bipol.uint16_RunFreq)
-                {
-                    //then we have nothing more to read out and we can leave the for loop
+                else if(uint16_Freq > g_Bipol.uint16_RunFreq) //then we have nothing more to read out and we can leave the for loop
                     uint8_loop = g_Param.uint8_DecNumbRamp;
-                }
                 else
                 {
                     //otherwise all parameters are right, so add the number of steps
@@ -583,13 +515,8 @@ void bi_CheckCalc(void)
                 }
             }
         }
-        else
-        {
-            //otherwise do nothing
-        }
-    
         //-------------------------DEFINE THE POSITIONS-------------------------
-        if(!(g_Bipol.uint8_Status & 0x80))        //all parameters are correct for the move?
+        if(!g_Bipol.status.BITS.error)        //all parameters are correct for the move?
         {
             //then calculate the positions
             //acceleration stop position was calculated in the first for loop; use for this 'g_Bipol.uint32_AccStop'
@@ -599,36 +526,22 @@ void bi_CheckCalc(void)
             g_Bipol.uint32_DecStart = g_Bipol.uint32_GoalPos - g_Bipol.uint32_DecStart;
             //to know where to start in the deceleration array use this 'g_Bipol.uint32_DecStart'    
         }
-        else
-        {
-        //otherwise there is nothing to do
-        }
-    } 
-    else
-    {
-        //otherwise there is nothing to do
     }
-  
     //-------------------------VERIFY THE RUN MODE------------------------
-    if(g_Bipol.uint16_RunFreq > _BiFreqMax)  //verify if the frequency is higger than allowed?
+    if(g_Bipol.uint16_RunFreq > _BiFreqMax)  //verify if the frequency is higher than allowed?
     {
-        g_Bipol.uint8_Status |= 0x80;         //set error - run frequency to fast
+        g_Bipol.status.BITS.error = 1;         //set error - run frequency to fast
     }
-    else
-    {
-        //otherwise do nothing
-    }
-   
     //-------------------------PLAUSIBILITY CHECK-------------------------
      //do it only if there is not already an error
-    if(!(g_Bipol.uint8_Status & 0x80))
+    if(!g_Bipol.status.BITS.error)
     {
         //start plausibility check which means:
         //start position is always 0
         //goal position is the total of steps that we have to do
         //AccStop is the maximal steps that we have to do for the acceleration
         //goal position - DecStart is the maximal steps that we have to do for the deceleration
-        //we have to do at minimum 1 cylce in run mode that means 4 steps in full step
+        //we have to do at minimum 1 cycle in run mode that means 4 steps in full step
         //and 8 steps in half step
     
         //deceleration steps are already stored or 0 if not active -> add the acceleration steps
@@ -656,8 +569,8 @@ void bi_CheckCalc(void)
         //number of steps that we have to do greater then goal position?
         if(uint32_PlausCheck > g_Bipol.uint32_GoalPos)
         {
-            //then signale an error and send back the error code
-            g_Bipol.uint8_Status |= 0x80;
+            //then signal an error and send back the error code
+            g_Bipol.status.BITS.error = 1;
             g_Param.uint8_ErrCode = _BipPlausiCheck;    //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }

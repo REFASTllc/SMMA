@@ -42,9 +42,26 @@ extern void bi_CheckCalc(void);
 #define _BiPhOFF    0       //definition OFF for the output of the bipolar stepper motor
 #define _BiFreqMax  1000    //definition of maximal frequency
 
+typedef union
+{
+    unsigned char REG;
+    struct
+    {
+        unsigned char firstStepIsActived:1;
+        unsigned char lastStepIsActived:1;
+        unsigned char accelerationIsActived:1;
+        unsigned char decelerationIsActived:1;
+        unsigned char nextStepIsAllowed:1;
+        unsigned char goalIsReached:1;
+        unsigned char nu:1;
+        unsigned char error:1;
+    } BITS;
+} T_STATUS;
 
 typedef struct          //definitions of multiple variable for unipolar
 {
+// Custom defined types
+    T_STATUS status;
 //general variables  
     volatile unsigned long int uint32_RealPos;      //real position of the motor
     volatile unsigned long int uint32_GoalPos;      //goal position of the motor

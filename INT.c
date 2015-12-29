@@ -461,15 +461,15 @@ void __ISR(_TIMER_5_VECTOR, IPL1AUTO) __IntTimer45Handler(void)
             //force the interrupt routine to load the correct time (next time)
             g_Bipol.uint1_IntTimeExpiredFlag = 1;   
                 
-            g_Bipol.uint8_Status |= 0x10;   //allow next step
+            g_Bipol.status.BITS.nextStepIsAllowed = 1;   //allow next step
             oTestLed2 =! oTestLed2;
             
             //for security - be sure that the motor is in run
             if(g_Bipol.uint1_IsBipolEnabled == 1)
             {
                 //if it is the first or last step or motor error = true or real = goal position?
-                if((g_Bipol.uint8_Status & 0x01) || (g_Bipol.uint8_Status & 0x02) ||
-                (g_Bipol.uint8_Status & 0x80) || (g_Bipol.uint32_RealPos == g_Bipol.uint32_GoalPos))
+                if((g_Bipol.status.BITS.firstStepIsActived) || (g_Bipol.status.BITS.lastStepIsActived) ||
+                (g_Bipol.status.BITS.error) || (g_Bipol.uint32_RealPos == g_Bipol.uint32_GoalPos))
                 {
                     //then do nothing
                 }

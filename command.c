@@ -1310,6 +1310,13 @@ void cmd_BREAK(void)
 {  
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
+    // Code for bipolar motor here below //
+        oBiResetSignal = 0;
+        oVmotOnOff = 0;
+        oBiEnaVmot = 0;
+        A3981.RUN.BITS.EN = 0;
+        SendOneDataSPI1(A3981.RUN.REG);
+    // Code for unipolar motor here below // 
         //add here the conditions!!!!!
         
         //send back the needed informations
