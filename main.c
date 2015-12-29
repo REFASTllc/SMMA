@@ -20,6 +20,9 @@ extern SUART2txd g_UART2txd;
 extern SUART2rxd g_UART2rxd;
 extern SUni g_Uni;
 extern Sbipol g_Bipol;
+extern T_SPI SPI1;
+extern T_A3981 A3981;
+
 /**********************************************************************************************************************
  * Routine:                 main
 
@@ -34,9 +37,6 @@ extern Sbipol g_Bipol;
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-extern T_SPI SPI1;
-extern T_A3981 A3981;
-
 void main(void)
 {   
     unsigned short int tempToggle = 0;
@@ -58,8 +58,8 @@ void main(void)
     oBiEnaVmot = 1;
 #endif
 #ifdef _LIN
-    //lin
-    oEnaVLINSupply = 0;
+    oVmotOnOff = 1;
+    oEnaVLINSupply = 1;
 #endif
  //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!   
     
@@ -77,7 +77,7 @@ void main(void)
             //otherwise do nothing
         }     
         
-        if(g_Bipol.uint1_isBipolEnabled)
+        if(g_Bipol.uint1_IsBipolEnabled)
         {
             bi_move();
         }
@@ -102,5 +102,5 @@ void main(void)
             else
                 tempToggle++;
         }
-    }  
+    }   
 }   //end of main

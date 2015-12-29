@@ -55,8 +55,8 @@ extern void param_init(void);
 #define _DecNumbStepMax     1000        //<OK> maximal number of steps for the frequency for deceleration
 #define _DecFreqMin         1           //<OK> minimal frequency for the number of steps in [Hz] for deceleration
 #define _DecFreqMax         1000        //<OK> maximal frequency for the number of stpes in [Hz] for deceleration
-#define _StepModeUniMatMin  0           //<OK> supported or minimal step mode for unipolar and matrix actuators
-#define _StepModeUniMatMax  5           //<OK> supported or maximal step mode for unipolar and matrix actuators
+#define _StepModeMin        0           //<OK> supported or minimal step mode for unipolar and matrix actuators
+#define _StepModeMax        5           //<OK> supported or maximal step mode for unipolar and matrix actuators
 #define _StepCountMin       0           //<OK> minimal step count 
 #define _StepCountMax       10000000    //<OK> maximal step count
 #define _RunFreqMin         1           //<OK> minimal run speed in [Hz]
@@ -136,8 +136,12 @@ extern void param_init(void);
 #define _YearMax            79          //range for the year
 #define _LinSpdMin          100         //range for the lin speed communication
 #define _LinSpdMax          200000      //range for the lin speed communication
-#define _LinToMin           2           //range for the lin timeout communication
+#define _LinToMin           1           //range for the lin timeout communication
 #define _LinToMax           10000       //range for the lin timeout communication
+#define _LinLengthMin       0           //range for the lin slave answer
+#define _LinLengthMax       40          //range for the lin slave answer
+#define _LinParaMin         0           //range for the lin parameter
+#define _LinParaMax         255         //range for the lin parameter
 
 
 /*

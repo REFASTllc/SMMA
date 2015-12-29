@@ -385,10 +385,16 @@ void uart_init(unsigned char uartx)
  * Description:
  * Setting of the UART module.
  * 
+ * Modification (26.12.2015 / A. Staub)
+ * The follow code:
+ *      case _NONE: U1MODEbits.PDSEL = 3; 
+ * was wrong. By using 8 data bits without parity it has to be set to 0 not to 3. 
+ * I corrected the code for both UART moduls. 
+ * 
  * Creator:                 J. Rebetez
  * Date of creation:        05.10.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    26.12.2015
+ * Modified by:             A. Staub
  * 
  * Input:                   uartx (choose of the module)
  *                          parity (choose of the parity)
@@ -414,7 +420,7 @@ void uart_set(unsigned char uartx, unsigned char parity, unsigned char stopBit, 
     //--- Set the parity ---//
         switch(parity)
         {
-            case _NONE: U1MODEbits.PDSEL = 3;
+            case _NONE: U1MODEbits.PDSEL = 0;
                         break;
             case _EVEN: U1MODEbits.PDSEL = 1;
                         break;
@@ -448,7 +454,7 @@ void uart_set(unsigned char uartx, unsigned char parity, unsigned char stopBit, 
     //--- Set the parity ---//
         switch(parity)
         {
-            case _NONE: U2MODEbits.PDSEL = 3;
+            case _NONE: U2MODEbits.PDSEL = 0;
                         break;
             case _EVEN: U2MODEbits.PDSEL = 1;
                         break;
@@ -508,9 +514,9 @@ void uart_InitInterrupt(unsigned char uartx, unsigned char action)
         {
             IPC6bits.U1IP = 2;
             IPC6bits.U1IS = 3;
-            IEC0bits.U1RXIE = 1;
-            IEC0bits.U1TXIE = 1;   
-            IEC0bits.U1EIE = 1;
+            IEC0bits.U1RXIE = 0;    //set back later
+            IEC0bits.U1TXIE = 0;    //this bit is controlled externally - don't set it 
+            IEC0bits.U1EIE = 0;     //set back later
         }
         else
         {

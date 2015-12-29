@@ -14,7 +14,9 @@
  *                          - funct_AsciiToInt
  *                          - funct_CheckTol
  *                          - funct_FreqToTimer2
+ *                          - funct_FreqToTimer23
  *                          - funct_msToTimer2
+ *                          - funct_msToTimer23
  *                          - funct_ReadRamp
  *                          - funct_CheckCmdSILIM
  *                          - funct_CheckCmdSMTYP
@@ -218,127 +220,76 @@ unsigned char funct_CheckTol(unsigned long uint32_Value, unsigned long uint32_Mi
 
 
 /**********************************************************************************************************************
- * Routine:                 funct_FreqToTimer2
+ * Routine:                 funct_FreqToTimer23
 
  * Description:
- * There are two local variables. One is the time base that is acutally the time base from the timer. 
- * The other one is for the rest value after the divison. 
- * First we calculate the needed wait time for the frequency by divide the time base with the frequency. 
- * The rest of this division we store into the second local variabel. Then we verify if there is a rest available.
- * If true:
- * We load the last time with this rest and subract this rest from the total time. Then we verify if the total time 
- * is not 0. If it is not 0, then write into the counter how much time the interrupt time must be executed and 
- * increment this counter by 1, because the last time is different from the interrupt time. If it 0, then we fix the 
- * counter to 1, because we only need the last time to wait
- * If false:
- * Here the last time correspond to the interrupt time, so we only have to store into the counter how many times we 
- * have to wait the interrupt time.   
- * Modification (21.12.2015):   Adapt the fonction to be also used with bipolar motor (g_Bipol variables)
+ * Use this smalle subroutine if you want to convert a frequency into a counter for the timer 23. 
+ * The time base is 25ns, so the frequency of this time base is 40MHz.
+ * By making a division of 40MHz with the frequency given, it gives the number of counts; how much 
+ * time we have to count with the 25ns time base to achive this time. Of course some frequencies 
+ * have some small conversation errors but this are less than 0.01%.
  * 
  * Creator:                 A. Staub
- * Date of creation:        30.09.2015
- * Last modification on:    21.12.2015
- * Modified by:             J. Rebetez
+ * Date of creation:        23.12.2015
+ * Last modification on:    
+ * Modified by:             
  * 
  * Input:                   uint32_Freq
- *                          uint16_IntTime
- * Output:                  -
+ * Output:                  uint32_WB
 ***********************************************************************************************************************/
-void funct_FreqToTimer2(unsigned long int uint32_Freq, unsigned short int uint16_IntTime)
+unsigned long int funct_FreqToTimer23(unsigned long int uint32_Freq)
 {
-    auto unsigned long int uint32_WB = 10000000;    //local work register for time base = 100ns
-    auto unsigned long int uint32_WB1 = 0;          //local work register for the rest (modulo)
+    auto unsigned long int uint32_WB = 40000000;    //local work register for time base = 25ns
+                                                    //calculated with 1 / 25ns = 40MHz
     
-    uint32_WB = uint32_WB / uint32_Freq;        //calculation the needed wait time
-    uint32_WB1 = uint32_WB % uint16_IntTime;    //calculation the rest 
-   
-    if(uint32_WB1)                              //is a rest available?
-    {
-        g_Uni.uint16_LastTime = uint32_WB1;     //then load the last time with the rest time
-        g_Bipol.uint16_LastTime = uint32_WB1;
-        uint32_WB = uint32_WB - uint32_WB1;     //subtract the last time from the total time
+    uint32_WB = uint32_WB / uint32_Freq;            //calculation the needed wait time
+                                                    //for example by 400 Hz (2.5ms):
+                                                    //40'000'000 / 400 = 100k
+                                                    //100k * 25ns time base = 2.5ms
+                                                    //error of = 0%
+                                                    //for example by 759 Hz (1.3175231ms):
+                                                    //40'000'000 / 759 = 52k700
+                                                    //52k7 * 25ns time base = 1.3175ms
+                                                    //error of = 0.00175%
     
-        if(uint32_WB)                           //result not 0?
-        {
-            //then verify how many times it must wait the interrupt time
-            g_Uni.uint16_Count = uint32_WB / uint16_IntTime;  
-            g_Bipol.uint16_Count =uint32_WB / uint16_IntTime;  
-            g_Uni.uint16_Count++;               //and add plus 1, because the last time is different 
-            g_Bipol.uint16_Count++;             //and not the interrupt time
-        }
-        else
-        {
-            g_Uni.uint16_Count = 1;             //otherwise set it fix to 1
-            g_Bipol.uint16_Count = 1;
-        }   
-    }
-    else
-    {
-        g_Uni.uint16_LastTime = uint16_IntTime; //otherwise load the last time with the interrupt time
-        g_Bipol.uint16_LastTime = uint16_IntTime; 
-        //verify how many times more this interrupt time must be wait
-        g_Uni.uint16_Count = uint32_WB / uint16_IntTime;   
-        g_Bipol.uint16_Count = uint32_WB / uint16_IntTime;   
-    }   
-}   //end of funct_FreqToTimer2
+    return uint32_WB;       //send back the result
+}   //end of funct_FreqToTimer23
 
 
 /**********************************************************************************************************************
- * Routine:                 funct_msToTimer2
+ * Routine:                 funct_msToTimer23
 
  * Description:
- * This subroutine does the same thing as the 'funct_FreqToTimer2' the only difference is that we have not a 
- * frequency - we have a time in ms. So we multiply the time with 1000 to have the correct timebase (100ns) and make 
- * the same calculations (see 'funct_FreqToTimer2').  
- * Modification (21.12.2015):   Adapt the fonction to be also used with bipolar motor (g_Bipol variables) 
+ * Use this small subroutine to convert a given time in ms into a counter for the timer 23.
+ * The time base is 25ns and this is a frequency of 40MHz. Like we want to have the time in ms, we 
+ * devide this time by 1000 and have 40kHz. Multiply this 40'000 with the wished time in ms 
+ * and this give you the amounts of 25ns counts. 
  * 
  * Creator:                 A. Staub
- * Date of creation:        30.09.2015
- * Last modification on:    21.12.2015
- * Modified by:             J. Rebetez
+ * Date of creation:        23.12.2015
+ * Last modification on:    
+ * Modified by:             
  * 
- * Input:                   uint16_msTime
- *                          int16_IntTime
- * Output:                  -
+ * Input:                   uint32_msTime
+ * Output:                  uint32_WB
 ***********************************************************************************************************************/
-void funct_msToTimer2(unsigned short int uint16_msTime, unsigned short int uint16_IntTime)
+unsigned long int funct_msToTimer23(unsigned long int uint32_msTime)
 {
-    auto unsigned long int uint32_WB = 10000;       //local work register for time base = 100ns
-    auto unsigned long int uint32_WB1 = 0;          //local work register for the rest (modulo)
+    auto unsigned long int uint32_WB = 40000;       //local work register for time base = 25ns
+                                                    //calculated with 40MHz / 1000 (for ms) = 40kHz
     
-    uint32_WB = uint32_WB * uint16_msTime;      //multipli to the ms time the needed time base 
-    uint32_WB1 = uint32_WB % uint16_IntTime;    //calculation the rest
-   
-    if(uint32_WB1)                              //is a rest available?
-    {
-        g_Uni.uint16_LastTime = uint32_WB1;     //then load the last time with the rest time
-        g_Bipol.uint16_LastTime = uint32_WB1;     
-        uint32_WB = uint32_WB - uint32_WB1;     //subtract the last time from the total time
+    uint32_WB = uint32_WB * uint32_msTime;          //calculation the needed wait time
+                                                    //for example by 50ms:
+                                                    //40'000 * 50 = 2M
+                                                    //2M * 25ns time base = 50ms
+                                                    //error of = 0%
+                                                    //for example by 23ms:
+                                                    //40'000 * 23 = 920k
+                                                    //920 * 25ns time base = 23ms
+                                                    //error of = 0%
     
-        if(uint32_WB)                           //result not 0?
-        {
-            //then verify how many times it must wait the interrupt time
-            g_Uni.uint16_Count = uint32_WB / uint16_IntTime;    
-            g_Bipol.uint16_Count = uint32_WB / uint16_IntTime;    
-            //and add plus 1, because the last time is different and not the interrupt time
-            g_Uni.uint16_Count++;
-            g_Bipol.uint16_Count++;
-        }
-        else
-        {
-            g_Uni.uint16_Count = 1;             //otherwise set it fix to 1
-            g_Bipol.uint16_Count = 1; 
-        }   
-    }
-    else
-    {
-        g_Uni.uint16_LastTime = uint16_IntTime; //otherwise load the last time with the interrupt time
-        g_Bipol.uint16_LastTime = uint16_IntTime;
-        //verify how many times more this interrupt time must be wait
-        g_Uni.uint16_Count = uint32_WB / uint16_IntTime;
-        g_Bipol.uint16_Count = uint32_WB / uint16_IntTime;
-    }   
-}   //end of funct_msToTimer2
+    return uint32_WB;       //send back the result 
+}   //end of funct_msToTimer23
 
 
 /**********************************************************************************************************************

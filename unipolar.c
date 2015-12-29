@@ -22,7 +22,7 @@
 
 SUni g_Uni;                 //global variables for struct
 extern SParam g_Param;
-extern STimer2 g_Timer2;
+
 /**********************************************************************************************************************
  * Routine:                 uni_init
 
@@ -67,14 +67,10 @@ void uni_init(void)
     //                       +-------- 7:        - not used / free
     
     g_Uni.uint8_FsHsCount = 0;              //clear the full or half step counter
-    g_Uni.uint16_LastTime = 0;              //clear the last time
-    g_Uni.uint16_Count = 0;                 //clear the counter
-    g_Uni.uint16_RunLastTime = 0;           //clear the run last time
-    g_Uni.uint16_RunCount = 0;              //clear the run counter
-    g_Uni.uint16_SwOnLastTime = 0;          //clear the switch on last time
-    g_Uni.uint16_SwOnCount = 0;             //clear the switch on counter
-    g_Uni.uint16_SwOffLastTime = 0;         //clear the switch off last time
-    g_Uni.uint16_SwOffCount = 0;            //clear the switch off counter
+    g_Uni.uint32_IntTime = 0;                 //clear effective interrupt time
+    g_Uni.uint32_RunTime = 0;                 //clear run time for interrupt
+    g_Uni.uint32_SwOnTime = 0;                //clear switch on time for interrupt
+    g_Uni.uint32_SwOffTime = 0;               //clear switch off time for interrupt
     g_Uni.uint8_AccArrPos = 0;              //clear the acceleration array position
     g_Uni.uint16_AccNumbStep = 0;           //clear the acceleration number of steps
     g_Uni.uint32_AccStop = 0;               //clear the acceleration stop position
@@ -92,21 +88,7 @@ void uni_init(void)
     oUniCoilA1 = _UniPhOFF;                 //output PhA1 = off
     oUniCoilA2 = _UniPhOFF;                 //output PhA2 = off
     oUniCoilB1 = _UniPhOFF;                 //output PhB1 = off
-    oUniCoilB2 = _UniPhOFF;                 //output PhB2 = off
-
-//used parameters from old firmware to start the motor without using RS232 (TEST)
-  //g_CmdPar.uint32_StepCount = 10;
-  //g_Uni.uint32_GoalPos = 1000;
-  //g_CmdPar.uint16_Speed = 250;
-  //g_Uni.uint16_RunFreq = 350;
-  //g_Uni.uint8_Settings = 0x01;
-  //g_Unipolar.uint8_Settings = 0x0;
-  //g_Uni.uint16_SwOnLastTime = 5000;
-  //g_Uni.uint16_SwOnCount = 11;
-  //g_Uni.uint16_SwOffLastTime = 5000;
-  //g_Uni.uint16_SwOffCount = 3; 
-  //g_CmdPar.uint8_ACCNumberOfRamps = 2;
-  //g_CmdPar.uint8_DECNumberOfRamps = 2;   
+    oUniCoilB2 = _UniPhOFF;                 //output PhB2 = off  
 }   //end of uni_init
 
 
@@ -158,9 +140,10 @@ void uni_move(void)
         
                 //and stop the timer2 
                 T2CONbits.ON = 0;               //switch off timer 2
-                TMR2 = 0;                       //reset counter
-                PR2 = 100;                      //load timer with start condition
-                g_Timer2.uint16_Count = 0;      //force the interrupt routine to load the new time 
+                TMR2 = 0;                       //reset LSB counter
+                TMR3 = 0;                       //reset MSB counter
+                PR2 = 400;                      //load LSB register with start condition
+                PR3 = 0;                        //load MSB register with 0 
                 
                 //and switch off all outputs
                 oUniCoilA1 = _UniPhOFF;                 //output PhA1 = off
@@ -173,16 +156,15 @@ void uni_move(void)
         {
         //It is a must have to load the modulo timer already with a number. This number must be higher then 0, and 
         //should be not to small. Is this time is to short, then the interrupt will be called to much time before it 
-        //has time to load the new switch on delay. The delay should be 100 * 100ns (timebase) that give us 10us
+        //has time to load the new switch on delay. The delay should be 400 * 25ns (timebase) that give us 10us
         //this means on a switch on wait time of 1ms, the real time is 1.01ms. Now it is important to know, that you 
         //cannot load this modulo timer in this else case, because this case could be executed more then 1 time 
         //(depending on main charge routine). Writing more then 1 time on this modulo timer inhibits the interrupt bit. 
         //So you have to load this modulo timer during the initialization phase and to set it again at the end 
-        //of the move! PR2 = 100;
+        //of the move! PR2 = 400;
       
         //load the first switch on delay 
-        g_Uni.uint16_LastTime = g_Uni.uint16_SwOnLastTime;
-        g_Uni.uint16_Count = g_Uni.uint16_SwOnCount; 
+        g_Uni.uint32_IntTime = g_Uni.uint32_SwOnTime;
       
         //prepare the start sequency
         oUniCoilA1 = g_Uni.uint8_PhA1;
@@ -208,9 +190,10 @@ void uni_move(void)
                 {
                     //then stop the timer 
                     T2CONbits.ON = 0;               //switch off the timer
-                    TMR2 = 0;                       //reset counter
-                    PR2 = 100;                      //load timer with the start condition
-                    g_Timer2.uint16_Count = 0;      //force the interrupt routine to load the new time
+                    TMR2 = 0;                       //reset LSB counter
+                    TMR3 = 0;                       //reset MSB counter
+                    PR2 = 400;                      //load LSB register with start condition
+                    PR3 = 0;                        //load MSB register with 0
           
                     if(g_Uni.uint8_Settings & 0x08) //coils current active after move?
                     {
@@ -247,8 +230,7 @@ void uni_move(void)
             else
             {
                 //otherwise load the last switch off delay 
-                g_Uni.uint16_LastTime = g_Uni.uint16_SwOffLastTime;
-                g_Uni.uint16_Count = g_Uni.uint16_SwOffCount;
+                g_Uni.uint32_IntTime = g_Uni.uint32_SwOffTime;
             }
         }
         else
@@ -330,17 +312,18 @@ void uni_acc(void)
         {
             //then load the new number of steps from the array
             g_Uni.uint16_AccNumbStep = funct_ReadRamp(_Acc,_Step,g_Uni.uint8_AccArrPos);
-      
-            //and load the new time from the frequency
+            
+            //load the new ACC time, convert and store it
             uint16_Freq = funct_ReadRamp(_Acc,_Freq,g_Uni.uint8_AccArrPos);
-            funct_FreqToTimer2(uint16_Freq,g_Timer2.uint16_IntTime);
+            g_Uni.uint32_IntTime = funct_FreqToTimer23(uint16_Freq);
+      
+            //increment position for the array
             g_Uni.uint8_AccArrPos++;       
         }
         else
         {
             //otherwise do nothing, because the timer loads automatically 
-            //again the same time from the already defined variables
-            //g_Timer2.uint16_Count and g_Timer2.uint16_LastTime
+            //again the same time from the already defined variable g_Bipol.uint32_IntTime
         }      
     } 
 }   //end of uni_acc
@@ -389,8 +372,7 @@ void uni_run(void)
     else
     { 
         //otherwise load always the run time
-        g_Uni.uint16_LastTime = g_Uni.uint16_RunLastTime;
-        g_Uni.uint16_Count = g_Uni.uint16_RunCount;      
+        g_Uni.uint32_IntTime = g_Uni.uint32_RunTime;     
     }   
 }   //end of uni_run
 
@@ -442,17 +424,18 @@ void uni_dec(void)
         {
             //then load the new number of steps from the array
             g_Uni.uint16_DecNumbStep = funct_ReadRamp(_Dec,_Step,g_Uni.uint8_DecArrPos);
-      
-            //and load the new time from the frequency
+            
+            //load the new DEC time, convert and store it
             uint16_Freq = funct_ReadRamp(_Dec,_Freq,g_Uni.uint8_DecArrPos);
-            funct_FreqToTimer2(uint16_Freq,g_Timer2.uint16_IntTime);
+            g_Uni.uint32_IntTime = funct_FreqToTimer23(uint16_Freq);
+      
+            //decrement the array for the next parameter
             g_Uni.uint8_DecArrPos--;       
         }
         else
         {
-            //otherwise do nothing, because the TPM1 timer loads automatically 
-            //again the same time from the already defined variables
-            //g_Funct.uint16_TPM1counter and g_Funct.uint16_TPM1lastTime
+            //otherwise do nothing, because the timer loads automatically 
+            //again the same time from the already defined variable g_Bipol.uint32_IntTime
         }    
     }
 }   //end of uni_dec
@@ -641,7 +624,7 @@ void uni_CheckCalc(void)
         }
         else
         {
-        //otherwise there is nothing to do
+            //otherwise there is nothing to do
         }
     } 
     else
@@ -656,12 +639,7 @@ void uni_CheckCalc(void)
     }
     else
     {
-        //otherwise the run frequency is correct, so calculate already the run time
-        funct_FreqToTimer2(g_Uni.uint16_RunFreq,g_Timer2.uint16_IntTime);
-        
-        //store the result to use it later
-        g_Uni.uint16_RunLastTime = g_Uni.uint16_LastTime;
-        g_Uni.uint16_RunCount = g_Uni.uint16_Count;
+        //otherwise do nothing
     }
    
     //-------------------------PLAUSIBILITY CHECK-------------------------
@@ -696,8 +674,8 @@ void uni_CheckCalc(void)
         {
             //then signale an error and send back the error code
             g_Uni.uint8_Status |= 0x80;
-            //g_Cmd.uint8_ErrorCode = 49;             //set error code
-            //cmd_sendError(g_Cmd.uint8_ErrorCode);   //call subroutine
+            g_Param.uint8_ErrCode = _UniPlausiCheck;    //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
@@ -707,7 +685,7 @@ void uni_CheckCalc(void)
             {
                 //load the firt ACC time
                 uint16_Freq = funct_ReadRamp(_Acc,_Freq,0);
-                funct_FreqToTimer2(uint16_Freq,g_Timer2.uint16_IntTime);
+                g_Uni.uint32_IntTime = funct_FreqToTimer23(uint16_Freq);
         
                 //load the number of steps that are to do with this frequency
                 g_Uni.uint16_AccNumbStep = funct_ReadRamp(_Acc,_Step,0);
@@ -717,9 +695,9 @@ void uni_CheckCalc(void)
             }
             else
             {
-                //otherwise load the run time
-                g_Uni.uint16_LastTime = g_Uni.uint16_RunLastTime;
-                g_Uni.uint16_Count = g_Uni.uint16_RunCount;      
+                //otherwise convert the run time and store it
+                g_Uni.uint32_RunTime = funct_FreqToTimer23(g_Uni.uint16_RunFreq);
+                g_Uni.uint32_IntTime = g_Uni.uint32_RunTime;
             }
             
             //send back the OK

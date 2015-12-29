@@ -13,8 +13,7 @@
  *                          - __IntUart2Handler
  *                          - __IntSPI1Handler
  *                          - __IntRTCCHandler
- *                          - __IntTimer2Handler
- *                          - __IntTimer3Handler
+ *                          - __IntTimer23Handler
  *                          - __IntPWM1Handler
  *                          - __IntI2cHandler
  *                          - __IntINT2handler
@@ -26,7 +25,7 @@
 #include "includes.h" // File which contain all includes files
 
 extern Si2c1 g_i2c1;
-extern STimer2 g_Timer2;
+extern STimer1 g_Timer1;
 extern SUART2txd g_UART2txd;
 extern SUART2rxd g_UART2rxd;
 extern SUni g_Uni;
@@ -34,6 +33,9 @@ extern SLin g_LIN;
 extern Sbipol g_Bipol;
 extern T_A3981 A3981;
 extern SParam g_Param;
+extern SLin g_LIN; 
+extern SUART1txd g_UART1txd;      
+extern SUART1rxd g_UART1rxd;
 
 /**********************************************************************************************************************
  * Routine:                 INT_init
@@ -229,305 +231,263 @@ void __ISR(_RTCC_VECTOR, IPL3AUTO) __IntRTCCHandler(void)
 
 
 /**********************************************************************************************************************
- * Routine:                 __IntTimer2Handler
+ * Routine:                 __IntTimer23Handler
 
  * Description:
- * First reset the interrupt flag doing this in two steps, first read it and then set it to 0. 
- * Then switch off the clock source to update the modulo value and reset the counter. The switch-case verifies the 
- * value of the counter - if this is:
- * 0:
- * Then the waiting time is expired and the new value must be loaded. It is a must have to verify if the counter has 
- * the value 1, because this means that the last time can be used directly. So the needed time is under the defined 
- * interrupt time. Otherwise we have to load the defined interrupt time as next. 
- * 1:
- * This is the case to load the last waiting time. 
- * default (2-65535):
- * If we have not to use the last time, then this case will be executed and the time will be the defined 
- * interrupt time.
+ * -old text deleted- 
  * 
- * At the end we decrement the counter by 1 and switch on again the clock source. The idea to have different modulo 
- * value is that this interrupt will be not called each 50us or each 10us, etc. The idea was to call this interrupt 
- * as less as possible. And this time is fixed with the variable g_Timer2.uint16_IntTime in 100ns steps.
- * With this solution we execute the interrupt not so much and in the same time we can use the resolution of 100ns.
+ * Modification (23.12.2015 / A. Staub):
+ * Timer changed to a combination of timer 2 and 3; name changed to __IntTimer23Handler.
+ * Interrupt flag changed to timer 3.
+ * 
+ * Modification (24.12.2015 / A. Staub):
+ * Old describtion complete erased, because we change the whole code. New description:
+ * First this routine disble the interrupt for timer 23 and reset the interrupt flag and counter. 
+ * Then it verifies if the motor type is set to unipolar / matrix or bipolar.
+ * Unipolar to do's:
+ * - load the counter with the new time
+ * - set allow next step flag
+ * - if it is the first, or last or an error is present or real = goal position:
+ *      then nothing will be done
+ * - if this is not the case, then we increment the real position and check which step mode is active to switch
+ *   the outputs correct
+ * 
+ * Bipolar:
+ * The important things to understand for the bipolar is that we have to generate an impuls on the step input
+ * of the driver for that it executes a next step and this impuls has to be at least 1us long. 
+ * So inside this routine we need two different times:
+ * - the effective time that we have to wait between two impuls (step executes on the rising edge)
+ * - the time to switch off the output step after >1us. 
+ * That is the reason why we use the flag "g_Bipol.uint1_IntTimeExpiredFlag". 
+ * If this flag is true then we have to load the new effective time but in the same time we subtracte
+ * 400 (25ns * 400 = 10us) from the counter, because this was the time that we already waited for the impuls. 
+ * If this flag is false then we load the time for the switch off of the output step at the beginning,
+ * set the flag allow next step, increment the real position and switch on the output step as well. 
+ * We also have a condition for the first, or last, or error or real = goal position.  
  * 
  * Creator:                 J. Rebetez
  * Date of creation:        08.08.2015
- * Last modification on:    01.10.2015
+ * Last modification on:    24.12.2015
  * Modified by:             A. Staub
  * 
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void __ISR(_TIMER_2_VECTOR, IPL1AUTO) __IntTimer2Handler(void)
+void __ISR(_TIMER_3_VECTOR, IPL1AUTO) __IntTimer23Handler(void)
 {
     auto unsigned char uint8_WB1;       //local variabel 'WorkByte1'
     
     T2CONbits.ON = 0;           //disable interrupt module
-    IFS0bits.T2IF = 0;          //clear interrupt flag
-    TMR2 = 0;                   //reset counter 
+    IFS0bits.T3IF = 0;          //clear interrupt flag of timer 3
+    TMR2 = 0;                   //reset LSB counter
+    TMR3 = 0;                   //reset MSB counter
     
-    if(g_Param.uint8_MotTyp == 'U')
+    if((g_Param.uint8_MotTyp == 'U') || (g_Param.uint8_MotTyp == 'M'))
     {
-        switch (g_Timer2.uint16_Count)      //verify the value of the counter
+        //load the new interrupt time
+        PR2 = g_Uni.uint32_IntTime & 0x0000FFFF;  //first the LSB
+        PR3 = g_Uni.uint32_IntTime >> 16;         //second the MSB
+
+        g_Uni.uint8_Status |= 0x10;     //allow next step
+
+        //for security - be sure that the motor is in run
+        if(g_Uni.uint8_Settings & 0x01)
         {
-            case (0): //time expired 
-                //load the new time for the next step - how many times to wait the interrupt time
-                g_Timer2.uint16_Count = g_Uni.uint16_Count;
+            //then verify if it is the first or last step or motor error = true or real = goal position
+            if((g_Uni.uint8_Status & 0x01) || (g_Uni.uint8_Status & 0x02) ||
+            (g_Uni.uint8_Status & 0x80) || (g_Uni.uint32_RealPos == g_Uni.uint32_GoalPos))
+            {
+                //then do nothing
+            }
+            else    //otherwise do...
+            {
+                g_Uni.uint32_RealPos++;     //increment real position with 1      
 
-                //load the last time for the next step
-                g_Timer2.uint16_LastTime = g_Uni.uint16_LastTime;
-
-                //verify if the counter is 1, because in this case the last time must be directly used 
-                if(g_Timer2.uint16_Count == 1)
+                if(g_Uni.uint8_Settings & 0x10)     //verify the direction
                 {
-                    //then load PR2 with the last time
-                    PR2 = g_Timer2.uint16_LastTime;
+                    //direction = CW
+                    g_Uni.uint8_FsHsCount++;    //increment counter
                 }
                 else
                 {
-                    //otherwise load it with the interrupt time
-                    PR2 = g_Timer2.uint16_IntTime;
-                } 
+                    //direction = CCW
+                    g_Uni.uint8_FsHsCount--;    //decrement counter
+                }
 
-                //allow next step
-                g_Uni.uint8_Status |= 0x10;
-
-                //for security - be sure that the motor is in run
-                if(g_Uni.uint8_Settings & 0x01)
+                if(g_Uni.uint8_Settings & 0x04) //verify step mode if full or half
                 {
-                    //then verify if it is the first or last step or motor error = true or real = goal position
-                    if((g_Uni.uint8_Status & 0x01) || (g_Uni.uint8_Status & 0x02) ||
-                    (g_Uni.uint8_Status & 0x80) || (g_Uni.uint32_RealPos == g_Uni.uint32_GoalPos))
+                    //step mode = half step
+                    uint8_WB1 = g_Uni.uint8_FsHsCount % 8;  //counter modulo 8
+
+                    switch(uint8_WB1)
                     {
-                        //then do nothing
-                    }
-                    else
-                    {
-                        //otherwise do the follow
-                        g_Uni.uint32_RealPos++;     //increment real position with 1      
+                        case (0):
+                            g_Uni.uint8_PhA1 = _UniPhOFF;
+                            g_Uni.uint8_PhA2 = _UniPhON;
+                            g_Uni.uint8_PhB1 = _UniPhOFF;
+                            g_Uni.uint8_PhB2 = _UniPhON;
+                            break;
 
-                        //verify the direction
-                        if(g_Uni.uint8_Settings & 0x10)
-                        {
-                            //direction = CW
-                            g_Uni.uint8_FsHsCount++;    //increment counter
-                        }
-                        else
-                        {
-                            //direction = CCW
-                            g_Uni.uint8_FsHsCount--;    //decrement counter
-                        }
+                        case (1):
+                            g_Uni.uint8_PhA1 = _UniPhOFF;
+                            g_Uni.uint8_PhA2 = _UniPhON;
+                            g_Uni.uint8_PhB1 = _UniPhOFF;
+                            g_Uni.uint8_PhB2 = _UniPhOFF;
+                            break;
 
-                        //verify step mode if full or half
-                        if(g_Uni.uint8_Settings & 0x04)
-                        {
-                            //step mode = half step
-                            uint8_WB1 = g_Uni.uint8_FsHsCount % 8;  //counter modulo 8
+                        case (2):
+                            g_Uni.uint8_PhA1 = _UniPhOFF;
+                            g_Uni.uint8_PhA2 = _UniPhON;
+                            g_Uni.uint8_PhB1 = _UniPhON;
+                            g_Uni.uint8_PhB2 = _UniPhOFF;
+                            break;
 
-                            switch(uint8_WB1)
-                            {
-                                case (0):
-                                    g_Uni.uint8_PhA1 = _UniPhOFF;
-                                    g_Uni.uint8_PhA2 = _UniPhON;
-                                    g_Uni.uint8_PhB1 = _UniPhOFF;
-                                    g_Uni.uint8_PhB2 = _UniPhON;
-                                    break;
+                        case (3):
+                            g_Uni.uint8_PhA1 = _UniPhOFF;
+                            g_Uni.uint8_PhA2 = _UniPhOFF;
+                            g_Uni.uint8_PhB1 = _UniPhON;
+                            g_Uni.uint8_PhB2 = _UniPhOFF;
+                            break;
 
-                                case (1):
-                                    g_Uni.uint8_PhA1 = _UniPhOFF;
-                                    g_Uni.uint8_PhA2 = _UniPhON;
-                                    g_Uni.uint8_PhB1 = _UniPhOFF;
-                                    g_Uni.uint8_PhB2 = _UniPhOFF;
-                                    break;
+                        case (4):
+                            g_Uni.uint8_PhA1 = _UniPhON;
+                            g_Uni.uint8_PhA2 = _UniPhOFF;
+                            g_Uni.uint8_PhB1 = _UniPhON;
+                            g_Uni.uint8_PhB2 = _UniPhOFF;
+                            break;
 
-                                case (2):
-                                    g_Uni.uint8_PhA1 = _UniPhOFF;
-                                    g_Uni.uint8_PhA2 = _UniPhON;
-                                    g_Uni.uint8_PhB1 = _UniPhON;
-                                    g_Uni.uint8_PhB2 = _UniPhOFF;
-                                    break;
+                        case (5):
+                            g_Uni.uint8_PhA1 = _UniPhON;
+                            g_Uni.uint8_PhA2 = _UniPhOFF;
+                            g_Uni.uint8_PhB1 = _UniPhOFF;
+                            g_Uni.uint8_PhB2 = _UniPhOFF;
+                            break;
 
-                                case (3):
-                                    g_Uni.uint8_PhA1 = _UniPhOFF;
-                                    g_Uni.uint8_PhA2 = _UniPhOFF;
-                                    g_Uni.uint8_PhB1 = _UniPhON;
-                                    g_Uni.uint8_PhB2 = _UniPhOFF;
-                                    break;
+                        case (6):
+                            g_Uni.uint8_PhA1 = _UniPhON;
+                            g_Uni.uint8_PhA2 = _UniPhOFF;
+                            g_Uni.uint8_PhB1 = _UniPhOFF;
+                            g_Uni.uint8_PhB2 = _UniPhON;
+                            break;
 
-                                case (4):
-                                    g_Uni.uint8_PhA1 = _UniPhON;
-                                    g_Uni.uint8_PhA2 = _UniPhOFF;
-                                    g_Uni.uint8_PhB1 = _UniPhON;
-                                    g_Uni.uint8_PhB2 = _UniPhOFF;
-                                    break;
+                        case (7):
+                            g_Uni.uint8_PhA1 = _UniPhOFF;
+                            g_Uni.uint8_PhA2 = _UniPhOFF;
+                            g_Uni.uint8_PhB1 = _UniPhOFF;
+                            g_Uni.uint8_PhB2 = _UniPhON;
+                            break;
 
-                                case (5):
-                                    g_Uni.uint8_PhA1 = _UniPhON;
-                                    g_Uni.uint8_PhA2 = _UniPhOFF;
-                                    g_Uni.uint8_PhB1 = _UniPhOFF;
-                                    g_Uni.uint8_PhB2 = _UniPhOFF;
-                                    break;
-
-                                case (6):
-                                    g_Uni.uint8_PhA1 = _UniPhON;
-                                    g_Uni.uint8_PhA2 = _UniPhOFF;
-                                    g_Uni.uint8_PhB1 = _UniPhOFF;
-                                    g_Uni.uint8_PhB2 = _UniPhON;
-                                    break;
-
-                                case (7):
-                                    g_Uni.uint8_PhA1 = _UniPhOFF;
-                                    g_Uni.uint8_PhA2 = _UniPhOFF;
-                                    g_Uni.uint8_PhB1 = _UniPhOFF;
-                                    g_Uni.uint8_PhB2 = _UniPhON;
-                                    break;
-
-                                default:
-                                    //nothing is done
-                                    break;
-                            }   
-                        }
-                        else
-                        {
-                            //step mode = full step
-                            uint8_WB1 = g_Uni.uint8_FsHsCount % 4;  //counter modulo 4
-
-                            //define which coil(s) should be switched on and in the same time do not
-                            //switch on some coils if the full step is in one phase on. 
-                            switch(uint8_WB1)       
-                            {
-                                case (0):
-                                    g_Uni.uint8_PhA1 = _UniPhOFF;
-                                    g_Uni.uint8_PhA2 = _UniPhON;
-                                    g_Uni.uint8_PhB1 = _UniPhON && (g_Uni.uint8_Settings & 0x40);
-                                    g_Uni.uint8_PhB2 = _UniPhOFF;
-                                    break;
-
-                                case (1):
-                                    g_Uni.uint8_PhA1 = _UniPhON && (g_Uni.uint8_Settings & 0x40);
-                                    g_Uni.uint8_PhA2 = _UniPhOFF;
-                                    g_Uni.uint8_PhB1 = _UniPhON;
-                                    g_Uni.uint8_PhB2 = _UniPhOFF;
-                                    break;
-
-                                case (2):
-                                    g_Uni.uint8_PhA1 = _UniPhON;
-                                    g_Uni.uint8_PhA2 = _UniPhOFF;
-                                    g_Uni.uint8_PhB1 = _UniPhOFF;
-                                    g_Uni.uint8_PhB2 = _UniPhON && (g_Uni.uint8_Settings & 0x40);
-                                    break;
-
-                                case (3):
-                                    g_Uni.uint8_PhA1 = _UniPhOFF;
-                                    g_Uni.uint8_PhA2 = _UniPhON && (g_Uni.uint8_Settings & 0x40);
-                                    g_Uni.uint8_PhB1 = _UniPhOFF;
-                                    g_Uni.uint8_PhB2 = _UniPhON;
-                                    break;
-
-                                default:
-                                    //nothing is done
-                                    break;
-                            }
-                        }       
-                        //write the new values to the outputs
-                        oUniCoilA1 = g_Uni.uint8_PhA1;
-                        oUniCoilA2 = g_Uni.uint8_PhA2;
-                        oUniCoilB1 = g_Uni.uint8_PhB1;
-                        oUniCoilB2 = g_Uni.uint8_PhB2;
-                    }
+                        default:
+                            //nothing is done
+                            break;
+                    }   
                 }
                 else
                 {
-                    //otherwise load the modulo timer with the maximum value possible for
-                    //that the interrupt does not execute to much times
-                    PR2 = 0xFF;
-                }
-                break;
+                    //step mode = full step
+                    uint8_WB1 = g_Uni.uint8_FsHsCount % 4;  //counter modulo 4
 
-            case (1):
-                PR2 = g_Timer2.uint16_LastTime; //load timer with last waiting time
-                break; 
+                    //define which coil(s) should be switched on and in the same time do not
+                    //switch on some coils if the full step is in one phase on. 
+                    switch(uint8_WB1)       
+                    {
+                        case (0):
+                            g_Uni.uint8_PhA1 = _UniPhOFF;
+                            g_Uni.uint8_PhA2 = _UniPhON;
+                            g_Uni.uint8_PhB1 = _UniPhON && (g_Uni.uint8_Settings & 0x40);
+                            g_Uni.uint8_PhB2 = _UniPhOFF;
+                            break;
 
-            default:
-                PR2 = g_Timer2.uint16_IntTime;  //load timer with defined time
-                break;
+                        case (1):
+                            g_Uni.uint8_PhA1 = _UniPhON && (g_Uni.uint8_Settings & 0x40);
+                            g_Uni.uint8_PhA2 = _UniPhOFF;
+                            g_Uni.uint8_PhB1 = _UniPhON;
+                            g_Uni.uint8_PhB2 = _UniPhOFF;
+                            break;
+
+                        case (2):
+                            g_Uni.uint8_PhA1 = _UniPhON;
+                            g_Uni.uint8_PhA2 = _UniPhOFF;
+                            g_Uni.uint8_PhB1 = _UniPhOFF;
+                            g_Uni.uint8_PhB2 = _UniPhON && (g_Uni.uint8_Settings & 0x40);
+                            break;
+
+                        case (3):
+                            g_Uni.uint8_PhA1 = _UniPhOFF;
+                            g_Uni.uint8_PhA2 = _UniPhON && (g_Uni.uint8_Settings & 0x40);
+                            g_Uni.uint8_PhB1 = _UniPhOFF;
+                            g_Uni.uint8_PhB2 = _UniPhON;
+                            break;
+
+                        default:
+                            //nothing is done
+                            break;
+                    }
+                }       
+                //write the new values to the outputs
+                oUniCoilA1 = g_Uni.uint8_PhA1;
+                oUniCoilA2 = g_Uni.uint8_PhA2;
+                oUniCoilB1 = g_Uni.uint8_PhB1;
+                oUniCoilB2 = g_Uni.uint8_PhB2;
+            }
+        }
+        else
+        {
+            //otherwise load the modulo timer with around 0.5s 
+            //for that it executes not too much <-- error
+            PR2 = 0xFFFF;
+            PR3 = 0x00FF;
         }
     }
-    else    // Case for bipolar motor
+    else    //motor is a bipolar
     {
-        switch (g_Timer2.uint16_Count)      //verify the value of the counter
+        if(g_Bipol.uint1_IntTimeExpiredFlag)    //interrupt time expired?
         {
-            case (0): //time expired 
-                //load the new time for the next step - how many times to wait the interrupt time
-                g_Timer2.uint16_Count = g_Bipol.uint16_Count;
-
-                //load the last time for the next step
-                g_Timer2.uint16_LastTime = g_Bipol.uint16_LastTime;
-
-                //verify if the counter is 1, because in this case the last time must be directly used 
-                if(g_Timer2.uint16_Count == 1)
+            g_Bipol.uint1_IntTimeExpiredFlag = 0;   //clear the flag
+            oBiStepSignal = 0;                      //reset output
+            
+            //load the new interrupt time
+            PR2 = g_Bipol.uint32_IntTime & 0x0000FFFF;  //first the LSB
+            PR3 = g_Bipol.uint32_IntTime >> 16;         //second the MSB
+            PR2 -=400;  //to correct the already waited time of 10us from the step impuls (output)
+        }
+        else
+        {
+            PR2 = 400;  //load interrupt time with 10us
+            //force the interrupt routine to load the correct time (next time)
+            g_Bipol.uint1_IntTimeExpiredFlag = 1;   
+                
+            g_Bipol.uint8_Status |= 0x10;   //allow next step
+            oTestLed2 =! oTestLed2;
+            
+            //for security - be sure that the motor is in run
+            if(g_Bipol.uint1_IsBipolEnabled == 1)
+            {
+                //if it is the first or last step or motor error = true or real = goal position?
+                if((g_Bipol.uint8_Status & 0x01) || (g_Bipol.uint8_Status & 0x02) ||
+                (g_Bipol.uint8_Status & 0x80) || (g_Bipol.uint32_RealPos == g_Bipol.uint32_GoalPos))
                 {
-                    //then load PR2 with the last time
-                    PR2 = g_Timer2.uint16_LastTime;
+                    //then do nothing
                 }
-                else
+                else        //otherwise do...
                 {
-                    //otherwise load it with the interrupt time
-                    PR2 = g_Timer2.uint16_IntTime;
-                } 
-
-                //allow next step
-                g_Bipol.uint8_Status |= 0x10;
-
-                //for security - be sure that the motor is in run
-                if(A3981.RUN.BITS.EN == 1)
-                {
-                    //then verify if it is the first or last step or motor error = true or real = goal position
-                    if((g_Bipol.uint8_Status & 0x01) || (g_Bipol.uint8_Status & 0x02) ||
-                    (g_Bipol.uint8_Status & 0x80) || (g_Bipol.uint32_RealPos == g_Bipol.uint32_GoalPos))
-                    {
-                        //then do nothing
-                    }
-                    else
-                    {
-                        //otherwise do the follow
-                        g_Bipol.uint32_RealPos++;     //increment real position with 1      
-                        oBiStepSignal = 1;
-                    }
+                    g_Bipol.uint32_RealPos++;       //increment real position with 1      
+                    oBiStepSignal = 1;              //execute one step
                 }
-                else
-                {
-                    //otherwise load the modulo timer with the maximum value possible for
-                    //that the interrupt does not execute to much times
-                    PR2 = 0xFF;
-                }
-                break;
-
-            case (1):
-                PR2 = g_Timer2.uint16_LastTime; //load timer with last waiting time
-                oBiStepSignal = 0;
-                break; 
-
-            default:
-                PR2 = g_Timer2.uint16_IntTime;  //load timer with defined time
-                oBiStepSignal = 0;
-                break;
+            }
+            else
+            {
+                //otherwise load the modulo timer with around 0.5s 
+                //for that it executes not too much <-- error
+                PR2 = 0xFFFF;
+                PR3 = 0x00FF;
+            }
         }
     }
     
-    g_Timer2.uint16_Count--;    //decrement the counter by 1 
     T2CONbits.ON = 1;           //enable interrupt module    
 }   //end of __IntTimer2Handler
 
-
-/****************************************************************************/
-/*  Purpose of the INT routine:  Manage TIMER3 overflow interrupts          */
-/****************************************************************************/
-void __ISR(_TIMER_3_VECTOR, IPL1AUTO) __IntTimer3Handler(void)
-{
-    TMR3 = 0;
-    IFS0bits.T3IF = 0;
-}
 
 /****************************************************************************/
 /*  Purpose of the INT routine:  Manage PWM1 overflow interrupts            */
@@ -799,7 +759,10 @@ void __ISR(_EXTERNAL_2_VECTOR, IPL3AUTO) __IntINT2handler(void)
  * Routine:                 __IntTimer1Handler
 
  * Description:
- * This interrupt occurs every 1ms and can be used for a timeout or something other. 
+ * First we reset the interrupt flag and disable the interrupt as well.
+ * If the counter (how much time we have to wait the 200ms is not empty then we load again 200ms for the
+ * interrupt and enable it. 
+ * Once the counter is empty (0) we disable the interrupt and the safety flag. 
  * 
  * Creator:                 A. Staub
  * Date of creation:        18.12.2015
@@ -810,11 +773,28 @@ void __ISR(_EXTERNAL_2_VECTOR, IPL3AUTO) __IntINT2handler(void)
  * Output:                  -
 ***********************************************************************************************************************/
 void __ISR(_TIMER_1_VECTOR, IPL5AUTO) __IntTimer1Handler(void)
-{    
+{ 
+    T1CONbits.ON = 0;       //disable timer 1
     TMR1 = 0;               //reset counter
     IFS0bits.T1IF = 0;      //clear interrupt flag
     
-    g_LIN.uint16_TimeoutCounter++;
+    switch (g_Timer1.uint8_200msCount)  //verify the value of how much time we have to wait the 200ms
+    {
+        case (0):   //time expired?
+            g_Timer1.uint8_Timer1SafFlag = 0;   //disable the safety flag
+            T1CONbits.ON = 0;                   //disable timer 1
+            
+            //add here some flags / register for your application (LIN, etc. )
+            //...
+            oTestLed2 =! oTestLed2;
+            break;
+            
+        default:
+            PR1 = 312 * 200;    //load PR1 with 312 (1ms) * 200 to have a wait time of 200ms
+            g_Timer1.uint8_200msCount--;    //decrement the counter for the 200ms 
+            T1CONbits.ON = 1;               //enable timer 1
+            break;
+    }
 }   //end of __IntTimer1Handler
 
 
@@ -870,32 +850,41 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
     {
         IFS0bits.U1TXIF = 0;        //clear interrupt bit
         
-        /*if(!g_UART2txd.uint8_BufEmpty)      //send buffer not empty?
+        if(!g_UART1txd.uint8_BufEmpty)  //send buffer is not empty
         {
-            //read out one byte from the send buffer and send it directly
-            U2TXREG = g_UART2txd.uint8_Buffer[g_UART2txd.uint16_Rch];
-            
-            //increment the read-pointer of the ring buffer
-            g_UART2txd.uint16_Rch++;
-      
-            //verify if read-pointer is at the end of ring buffer
-            g_UART2txd.uint16_Rch = g_UART2txd.uint16_Rch % _TxD2_BUFSIZE;
-            
-            //verify if read-pointer and write-pointer of the ring buffer are equal
-            if(g_UART2txd.uint16_Rch == g_UART2txd.uint16_Wch)
+            if(g_LIN.uint8_LinBreakToSend)  //lin break to send
             {
-                g_UART2txd.uint8_BufEmpty = 1;  //send buffer = empty
+                U1STAbits.UTXBRK = 1;       //set transmit break bit
+                U1TXREG = 0;                //load register with dummy character (value is ignored)
+                g_LIN.uint8_LinBreakToSend = 0; //reset the flag for the lin break to send
             }
-            else
+            else    //normal characters to send
             {
-                //do nothing
+                //read out one byte from the send buffer and send it directly
+                U1TXREG = g_UART1txd.uint8_Buffer[g_UART1txd.uint16_Rch];
+                
+                //increment the read-pointer of the ring buffer
+                g_UART1txd.uint16_Rch++;
+                
+                //verify if read-pointer is at the end of ring buffer
+                g_UART1txd.uint16_Rch = g_UART1txd.uint16_Rch % _TxDRxD_BUFSIZE;
+                
+                //verify if read-pointer and write-pointer of the ring buffer are equal
+                if(g_UART1txd.uint16_Rch == g_UART1txd.uint16_Wch)
+                {
+                    g_UART1txd.uint8_BufEmpty = 1;  //send buffer = empty
+                }
+                else
+                {
+                    //do nothing
+                }
             }
         }
-        else
+        else        //send buffer is empty
         {
-            IEC1bits.U2TXIE = 0;    //disable the send interrupt
-            IFS1bits.U2TXIF = 1;    //enable interrupt flag for the next time
-        }  */   
+            IEC0bits.U1TXIE = 0;    //disable the send interrupt
+            IFS0bits.U1TXIF = 1;    //enable interrupt flag for the next time
+        }
     }
     
 //--- Is this an error request interrupt? ---//

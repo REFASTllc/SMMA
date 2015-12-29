@@ -1,35 +1,56 @@
-/****************************************************************************/
-/*  Name of the file:       adc.c                                           */
-/*  Purpose of the file:    Functions related to AD converter modul         */
-/*  Creator:                julien_rebetez                                  */
-/*  Date of creation:       17 août 2015, 17:12                             */
-/*                                                                          */
-/*  Last modification on:   -                                               */
-/*  Modified by:            -                                               */
-/*  Version:                -                                               */
-/* **************************************************************************/
+/**********************************************************************************************************************
+
+                                            UBD - Unipolar Bipolar Driver
+
+***********************************************************************************************************************
+ * File name:               system.c
+ * Creation date:           17.08.2015
+ * Main creator:            J. Rebetez
+ * Company:                 REFAST GmbH
+ *                          Copyright (c) 2015 REFAST GmbH
+***********************************************************************************************************************
+ * Content overview:        - InitADInterrupt
+ *                          - InitADInterrupt
+***********************************************************************************************************************/
+
 
 #include "includes.h" // File which contain all includes files
 
-/****************************************************************************/
-/*  Name of the function:       InitADModule                                */
-/*  Purpose of the function:    Initialization of the AD module             */
-/*  Parameters:                                                             */
-/*      IN:                     -                                           */
-/*      OUT:                    -                                           */
-/*                                                                          */
-/*  Creator:                    J. Rebetez                                  */
-/*  Date of creation:           17.08.2015, 17:13                           */
-/*                                                                          */
-/*  Last modified on:           -                                           */
-/*  Modified by:                -                                           */
-/*  Version:                    -                                           */
-/*                                                                          */
-/*  Remark:                     -                                           */
-/****************************************************************************/
+
+/**********************************************************************************************************************
+ * Routine:                 InitADInterrupt
+
+ * Description:
+ * Initialization of the AD module. 
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        17.08.2015
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
 void InitADModule(void)
 {
-    AD1PCFG = 0;
+//configure pin if digital or analog mode (1 = digital / 0 = analog)
+    AD1PCFGbits.PCFG0 = 1;  //digital mode (programming pin)
+    AD1PCFGbits.PCFG1 = 1;  //digital mode (programming pin)
+    AD1PCFGbits.PCFG2 = 0;  //unipolar; Icoil A2
+    AD1PCFGbits.PCFG3 = 0;  //unipolar; Icoil A1
+    AD1PCFGbits.PCFG4 = 0;  //unipolar; Icoil B2
+    AD1PCFGbits.PCFG5 = 0;  //unipolar; Icoil B1
+    AD1PCFGbits.PCFG6 = 0;  //bipolar; Icoil B
+    AD1PCFGbits.PCFG7 = 0;  //bipolar; Vref
+    AD1PCFGbits.PCFG8 = 0;  //Vmot
+    AD1PCFGbits.PCFG9 = 0;  //Imot
+    AD1PCFGbits.PCFG10 = 0; //bipolar; Icoil A
+    AD1PCFGbits.PCFG11 = 0; //battery
+    AD1PCFGbits.PCFG12 = 1; //free
+    AD1PCFGbits.PCFG13 = 1; //free
+    AD1PCFGbits.PCFG14 = 1; //digital used for Vmot switch
+    AD1PCFGbits.PCFG15 = 1; //digital used to switch the measure to coil resistor
+    
 /*** AD1CON1 ******************************************************************/
     AD1CON1bits.ON = 0;     // 1 = ADC module is operating
                             // 0 = ADC is off
@@ -37,9 +58,9 @@ void InitADModule(void)
     AD1CON1bits.SIDL = 1;   // 1 = Discontinue module operation when device enters Idle mode
                             // 0 = Continue module operation in Idle mode
 
-    AD1CON1bits.FORM2 = 0;  // 011 = Signed Fractional 16-bit (DOUT = 0000 0000 0000 0000 sddd dddd dd00 0000)
+    AD1CON1bits.FORM2 = 1;  // 011 = Signed Fractional 16-bit (DOUT = 0000 0000 0000 0000 sddd dddd dd00 0000)
     AD1CON1bits.FORM1 = 0;  // 010 = Fractional 16-bit (DOUT = 0000 0000 0000 0000 dddd dddd dd00 0000)
-    AD1CON1bits.FORM0 =0;   // 001 = Signed Integer 16-bit (DOUT = 0000 0000 0000 0000 ssss sssd dddd dddd)
+    AD1CON1bits.FORM0 = 0;  // 001 = Signed Integer 16-bit (DOUT = 0000 0000 0000 0000 ssss sssd dddd dddd)
                             // 000 = Integer 16-bit (DOUT = 0000 0000 0000 0000 0000 00dd dddd dddd)
                             // 111 = Signed Fractional 32-bit (DOUT = sddd dddd dd00 0000 0000 0000 0000)
                             // 110 = Fractional 32-bit (DOUT = dddd dddd dd00 0000 0000 0000 0000 0000)
@@ -89,7 +110,7 @@ void InitADModule(void)
 
     AD1CON2bits.SMPI3 = 0;  // 1111 = Interrupts at the completion of conversion for each 16th sample/convert sequence
     AD1CON2bits.SMPI2 = 0;  // 1110 = Interrupts at the completion of conversion for each 15th sample/convert sequence
-    AD1CON2bits.SMPI1 = 0;  // ?
+    AD1CON2bits.SMPI1 = 0;  // ...
     AD1CON2bits.SMPI0 = 0;  // 0001 = Interrupts at the completion of conversion for each 2nd sample/convert sequence
                             // 0000 = Interrupts at the completion of conversion for each sample/convert sequence
 
@@ -100,47 +121,83 @@ void InitADModule(void)
                             //     MUX A input multiplexer settings for all subsequent samples
                             // 0 = Always use MUX A input multiplexer settings
 /*** AD1CON3 ******************************************************************/
-    AD1CON3bits.ADRC = 1;   // 1 = ADC internal RC clock
+    AD1CON3bits.ADRC = 0;   // 1 = ADC internal RC clock
                             // 0 = Clock derived from Peripheral Bus Clock (PBCLK)
 
     AD1CON3bits.SAMC4 = 0;  // 11111 = 31 TAD
-    AD1CON3bits.SAMC3 = 1;  // ?
-    AD1CON3bits.SAMC2 = 1;  // ?
+    AD1CON3bits.SAMC3 = 1;  // ...
+    AD1CON3bits.SAMC2 = 1;  // ...
     AD1CON3bits.SAMC1 = 1;  // 00001 = 1 TAD
     AD1CON3bits.SAMC0 = 1;  // 00000 = 0 TAD (Not allowed)
 
     AD1CON3bits.ADCS7 = 0;  // 11111111 = TPB ? 2 ? (ADCS<7:0> + 1) = 512 ? TPB = TAD
-    AD1CON3bits.ADCS6 = 1;  // ?
-    AD1CON3bits.ADCS5 = 1;  // ?
-    AD1CON3bits.ADCS4 = 1;  // ?
+    AD1CON3bits.ADCS6 = 1;  // ...
+    AD1CON3bits.ADCS5 = 1;  // ...
+    AD1CON3bits.ADCS4 = 1;  // ...
     AD1CON3bits.ADCS3 = 1;  // 00000001 = TPB ? 2 ? (ADCS<7:0> + 1) = 4 ? TPB = TAD
     AD1CON3bits.ADCS2 = 1;  // 00000000 = TPB ? 2 ? (ADCS<7:0> + 1) = 2 ? TPB = TAD
     AD1CON3bits.ADCS1 = 1;  // TPB is the PIC32 Peripheral Bus clock time period.
     AD1CON3bits.ADCS0 = 1;  // Refer to Section 6. ?Oscillator? (DS61112) for more information.
+    
+//AD1CHS: ADC input select register
+    AD1CHSbits.CH0NB = 0;   //negative input select for MUX B bit
+                            //0= channel 0 negative input is VR-
+                            //1= channel 0 negative input is AN1
+    
+    AD1CHSbits.CH0SB3 = 0;  //positive input select for MUX B bits
+    AD1CHSbits.CH0SB2 = 0;  //1111= channel 0 positive input is AN15
+    AD1CHSbits.CH0SB1 = 0;  //...
+    AD1CHSbits.CH0SB0 = 0;  //0000= channel 0 positive input is AN0
+    
+    AD1CHSbits.CH0NA = 0;   //negative input select for MUX A bit
+                            //0= channel 0 negative input is VR-
+                            //1= channel 0 negative input is AN1
+    
+    AD1CHSbits.CH0SA3 = 0;  //positive input select for MUX A bits
+    AD1CHSbits.CH0SA2 = 0;  //11111= channel 0 positive input is AN15
+    AD1CHSbits.CH0SA1 = 0;  //...
+    AD1CHSbits.CH0SA0 = 0;  //0000= channel 0 positive input is AN0
+    
+//AD1CSSL: ADC input scan select register
+    AD1CSSLbits.CSSL0 = 0;  //skip AN0 for input scan
+    AD1CSSLbits.CSSL1 = 0;  //skip AN1 for input scan
+    AD1CSSLbits.CSSL2 = 0;  //skip AN2 for input scan
+    AD1CSSLbits.CSSL3 = 0;  //skip AN3 for input scan
+    AD1CSSLbits.CSSL4 = 0;  //skip AN4 for input scan
+    AD1CSSLbits.CSSL5 = 0;  //skip AN5 for input scan
+    AD1CSSLbits.CSSL6 = 0;  //skip AN6 for input scan
+    AD1CSSLbits.CSSL7 = 0;  //skip AN7 for input scan
+    AD1CSSLbits.CSSL8 = 0;  //skip AN8 for input scan
+    AD1CSSLbits.CSSL9 = 0;  //skip AN9 for input scan
+    AD1CSSLbits.CSSL10 = 0; //skip AN10 for input scan
+    AD1CSSLbits.CSSL11 = 0; //skip AN11 for input scan
+    AD1CSSLbits.CSSL12 = 0; //skip AN12 for input scan
+    AD1CSSLbits.CSSL13 = 0; //skip AN13 for input scan
+    AD1CSSLbits.CSSL14 = 0; //skip AN14 for input scan
+    AD1CSSLbits.CSSL15 = 0; //skip AN15 for input scan
 }
 
-/****************************************************************************/
-/*  Name of the function:       InitADInterrupt                             */
-/*  Purpose of the function:    Initialization of the interrupts of the AD  */
-/*  Parameters:                                                             */
-/*      IN:                     -                                           */
-/*      OUT:                    -                                           */
-/*                                                                          */
-/*  Creator:                    J. Rebetez                                  */
-/*  Date of creation:           17.08.2015, 17:20                           */
-/*                                                                          */
-/*  Last modified on:           -                                           */
-/*  Modified by:                -                                           */
-/*  Version:                    -                                           */
-/*                                                                          */
-/*  Remark:                     -                                           */
-/****************************************************************************/
+
+/**********************************************************************************************************************
+ * Routine:                 InitADInterrupt
+
+ * Description:
+ * Initialization of the interrupts of the AD. 
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        17.08.2015
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
 void InitADInterrupt(void)
 {
     IFS1bits.AD1IF = 0; // Interrupt flag bit
 
     IPC6bits.AD1IP = 7; // Interrupt priority bits (7 = high, 0 = no interrupt)
-    IPC6bits.AD1IS = 3; // Interrupt sub-priority bits (3 = hig priority)
+    IPC6bits.AD1IS = 3; // Interrupt sub-priority bits (3 = high priority)
 
     IEC1bits.AD1IE = 0; // Interrupt enable bit
 }

@@ -80,8 +80,10 @@ void system_init(void)
 {   
 //system initialization    
     system_osc();                           //call subroutine
-    InitADModule();
     system_IOs();                           //call subroutine
+    //AD module must be initialize  after the system_IOs because we define here which pin is used 
+    //in analog mode
+    InitADModule(); 
 //    system_NoticeModule();                  //call subroutine
 //interrupt initialization    
     INT_init();                             //call subroutine
@@ -100,11 +102,11 @@ void system_init(void)
     uart_set(_UART2_,_EVEN,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,38400);   //call subroutine
     uart_InitInterrupt(_UART2_,_ENABLE);    //call subroutine
     uart_enable(_UART2_);                   //call subroutine
-//timer 2 initialization for unipolar driver
-    timers_Init(_TIMER2);                   //call subroutine and initialize timer 2
-    timers_SetInterrupt(_TIMER2,_ENABLE);   //call subroutine and set interrupt for timer 2
+//timer 2 & 3 initialization for unipolar and bipolar driver
+    timers_Init(_TIMER23);                  //call subroutine and initialize timer 2 & 3
+    timers_SetInterrupt(_TIMER23,_ENABLE);  //call subroutine and set interrupt for timer 2 & 3
 //front LED = black status (off)
-    funct_FrontLED(_FLEDblack);             //call subroutine and switch on green LED
+    funct_FrontLED(_FLEDgreen);             //call subroutine and switch on green LED
 //--- Initialization of SPI ---//
     InitSPI(_SPI_1);
     InitSPIInterrupt(_SPI_1, _ENABLE);
@@ -116,14 +118,11 @@ void system_init(void)
 //UART1 initialization
     uart_init(_UART1_);                     //call subroutine
     uart_set(_UART1_,_NONE,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,9600);   //call subroutine
-    uart_InitInterrupt(_UART2_,_ENABLE);    //call subroutine
-    
-
-   
+    uart_InitInterrupt(_UART1_,_ENABLE);    //call subroutine
+    uart_enable(_UART1_);                   //call subroutine
 //timer 1 initialization for 1ms interrupts
     timers_Init(_TIMER1);                   //call subroutine
     timers_SetInterrupt(_TIMER1,_ENABLE);   //call subroutine
-    timers_Set(_TIMER1,_ENABLE,0,312);      //generates every 1ms (theory) an interrupt
 //switch off the debugging LED's
     oTestLed1 = 0;                          //switch on the output for the test LED1
     oTestLed2 = 0;                          //switch on the output for the test LED2
@@ -174,11 +173,12 @@ void system_osc(void)
  * Output:                  -
 ***********************************************************************************************************************/
 void system_IOs(void)
-{
-    //AD1PCFG = 0xffffffff;
-    
+{   
 //DDPCON register (debug data port control register)
     DDPCON &= 0xFFFFFFF7;       //disable JTAG port to have full access on PORT A
+    
+//set every analog pin to digital function; analog functions are defined later
+    AD1PCFG = 0xFFFF;
     
 //+++ Port A +++
 //Port A register

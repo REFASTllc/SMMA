@@ -35,6 +35,7 @@ extern void LINATA6628_init(void);
 typedef struct                  //definitions of multiple variable for timer1
 {
   volatile unsigned short int uint16_TimeoutCounter;    //LIN counter for timeout (time base 1ms)
+  volatile unsigned char uint8_LinBreakToSend;          //1 = Lin break to send / 0 = No Lin break to send
 } SLin;                         //struct name is SLin (S for struct)
 
 
