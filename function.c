@@ -13,9 +13,7 @@
  *                          - funct_IntToAscii
  *                          - funct_AsciiToInt
  *                          - funct_CheckTol
- *                          - funct_FreqToTimer2
  *                          - funct_FreqToTimer23
- *                          - funct_msToTimer2
  *                          - funct_msToTimer23
  *                          - funct_ReadRamp
  *                          - funct_CheckCmdSILIM

@@ -84,6 +84,7 @@ void system_init(void)
     //AD module must be initialize  after the system_IOs because we define here which pin is used 
     //in analog mode
     InitADModule(); 
+    InitADInterrupt();
 //    system_NoticeModule();                  //call subroutine
 //interrupt initialization    
     INT_init();                             //call subroutine

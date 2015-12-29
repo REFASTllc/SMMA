@@ -88,6 +88,7 @@ extern T_A3981 A3981;
 extern SLin g_LIN;
 extern SUART1txd g_UART1txd;  
 extern SUART1rxd g_UART1rxd;
+extern SADC g_ADC;
 
 /**********************************************************************************************************************
  * Routine:                 cmd_SILIM
@@ -1348,7 +1349,8 @@ void cmd_MUMOT(void)
         //send back the needed informations
         uart2_sendbuffer('E');                          //first the letter E
         uart2_sendbuffer(',');                          //add the comma
-        funct_IntToAscii(g_Param.uint16_Ue,_Active);    //add the voltage
+        //funct_IntToAscii(g_Param.uint16_Ue,_Active);    //add the voltage
+        funct_IntToAscii(g_ADC.uint16_Vmot,_Active);    //add the voltage
         uart2_sendbuffer(13);                           //add the CR at the end      
     }
     else

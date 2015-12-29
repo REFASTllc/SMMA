@@ -23,6 +23,7 @@ extern Sbipol g_Bipol;
 extern T_SPI SPI1;
 extern T_A3981 A3981;
 extern SLin g_LIN;
+extern SADC g_ADC;
 
 /**********************************************************************************************************************
  * Routine:                 main
@@ -57,10 +58,15 @@ void main(void)
     oBiResetSignal = 1;
     oVmotOnOff = 1;
     oBiEnaVmot = 1;
+    oEnaVLINSupply = 0;
 #endif
 #ifdef _LIN
     oVmotOnOff = 1;
-    //oEnaVLINSupply = 1;
+    oEnaVLINSupply = 1;
+#endif
+#ifdef _UNIPOLAR
+    oVmotOnOff = 1;
+    oEnaVLINSupply = 0;
 #endif
  //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!   
     
@@ -122,5 +128,7 @@ void main(void)
             //do nothing
         }
         
+        adc_LaunchNextMeasure();    //call subroutine
+        g_ADC.uint16_Vmot;        
     }   
 }   //end of main

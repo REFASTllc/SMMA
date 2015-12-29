@@ -19,6 +19,8 @@
  *                          - __IntINT2handler
  *                          - __IntTimer1Handler
  *                          - __IntUart1Handler
+ *                          - __IntADCHandler
+ * //_ADC_VECTOR
 ***********************************************************************************************************************/
 
 
@@ -36,6 +38,7 @@ extern SParam g_Param;
 extern SLin g_LIN; 
 extern SUART1txd g_UART1txd;      
 extern SUART1rxd g_UART1rxd;
+extern SADC g_ADC;
 
 /**********************************************************************************************************************
  * Routine:                 INT_init
@@ -920,3 +923,71 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
         //at the moment we do nothing by an error, just clear the interrupt flag
     }
 }   //end of __IntUart1Handler
+
+
+/**********************************************************************************************************************
+ * Routine:                 __IntADCHandler
+
+ * Description:
+ * ...
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        29.12.2015
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void __ISR(_ADC_VECTOR, IPL7AUTO) __IntADCHandler(void)
+{ 
+    IEC1bits.AD1IE = 0;     //interrupt disable
+    IFS1bits.AD1IF = 0;     //clear interrupt flag 
+    g_ADC.uint8_ConvStarted = 0;
+       
+    switch(g_ADC.uint8_MeasuredValueID)
+    {
+        case (0):   //unipolar; Icoil A2
+            g_ADC.uint16_UniIcoilA2 = ADC1BUF0;
+            break;
+                
+        case (1):   //unipolar; Icoil A1
+            g_ADC.uint16_UniIcoilA1 = ADC1BUF0;
+            break;
+                
+        case (2):   //unipolar; Icoil B2
+            g_ADC.uint16_UniIcoilB2 = ADC1BUF0;
+            break;
+                
+        case (3):   //unipolar; Icoil B1
+            g_ADC.uint16_UniIcoilB1 = ADC1BUF0;
+            break;
+                
+        case (4):   //bipolar; Icoil B
+            g_ADC.uint16_BipIcoilB = ADC1BUF0;
+            break;
+                
+        case (5):   //bipolar; Vref
+            g_ADC.uint16_BipVref = ADC1BUF0;
+            break;
+                
+        case (6):   //Vmot
+            g_ADC.uint16_Vmot = ADC1BUF0;
+            break;
+                
+        case (7):   //Imot
+            g_ADC.uint16_Imot = ADC1BUF0;
+            break;
+                
+        case (8):   //bipolar; Icoil A
+            g_ADC.uint16_BipIcoilA = ADC1BUF0;
+            break;
+                
+        case (9):   //battery
+            g_ADC.uint16_Battery = ADC1BUF0;
+            break;
+                
+        default:    //do nothing
+            break;
+    }  
+}   //end of __IntADCHandler
