@@ -943,51 +943,30 @@ void __ISR(_ADC_VECTOR, IPL7AUTO) __IntADCHandler(void)
 { 
     IEC1bits.AD1IE = 0;     //interrupt disable
     IFS1bits.AD1IF = 0;     //clear interrupt flag 
-    g_ADC.uint8_ConvStarted = 0;
+    oTestLed2 = 0;
        
     switch(g_ADC.uint8_MeasuredValueID)
     {
-        case (0):   //unipolar; Icoil A2
+        case (0):   //results are for the first scan 
             g_ADC.uint16_UniIcoilA2 = ADC1BUF0;
+            g_ADC.uint16_UniIcoilA1 = ADC1BUF1;
+            g_ADC.uint16_UniIcoilB2 = ADC1BUF2;
+            g_ADC.uint16_UniIcoilB1 = ADC1BUF3;
+            g_ADC.uint16_BipIcoilB = ADC1BUF4;
+            g_ADC.uint16_BipIcoilA = ADC1BUF5;           
             break;
                 
-        case (1):   //unipolar; Icoil A1
-            g_ADC.uint16_UniIcoilA1 = ADC1BUF0;
-            break;
-                
-        case (2):   //unipolar; Icoil B2
-            g_ADC.uint16_UniIcoilB2 = ADC1BUF0;
-            break;
-                
-        case (3):   //unipolar; Icoil B1
-            g_ADC.uint16_UniIcoilB1 = ADC1BUF0;
-            break;
-                
-        case (4):   //bipolar; Icoil B
-            g_ADC.uint16_BipIcoilB = ADC1BUF0;
-            break;
-                
-        case (5):   //bipolar; Vref
+        case (1):   //results are for the second scan
             g_ADC.uint16_BipVref = ADC1BUF0;
-            break;
-                
-        case (6):   //Vmot
-            g_ADC.uint16_Vmot = ADC1BUF0;
-            break;
-                
-        case (7):   //Imot
-            g_ADC.uint16_Imot = ADC1BUF0;
-            break;
-                
-        case (8):   //bipolar; Icoil A
-            g_ADC.uint16_BipIcoilA = ADC1BUF0;
-            break;
-                
-        case (9):   //battery
-            g_ADC.uint16_Battery = ADC1BUF0;
+            g_ADC.uint16_Vmot = ADC1BUF1;
+            g_ADC.uint16_Imot = ADC1BUF2;
+            g_ADC.uint16_Battery = ADC1BUF3;        
             break;
                 
         default:    //do nothing
             break;
     }  
+    AD1CON1bits.ON = 0;     //disable ADC module because we will change later the configuration
+                            //for the scan and supply reference
+    g_ADC.uint8_ConvStarted = 0;    //signal that conversion is done
 }   //end of __IntADCHandler

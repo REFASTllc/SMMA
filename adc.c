@@ -99,12 +99,12 @@ void InitADModule(void)
                             // 1xx  AVDD                AVSS
 
 
-    AD1CON2bits.OFFCAL = 1; // 1 = Enable Offset Calibration mode
+    AD1CON2bits.OFFCAL = 0; // 1 = Enable Offset Calibration mode
                             //     VINH and VINL of the SHA are connected to VR-
                             // 0 = Disable Offset Calibration mode
                             //     The inputs to the SHA are controlled by AD1CHS or AD1CSSL
 
-    AD1CON2bits.CSCNA = 0;  // 1 = Scan inputs
+    AD1CON2bits.CSCNA = 1;  // 1 = Scan inputs
                             // 0 = Do not scan inputs
 
     AD1CON2bits.BUFS = 0;   // Only valid when BUFM = 1 (ADRES split into 2 x 8-word buffers).
@@ -127,14 +127,14 @@ void InitADModule(void)
                             // 0 = Clock derived from Peripheral Bus Clock (PBCLK)
 
     //SAMC = 2 (refer to the document "ADC calculations" for more details)
-    AD1CON3bits.SAMC4 = 0;  // 11111 = 31 TAD
-    AD1CON3bits.SAMC3 = 0;  // ...
-    AD1CON3bits.SAMC2 = 0;  // ...
-    AD1CON3bits.SAMC1 = 1;  // 00001 = 1 TAD
-    AD1CON3bits.SAMC0 = 0;  // 00000 = 0 TAD (Not allowed)
+    AD1CON3bits.SAMC4 = 1;  // 11111 = 31 TAD
+    AD1CON3bits.SAMC3 = 1;  // ...
+    AD1CON3bits.SAMC2 = 1;  // ...
+    AD1CON3bits.SAMC1 = 1;  // 00001 = 1 TAD (1)
+    AD1CON3bits.SAMC0 = 1;  // 00000 = 0 TAD (Not allowed)
 
     //ADCS = 10 (refer to the document "ADC calculations" for more details)
-    AD1CON3bits.ADCS7 = 0;  // 11111111 = TPB ? 2 ? (ADCS<7:0> + 1) = 512 ? TPB = TAD
+    AD1CON3bits.ADCS7 = 1;  // 11111111 = TPB ? 2 ? (ADCS<7:0> + 1) = 512 ? TPB = TAD
     AD1CON3bits.ADCS6 = 0;  // ...
     AD1CON3bits.ADCS5 = 0;  // ...
     AD1CON3bits.ADCS4 = 0;  // ...
@@ -181,7 +181,7 @@ void InitADModule(void)
     AD1CSSLbits.CSSL15 = 0; //skip AN15 for input scan
     
     
-    AD1CON1bits.ON = 1;     //ADC module is operating
+    //AD1CON1bits.ON = 1;     //ADC module is operating
     
     g_ADC.uint8_ConvStarted = 0;    //reset variable
     g_ADC.uint8_ChannelSelect = 0;  //reset variable
@@ -238,88 +238,91 @@ void adc_LaunchNextMeasure(void)
     else
     {
         uint8_WB = g_ADC.uint8_ChannelSelect;
-        uint8_WB = uint8_WB % 10;   //Modulo 10, because we have ten channels to measure
+        uint8_WB = uint8_WB % 2;   //Modulo 2, because we have two different functions
         g_ADC.uint8_MeasuredValueID = uint8_WB; //variable will be used inside the interrupt
         
         switch(uint8_WB)
         {
             case (0):   //unipolar; Icoil A2
-                AD1CHSbits.CH0SA3 = 0;  //positive input select for MUX A bits
-                AD1CHSbits.CH0SA2 = 0;  //is AN2
-                AD1CHSbits.CH0SA1 = 1;  
-                AD1CHSbits.CH0SA0 = 0;  
+                //set reference voltage to external VREF+ and VREF-
+                AD1CON2bits.VCFG2 = 0;  //      ADC VR+             ADC VR-
+                AD1CON2bits.VCFG1 = 1;  // 000  AVDD                AVSS
+                AD1CON2bits.VCFG0 = 1;  // 001  External VREF+ pin  AVSS
+                                        // 010  AVDD                External VREF- pin
+                                        // 011  External VREF+ pin  External VREF- pin
+                                        // 1xx  AVDD                AVSS
+                
+                //set scanning channels
+                AD1CSSLbits.CSSL0 = 0;  //skip AN0 for input scan
+                AD1CSSLbits.CSSL1 = 0;  //skip AN1 for input scan
+                AD1CSSLbits.CSSL2 = 1;  //unipolar; Icoil A2
+                AD1CSSLbits.CSSL3 = 1;  //unipolar; Icoil A1
+                AD1CSSLbits.CSSL4 = 1;  //unipolar; Icoil B2
+                AD1CSSLbits.CSSL5 = 1;  //unipolar; Icoil B1
+                AD1CSSLbits.CSSL6 = 1;  //bipolar; Icoil B
+                AD1CSSLbits.CSSL7 = 0;  //bipolar; Vref
+                AD1CSSLbits.CSSL8 = 0;  //Vmot
+                AD1CSSLbits.CSSL9 = 0;  //Imot
+                AD1CSSLbits.CSSL10 = 1; //bipolar; Icoil A
+                AD1CSSLbits.CSSL11 = 0; //battery
+                AD1CSSLbits.CSSL12 = 0; //skip AN12 for input scan
+                AD1CSSLbits.CSSL13 = 0; //skip AN13 for input scan
+                AD1CSSLbits.CSSL14 = 0; //skip AN14 for input scan
+                AD1CSSLbits.CSSL15 = 0; //skip AN15 for input scan
+                
+                //set that interrupt should occur after 6 measured values
+                AD1CON2bits.SMPI3 = 0;  
+                AD1CON2bits.SMPI2 = 1;  
+                AD1CON2bits.SMPI1 = 1;  
+                AD1CON2bits.SMPI0 = 0;   
                 break;
                 
             case (1):   //unipolar; Icoil A1
-                AD1CHSbits.CH0SA3 = 0;  //positive input select for MUX A bits
-                AD1CHSbits.CH0SA2 = 0;  //is AN3
-                AD1CHSbits.CH0SA1 = 1;  
-                AD1CHSbits.CH0SA0 = 1;
-                break;
+                //set reference voltage to external AVDD and AVSS
+                AD1CON2bits.VCFG2 = 0;  //      ADC VR+             ADC VR-
+                AD1CON2bits.VCFG1 = 0;  // 000  AVDD                AVSS
+                AD1CON2bits.VCFG0 = 0;  // 001  External VREF+ pin  AVSS
+                                        // 010  AVDD                External VREF- pin
+                                        // 011  External VREF+ pin  External VREF- pin
+                                        // 1xx  AVDD                AVSS
                 
-            case (2):   //unipolar; Icoil B2
-                AD1CHSbits.CH0SA3 = 0;  //positive input select for MUX A bits
-                AD1CHSbits.CH0SA2 = 1;  //is AN4
-                AD1CHSbits.CH0SA1 = 0;  
-                AD1CHSbits.CH0SA0 = 0;
-                break;
+                //set scanning channels
+                AD1CSSLbits.CSSL0 = 0;  //skip AN0 for input scan
+                AD1CSSLbits.CSSL1 = 0;  //skip AN1 for input scan
+                AD1CSSLbits.CSSL2 = 0;  //unipolar; Icoil A2
+                AD1CSSLbits.CSSL3 = 0;  //unipolar; Icoil A1
+                AD1CSSLbits.CSSL4 = 0;  //unipolar; Icoil B2
+                AD1CSSLbits.CSSL5 = 0;  //unipolar; Icoil B1
+                AD1CSSLbits.CSSL6 = 0;  //bipolar; Icoil B
+                AD1CSSLbits.CSSL7 = 1;  //bipolar; Vref
+                AD1CSSLbits.CSSL8 = 1;  //Vmot
+                AD1CSSLbits.CSSL9 = 1;  //Imot
+                AD1CSSLbits.CSSL10 = 0; //bipolar; Icoil A
+                AD1CSSLbits.CSSL11 = 1; //battery
+                AD1CSSLbits.CSSL12 = 0; //skip AN12 for input scan
+                AD1CSSLbits.CSSL13 = 0; //skip AN13 for input scan
+                AD1CSSLbits.CSSL14 = 0; //skip AN14 for input scan
+                AD1CSSLbits.CSSL15 = 0; //skip AN15 for input scan
                 
-            case (3):   //unipolar; Icoil B1
-                AD1CHSbits.CH0SA3 = 0;  //positive input select for MUX A bits
-                AD1CHSbits.CH0SA2 = 1;  //is AN5
-                AD1CHSbits.CH0SA1 = 0;  
-                AD1CHSbits.CH0SA0 = 1;
+                //set that interrupt should occur after 4 measured values
+                AD1CON2bits.SMPI3 = 0;  
+                AD1CON2bits.SMPI2 = 1;  
+                AD1CON2bits.SMPI1 = 0;  
+                AD1CON2bits.SMPI0 = 0; 
                 break;
-                
-            case (4):   //bipolar; Icoil B
-                AD1CHSbits.CH0SA3 = 0;  //positive input select for MUX A bits
-                AD1CHSbits.CH0SA2 = 1;  //is AN6
-                AD1CHSbits.CH0SA1 = 1;  
-                AD1CHSbits.CH0SA0 = 0;
-                break;
-                
-            case (5):   //bipolar; Vref
-                AD1CHSbits.CH0SA3 = 0;  //positive input select for MUX A bits
-                AD1CHSbits.CH0SA2 = 1;  //is AN7
-                AD1CHSbits.CH0SA1 = 1;  
-                AD1CHSbits.CH0SA0 = 1;
-                break;
-                
-            case (6):   //Vmot
-                AD1CHSbits.CH0SA3 = 1;  //positive input select for MUX A bits
-                AD1CHSbits.CH0SA2 = 0;  //is AN8
-                AD1CHSbits.CH0SA1 = 0;  
-                AD1CHSbits.CH0SA0 = 0;
-                break;
-                
-            case (7):   //Imot
-                AD1CHSbits.CH0SA3 = 1;  //positive input select for MUX A bits
-                AD1CHSbits.CH0SA2 = 0;  //is AN9
-                AD1CHSbits.CH0SA1 = 0;  
-                AD1CHSbits.CH0SA0 = 1;
-                break;
-                
-            case (8):   //bipolar; Icoil A
-                AD1CHSbits.CH0SA3 = 1;  //positive input select for MUX A bits
-                AD1CHSbits.CH0SA2 = 0;  //is AN10
-                AD1CHSbits.CH0SA1 = 1;  
-                AD1CHSbits.CH0SA0 = 0;
-                break;
-                
-            case (9):   //battery
-                AD1CHSbits.CH0SA3 = 1;  //positive input select for MUX A bits
-                AD1CHSbits.CH0SA2 = 0;  //is AN11
-                AD1CHSbits.CH0SA1 = 1;  
-                AD1CHSbits.CH0SA0 = 1;
-                break;
-                
+                               
             default:    //do nothing
                 break;
         }
         //launch new measure
-        g_ADC.uint8_ConvStarted = 1;
+        g_ADC.uint8_ConvStarted = 1;    //signal that a conversion is started
         g_ADC.uint8_ChannelSelect++;    //increment channel select
+        AD1CON1bits.ON = 1;     //enable ADC module
+        IFS1bits.AD1IF = 0;     //clear interrupt flag
         IEC1bits.AD1IE = 1;     //interrupt enable
-        AD1CON1bits.SAMP = 1;   //starts sampling
+        AD1CON1bits.ASAM = 1;   //launch the conversion
+                                //note this bit is set back to 0 automatic after 
+                                //the interrupt is generated
+        oTestLed2 = 1;
     }
 }   //end of adc_LaunchNextMeasure

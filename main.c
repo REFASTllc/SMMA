@@ -128,7 +128,6 @@ void main(void)
             //do nothing
         }
         
-        adc_LaunchNextMeasure();    //call subroutine
-        g_ADC.uint16_Vmot;        
+        adc_LaunchNextMeasure();    //call subroutine  
     }   
 }   //end of main
