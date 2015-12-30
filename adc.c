@@ -206,7 +206,7 @@ void InitADInterrupt(void)
 {
     IFS1bits.AD1IF = 0; // Interrupt flag bit
 
-    IPC6bits.AD1IP = 7; // Interrupt priority bits (7 = high, 0 = no interrupt)
+    IPC6bits.AD1IP = 2; // Interrupt priority bits (7 = high, 0 = no interrupt)
     IPC6bits.AD1IS = 3; // Interrupt sub-priority bits (3 = high priority)
 
     IEC1bits.AD1IE = 0; // Interrupt disable

@@ -280,7 +280,7 @@ void __ISR(_RTCC_VECTOR, IPL3AUTO) __IntRTCCHandler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void __ISR(_TIMER_5_VECTOR, IPL1AUTO) __IntTimer45Handler(void)
+void __ISR(_TIMER_5_VECTOR, IPL6AUTO) __IntTimer45Handler(void)
 {
     auto unsigned char uint8_WB1;       //local variabel 'WorkByte1'
     
@@ -939,7 +939,7 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void __ISR(_ADC_VECTOR, IPL7AUTO) __IntADCHandler(void)
+void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
 { 
     IEC1bits.AD1IE = 0;     //interrupt disable
     IFS1bits.AD1IF = 0;     //clear interrupt flag 
