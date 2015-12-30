@@ -127,20 +127,20 @@ void InitADModule(void)
                             // 0 = Clock derived from Peripheral Bus Clock (PBCLK)
 
     //SAMC = 2 (refer to the document "ADC calculations" for more details)
-    AD1CON3bits.SAMC4 = 1;  // 11111 = 31 TAD
-    AD1CON3bits.SAMC3 = 1;  // ...
-    AD1CON3bits.SAMC2 = 1;  // ...
-    AD1CON3bits.SAMC1 = 1;  // 00001 = 1 TAD (1)
-    AD1CON3bits.SAMC0 = 1;  // 00000 = 0 TAD (Not allowed)
+    AD1CON3bits.SAMC4 = 0;  // 11111 = 31 TAD
+    AD1CON3bits.SAMC3 = 0;  // ...
+    AD1CON3bits.SAMC2 = 0;  // ...
+    AD1CON3bits.SAMC1 = 1;  // 00001 = 1 TAD 
+    AD1CON3bits.SAMC0 = 0;  // 00000 = 0 TAD (Not allowed)
 
-    //ADCS = 10 (refer to the document "ADC calculations" for more details)
-    AD1CON3bits.ADCS7 = 1;  // 11111111 = TPB ? 2 ? (ADCS<7:0> + 1) = 512 ? TPB = TAD
+    //ADCS = 40 (refer to the document "ADC calculations" for more details)
+    AD1CON3bits.ADCS7 = 0;  // 11111111 = TPB ? 2 ? (ADCS<7:0> + 1) = 512 ? TPB = TAD
     AD1CON3bits.ADCS6 = 0;  // ...
-    AD1CON3bits.ADCS5 = 0;  // ...
+    AD1CON3bits.ADCS5 = 1;  // ...
     AD1CON3bits.ADCS4 = 0;  // ...
     AD1CON3bits.ADCS3 = 1;  // 00000001 = TPB ? 2 ? (ADCS<7:0> + 1) = 4 ? TPB = TAD
     AD1CON3bits.ADCS2 = 0;  // 00000000 = TPB ? 2 ? (ADCS<7:0> + 1) = 2 ? TPB = TAD
-    AD1CON3bits.ADCS1 = 1;  // TPB is the PIC32 Peripheral Bus clock time period.
+    AD1CON3bits.ADCS1 = 0;  // TPB is the PIC32 Peripheral Bus clock time period.
     AD1CON3bits.ADCS0 = 0;  // Refer to Section 6. ?Oscillator? (DS61112) for more information.
     
 //AD1CHS: ADC input select register
