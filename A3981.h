@@ -174,4 +174,26 @@ void InitA3981(void);
 /********************************************************************************************************************/
 signed char SetA3981(unsigned short int value);
 
+/********************************************************************************************************************/
+/*  Name of the function:       checckA3981									    
+/*  Purpose of the function:    Check the status of the A3981					    
+/*  Parameters:													    
+/*      IN:                     -										    
+/*      OUT:                    1: function ok
+/*                              -1: error during the function 
+/*														    
+/*  Remark:                     This function will update both FAULT register of the driver.		
+/*                              This function should be preceded by function initA3981. 							    
+/*														    
+/*  Creator:                    julien_rebetez									    
+/*  Date of creation:           02.01.2016								    
+/*														    
+/*  Last modified on:           -										    
+/*  Modified by:                -										    
+/*  Version:                    -										    
+/*														    
+/*  Remark:                     -										    
+/********************************************************************************************************************/
+signed char checkA3981(void);
+
 #endif	/* A3981_H */

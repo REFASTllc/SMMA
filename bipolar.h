@@ -58,19 +58,28 @@ typedef union
     } BITS;
 } T_STATUS;
 
+typedef struct
+{
+    unsigned char statePhA1:1;          //output state of phase A1
+    unsigned char statePhA2:1;          //output state of phase A2
+    unsigned char statePhB1:1;          //output state of phase B1
+    unsigned char statePhB2:1;          //output state of phase B2
+} T_MOTOR;
+
 typedef struct          //definitions of multiple variable for unipolar
 {
 // Custom defined types
     T_STATUS status;
+    T_MOTOR motBipol;
 //general variables  
     volatile unsigned long int uint32_RealPos;      //real position of the motor
     volatile unsigned long int uint32_GoalPos;      //goal position of the motor
     volatile unsigned short int uint16_RunFreq;       //run frequency for normal run
-    volatile unsigned char uint8_PhA1;          //output state of phase A1
-    volatile unsigned char uint8_PhA2;          //output state of phase A2
-    volatile unsigned char uint8_PhB1;          //output state of phase B1
-    volatile unsigned char uint8_PhB2;          //output state of phase B2
-    volatile unsigned char uint8_Status;        //motor status - definition see uni_init()
+//    volatile unsigned char uint8_PhA1;          //output state of phase A1
+//    volatile unsigned char uint8_PhA2;          //output state of phase A2
+//    volatile unsigned char uint8_PhB1;          //output state of phase B1
+//    volatile unsigned char uint8_PhB2;          //output state of phase B2
+//    volatile unsigned char uint8_Status;        //motor status - definition see uni_init()
 //variables for timer 23
     volatile unsigned long int uint32_IntTime;      //effective interrupt time
     volatile unsigned long int uint32_RunTime;      //run time for interrupt

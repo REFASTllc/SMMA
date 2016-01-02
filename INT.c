@@ -48,7 +48,7 @@ extern SUART1rxd g_UART1rxd;
  * Last modification on:    -
  * Modified by:             - 
  * 
- * Input:                   timerx  (selected timer)
+ * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
 void INT_init(void)
@@ -462,7 +462,6 @@ void __ISR(_TIMER_5_VECTOR, IPL1AUTO) __IntTimer45Handler(void)
             g_Bipol.uint1_IntTimeExpiredFlag = 1;   
                 
             g_Bipol.status.BITS.nextStepIsAllowed = 1;   //allow next step
-            oTestLed2 =! oTestLed2;
             
             //for security - be sure that the motor is in run
             if(g_Bipol.uint1_IsBipolEnabled == 1)
@@ -904,7 +903,6 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
             if(g_LIN.uint8_SlaveAnswerRequested)
             {
                 timers_Set(_TIMER1,_ENABLE,0,g_Param.uint16_LinTO);
-                oTestLed2 = 1;
             }
             else
             {

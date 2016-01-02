@@ -949,7 +949,7 @@ void cmd_GMTYP(void)
  * Routine:                 cmd_STEST
 
  * Description:
- * Perform a self-test sequence only if possible if there is nothing activated, running, etc. 
+ * Perform a self-test sequence only possible if there is nothing activated, running, etc. 
  * 
  * Creator:                 A. Staub
  * Date of creation:        25.10.2015
@@ -963,6 +963,16 @@ void cmd_STEST(void)
 {  
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
+    //--- Driving test of A3981 driver and indirectly of SPI 1 ---//
+        if(checkA3981() == -1)
+        {   
+            // TODO: measure voltage on the Vbb pin 
+            // if there is no voltage, then the status of the chip will be wrong (i.g. overvoltage, temperature errors)
+            if(A3981.FAULT0.BITS.TW == 2)    // Temperature error
+                // stop the device if possible
+                if(A3981.FAULT0.BITS.OV);     // Overvoltage error
+                
+        }
         //to define!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     
         uart2_sendbuffer('E');                      //first the letter E
@@ -1001,23 +1011,23 @@ void cmd_GILIM(void)
         uart2_sendbuffer('E');                  //first the letter E
         uart2_sendbuffer(',');                  //add the comma
   
-        //convert the minimal ON current into an ascii and store it into the send buffer
+        //convert the minimal ON current into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint16_Imin,_Active);
         uart2_sendbuffer(',');                  //add the comma
   
-        //convert the maximal ON current into an ascii and store it into the send buffer
+        //convert the maximal ON current into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint16_Imax,_Active);
         uart2_sendbuffer(',');                  //add the comma
   
-        //convert the test voltage into an ascii and store it into the send buffer
+        //convert the test voltage into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint16_Umot,_Active);
         uart2_sendbuffer(',');                  //add the comma
   
-        //convert the short-circuit current limit into an ascii and store it into the send buffer
+        //convert the short-circuit current limit into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint16_SCiLevel,_Active);
         uart2_sendbuffer(',');                  //add the comma
   
-        //convert the short-circuit wait time into an ascii and store it into the send buffer
+        //convert the short-circuit wait time into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint8_SCtLevel,_Active);
         uart2_sendbuffer(13);                   //add the CR at the end      
     }
@@ -1120,11 +1130,11 @@ void cmd_GRACC(void)
                 {
                     uart2_sendbuffer(',');              //add the comma
     
-                    //convert the number of steps into an ascii and store it into the send buffer
+                    //convert the number of steps into an ASCII and store it into the send buffer
                     funct_IntToAscii(g_Param.uint16_AccNumbStep[uint8_WB],_Active);
                     uart2_sendbuffer(',');              //add the comma
     
-                    //convert the frequency into an ascii and store it into the send buffer
+                    //convert the frequency into an ASCII and store it into the send buffer
                     funct_IntToAscii(g_Param.uint16_AccFreq[uint8_WB],_Active);        
                 }
             }
@@ -1147,7 +1157,7 @@ void cmd_GRACC(void)
  * This can be a long protocol to send back - maximal 50 times number of steps and 50 times the corresponding frequency.  
  * Note - the send buffer needs a minimum size of:
  * - uint16_DecNumbStep max character length = 5 x 50 different steps = 250
- * - uint16_DecFreq max character lenght = 4 x 50 different frequency = 200
+ * - uint16_DecFreq max character length = 4 x 50 different frequency = 200
  * - Each parameter separated by a comma = 100 x 1 character = 100
  * - Started with the 'E' and ended with 'CR' = 2
  * total size = 552 bytes.  
@@ -1187,11 +1197,11 @@ void cmd_GRDEC(void)
                 {
                     uart2_sendbuffer(',');              //add the comma
     
-                    //convert the number of steps into an ascii and store it into the send buffer
+                    //convert the number of steps into an ASCII and store it into the send buffer
                     funct_IntToAscii(g_Param.uint16_DecNumbStep[uint8_WB],_Active);
                     uart2_sendbuffer(',');              //add the comma
     
-                    //convert the frequency into an ascii and store it into the send buffer
+                    //convert the frequency into an ASCII and store it into the send buffer
                     funct_IntToAscii(g_Param.uint16_DecFreq[uint8_WB],_Active);        
                 }
             }
@@ -1232,55 +1242,55 @@ void cmd_GRUN(void)
         uart2_sendbuffer(g_Param.uint8_MotTyp);     //add the motor type
         uart2_sendbuffer(',');                      //add the comma
   
-        //convert the step mode of the actuator into an ascii and store it into the send buffer
+        //convert the step mode of the actuator into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint8_StepMode,_Active);
         uart2_sendbuffer(',');                      //add the comma
   
-        //convert the step count of the actuator into an ascii and store it into the send buffer
+        //convert the step count of the actuator into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint32_StepCount,_Active);
         uart2_sendbuffer(',');                      //add the comma 
   
-        //convert the speed into an ascii and store it into the send buffer
+        //convert the speed into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint16_RunFreq,_Active);
         uart2_sendbuffer(',');                      //add the comma
   
-        //convert the direction into an ascii and store it into the send buffer
+        //convert the direction into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint8_Direction,_Active);
         uart2_sendbuffer(',');                      //add the comma
   
-        //convert the coil state into an ascii and store it into the send buffer
+        //convert the coil state into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint8_CoilState,_Active);
         uart2_sendbuffer(',');                      //add the comma
   
-        //convert the current during move into an ascii and store it into the send buffer
+        //convert the current during move into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint16_BipRunI,_Active);
         uart2_sendbuffer(',');                      //add the comma
   
-        //convert the "holding" current into an ascii and store it into the send buffer
+        //convert the "holding" current into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint16_BipHoldI,_Active);
         uart2_sendbuffer(',');                      //add the comma
   
-        //convert the selected ramp into an ascii and store it into the send buffer
+        //convert the selected ramp into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint8_SelectRamp,_Active);
         uart2_sendbuffer(',');                      //add the comma
   
-        //convert the curremt for acceleration into an ascii and store it into the send buffer
+        //convert the current for acceleration into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint16_BipAccI,_Active);
         uart2_sendbuffer(',');                      //add the comma
   
-        //convert the curremt for deceleration into an ascii and store it into the send buffer
+        //convert the current for deceleration into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint16_BipDecI,_Active);
         uart2_sendbuffer(',');                      //add the comma
  
-        //convert the time into an ascii and store it into the send buffer
+        //convert the time into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint16_AccOnDelay,_Active);
         uart2_sendbuffer(',');                      //add the comma
   
-        //convert the time into an ascii and store it into the send buffer
+        //convert the time into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint16_DecOffDelay,_Active);
         uart2_sendbuffer(',');                      //add the comma
   
-        //convert the protocol quittance into an ascii and store it into the send buffer
+        //convert the protocol quittance into an ASCII and store it into the send buffer
         funct_IntToAscii(g_Param.uint8_Acknowledge,_Active);
         uart2_sendbuffer(13);                       //add the CR at the end      
     }

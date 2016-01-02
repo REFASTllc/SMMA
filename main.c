@@ -40,7 +40,7 @@ extern SLin g_LIN;
 ***********************************************************************************************************************/
 void main(void)
 {   
-    unsigned short int tempToggle = 0;
+    unsigned short int enaLed1 = 0;
     
     system_init();          //call subroutine
           
@@ -62,6 +62,9 @@ void main(void)
     oVmotOnOff = 1;
     //oEnaVLINSupply = 1;
 #endif
+#ifdef _UNIPOLAR
+    oVmotOnOff = 1;
+#endif
  //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!   
     
     periph_init();
@@ -71,6 +74,15 @@ void main(void)
     {        
         if(g_Uni.uint8_Settings & 0x01) //verify if the unipolar motor has to move
         {
+            enaLed1 = 1;
+            static unsigned short int temp = 0;
+            if(temp >= 5000)
+            {
+                oTestLed2 =! oTestLed2;
+                temp = 0;
+            }
+            else
+                temp++;
             uni_move();                 //then call the subroutine
         }
         else
@@ -92,24 +104,11 @@ void main(void)
         
         if(!g_UART2rxd.uint8_BufEmpty)  //receive buffer not empty?
             cmdchk_check();             //call subroutine
-        else
-        {
-            //--- Toggle of led (alive test) ---//
-            if(tempToggle >= 200)
-            {
-                oTestLed1 =! oTestLed1;
-                tempToggle = 0;
-            }
-            else
-                tempToggle++;
-        }
-        
         if(g_LIN.uint8_SlaveAnswerRequested)    //answer from LIN slave requested
         {
             //timeout or slave answer received
             if((g_LIN.uint8_SlaveTimeout) || (g_LIN.uint8_SlaveAnswerFinish))  
             {
-                oTestLed2 = 0;
                 LINATA6629_SendBackSlaveAnswer();
             }
             else
@@ -119,8 +118,18 @@ void main(void)
         }
         else
         {
+            static unsigned short int temp = 0;
+            if(temp >= 10000 && enaLed1)
+            {
+                oTestLed1 =! oTestLed1;
+                temp = 0;
+            }
+            else
+                temp++;
             //do nothing
         }
         
     }   
+    enaLed1++;
+    enaLed1++;
 }   //end of main
