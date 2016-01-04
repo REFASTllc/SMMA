@@ -299,9 +299,13 @@ void timers_Init(unsigned char timerx)
  * Modification (29.12.2015 / A. Staub):
  * Changed timer 2 and 3 to 4 and 5
  * 
+ * Modification (30.12.2015 / A. Staub):
+ * Change priority of the timer 45. It was only on priority 1 and all others are higher but this 
+ * one should have more priority. Changed to 6. 
+ * 
  * Creator:                 J. Rebetez
  * Date of creation:        08.08.2015
- * Last modification on:    29.12.2015
+ * Last modification on:    30.12.2015
  * Modified by:             A. Staub
  * 
  * Input:                   timerx  (selected timer)
@@ -363,7 +367,7 @@ void timers_SetInterrupt(unsigned char timerx, unsigned char action)
     {
         IFS0bits.T4IF = 0;  //just to be safe
         IFS0bits.T5IF = 0;
-        IPC5bits.T5IP = 1;
+        IPC5bits.T5IP = 6;
         IPC5bits.T5IS = 3;
         if(action == _ENABLE) IEC0bits.T5IE = 1;
         else IEC0bits.T5IE = 0;

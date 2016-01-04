@@ -9,19 +9,22 @@
  * Company:                 REFAST GmbH
  *                          Copyright (c) 2015 REFAST GmbH
 ***********************************************************************************************************************
- * Content overview:        - InitADInterrupt
+ * Content overview:        - InitADModule
  *                          - InitADInterrupt
+ *                          - adc_LaunchNextMeasure
 ***********************************************************************************************************************/
 
 
 #include "includes.h" // File which contain all includes files
 
+SADC g_ADC;         
+
 
 /**********************************************************************************************************************
- * Routine:                 InitADInterrupt
+ * Routine:                 InitADModule
 
  * Description:
- * Initialization of the AD module. 
+ * Initialization of the AD module. At the end the ADC module will be enabled for that it starts operating. 
  * 
  * Creator:                 J. Rebetez
  * Date of creation:        17.08.2015
@@ -96,12 +99,12 @@ void InitADModule(void)
                             // 1xx  AVDD                AVSS
 
 
-    AD1CON2bits.OFFCAL = 1; // 1 = Enable Offset Calibration mode
+    AD1CON2bits.OFFCAL = 0; // 1 = Enable Offset Calibration mode
                             //     VINH and VINL of the SHA are connected to VR-
                             // 0 = Disable Offset Calibration mode
                             //     The inputs to the SHA are controlled by AD1CHS or AD1CSSL
 
-    AD1CON2bits.CSCNA = 0;  // 1 = Scan inputs
+    AD1CON2bits.CSCNA = 1;  // 1 = Scan inputs
                             // 0 = Do not scan inputs
 
     AD1CON2bits.BUFS = 0;   // Only valid when BUFM = 1 (ADRES split into 2 x 8-word buffers).
@@ -109,35 +112,36 @@ void InitADModule(void)
                             // 0 = ADC is currently filling buffer 0x0-0x7, user should access data in 0x8-0xF
 
     AD1CON2bits.SMPI3 = 0;  // 1111 = Interrupts at the completion of conversion for each 16th sample/convert sequence
-    AD1CON2bits.SMPI2 = 0;  // 1110 = Interrupts at the completion of conversion for each 15th sample/convert sequence
-    AD1CON2bits.SMPI1 = 0;  // ...
-    AD1CON2bits.SMPI0 = 0;  // 0001 = Interrupts at the completion of conversion for each 2nd sample/convert sequence
-                            // 0000 = Interrupts at the completion of conversion for each sample/convert sequence
-
+    AD1CON2bits.SMPI2 = 0;  // .... 
+    AD1CON2bits.SMPI1 = 0;  // 0001 = Interrupts at the completion of conversion for each 2nd sample/convert sequence
+    AD1CON2bits.SMPI0 = 0;  // 0000 = Interrupts at the completion of conversion for each sample/convert sequence
+                            
     AD1CON2bits.BUFM = 0;   // 1 = Buffer configured as two 8-word buffers, ADC1BUF(7...0), ADC1BUF(15...8)
                             // 0 = Buffer configured as one 16-word buffer ADC1BUF(15...0.)
 
-    AD1CON2bits.ALTS = 1;   // 1 = Uses MUX A input multiplexer settings for first sample, then alternates between MUX B and
+    AD1CON2bits.ALTS = 0;   // 1 = Uses MUX A input multiplexer settings for first sample, then alternates between MUX B and
                             //     MUX A input multiplexer settings for all subsequent samples
                             // 0 = Always use MUX A input multiplexer settings
 /*** AD1CON3 ******************************************************************/
     AD1CON3bits.ADRC = 0;   // 1 = ADC internal RC clock
                             // 0 = Clock derived from Peripheral Bus Clock (PBCLK)
 
+    //SAMC = 2 (refer to the document "ADC calculations" for more details)
     AD1CON3bits.SAMC4 = 0;  // 11111 = 31 TAD
-    AD1CON3bits.SAMC3 = 1;  // ...
-    AD1CON3bits.SAMC2 = 1;  // ...
-    AD1CON3bits.SAMC1 = 1;  // 00001 = 1 TAD
-    AD1CON3bits.SAMC0 = 1;  // 00000 = 0 TAD (Not allowed)
+    AD1CON3bits.SAMC3 = 0;  // ...
+    AD1CON3bits.SAMC2 = 0;  // ...
+    AD1CON3bits.SAMC1 = 1;  // 00001 = 1 TAD 
+    AD1CON3bits.SAMC0 = 0;  // 00000 = 0 TAD (Not allowed)
 
+    //ADCS = 40 (refer to the document "ADC calculations" for more details)
     AD1CON3bits.ADCS7 = 0;  // 11111111 = TPB ? 2 ? (ADCS<7:0> + 1) = 512 ? TPB = TAD
-    AD1CON3bits.ADCS6 = 1;  // ...
+    AD1CON3bits.ADCS6 = 0;  // ...
     AD1CON3bits.ADCS5 = 1;  // ...
-    AD1CON3bits.ADCS4 = 1;  // ...
+    AD1CON3bits.ADCS4 = 0;  // ...
     AD1CON3bits.ADCS3 = 1;  // 00000001 = TPB ? 2 ? (ADCS<7:0> + 1) = 4 ? TPB = TAD
-    AD1CON3bits.ADCS2 = 1;  // 00000000 = TPB ? 2 ? (ADCS<7:0> + 1) = 2 ? TPB = TAD
-    AD1CON3bits.ADCS1 = 1;  // TPB is the PIC32 Peripheral Bus clock time period.
-    AD1CON3bits.ADCS0 = 1;  // Refer to Section 6. ?Oscillator? (DS61112) for more information.
+    AD1CON3bits.ADCS2 = 0;  // 00000000 = TPB ? 2 ? (ADCS<7:0> + 1) = 2 ? TPB = TAD
+    AD1CON3bits.ADCS1 = 0;  // TPB is the PIC32 Peripheral Bus clock time period.
+    AD1CON3bits.ADCS0 = 0;  // Refer to Section 6. ?Oscillator? (DS61112) for more information.
     
 //AD1CHS: ADC input select register
     AD1CHSbits.CH0NB = 0;   //negative input select for MUX B bit
@@ -175,6 +179,12 @@ void InitADModule(void)
     AD1CSSLbits.CSSL13 = 0; //skip AN13 for input scan
     AD1CSSLbits.CSSL14 = 0; //skip AN14 for input scan
     AD1CSSLbits.CSSL15 = 0; //skip AN15 for input scan
+    
+    
+    //AD1CON1bits.ON = 1;     //ADC module is operating
+    
+    g_ADC.uint8_ConvStarted = 0;    //reset variable
+    g_ADC.uint8_ChannelSelect = 0;  //reset variable
 }
 
 
@@ -196,8 +206,123 @@ void InitADInterrupt(void)
 {
     IFS1bits.AD1IF = 0; // Interrupt flag bit
 
-    IPC6bits.AD1IP = 7; // Interrupt priority bits (7 = high, 0 = no interrupt)
+    IPC6bits.AD1IP = 2; // Interrupt priority bits (7 = high, 0 = no interrupt)
     IPC6bits.AD1IS = 3; // Interrupt sub-priority bits (3 = high priority)
 
-    IEC1bits.AD1IE = 0; // Interrupt enable bit
+    IEC1bits.AD1IE = 0; // Interrupt disable
 }
+
+
+/**********************************************************************************************************************
+ * Routine:                 adc_LaunchNextMeasure
+
+ * Description:
+ * ...
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        17.08.2015
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void adc_LaunchNextMeasure(void)
+{
+    volatile unsigned char uint8_WB;    //local work byte
+    
+    if(g_ADC.uint8_ConvStarted)     //conversion in progress
+    {
+        //do nothing
+    }
+    else
+    {
+        uint8_WB = g_ADC.uint8_ChannelSelect;
+        uint8_WB = uint8_WB % 2;   //Modulo 2, because we have two different functions
+        g_ADC.uint8_MeasuredValueID = uint8_WB; //variable will be used inside the interrupt
+        
+        switch(uint8_WB)
+        {
+            case (0):   //unipolar; Icoil A2
+                //set reference voltage to external VREF+ and VREF-
+                AD1CON2bits.VCFG2 = 0;  //      ADC VR+             ADC VR-
+                AD1CON2bits.VCFG1 = 1;  // 000  AVDD                AVSS
+                AD1CON2bits.VCFG0 = 1;  // 001  External VREF+ pin  AVSS
+                                        // 010  AVDD                External VREF- pin
+                                        // 011  External VREF+ pin  External VREF- pin
+                                        // 1xx  AVDD                AVSS
+                
+                //set scanning channels
+                AD1CSSLbits.CSSL0 = 0;  //skip AN0 for input scan
+                AD1CSSLbits.CSSL1 = 0;  //skip AN1 for input scan
+                AD1CSSLbits.CSSL2 = 1;  //unipolar; Icoil A2
+                AD1CSSLbits.CSSL3 = 1;  //unipolar; Icoil A1
+                AD1CSSLbits.CSSL4 = 1;  //unipolar; Icoil B2
+                AD1CSSLbits.CSSL5 = 1;  //unipolar; Icoil B1
+                AD1CSSLbits.CSSL6 = 1;  //bipolar; Icoil B
+                AD1CSSLbits.CSSL7 = 0;  //bipolar; Vref
+                AD1CSSLbits.CSSL8 = 0;  //Vmot
+                AD1CSSLbits.CSSL9 = 0;  //Imot
+                AD1CSSLbits.CSSL10 = 1; //bipolar; Icoil A
+                AD1CSSLbits.CSSL11 = 0; //battery
+                AD1CSSLbits.CSSL12 = 0; //skip AN12 for input scan
+                AD1CSSLbits.CSSL13 = 0; //skip AN13 for input scan
+                AD1CSSLbits.CSSL14 = 0; //skip AN14 for input scan
+                AD1CSSLbits.CSSL15 = 0; //skip AN15 for input scan
+                
+                //set that interrupt should occur after 6 measured values
+                AD1CON2bits.SMPI3 = 0;  
+                AD1CON2bits.SMPI2 = 1;  
+                AD1CON2bits.SMPI1 = 1;  
+                AD1CON2bits.SMPI0 = 0;   
+                break;
+                
+            case (1):   //unipolar; Icoil A1
+                //set reference voltage to external AVDD and AVSS
+                AD1CON2bits.VCFG2 = 0;  //      ADC VR+             ADC VR-
+                AD1CON2bits.VCFG1 = 0;  // 000  AVDD                AVSS
+                AD1CON2bits.VCFG0 = 0;  // 001  External VREF+ pin  AVSS
+                                        // 010  AVDD                External VREF- pin
+                                        // 011  External VREF+ pin  External VREF- pin
+                                        // 1xx  AVDD                AVSS
+                
+                //set scanning channels
+                AD1CSSLbits.CSSL0 = 0;  //skip AN0 for input scan
+                AD1CSSLbits.CSSL1 = 0;  //skip AN1 for input scan
+                AD1CSSLbits.CSSL2 = 0;  //unipolar; Icoil A2
+                AD1CSSLbits.CSSL3 = 0;  //unipolar; Icoil A1
+                AD1CSSLbits.CSSL4 = 0;  //unipolar; Icoil B2
+                AD1CSSLbits.CSSL5 = 0;  //unipolar; Icoil B1
+                AD1CSSLbits.CSSL6 = 0;  //bipolar; Icoil B
+                AD1CSSLbits.CSSL7 = 1;  //bipolar; Vref
+                AD1CSSLbits.CSSL8 = 1;  //Vmot
+                AD1CSSLbits.CSSL9 = 1;  //Imot
+                AD1CSSLbits.CSSL10 = 0; //bipolar; Icoil A
+                AD1CSSLbits.CSSL11 = 1; //battery
+                AD1CSSLbits.CSSL12 = 0; //skip AN12 for input scan
+                AD1CSSLbits.CSSL13 = 0; //skip AN13 for input scan
+                AD1CSSLbits.CSSL14 = 0; //skip AN14 for input scan
+                AD1CSSLbits.CSSL15 = 0; //skip AN15 for input scan
+                
+                //set that interrupt should occur after 4 measured values
+                AD1CON2bits.SMPI3 = 0;  
+                AD1CON2bits.SMPI2 = 1;  
+                AD1CON2bits.SMPI1 = 0;  
+                AD1CON2bits.SMPI0 = 0; 
+                break;
+                               
+            default:    //do nothing
+                break;
+        }
+        //launch new measure
+        g_ADC.uint8_ConvStarted = 1;    //signal that a conversion is started
+        g_ADC.uint8_ChannelSelect++;    //increment channel select
+        AD1CON1bits.ON = 1;     //enable ADC module
+        IFS1bits.AD1IF = 0;     //clear interrupt flag
+        IEC1bits.AD1IE = 1;     //interrupt enable
+        AD1CON1bits.ASAM = 1;   //launch the conversion
+                                //note this bit is set back to 0 automatic after 
+                                //the interrupt is generated
+        oTestLed2 = 1;
+    }
+}   //end of adc_LaunchNextMeasure

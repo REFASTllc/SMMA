@@ -13,9 +13,7 @@
  *                          - funct_IntToAscii
  *                          - funct_AsciiToInt
  *                          - funct_CheckTol
- *                          - funct_FreqToTimer2
  *                          - funct_FreqToTimer23
- *                          - funct_msToTimer2
  *                          - funct_msToTimer23
  *                          - funct_ReadRamp
  *                          - funct_CheckCmdSILIM
@@ -538,6 +536,7 @@ unsigned char funct_CheckCmdSMTYP(void)
 void funct_LoadDeviceInfo(void)
 {
     auto signed short int sint16_WB;    //local work integer
+    auto unsigned short int uint16_WB;  //local work integer
     
     uart2_sendbuffer('E');
     uart2_sendbuffer(',');
@@ -573,6 +572,10 @@ void funct_LoadDeviceInfo(void)
     funct_IntToAscii(sint16_WB,_Active);
     uart2_sendbuffer('°');
     uart2_sendbuffer('C');
+    uart2_sendbuffer(' ');
+    uint16_WB = RCON;
+    funct_IntToAscii(uint16_WB,_Active);
+    RCON = 0;
     uart2_sendbuffer(13);
 }   //end of funct_LoadDeviceInfo
 
