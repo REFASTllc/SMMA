@@ -576,6 +576,9 @@ void funct_LoadDeviceInfo(void)
     uint16_WB = RCON;
     funct_IntToAscii(uint16_WB,_Active);
     RCON = 0;
+    uart2_sendbuffer(' ');
+    uint16_WB = WDTCON;
+    funct_IntToAscii(uint16_WB, _Active);
     uart2_sendbuffer(13);
 }   //end of funct_LoadDeviceInfo
 
