@@ -128,6 +128,6 @@ void main(void)
             //do nothing
         }
         
-        adc_LaunchNextMeasure();    //call subroutine  
+        //adc_LaunchNextMeasure();    //call subroutine  
     }   
 }   //end of main
