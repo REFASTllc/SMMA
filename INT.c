@@ -224,13 +224,6 @@ void __ISR(_SPI_1_VECTOR, IPL4AUTO) __IntSPI1Handler(void)
     }
 }
 #endif
-/****************************************************************************/
-/*  Purpose of the INT routine:  Manage RTCC alarm interrupts               */
-/****************************************************************************/
-void __ISR(_RTCC_VECTOR, IPL3AUTO) __IntRTCCHandler(void)
-{
-    IFS1bits.RTCCIF = 0;
-}
 
 
 /**********************************************************************************************************************
@@ -493,15 +486,6 @@ void __ISR(_TIMER_5_VECTOR, IPL6AUTO) __IntTimer45Handler(void)
     
     T4CONbits.ON = 1;           //enable interrupt module    
 }   //end of __IntTimer2Handler
-
-
-/****************************************************************************/
-/*  Purpose of the INT routine:  Manage PWM1 overflow interrupts            */
-/****************************************************************************/
-void __ISR(_OUTPUT_COMPARE_1_VECTOR, IPL3AUTO) __IntPWM1Handler(void)
-{
-    IFS0bits.OC1IF = 0;
-}
 
 
 /**********************************************************************************************************************
@@ -939,10 +923,10 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
 ***********************************************************************************************************************/
 void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
 { 
-    IEC1bits.AD1IE = 0;     //interrupt disable
-    IFS1bits.AD1IF = 0;     //clear interrupt flag 
+    IFS1bits.AD1IF = 0;     //clear interrupt flag
+    
     oTestLed2 = 0;
-       
+    
     switch(g_ADC.uint8_MeasuredValueID)
     {
         case (0):   //results are for the first scan 
@@ -951,20 +935,22 @@ void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
             g_ADC.uint16_UniIcoilB2 = ADC1BUF2;
             g_ADC.uint16_UniIcoilB1 = ADC1BUF3;
             g_ADC.uint16_BipIcoilB = ADC1BUF4;
-            g_ADC.uint16_BipIcoilA = ADC1BUF5;           
+            g_ADC.uint16_BipIcoilA = ADC1BUF5;    
             break;
                 
         case (1):   //results are for the second scan
             g_ADC.uint16_BipVref = ADC1BUF0;
             g_ADC.uint16_Vmot = ADC1BUF1;
             g_ADC.uint16_Imot = ADC1BUF2;
-            g_ADC.uint16_Battery = ADC1BUF3;        
+            g_ADC.uint16_Battery = ADC1BUF3;    
             break;
                 
         default:    //do nothing
             break;
-    }  
+    } 
+    
     AD1CON1bits.ON = 0;     //disable ADC module because we will change later the configuration
                             //for the scan and supply reference
     g_ADC.uint8_ConvStarted = 0;    //signal that conversion is done
+    //IEC1bits.AD1IE = 0;     //interrupt disable 
 }   //end of __IntADCHandler

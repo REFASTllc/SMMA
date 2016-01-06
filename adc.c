@@ -61,7 +61,7 @@ void InitADModule(void)
     AD1CON1bits.SIDL = 1;   // 1 = Discontinue module operation when device enters Idle mode
                             // 0 = Continue module operation in Idle mode
 
-    AD1CON1bits.FORM2 = 1;  // 011 = Signed Fractional 16-bit (DOUT = 0000 0000 0000 0000 sddd dddd dd00 0000)
+    AD1CON1bits.FORM2 = 0;  // 011 = Signed Fractional 16-bit (DOUT = 0000 0000 0000 0000 sddd dddd dd00 0000)
     AD1CON1bits.FORM1 = 0;  // 010 = Fractional 16-bit (DOUT = 0000 0000 0000 0000 dddd dddd dd00 0000)
     AD1CON1bits.FORM0 = 0;  // 001 = Signed Integer 16-bit (DOUT = 0000 0000 0000 0000 ssss sssd dddd dddd)
                             // 000 = Integer 16-bit (DOUT = 0000 0000 0000 0000 0000 00dd dddd dddd)
@@ -231,7 +231,7 @@ void adc_LaunchNextMeasure(void)
 {
     volatile unsigned char uint8_WB;    //local work byte
     
-    if(g_ADC.uint8_ConvStarted)     //conversion in progress
+    if(g_ADC.uint8_ConvStarted)         //conversion in progress
     {
         //do nothing
     }
@@ -240,7 +240,7 @@ void adc_LaunchNextMeasure(void)
         uint8_WB = g_ADC.uint8_ChannelSelect;
         uint8_WB = uint8_WB % 2;   //Modulo 2, because we have two different functions
         g_ADC.uint8_MeasuredValueID = uint8_WB; //variable will be used inside the interrupt
-        
+
         switch(uint8_WB)
         {
             case (0):   //unipolar; Icoil A2
@@ -317,9 +317,9 @@ void adc_LaunchNextMeasure(void)
         //launch new measure
         g_ADC.uint8_ConvStarted = 1;    //signal that a conversion is started
         g_ADC.uint8_ChannelSelect++;    //increment channel select
-        AD1CON1bits.ON = 1;     //enable ADC module
         IFS1bits.AD1IF = 0;     //clear interrupt flag
         IEC1bits.AD1IE = 1;     //interrupt enable
+        AD1CON1bits.ON = 1;     //enable ADC module
         AD1CON1bits.ASAM = 1;   //launch the conversion
                                 //note this bit is set back to 0 automatic after 
                                 //the interrupt is generated
