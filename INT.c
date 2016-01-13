@@ -224,14 +224,6 @@ void __ISR(_SPI_1_VECTOR, IPL4AUTO) __IntSPI1Handler(void)
     }
 }
 #endif
-/****************************************************************************/
-/*  Purpose of the INT routine:  Manage RTCC alarm interrupts               */
-/****************************************************************************/
-void __ISR(_RTCC_VECTOR, IPL3AUTO) __IntRTCCHandler(void)
-{
-    IFS1bits.RTCCIF = 0;
-}
-
 
 /**********************************************************************************************************************
  * Routine:                 __IntTimer45Handler
@@ -456,11 +448,11 @@ void __ISR(_TIMER_5_VECTOR, IPL6AUTO) __IntTimer45Handler(void)
             //load the new interrupt time
             PR4 = g_Bipol.uint32_IntTime & 0x0000FFFF;  //first the LSB
             PR5 = g_Bipol.uint32_IntTime >> 16;         //second the MSB
-            PR4 -=400;  //to correct the already waited time of 10us from the step impuls (output)
+            PR4 -=8000;  //to correct the already waited time of 10us from the step impuls (output)
         }
         else
         {
-            PR4 = 400;  //load interrupt time with 10us
+            PR4 = 8000;  //load interrupt time with 10us
             //force the interrupt routine to load the correct time (next time)
             g_Bipol.uint1_IntTimeExpiredFlag = 1;   
                 
@@ -493,16 +485,6 @@ void __ISR(_TIMER_5_VECTOR, IPL6AUTO) __IntTimer45Handler(void)
     
     T4CONbits.ON = 1;           //enable interrupt module    
 }   //end of __IntTimer2Handler
-
-
-/****************************************************************************/
-/*  Purpose of the INT routine:  Manage PWM1 overflow interrupts            */
-/****************************************************************************/
-void __ISR(_OUTPUT_COMPARE_1_VECTOR, IPL3AUTO) __IntPWM1Handler(void)
-{
-    IFS0bits.OC1IF = 0;
-}
-
 
 /**********************************************************************************************************************
  * Routine:                 __IntI2cHandler
@@ -943,7 +925,7 @@ void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
     IFS1bits.AD1IF = 0;     //clear interrupt flag 
     oTestLed2 = 0;
        
-    switch(g_ADC.uint8_MeasuredValueID)
+    switch(g_ADC.uint8_ChannelSelect)
     {
         case (0):   //results are for the first scan 
             g_ADC.uint16_UniIcoilA2 = ADC1BUF0;
@@ -968,3 +950,4 @@ void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
                             //for the scan and supply reference
     g_ADC.uint8_ConvStarted = 0;    //signal that conversion is done
 }   //end of __IntADCHandler
+
