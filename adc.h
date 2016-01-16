@@ -30,6 +30,10 @@
 #ifndef ADC_H
 #define	ADC_H
 
+
+#define _AUTO   1
+#define _MAN    2
+
 extern void InitADModule(void);
 extern void InitADInterrupt(void);
 extern void adc_LaunchNextMeasure(void);

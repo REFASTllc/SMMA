@@ -61,7 +61,7 @@ void InitADModule(void)
     AD1CON1bits.SIDL = 1;   // 1 = Discontinue module operation when device enters Idle mode
                             // 0 = Continue module operation in Idle mode
 
-    AD1CON1bits.FORM2 = 0;  // 011 = Signed Fractional 16-bit (DOUT = 0000 0000 0000 0000 sddd dddd dd00 0000)
+    AD1CON1bits.FORM2 = 1;  // 011 = Signed Fractional 16-bit (DOUT = 0000 0000 0000 0000 sddd dddd dd00 0000)
     AD1CON1bits.FORM1 = 0;  // 010 = Fractional 16-bit (DOUT = 0000 0000 0000 0000 dddd dddd dd00 0000)
     AD1CON1bits.FORM0 = 0;  // 001 = Signed Integer 16-bit (DOUT = 0000 0000 0000 0000 ssss sssd dddd dddd)
                             // 000 = Integer 16-bit (DOUT = 0000 0000 0000 0000 0000 00dd dddd dddd)
@@ -212,6 +212,114 @@ void InitADInterrupt(void)
     IEC1bits.AD1IE = 0; // Interrupt disable
 }
 
+/**********************************************************************************************************************
+ * Routine:                 SetChannelAD
+
+ * Description:
+ * Set the channel AD to be read 
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        09.01.2016
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   channel
+ * Output:                  1 : assignation ok
+ *                          -1: error during assignation 
+ * 
+ * Remark:                  If the AD module was actived (AD1CON1bits.ON = 1), then module will be also reactived. 
+ *                          If not, the AD module will stay deactived.
+***********************************************************************************************************************/
+signed char SetChannelAD(unsigned char channel)
+{
+    unsigned char statusAD = AD1CON1bits.ON;
+    // Disable AD module before doing any operation
+    AD1CON1bits.ON = 0;
+    // Deactivate the scan mode
+    if(AD1CON2bits.CSCNA)
+        AD1CON2bits.CSCNA = 0;
+    // Set the new channel
+    AD1CHSbits.CH0SA = channel;
+    
+    
+    
+    
+    
+    
+    
+    // Return the module in the default status (before this function)
+    AD1CON1bits.ON = statusAD;
+}
+
+/**********************************************************************************************************************
+ * Routine:                 SetSamplingType
+
+ * Description:             Selecting automatic or manual sampling
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        09.01.2016
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   sampling type (_AUTO, _MAN)
+ * Output:                  1 : sampling type ok
+ *                          -1: error during function 
+ * 
+ * Remark:                  If the AD module was actived (AD1CON1bits.ON = 1), then module will be also reactived. 
+ *                          If not, the AD module will stay deactived.
+***********************************************************************************************************************/
+signed char SetSamplingType(unsigned char sampleType)
+{
+    unsigned char statusAD = AD1CON1bits.ON;
+    // Disable AD module before doing any operation
+    if(AD1CON1bits.ON)
+        AD1CON1bits.ON = 0;
+    
+    if(sampleType == _AUTO)
+    {
+        AD1CON1bits.ASAM = 1;
+        // Return the module in the default status (before this function)
+        AD1CON1bits.ON = statusAD;
+        return 1;
+    }
+    else if(sampleType == _MAN)
+    {
+        AD1CON1bits.ASAM = 0;
+        // Return the module in the default status (before this function)
+        AD1CON1bits.ON = statusAD;
+        return 1;
+    }
+    return -1;
+}
+
+/**********************************************************************************************************************
+ * Routine:                 SetNbrConvertPerInt
+
+ * Description:             Set the number of conversion before an interrupt occurs
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        09.01.2016
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   Number of conversion before interrupt (1 - 16)
+ * Output:                  1 : function ok
+ *                          -1: error during function 
+ * 
+ * Remark:                  If the AD module was actived (AD1CON1bits.ON = 1), then module will be also reactived. 
+ *                          If not, the AD module will stay deactived.
+***********************************************************************************************************************/
+signed char SetNbrConvertPerInt(unsigned char nbrConvert)
+{
+    unsigned char statusAD = AD1CON1bits.ON;
+    // Disable AD module before doing any operation
+    if(AD1CON1bits.ON)
+        AD1CON1bits.ON = 0;
+    // Set the number of conversion before interrupt occurs
+    AD1CON2bits.SMPI = nbrConvert - 1;
+    // Return the module in the default status (before this function)
+    AD1CON1bits.ON = statusAD;
+}
 
 /**********************************************************************************************************************
  * Routine:                 adc_LaunchNextMeasure
@@ -231,17 +339,19 @@ void adc_LaunchNextMeasure(void)
 {
     volatile unsigned char uint8_WB;    //local work byte
     
-    if(g_ADC.uint8_ConvStarted)         //conversion in progress
+    if(g_ADC.uint8_ConvStarted)     //conversion in progress
     {
-        //do nothing
+
     }
     else
     {
-        uint8_WB = g_ADC.uint8_ChannelSelect;
-        uint8_WB = uint8_WB % 2;   //Modulo 2, because we have two different functions
-        g_ADC.uint8_MeasuredValueID = uint8_WB; //variable will be used inside the interrupt
-
-        switch(uint8_WB)
+        if(AD1CON1bits.ON)
+            AD1CON1bits.ON = 0;
+        while(AD1CON1bits.ON);
+        
+        g_ADC.uint8_ChannelSelect =! g_ADC.uint8_ChannelSelect;
+        
+        switch(g_ADC.uint8_ChannelSelect)
         {
             case (0):   //unipolar; Icoil A2
                 //set reference voltage to external VREF+ and VREF-
@@ -316,10 +426,10 @@ void adc_LaunchNextMeasure(void)
         }
         //launch new measure
         g_ADC.uint8_ConvStarted = 1;    //signal that a conversion is started
-        g_ADC.uint8_ChannelSelect++;    //increment channel select
+      //  g_ADC.uint8_ChannelSelect++;    //increment channel select
+        AD1CON1bits.ON = 1;     //enable ADC module
         IFS1bits.AD1IF = 0;     //clear interrupt flag
         IEC1bits.AD1IE = 1;     //interrupt enable
-        AD1CON1bits.ON = 1;     //enable ADC module
         AD1CON1bits.ASAM = 1;   //launch the conversion
                                 //note this bit is set back to 0 automatic after 
                                 //the interrupt is generated

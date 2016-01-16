@@ -32,9 +32,9 @@
 
 
 // Compilation variables
-//#define _BIPOLAR
+#define _BIPOLAR
 //#define _LIN
-#define _UNIPOLAR
+//#define _UNIPOLAR
 
 
 // Inputs & Outputs definitions

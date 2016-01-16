@@ -34,6 +34,7 @@ extern SCmdChk g_CmdChk;
 extern SParam g_Param;
 extern SUni g_Uni;
 extern Sbipol g_Bipol;
+extern T_A3981 A3981;
 /**********************************************************************************************************************
  * Routine:                 funct_init
 
@@ -572,13 +573,6 @@ void funct_LoadDeviceInfo(void)
     funct_IntToAscii(sint16_WB,_Active);
     uart2_sendbuffer('°');
     uart2_sendbuffer('C');
-    uart2_sendbuffer(' ');
-    uint16_WB = RCON;
-    funct_IntToAscii(uint16_WB,_Active);
-    RCON = 0;
-    uart2_sendbuffer(' ');
-    uint16_WB = WDTCON;
-    funct_IntToAscii(uint16_WB, _Active);
     uart2_sendbuffer(13);
 }   //end of funct_LoadDeviceInfo
 

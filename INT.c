@@ -225,7 +225,6 @@ void __ISR(_SPI_1_VECTOR, IPL4AUTO) __IntSPI1Handler(void)
 }
 #endif
 
-
 /**********************************************************************************************************************
  * Routine:                 __IntTimer45Handler
 
@@ -449,11 +448,11 @@ void __ISR(_TIMER_5_VECTOR, IPL6AUTO) __IntTimer45Handler(void)
             //load the new interrupt time
             PR4 = g_Bipol.uint32_IntTime & 0x0000FFFF;  //first the LSB
             PR5 = g_Bipol.uint32_IntTime >> 16;         //second the MSB
-            PR4 -=400;  //to correct the already waited time of 10us from the step impuls (output)
+            PR4 -=8000;  //to correct the already waited time of 10us from the step impuls (output)
         }
         else
         {
-            PR4 = 400;  //load interrupt time with 10us
+            PR4 = 8000;  //load interrupt time with 10us
             //force the interrupt routine to load the correct time (next time)
             g_Bipol.uint1_IntTimeExpiredFlag = 1;   
                 
@@ -486,7 +485,6 @@ void __ISR(_TIMER_5_VECTOR, IPL6AUTO) __IntTimer45Handler(void)
     
     T4CONbits.ON = 1;           //enable interrupt module    
 }   //end of __IntTimer2Handler
-
 
 /**********************************************************************************************************************
  * Routine:                 __IntI2cHandler
@@ -923,11 +921,11 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
 ***********************************************************************************************************************/
 void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
 { 
-    IFS1bits.AD1IF = 0;     //clear interrupt flag
-    
+    IEC1bits.AD1IE = 0;     //interrupt disable
+    IFS1bits.AD1IF = 0;     //clear interrupt flag 
     oTestLed2 = 0;
-    
-    switch(g_ADC.uint8_MeasuredValueID)
+       
+    switch(g_ADC.uint8_ChannelSelect)
     {
         case (0):   //results are for the first scan 
             g_ADC.uint16_UniIcoilA2 = ADC1BUF0;
@@ -935,22 +933,21 @@ void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
             g_ADC.uint16_UniIcoilB2 = ADC1BUF2;
             g_ADC.uint16_UniIcoilB1 = ADC1BUF3;
             g_ADC.uint16_BipIcoilB = ADC1BUF4;
-            g_ADC.uint16_BipIcoilA = ADC1BUF5;    
+            g_ADC.uint16_BipIcoilA = ADC1BUF5;           
             break;
                 
         case (1):   //results are for the second scan
             g_ADC.uint16_BipVref = ADC1BUF0;
             g_ADC.uint16_Vmot = ADC1BUF1;
             g_ADC.uint16_Imot = ADC1BUF2;
-            g_ADC.uint16_Battery = ADC1BUF3;    
+            g_ADC.uint16_Battery = ADC1BUF3;        
             break;
                 
         default:    //do nothing
             break;
-    } 
-    
+    }  
     AD1CON1bits.ON = 0;     //disable ADC module because we will change later the configuration
                             //for the scan and supply reference
     g_ADC.uint8_ConvStarted = 0;    //signal that conversion is done
-    //IEC1bits.AD1IE = 0;     //interrupt disable 
 }   //end of __IntADCHandler
+

@@ -42,13 +42,7 @@ void bi_init(void)
 //initialize the variables of the unipolar actuator
     g_Bipol.uint32_RealPos = 0;               //set the real position to 0
     g_Bipol.uint32_GoalPos = 0;               //set the goal position to 0
-    g_Bipol.uint16_RunFreq = 0;               //set the run frequency to 0
-    
-    A3981.RUN.REG = 0b1000101001000000;
-    A3981.CONFIG0.REG = 0b0010011100011100;
-    A3981.CONFIG1.REG = 0b0111000000100000;
-    A3981.TBLLD.REG = 0b1111000001000101;
-    
+    g_Bipol.uint16_RunFreq = 0;               //set the run frequency to 0    
     g_Bipol.status.REG = 0b00000001;        //status byte - set bit 'FS' and clear the other bits
     //                     ||||||||
     //                     |||||||+- 0: FS    - First step; 1: active / 0: not active 
@@ -71,7 +65,7 @@ void bi_init(void)
     g_Bipol.uint16_DecNumbStep = 0;             //clear the deceleration number of steps
     g_Bipol.uint32_DecStart = 0;                //clear the deceleration start position
     g_Bipol.uint1_IntTimeExpiredFlag = 1;       //force the interrupt routine to load the new time
-}   //end of uni_init
+}   //end of bi_init
 
 
 /**********************************************************************************************************************

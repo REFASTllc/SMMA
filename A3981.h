@@ -73,7 +73,7 @@ typedef union
         unsigned short int TOF_FRQ:3;
         unsigned short int TBK:2;
         unsigned short int PFD:3;
-        unsigned short int MX:2;
+        unsigned short int MXI:2;
         unsigned short int MS:2;
         unsigned short int SYR:1;
         unsigned short int ADR:2;
@@ -117,7 +117,7 @@ typedef union
     {
         unsigned short int PT:6;
         unsigned short int PTP:1;
-        unsigned short int nu:5;
+        unsigned short int :5;
         unsigned short int STS:2;
         unsigned short int ADR:2;
     } BITS;

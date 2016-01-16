@@ -59,6 +59,7 @@ void main(void)
     oVmotOnOff = 1;
     oBiEnaVmot = 1;
     oEnaVLINSupply = 0;
+    oBiPhCurrCtrl = 1;
 #endif
 #ifdef _LIN
     oVmotOnOff = 1;
@@ -68,75 +69,41 @@ void main(void)
     oVmotOnOff = 1;
     oEnaVLINSupply = 0;
 #endif
-#ifdef _UNIPOLAR
-    oVmotOnOff = 1;
-#endif
  //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!   
     
     periph_init();
-    DAC7571_WrByte(_NormalMode, 886);
-    
+//    DAC7571_WrByte(_NormalMode, 1240);  // 1V
+//    DAC7571_WrByte(_NormalMode, 2381);  // 2V
+//    DAC7571_WrByte(_NormalMode, 992);  // 0V8
+    DAC7571_WrByte(_NormalMode, 2113);  // 1.7V
+ 
     while(1)
     {        
         if(g_Uni.uint8_Settings & 0x01) //verify if the unipolar motor has to move
-        {
-            enaLed1 = 1;
-            static unsigned short int temp = 0;
-            if(temp >= 5000)
-            {
-                oTestLed2 =! oTestLed2;
-                temp = 0;
-            }
-            else
-                temp++;
             uni_move();                 //then call the subroutine
-        }
-        else
-        {
-            //otherwise do nothing
-        }     
-        
         if(g_Bipol.uint1_IsBipolEnabled)
-        {
             bi_move();
-        }
-        
         if(!g_UART2txd.uint8_BufEmpty)  //send buffer not empty?
-            IEC1bits.U2TXIE = 1;        //enable the send interrupt
-        else
-        {
-            //do nothing
-        }
-        
+            IEC1bits.U2TXIE = 1;        //enable the send interrupt        
         if(!g_UART2rxd.uint8_BufEmpty)  //receive buffer not empty?
             cmdchk_check();             //call subroutine
         if(g_LIN.uint8_SlaveAnswerRequested)    //answer from LIN slave requested
         {
             //timeout or slave answer received
             if((g_LIN.uint8_SlaveTimeout) || (g_LIN.uint8_SlaveAnswerFinish))  
-            {
                 LINATA6629_SendBackSlaveAnswer();
-            }
-            else
-            {
-                //do nothing
-            }
         }
         else
         {
             static unsigned short int temp = 0;
-            if(temp >= 10000 && enaLed1)
-            {
+            if(temp >= 10000)
+            { 
+                adc_LaunchNextMeasure();    //call subroutine 
                 oTestLed1 =! oTestLed1;
                 temp = 0;
             }
             else
                 temp++;
-            //do nothing
         }
-        
-        adc_LaunchNextMeasure();    //call subroutine  
-    }   
-    enaLed1++;
-    enaLed1++;
+    }
 }   //end of main
