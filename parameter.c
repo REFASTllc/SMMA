@@ -141,4 +141,18 @@ void param_init(void)
     g_Param.uint8_LinStatus = 0;        //reset the lin bus status
     g_Param.uint32_LinSpd = 9600;       //baud rate of the lin bus
     g_Param.uint16_LinTO = 500;         //timeout for the communication = 500ms
+    
+    //reset or define the bipolar flag's and default values
+    g_Param.uint8_SYR = 0;               //bipolar synchronous rectification mode
+    g_Param.uint8_DCY = 1;               //bipolar decay mode mixed PDF fixed
+    g_Param.uint8_HLR = 0;               //bipolar selects slow decay and brake recirculation path = high
+    g_Param.uint8_TCS = 2;               //bipolar overcurrent fault delay = 2us
+    g_Param.uint8_OL = 1;                //bipolar open load current threshold = 30%
+    g_Param.uint8_STS = 2;               //bipolar stall detection scheme = disabled
+    g_Param.uint8_PWMcount = 8;          //bipolar PWM count for stall detection
+    g_Param.uint8_PFD = 4;               //bipolar fast decay time for mixed decay = 8us
+    g_Param.uint8_TBK = 1;               //bipolar blank time used in PWM mode = 1.5us
+    g_Param.uint8_TOF = 6;               //bipolar off time in PWM mode = 44us
+    g_Param.uint8_FRQ = 6;               //bipolar frequency = 60us/16.7kHz
+    g_Param.uint8_SLEW = 1;              //bipolar select slow rate control = enabled
 }   //end of param_init

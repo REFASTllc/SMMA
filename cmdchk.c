@@ -599,6 +599,46 @@ void cmdchk_check(void)
                 case (_IdSLIN):         //command SLIN
                     cmd_SLIN();         //call subroutine
                     break;
+                    
+                case (_IdGBIPSTAS):     //command GBIPSTAS
+                    cmd_GBIPSTAS();     //call subroutine
+                    break;
+                    
+                case (_IdGBIPSTAL):     //command GBIPSTAL
+                    cmd_GBIPSTAL();     //call subroutine
+                    break;
+                    
+                case (_IdSBIPPD):       //command SBIPPD
+                    cmd_SBIPPD();       //call subroutine
+                    break;
+                    
+                case (_IdGBIPPD):       //command GBIPPD
+                    cmd_GBIPPD();       //call subroutine
+                    break;
+                    
+                case (_IdSBIPTSC):      //command SBIPTSC
+                    cmd_SBIPTSC();      //call subroutine
+                    break;
+                    
+                case (_IdGBIPTSC):      //command GBIPTSC
+                    cmd_GBIPTSC();      //call subroutine
+                    break;
+                    
+                case (_IdSBIPOL):       //command SBIPOL
+                    cmd_SBIPOL();       //call subroutine
+                    break;
+                    
+                case (_IdGBIPOL):       //command GBIPOL
+                    cmd_GBIPOL();       //call subroutine
+                    break;
+                
+                case (_IdSBIPSTS):      //command SBIPSTS
+                    cmd_SBIPSTS();      //call subroutine
+                    break;
+                    
+                case (_IdGBIPSTS):      //command GBIPSTS
+                    cmd_GBIPSTS();      //call subroutine
+                    break;
                                      
                 default:    //command ID does not exist
                     //do nothing - error has to be send before this routine
@@ -1278,6 +1318,106 @@ void cmdchk_def(void)
                             case (0x47544F4C):  //cmd is = GTOLIN
                                 g_CmdChk.uint8_CmdID = _IdGTOLIN;
                                 break;  
+                                
+                            default:    //error - command is not defined
+                                g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID
+                                g_Param.uint8_ErrCode = _UnknownCmd;    //set error code
+                                break;
+                        }
+                        break;
+                        
+                    case (0x53544153):  //letter STAS?
+                        switch(g_CmdChk.uint32_Cmd1st4)
+                        {
+                            case (0x47424950):  //cmd is = GBIPSTAS
+                                g_CmdChk.uint8_CmdID = _IdGBIPSTAS;
+                                break;    
+                                
+                            default:    //error - command is not defined
+                                g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID
+                                g_Param.uint8_ErrCode = _UnknownCmd;    //set error code
+                                break;
+                        }
+                        break;
+                        
+                    case (0x5354414C):  //letter STAL?
+                        switch(g_CmdChk.uint32_Cmd1st4)
+                        {
+                            case (0x47424950):  //cmd is = GBIPSTAL
+                                g_CmdChk.uint8_CmdID = _IdGBIPSTAL;
+                                break;    
+                                
+                            default:    //error - command is not defined
+                                g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID
+                                g_Param.uint8_ErrCode = _UnknownCmd;    //set error code
+                                break;
+                        }
+                        break;
+                        
+                    case (0x5044):  //letter PD?
+                        switch(g_CmdChk.uint32_Cmd1st4)
+                        {
+                            case (0x53424950):  //cmd is = SBIPPD
+                                g_CmdChk.uint8_CmdID = _IdSBIPPD;
+                                break;
+                                
+                            case (0x47424950):  //cmd is = GBIPPD
+                                g_CmdChk.uint8_CmdID = _IdGBIPPD;
+                                break;    
+                                
+                            default:    //error - command is not defined
+                                g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID
+                                g_Param.uint8_ErrCode = _UnknownCmd;    //set error code
+                                break;
+                        }
+                        break;
+                        
+                    case (0x545343):  //letter TSC?
+                        switch(g_CmdChk.uint32_Cmd1st4)
+                        {
+                            case (0x53424950):  //cmd is = SBIPTSC
+                                g_CmdChk.uint8_CmdID = _IdSBIPTSC;
+                                break;
+                                
+                            case (0x47424950):  //cmd is = GBIPTSC
+                                g_CmdChk.uint8_CmdID = _IdGBIPTSC;
+                                break;    
+                                
+                            default:    //error - command is not defined
+                                g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID
+                                g_Param.uint8_ErrCode = _UnknownCmd;    //set error code
+                                break;
+                        }
+                        break;
+                        
+                    case (0x4F4C):  //letter OL?
+                        switch(g_CmdChk.uint32_Cmd1st4)
+                        {
+                            case (0x53424950):  //cmd is = SBIPOL
+                                g_CmdChk.uint8_CmdID = _IdSBIPOL;
+                                break;
+                                
+                            case (0x47424950):  //cmd is = GBIPOL
+                                g_CmdChk.uint8_CmdID = _IdGBIPOL;
+                                break;    
+                                
+                            default:    //error - command is not defined
+                                g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID
+                                g_Param.uint8_ErrCode = _UnknownCmd;    //set error code
+                                break;
+                        }
+                        break;
+                        
+                    case (0x535453):  //letter STS?
+                        switch(g_CmdChk.uint32_Cmd1st4)
+                        {
+                            case (0x53424950):  //cmd is = SBIPSTS
+                                g_CmdChk.uint8_CmdID = _IdSBIPSTS;
+                                break;
+                                
+                            case (0x47424950):  //cmd is = GBIPSTS
+                                g_CmdChk.uint8_CmdID = _IdGBIPSTS;
+                                break;    
                                 
                             default:    //error - command is not defined
                                 g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID

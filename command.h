@@ -95,5 +95,15 @@ extern void cmd_GSPDLIN(void);
 extern void cmd_STOLIN(void);
 extern void cmd_GTOLIN(void);
 extern void cmd_SLIN(void);
+extern void cmd_GBIPSTAS(void);
+extern void cmd_GBIPSTAL(void);
+extern void cmd_SBIPPD(void);
+extern void cmd_GBIPPD(void);
+extern void cmd_SBIPTSC(void);
+extern void cmd_GBIPTSC(void);
+extern void cmd_SBIPOL(void);
+extern void cmd_GBIPOL(void);
+extern void cmd_SBIPSTS(void);
+extern void cmd_GBIPSTS(void);
 
 #endif	/* COMMAND_H */

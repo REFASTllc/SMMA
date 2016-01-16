@@ -142,6 +142,20 @@ extern void param_init(void);
 #define _LinLengthMax       40          //range for the lin slave answer
 #define _LinParaMin         0           //range for the lin parameter
 #define _LinParaMax         255         //range for the lin parameter
+#define _BipSyrMin          0           //range for the bipolar SYR
+#define _BipSyrMax          1           //range for the bipolar SYR
+#define _BipDcyMin          0           //range for the bipolar DCY
+#define _BipDcyMax          3           //range for the bipolar DCY
+#define _BipHlrMin          0           //range for the bipolar HLR
+#define _BipHlrMax          1           //range for the bipolar HLR
+#define _BipTscMin          0           //range for the bipolar TSC
+#define _BipTscMax          3           //range for the bipolar TSC
+#define _BipOlMin           0           //range for the bipolar OL
+#define _BipOlMax           3           //range for the bipolar OL
+#define _BipStsMin          0           //range for the bipolar STS
+#define _BipStsMax          2           //range for the bipolar STS
+#define _BipCdMin           1           //range for the bipolar CD
+#define _BipCdMax           255         //range for the bipolar CD
 
 
 /*
@@ -229,6 +243,18 @@ typedef struct                      //definitions of multiple variable for comma
     volatile unsigned char uint8_LinStatus;         //status of the lin driver
     volatile unsigned long int uint32_LinSpd;       //speed (baud rate) of the lin driver
     volatile unsigned short int uint16_LinTO;       //timeout for the lin bus communication
+    volatile unsigned char uint8_SYR;               //bipolar synchronous rectification mode
+    volatile unsigned char uint8_DCY;               //bipolar decay mode selection
+    volatile unsigned char uint8_HLR;               //bipolar selects slow decay and brake recirculation path
+    volatile unsigned char uint8_TCS;               //bipolar overcurrent fault delay
+    volatile unsigned char uint8_OL;                //bipolar open load current threshold
+    volatile unsigned char uint8_STS;               //bipolar stall detection scheme
+    volatile unsigned char uint8_PWMcount;          //bipolar PWM count for stall detection
+    volatile unsigned char uint8_PFD;               //bipolar fast decay time for mixed decay
+    volatile unsigned char uint8_TBK;               //bipolar blank time used in PWM mode
+    volatile unsigned char uint8_TOF;               //bipolar off time in PWM mode
+    volatile unsigned char uint8_FRQ;               //bipolar frequency
+    volatile unsigned char uint8_SLEW;              //bipolar select slow rate control 
 }   SParam;                         //struct name is SParam (S for struct)
 
 #endif	/* PARAMETER_H */

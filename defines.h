@@ -149,6 +149,10 @@
 #define _BipETESTIN         102             //ETESTIN current measure not within the tolerance
 #define _BipSPHC            103             //SPHC parameter not within the tolerance
 #define _BipPlausiCheck     104             //plausibility check not passed
+#define _BipSBIPPD          105             //SBIPPD parameters not within the tolerance
+#define _BipSBIPTSC         106             //SBIPTSC parameter not within the tolerance
+#define _BipSBIPOL          107             //SBIPOL parameter not within the tolerance
+#define _BipSBIPSTS         108             //SBIPSTS parameter not within the tolerance
                             //LIN errors
 #define _LinSILIM           150             //received parameters not within the tolerance for SILIM
 #define _LinSMTYP           151             //parameters not within tolerance for switch on LIN
@@ -255,6 +259,16 @@
 #define _IdSTOLIN           86              //set the timeout of the LIN communication
 #define _IdGTOLIN           87              //get the timeout of the LIN communication
 #define _IdSLIN             88              //send parameters over the LIN bus
+#define _IdGBIPSTAS         89              //get bipolar status short
+#define _IdGBIPSTAL         90              //get bipolar status long
+#define _IdSBIPPD           91              //set bipolar phase decay
+#define _IdGBIPPD           92              //get bipolar phase decay
+#define _IdSBIPTSC          93              //set bipolar overcurrent fault delay
+#define _IdGBIPTSC          94              //get bipolar overcurrent fault delay
+#define _IdSBIPOL           95              //set bipolar open load current
+#define _IdGBIPOL           96              //get bipolar open load current
+#define _IdSBIPSTS          97              //set bipolar stall detection scheme
+#define _IdGBIPSTS          98              //get bipolar stall detection scheme
 
 #endif	/* DEFINES_H */
 
