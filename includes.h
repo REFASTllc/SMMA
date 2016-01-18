@@ -33,7 +33,7 @@
 #define _XTAL_FREQ 80000000
 
 //system header files
-#include "xc.h"                     
+#include "XC.h"                   
 #include "attribs.h"                                        
 #include "p32mx360f512l.h"
 //#include <math.h>
@@ -54,6 +54,7 @@
 #include "i2c.h"
 #include "adc.h"
 #include "outputCompare.h"
+#include "inputCapture.h"
 //Extern devices header files
 #include "periph.h"
 #include "A3981.h"

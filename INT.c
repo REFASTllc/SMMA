@@ -887,7 +887,7 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
             //enable timeout for slave answer if needed
             if(g_LIN.uint8_SlaveAnswerRequested)
             {
-                timers_Set(_TIMER1,_ENABLE,0,g_Param.uint16_LinTO);
+                SetTimer(_TIMER1,_ENABLE,0,g_Param.uint16_LinTO);
             }
             else
             {
@@ -951,3 +951,46 @@ void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
     g_ADC.uint8_ConvStarted = 0;    //signal that conversion is done
 }   //end of __IntADCHandler
 
+/**********************************************************************************************************************
+ * Routine:                 __IntInputCapture1Handler
+
+ * Description:
+ * ...
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        18.01.2016
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
+{
+    unsigned short int average = 0;
+    IFS0bits.IC1IF = 0;
+    
+    average = (IC1BUF + IC2BUF + IC3BUF + IC4BUF) / 4;
+}
+
+/**********************************************************************************************************************
+ * Routine:                 __IntInputCapture2Handler
+
+ * Description:
+ * ...
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        18.01.2016
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL2AUTO) __IntInputCapture2Handler(void)
+{
+    unsigned short int average = 0;
+    IFS0bits.IC2IF = 0;
+    
+    average = (IC1BUF + IC2BUF + IC3BUF + IC4BUF) / 4;
+}

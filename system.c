@@ -81,56 +81,65 @@
 ***********************************************************************************************************************/
 void system_init(void)
 {   
-//system initialization    
-    system_osc();                           //call subroutine
-    system_IOs();                           //call subroutine
+    // Initialization of the system    
+    system_osc();
+    system_IOs();
     //AD module must be initialize  after the system_IOs because we define here which pin is used 
     //in analog mode
     InitADModule(); 
     InitADInterrupt();
-//    system_NoticeModule();                  //call subroutine
-//interrupt initialization    
-    INT_init();                             //call subroutine
-//function initialization
-    funct_init();                           //call subroutine
-//unipolar initialization
-    uni_init();                             //call subroutine
-//bipolar initialization
+    // Initialization of interrupts
+    INT_init();
+    // Initialization of functions
+    funct_init();
+    // Initialization of unipolar
+    uni_init();
+    // Initialization of bipolar
     bi_init();
-//parameter initialization
-    param_init();                           //call subroutine
-//command check initialization
-    cmdchk_init();                          //call subroutine
-//UART2 initialization
-    uart_init(_UART2_);                     //call subroutine
-    uart_set(_UART2_,_EVEN,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,38400);   //call subroutine
-    uart_InitInterrupt(_UART2_,_ENABLE);    //call subroutine
-    uart_enable(_UART2_);                   //call subroutine
-//timer 4 & 5 initialization for unipolar and bipolar driver
-    timers_Init(_TIMER45);                  //call subroutine and initialize timer 4 & 5
-    timers_SetInterrupt(_TIMER45,_ENABLE);  //call subroutine and set interrupt for timer 4 & 5
-//front LED = black status (off)
-    funct_FrontLED(_FLEDgreen);             //call subroutine and switch on green LED
-//--- Initialization of SPI ---//
+    // Initialization of user parameters
+    param_init();
+    // Initialization of command check function
+    cmdchk_init();
+    // Initialization of UART2
+    uart_init(_UART2_);
+    uart_set(_UART2_,_EVEN,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,38400);
+    uart_InitInterrupt(_UART2_,_ENABLE);
+    uart_enable(_UART2_);
+    // Initialization of timers 4 & 5 as a 32 bits timer (used for timebase of motors operations)
+    InitTimer(_TIMER45);
+    InitInterruptTimer(_TIMER45,_ENABLE);
+    // Initialization of SPI
     InitSPI(_SPI_1);
     InitSPIInterrupt(_SPI_1, _ENABLE);
     EnableSPI1();
-//i2c initialization
-    i2c_init(_i2c1);                                //call subroutine
-    i2c_enable(_i2c1);                              //call subroutine
-    i2c_InitInterrupt(_i2c1,_i2cENABLE,_i2cMASTER); //call subroutine
-//UART1 initialization
-    uart_init(_UART1_);                     //call subroutine
-    uart_set(_UART1_,_NONE,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,9600);   //call subroutine
-    uart_InitInterrupt(_UART1_,_ENABLE);    //call subroutine
-    uart_enable(_UART1_);                   //call subroutine
-//timer 1 initialization for 1ms interrupts
-    timers_Init(_TIMER1);                   //call subroutine
-    timers_SetInterrupt(_TIMER1,_ENABLE);   //call subroutine
+    // Initialization of I2C module
+    i2c_init(_i2c1);
+    i2c_enable(_i2c1);
+    i2c_InitInterrupt(_i2c1,_i2cENABLE,_i2cMASTER);
+    // Initialization of UART1 module
+    uart_init(_UART1_);
+    uart_set(_UART1_,_NONE,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,9600);
+    uart_InitInterrupt(_UART1_,_ENABLE);
+    uart_enable(_UART1_);
+    // Initialization of timer 1 (used for 1ms interrupts)
+    InitTimer(_TIMER1);
+    InitInterruptTimer(_TIMER1,_ENABLE);
+    // Initialization of timer 2 (used for input capture module)
+    InitTimer(_TIMER2);
+    InitInterruptTimer(_TIMER2, _DISABLE);
+    // Initialization of input capture modules 1 & 2
+    InitInputCapture1Module();
+    InitInputCapture2Module();
+    InitInterruptInputCaptureModule(_IC_1, _ENABLE);
+    InitInterruptInputCaptureModule(_IC_2, _ENABLE);
+    IC1CONbits.ON = 1;
+   // IC2CONbits.ON = 1;
 //switch off the debugging LED's
     oTestLed1 = 0;                          //switch on the output for the test LED1
     oTestLed2 = 0;                          //switch on the output for the test LED2
     
+    // Front LED => Green
+    FrontLED(_GREEN);
 }   //end of system_init
 
 

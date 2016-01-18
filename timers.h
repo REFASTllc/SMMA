@@ -30,9 +30,9 @@
 #ifndef TIMERS_H
 #define	TIMERS_H
 
-extern void timers_Init(unsigned char timerx);
-extern void timers_SetInterrupt(unsigned char timerx, unsigned char action);
-extern void timers_Set(unsigned char timer, unsigned char status, unsigned long int valueTMRReg, unsigned long int valuePRReg);
+extern void InitTimer(unsigned char timerx);
+extern void InitInterruptTimer(unsigned char timerx, unsigned char action);
+extern void SetTimer(unsigned char timer, unsigned char status, unsigned long int valueTMRReg, unsigned long int valuePRReg);
 extern void timer1_LaunchMsTime(unsigned short int uint16_time);
 
 #define	_TIMER1		1

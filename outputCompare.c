@@ -96,17 +96,17 @@ void InitPWM(unsigned char pwmx)
     //--- If PWM is in 32-bit initialized, timer is also in 32-bit initialized. ---//
         if(OC1CONbits.OC32)
         {
-            timers_Init(_TIMER23);
+            InitTimer(_TIMER23);
             PR2 = 0;
         }
         else if(OC1CONbits.OCTSEL)
         {
-            timers_Init(_TIMER3);
+            InitTimer(_TIMER3);
             PR3 = 0;
         }
         else
         {
-            timers_Init(_TIMER2);
+            InitTimer(_TIMER2);
             PR2 = 0;
         }
     }
@@ -156,17 +156,17 @@ void InitPWM(unsigned char pwmx)
     //--- If PWM is in 32-bit initialized, timer is also in 32-bit initialized. ---//
         if(OC2CONbits.OC32)
         {
-            timers_Init(_TIMER23);
+            InitTimer(_TIMER23);
             PR2 = 0;
         }
         else if(OC2CONbits.OCTSEL)
         {
-            timers_Init(_TIMER3);
+            InitTimer(_TIMER3);
             PR3 = 0;
         }
         else
         {
-            timers_Init(_TIMER2);
+            InitTimer(_TIMER2);
             PR2 = 0;
         }
     }
@@ -216,17 +216,17 @@ void InitPWM(unsigned char pwmx)
     //--- If PWM is in 32-bit initialized, timer is also in 32-bit initialized. ---//
         if(OC3CONbits.OC32)
         {
-            timers_Init(_TIMER23);
+            InitTimer(_TIMER23);
             PR2 = 0;
         }
         else if(OC3CONbits.OCTSEL)
         {
-            timers_Init(_TIMER3);
+            InitTimer(_TIMER3);
             PR3 = 0;
         }
         else
         {
-            timers_Init(_TIMER2);
+            InitTimer(_TIMER2);
             PR2 = 0;
         }
     }
@@ -275,17 +275,17 @@ void InitPWM(unsigned char pwmx)
     //--- If PWM is in 32-bit initialized, timer is also in 32-bit initialized. ---//
         if(OC4CONbits.OC32)
         {
-            timers_Init(_TIMER23);
+            InitTimer(_TIMER23);
             PR2 = 0;
         }
         else if(OC4CONbits.OCTSEL)
         {
-            timers_Init(_TIMER3);
+            InitTimer(_TIMER3);
             PR3 = 0;
         }
         else
         {
-            timers_Init(_TIMER2);
+            InitTimer(_TIMER2);
             PR2 = 0;
         }
     }
@@ -335,17 +335,17 @@ void InitPWM(unsigned char pwmx)
     //--- If PWM is in 32-bit initialized, timer is also in 32-bit initialized. ---//
         if(OC5CONbits.OC32)
         {
-            timers_Init(_TIMER23);
+            InitTimer(_TIMER23);
             PR2 = 0;
         }
         else if(OC5CONbits.OCTSEL)
         {
-            timers_Init(_TIMER3);
+            InitTimer(_TIMER3);
             PR3 = 0;
         }
         else
         {
-            timers_Init(_TIMER2);
+            InitTimer(_TIMER2);
             PR2 = 0;
         }
     }
@@ -476,65 +476,85 @@ void SetPWMInterrupt(unsigned char pwmx, unsigned char action)
     {
         if(action == _ENABLE)
         {
-            if(OC1CONbits.OCTSEL || OC1CONbits.OC32) timers_SetInterrupt(_TIMER3, _ENABLE);
-            else timers_SetInterrupt(_TIMER2, _ENABLE);
+            if(OC1CONbits.OCTSEL || OC1CONbits.OC32)
+                InitInterruptTimer(_TIMER3, _ENABLE);
+            else 
+                InitInterruptTimer(_TIMER2, _ENABLE);
         }
         else
         {
-            if(OC1CONbits.OCTSEL || OC1CONbits.OC32) timers_SetInterrupt(_TIMER3, _DISABLE);
-            else timers_SetInterrupt(_TIMER2, _DISABLE);
+            if(OC1CONbits.OCTSEL || OC1CONbits.OC32) 
+                InitInterruptTimer(_TIMER3, _DISABLE);
+            else 
+                InitInterruptTimer(_TIMER2, _DISABLE);
         }
     }
     else if(pwmx == _PWM2)
     {
         if(action == _ENABLE)
         {
-            if(OC2CONbits.OCTSEL || OC2CONbits.OC32) timers_SetInterrupt(_TIMER3, _ENABLE);
-            else timers_SetInterrupt(_TIMER2, _ENABLE);
+            if(OC2CONbits.OCTSEL || OC2CONbits.OC32) 
+                InitInterruptTimer(_TIMER3, _ENABLE);
+            else 
+                InitInterruptTimer(_TIMER2, _ENABLE);
         }
         else
         {
-            if(OC2CONbits.OCTSEL || OC2CONbits.OC32) timers_SetInterrupt(_TIMER3, _DISABLE);
-            else timers_SetInterrupt(_TIMER2, _DISABLE);
+            if(OC2CONbits.OCTSEL || OC2CONbits.OC32) 
+                InitInterruptTimer(_TIMER3, _DISABLE);
+            else 
+                InitInterruptTimer(_TIMER2, _DISABLE);
         }
     }
     else if(pwmx == _PWM3)
     {
         if(action == _ENABLE)
         {
-            if(OC3CONbits.OCTSEL || OC3CONbits.OC32) timers_SetInterrupt(_TIMER3, _ENABLE);
-            else timers_SetInterrupt(_TIMER2, _ENABLE);
+            if(OC3CONbits.OCTSEL || OC3CONbits.OC32) 
+                InitInterruptTimer(_TIMER3, _ENABLE);
+            else 
+                InitInterruptTimer(_TIMER2, _ENABLE);
         }
         else
         {
-            if(OC3CONbits.OCTSEL || OC3CONbits.OC32) timers_SetInterrupt(_TIMER3, _DISABLE);
-            else timers_SetInterrupt(_TIMER2, _DISABLE);
+            if(OC3CONbits.OCTSEL || OC3CONbits.OC32) 
+                InitInterruptTimer(_TIMER3, _DISABLE);
+            else 
+                InitInterruptTimer(_TIMER2, _DISABLE);
         }
     }
     else if(pwmx == _PWM4)
     {
         if(action == _ENABLE)
         {
-            if(OC4CONbits.OCTSEL || OC4CONbits.OC32) timers_SetInterrupt(_TIMER3, _ENABLE);
-            else timers_SetInterrupt(_TIMER2, _ENABLE);
+            if(OC4CONbits.OCTSEL || OC4CONbits.OC32) 
+                InitInterruptTimer(_TIMER3, _ENABLE);
+            else 
+                InitInterruptTimer(_TIMER2, _ENABLE);
         }
         else
         {
-            if(OC4CONbits.OCTSEL || OC4CONbits.OC32) timers_SetInterrupt(_TIMER3, _DISABLE);
-            else timers_SetInterrupt(_TIMER2, _DISABLE);
+            if(OC4CONbits.OCTSEL || OC4CONbits.OC32) 
+                InitInterruptTimer(_TIMER3, _DISABLE);
+            else 
+                InitInterruptTimer(_TIMER2, _DISABLE);
         }
     }
     else if(pwmx == _PWM5)
     {
         if(action == _ENABLE)
         {
-            if(OC5CONbits.OCTSEL || OC5CONbits.OC32) timers_SetInterrupt(_TIMER3, _ENABLE);
-            else timers_SetInterrupt(_TIMER2, _ENABLE);
+            if(OC5CONbits.OCTSEL || OC5CONbits.OC32) 
+                InitInterruptTimer(_TIMER3, _ENABLE);
+            else 
+                InitInterruptTimer(_TIMER2, _ENABLE);
         }
         else
         {
-            if(OC5CONbits.OCTSEL || OC5CONbits.OC32) timers_SetInterrupt(_TIMER3, _DISABLE);
-            else timers_SetInterrupt(_TIMER2, _DISABLE);
+            if(OC5CONbits.OCTSEL || OC5CONbits.OC32) 
+                InitInterruptTimer(_TIMER3, _DISABLE);
+            else 
+                InitInterruptTimer(_TIMER2, _DISABLE);
         }
     }
 }
@@ -568,66 +588,46 @@ void SetPWMFrequency(unsigned char pwmx, float frequency)
     {
     //--- 32-bit mode ---/
         if(OC1CONbits.OC32)
-        {
             PR2 = temp*0xffffffff;
-        }
     //--- 16-bit mode ---//
         else
-        {
             PR3 = temp*0xffff;
-        }
     }
     else if(pwmx == _PWM2)
     {
     //--- 32-bit mode ---/
         if(OC2CONbits.OC32)
-        {
             PR2 = temp*0xffffffff;
-        }
     //--- 16-bit mode ---//
         else
-        {
             PR3 = temp*0xffff;
-        }
     }
     else if(pwmx == _PWM3)
     {
     //--- 32-bit mode ---/
         if(OC3CONbits.OC32)
-        {
             PR2 = temp*0xffffffff;
-        }
     //--- 16-bit mode ---//
         else
-        {
             PR3 = temp*0xffff;
-        }
     }
     else if(pwmx == _PWM4)
     {
     //--- 32-bit mode ---/
         if(OC4CONbits.OC32)
-        {
             PR2 = temp*0xffffffff;
-        }
     //--- 16-bit mode ---//
         else
-        {
             PR3 = temp*0xffff;
-        }
     }
     else if(pwmx == _PWM5)
     {
     //--- 32-bit mode ---/
         if(OC5CONbits.OC32)
-        {
             PR2 = temp*0xffffffff;
-        }
     //--- 16-bit mode ---//
         else
-        {
             PR3 = temp*0xffff;
-        }
     }
 }
 
@@ -655,27 +655,37 @@ void SetPWMDutyCycle(unsigned char pwmx, unsigned int dutyCycle)
 {
     if(pwmx == _PWM1)
     {
-        if(OC1CONbits.OC32) OC1RS = (PR2 / 100) * dutyCycle;
-        else OC1RS = (PR3 / 100) * dutyCycle;
+        if(OC1CONbits.OC32) 
+            OC1RS = (PR2 / 100) * dutyCycle;
+        else 
+            OC1RS = (PR3 / 100) * dutyCycle;
     }
     else if(pwmx == _PWM2)
     {
-        if(OC2CONbits.OC32) OC2RS = (PR2 / 100) * dutyCycle;
-        else OC2RS = (PR3 / 100) * dutyCycle;
+        if(OC2CONbits.OC32) 
+            OC2RS = (PR2 / 100) * dutyCycle;
+        else 
+            OC2RS = (PR3 / 100) * dutyCycle;
     }
     else if(pwmx == _PWM3)
     {
-        if(OC3CONbits.OC32) OC3RS = (PR2 / 100) * dutyCycle;
-        else OC3RS = (PR3 / 100) * dutyCycle;
+        if(OC3CONbits.OC32) 
+            OC3RS = (PR2 / 100) * dutyCycle;
+        else 
+            OC3RS = (PR3 / 100) * dutyCycle;
     }
     else if(pwmx == _PWM4)
     {
-        if(OC4CONbits.OC32) OC4RS = (PR2 / 100) * dutyCycle;
-        else OC4RS = (PR3 / 100) * dutyCycle;
+        if(OC4CONbits.OC32) 
+            OC4RS = (PR2 / 100) * dutyCycle;
+        else 
+            OC4RS = (PR3 / 100) * dutyCycle;
     }
     else if(pwmx == _PWM5)
     {
-        if(OC5CONbits.OC32) OC5RS = (PR2 / 100) * dutyCycle;
-        else OC5RS = (PR3 / 100) * dutyCycle;
+        if(OC5CONbits.OC32) 
+            OC5RS = (PR2 / 100) * dutyCycle;
+        else 
+            OC5RS = (PR3 / 100) * dutyCycle;
     }
 }

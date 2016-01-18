@@ -591,7 +591,7 @@ void funct_LoadDeviceInfo(void)
  * Input:                   uint8_color
  * Output:                  -
 ***********************************************************************************************************************/
-void funct_FrontLED(unsigned char uint8_color)
+void FrontLED(unsigned char uint8_color)
 {
     switch(uint8_color)
     {

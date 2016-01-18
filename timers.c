@@ -21,7 +21,7 @@ STimer1 g_Timer1;     //global variables for struct
 
 
 /**********************************************************************************************************************
- * Routine:                 timers_Init
+ * Routine:                 InitTimer
 
  * Description:
  * Initialization of the timers of the microcontroller.
@@ -66,7 +66,7 @@ STimer1 g_Timer1;     //global variables for struct
  * Input:                   timerx  (selected timer)
  * Output:                  -
 ***********************************************************************************************************************/
-void timers_Init(unsigned char timerx)
+void InitTimer(unsigned char timerx)
 {
     if(timerx == _TIMER1)
     {
@@ -271,7 +271,7 @@ void timers_Init(unsigned char timerx)
 }
 
 /**********************************************************************************************************************
- * Routine:                 timers_SetInterrupt
+ * Routine:                 InitInterruptTimer
 
  * Description:
  * Initialization of the interrupts of the selected timer.
@@ -312,7 +312,7 @@ void timers_Init(unsigned char timerx)
  *                          action  (enable / disable interrupt)
  * Output:                  -
 ***********************************************************************************************************************/
-void timers_SetInterrupt(unsigned char timerx, unsigned char action)
+void InitInterruptTimer(unsigned char timerx, unsigned char action)
 {
     if(timerx == _TIMER1)
     {
@@ -377,7 +377,7 @@ void timers_SetInterrupt(unsigned char timerx, unsigned char action)
 
 
 /**********************************************************************************************************************
- * Routine:                 timers_Set
+ * Routine:                 SetTimer
 
  * Description:
  * Start / stop and choose time for each 16bits timers.
@@ -424,7 +424,7 @@ void timers_SetInterrupt(unsigned char timerx, unsigned char action)
  *                          valuePRReg (init value of PRx reg)
  * Output:                  -
 ***********************************************************************************************************************/
-void timers_Set(unsigned char timer, unsigned char status, unsigned long int valueTMRReg, unsigned long int valuePRReg)
+void SetTimer(unsigned char timer, unsigned char status, unsigned long int valueTMRReg, unsigned long int valuePRReg)
 {
     switch(timer)
     {

@@ -41,7 +41,7 @@ extern unsigned short int funct_ReadRamp(unsigned char uint8_kind,unsigned char 
 extern unsigned char funct_CheckCmdSILIM(void);
 extern unsigned char funct_CheckCmdSMTYP(void);
 extern void funct_LoadDeviceInfo(void);
-extern void funct_FrontLED(unsigned char uint8_color);
+extern void FrontLED(unsigned char uint8_color);
 extern void funct_OutputHandler(unsigned char uint8_ToDo,unsigned char uint8_value);
 extern unsigned char funct_IOhandler(unsigned char uint8_ToDo,unsigned char uint8_IO,unsigned char uint8_value);
 extern void funct_StoreWdayIntoRSbuffer(void);
@@ -53,10 +53,10 @@ extern void funct_StoreMonthIntoRSbuffer(void);
 #define _Dec            0           //deceleration used for variable uint8_kind
 #define _Step           1           //used for variable uint8_sort
 #define _Freq           0           //used for variable uint8_sort
-#define _FLEDblack      0           //front LED switched off used for uint8_color
-#define _FLEDgreen      1           //front LED = green used for uint8_color
-#define _FLEDred        2           //front LED = red used for uint8_color
-#define _FLEDorange     3           //front LED = orange used for uint8_color
+#define _OFF            0           //front LED switched off used for uint8_color
+#define _GREEN          1           //front LED = green used for uint8_color
+#define _RED            2           //front LED = red used for uint8_color
+#define _ORANGE         3           //front LED = orange used for uint8_color
 #define _ClrBit         0           //used for variable uint8_ToDo and to clear the bit/output (reason for value 0)
 #define _SetBit         1           //used for variable uint8_ToDo and to set the bit/output (rason for value 1)
 #define _GetPort        2           //used for variable uint8_ToDo
