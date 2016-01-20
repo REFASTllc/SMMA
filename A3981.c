@@ -40,10 +40,10 @@ void InitA3981(void)
     A3981.CONFIG0.BITS.SYR = 1;         // Synchronous rectification
     A3981.CONFIG0.BITS.MS = _HALF_STEP; // Microstep mode for external STEP input control
     A3981.CONFIG0.BITS.MXI = 3;         // Max phase current as a percentage of ISMAX
-    A3981.CONFIG0.BITS.PFD = 0;         // Fast decay time for mixed decay
-    A3981.CONFIG0.BITS.TBK = 0;         // Blank Time
-    A3981.CONFIG0.BITS.TOF_FRQ = 0;     // Off time (when PWM bit = 0) / Frequency (when PWM bit = 1)
-    A3981.CONFIG0.BITS.PWM = 1;         // PWM configuration
+    A3981.CONFIG0.BITS.PFD = 4;         // Fast decay time for mixed decay = 8us
+    A3981.CONFIG0.BITS.TBK = 1;         // Blank Time = 1.5us
+    A3981.CONFIG0.BITS.TOF_FRQ = 6;     // Off time (when PWM bit = 0) / Frequency (when PWM bit = 1)
+    A3981.CONFIG0.BITS.PWM = 0;         // PWM configuration = fixed off-time
 
 //--- Configuration register 1 ---//
     A3981.CONFIG1.BITS.ADR = 1;         // Register address

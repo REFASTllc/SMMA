@@ -83,6 +83,15 @@
  *                          - cmd_GBIPOL
  *                          - cmd_SBIPSTS
  *                          - cmd_GBIPSTS
+ *                          - cmd_SBIPPFD
+ *                          - cmd_GBIPPFD
+ *                          - cmd_SBIPPWM
+ *                          - cmd_GBIPPWM
+ *                          - cmd_SBIPFRQ
+ *                          - cmd_GBIPFRQ
+ *                          - cmd_SBIPSLEW
+ *                          - cmd_GBIPSLEW
+ *                          - cmd_GBIPSST
 ***********************************************************************************************************************/
 
 
@@ -4065,7 +4074,7 @@ void cmd_GBIPSTAL(void)
  * If all is correct, then set the bipolar phase decay mode according to the received parameters
  * 
  * Creator:                 A. Staub
- * Date of creation:        16.12.2015
+ * Date of creation:        16.01.2016
  * Last modification on:    -
  * Modified by:             - 
  * 
@@ -4150,7 +4159,7 @@ void cmd_GBIPPD(void)
  * If all is correct, then set the bipolar overcurrent fault delay according to the received parameter
  * 
  * Creator:                 A. Staub
- * Date of creation:        16.12.2015
+ * Date of creation:        16.01.2016
  * Last modification on:    -
  * Modified by:             - 
  * 
@@ -4227,7 +4236,7 @@ void cmd_GBIPTSC(void)
  * If all is correct, then set the bipolar open load current according to the received parameter
  * 
  * Creator:                 A. Staub
- * Date of creation:        16.12.2015
+ * Date of creation:        16.01.2016
  * Last modification on:    -
  * Modified by:             - 
  * 
@@ -4304,7 +4313,7 @@ void cmd_GBIPOL(void)
  * If all is correct, then set the bipolar stall detection scheme according to the received parameters
  * 
  * Creator:                 A. Staub
- * Date of creation:        16.12.2015
+ * Date of creation:        16.01.2016
  * Last modification on:    -
  * Modified by:             - 
  * 
@@ -4382,3 +4391,365 @@ void cmd_GBIPSTS(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
 }   //end of cmd_GBIPSTS
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SBIPPFD
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then set the bipolar fast decay time according to the received parameters
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        20.01.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SBIPPFD(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    
+    if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipPfdMin,_BipPfdMax);
+        
+        if(uint8_Result == 1)       //verify the result
+        {
+            A3981.CONFIG0.BITS.PFD = g_CmdChk.uint32_TempPara[1];
+            
+            uart2_sendbuffer('E');      //first the letter E
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _BipSBIPPFD;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_SBIPPFD
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GBIPPFD
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then send back the bipolar fast decay time
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        20.01.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GBIPPFD(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        uart2_sendbuffer('E');      //first the letter E
+        uart2_sendbuffer(',');      //then the comma
+        funct_IntToAscii(A3981.CONFIG0.BITS.PFD,_Active);
+        uart2_sendbuffer(13);      //then the CR
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GBIPPFD
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SBIPPWM
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then set the bipolar PWM mode according to the received parameters
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        20.01.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SBIPPWM(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    
+    if(g_CmdChk.uint8_ParamPos == 3)        //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipTbkMin,_BipTbkMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_BipTofMin,_BipTofMax);
+        
+        if(uint8_Result == 2)       //verify the result
+        {
+            A3981.CONFIG0.BITS.TBK = g_CmdChk.uint32_TempPara[1];
+            A3981.CONFIG0.BITS.TOF_FRQ = g_CmdChk.uint32_TempPara[2];
+            A3981.CONFIG0.BITS.PWM = 0; //mode = fixed off-time (PWM)
+            
+            uart2_sendbuffer('E');      //first the letter E
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _BipSBIPPWM;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_SBIPPWM
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GBIPPWM
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then send back the bipolar PWM mode only if this mode is active.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        20.01.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GBIPPWM(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        if(A3981.CONFIG0.BITS.PWM == 0)     //PWM mode active?
+        {
+            uart2_sendbuffer('E');      //first the letter E
+            uart2_sendbuffer(',');      //then the comma
+            funct_IntToAscii(A3981.CONFIG0.BITS.TBK,_Active);
+            uart2_sendbuffer(',');      //then the comma
+            funct_IntToAscii(A3981.CONFIG0.BITS.TOF_FRQ,_Active);
+            uart2_sendbuffer(13);      //then the CR     
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _BipGBIPPWM;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine         
+        }       
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GBIPPWM
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SBIPFRQ
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then set the bipolar frequency mode according to the received parameters
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        20.01.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SBIPFRQ(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    
+    if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipFrqMin,_BipFrqMax);
+        
+        if(uint8_Result == 1)       //verify the result
+        {
+            A3981.CONFIG0.BITS.TOF_FRQ = g_CmdChk.uint32_TempPara[1];
+            A3981.CONFIG0.BITS.PWM = 1; //mode = fixed frequency
+            
+            uart2_sendbuffer('E');      //first the letter E
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _BipSBIPFRQ;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_SBIPFRQ
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GBIPFRQ
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then send back the bipolar frequency mode only if this mode is active.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        20.01.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GBIPFRQ(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        if(A3981.CONFIG0.BITS.PWM == 1)     //Frequency mode active?
+        {
+            uart2_sendbuffer('E');      //first the letter E
+            uart2_sendbuffer(',');      //then the comma
+            funct_IntToAscii(A3981.CONFIG0.BITS.TOF_FRQ,_Active);
+            uart2_sendbuffer(13);      //then the CR     
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _BipGBIPFRQ;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine         
+        }   
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GBIPFRQ
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SBIPSLEW
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then set the bipolar slew rate according to the received parameters
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        20.01.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SBIPSLEW(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    
+    if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipSlewMin,_BipSlewMax);
+        
+        if(uint8_Result == 1)       //verify the result
+        {
+            A3981.RUN.BITS.SLEW = g_CmdChk.uint32_TempPara[1];
+            
+            uart2_sendbuffer('E');      //first the letter E
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _BipSBIPSLEW;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_SBIPSLEW
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GBIPSLEW
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then send back the bipolar slew rate 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        20.01.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GBIPSLEW(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        uart2_sendbuffer('E');      //first the letter E
+        uart2_sendbuffer(',');      //then the comma
+        funct_IntToAscii(A3981.RUN.BITS.SLEW,_Active);
+        uart2_sendbuffer(13);      //then the CR
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GBIPSLEW
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GBIPSST
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then send back the bipolar stall status
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        20.01.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GBIPSST(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        uart2_sendbuffer('E');      //first the letter E
+        uart2_sendbuffer(',');      //then the comma
+        funct_IntToAscii(A3981.FAULT1.BITS.ST,_Active);
+        uart2_sendbuffer(13);      //then the CR
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GBIPSST

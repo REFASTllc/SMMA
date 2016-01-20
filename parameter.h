@@ -156,6 +156,16 @@ extern void param_init(void);
 #define _BipStsMax          2           //range for the bipolar STS
 #define _BipCdMin           1           //range for the bipolar CD
 #define _BipCdMax           255         //range for the bipolar CD
+#define _BipPfdMin          0           //range for the bipolar PFD
+#define _BipPfdMax          7           //range for the bipolar PFD
+#define _BipTbkMin          0           //range for the bipolar TBK
+#define _BipTbkMax          3           //range for the bipolar TBK
+#define _BipTofMin          0           //range for the bipolar TOF
+#define _BipTofMax          7           //range for the bipolar TOF
+#define _BipFrqMin          0           //range for the bipolar FRQ
+#define _BipFrqMax          7           //range for the bipolar FRQ
+#define _BipSlewMin         0           //range for the bipolar SLEW
+#define _BipSlewMax         1           //range for the bipolar SLEW
 
 
 /*

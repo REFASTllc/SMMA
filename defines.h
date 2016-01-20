@@ -153,6 +153,12 @@
 #define _BipSBIPTSC         106             //SBIPTSC parameter not within the tolerance
 #define _BipSBIPOL          107             //SBIPOL parameter not within the tolerance
 #define _BipSBIPSTS         108             //SBIPSTS parameter not within the tolerance
+#define _BipSBIPPFD         109             //SBIPPFD parameter not within the tolerance
+#define _BipSBIPPWM         110             //SBIPPWM parameters not within the tolerance
+#define _BipSBIPFRQ         111             //SBIPFRQ parameter not within the tolerance
+#define _BipSBIPSLEW        112             //SBIPSLEW parameter not within the tolerance
+#define _BipGBIPPWM         113             //GBIPPWM driver is in frequency mode instead of PWM mode
+#define _BipGBIPFRQ         114             //GBIPFRQ driver is in PWM mode instead of frequency mode
                             //LIN errors
 #define _LinSILIM           150             //received parameters not within the tolerance for SILIM
 #define _LinSMTYP           151             //parameters not within tolerance for switch on LIN
@@ -269,6 +275,15 @@
 #define _IdGBIPOL           96              //get bipolar open load current
 #define _IdSBIPSTS          97              //set bipolar stall detection scheme
 #define _IdGBIPSTS          98              //get bipolar stall detection scheme
+#define _IdSBIPPFD          99              //set bipolar fast decay time
+#define _IdGBIPPFD          100             //get bipolar fast decay time
+#define _IdSBIPPWM          101             //set bipolar PWM mode
+#define _IdGBIPPWM          102             //get bipolar PWM mode
+#define _IdSBIPFRQ          103             //set bipolar FRQ mode
+#define _IdGBIPFRQ          104             //get bipolar FRQ mode
+#define _IdSBIPSLEW         105             //set bipolar slew rate mode
+#define _IdGBIPSLEW         106             //get bipolar slew rate mode
+#define _IdGBIPSST          107             //get bipolar status stall
 
 #endif	/* DEFINES_H */
 
