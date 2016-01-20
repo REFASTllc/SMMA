@@ -92,6 +92,7 @@
  *                          - cmd_SBIPSLEW
  *                          - cmd_GBIPSLEW
  *                          - cmd_GBIPSST
+ *                          - cmd_GVBAK
 ***********************************************************************************************************************/
 
 
@@ -1378,15 +1379,22 @@ void cmd_BREAK(void)
 ***********************************************************************************************************************/
 void cmd_MUMOT(void)
 {  
+    auto unsigned long int uint32_WB;   //local work byte
+    
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         //measure here the voltage or take the last measured parameter and send it back!
-    
+        
+        //convert the result in mV
+        uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint16_Vmot,21);
+        
         //send back the needed informations
         uart2_sendbuffer('E');                          //first the letter E
         uart2_sendbuffer(',');                          //add the comma
         //funct_IntToAscii(g_Param.uint16_Ue,_Active);    //add the voltage
-        funct_IntToAscii(g_ADC.uint16_Vmot,_Active);    //add the voltage
+        funct_IntToAscii(uint32_WB,_Active);    //add the voltage
+        uart2_sendbuffer('m');                          //add the m
+        uart2_sendbuffer('V');                          //add the V
         uart2_sendbuffer(13);                           //add the CR at the end      
     }
     else
@@ -4753,3 +4761,55 @@ void cmd_GBIPSST(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
 }   //end of cmd_GBIPSST
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GVBAK
+
+ * Description:
+ * Send back the measured backup voltage of the button cell. Send the command starting with an X if 
+ * the cut-off voltage Vcut is measured
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        20.01.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GVBAK(void)
+{  
+    auto unsigned long int uint32_WB = 0;   //local work register for the result
+    
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        //measure here the voltage or take the last measured parameter and send it back!
+        
+        //convert the result in mV
+        uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint16_Battery,310);
+        
+        //Backup voltage less than the Vcut "cut-off" level
+        //621 = (ADCres / 3.3V) * Vcut = (1024 / 3.3V) * 2.0V
+        if(g_ADC.uint16_Battery <= 621)
+        {
+            uart2_sendbuffer('X');                      //first the letter X
+            uart2_sendbuffer(',');                      //add the comma       
+        }
+        else
+        {
+            uart2_sendbuffer('E');                      //first the letter E
+            uart2_sendbuffer(',');                      //add the comma 
+        }
+        //send back the needed informations
+        funct_IntToAscii(uint32_WB,_Active);            //add the voltage
+        uart2_sendbuffer('m');                          //add the m
+        uart2_sendbuffer('V');                          //add the V symbol
+        uart2_sendbuffer(13);                           //add the CR at the end      
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
+}   //end of cmd_GVBAK

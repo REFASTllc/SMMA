@@ -675,6 +675,10 @@ void cmdchk_check(void)
                 case (_IdGBIPSST):      //command GBIPSST
                     cmd_GBIPSST();      //call subroutine
                     break;
+                    
+                case (_IdGVBAK):        //command GVBAK
+                    cmd_GVBAK();        //call subroutine
+                    break;
                                      
                 default:    //command ID does not exist
                     //do nothing - error has to be send before this routine
@@ -1035,6 +1039,10 @@ void cmdchk_def(void)
                         {
                             case (0x42524541):  //cmd is = BREAK
                                 g_CmdChk.uint8_CmdID = _IdBREAK;
+                                break;
+                                
+                            case (0x47564241):  //cmd is GVBAK
+                                g_CmdChk.uint8_CmdID = _IdGVBAK;
                                 break;
             
                             default:  //error - command is not defined

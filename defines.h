@@ -284,6 +284,7 @@
 #define _IdSBIPSLEW         105             //set bipolar slew rate mode
 #define _IdGBIPSLEW         106             //get bipolar slew rate mode
 #define _IdGBIPSST          107             //get bipolar status stall
+#define _IdGVBAK            108             //get the backup voltage of the button cell
 
 #endif	/* DEFINES_H */
 

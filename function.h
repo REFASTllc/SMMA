@@ -32,7 +32,7 @@
 
 
 extern void funct_init(void);
-extern void funct_IntToAscii(unsigned long uint32_DataByte,unsigned char uint8_sending);
+extern void funct_IntToAscii(unsigned long int uint32_DataByte,unsigned char uint8_sending);
 extern unsigned long int funct_AsciiToInt(void);
 extern unsigned char funct_CheckTol(unsigned long int uint32_Value,unsigned long int uint32_Min,unsigned long int uint32_Max);
 extern unsigned long int funct_FreqToTimer23(unsigned long int uint32_Freq);
@@ -46,6 +46,7 @@ extern void funct_OutputHandler(unsigned char uint8_ToDo,unsigned char uint8_val
 extern unsigned char funct_IOhandler(unsigned char uint8_ToDo,unsigned char uint8_IO,unsigned char uint8_value);
 extern void funct_StoreWdayIntoRSbuffer(void);
 extern void funct_StoreMonthIntoRSbuffer(void);
+extern unsigned long int funct_ADCtoMiliUnit(unsigned long int uint32_ADCvalue,unsigned short int uint16_ADCstep);
 
 #define _Active         1           //used for variable uint8_sending
 #define _Inactive       0           //used for variable uint8_sending
