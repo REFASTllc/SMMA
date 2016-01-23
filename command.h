@@ -105,5 +105,15 @@ extern void cmd_SBIPOL(void);
 extern void cmd_GBIPOL(void);
 extern void cmd_SBIPSTS(void);
 extern void cmd_GBIPSTS(void);
+extern void cmd_SBIPPFD(void);
+extern void cmd_GBIPPFD(void);
+extern void cmd_SBIPPWM(void);
+extern void cmd_GBIPPWM(void);
+extern void cmd_SBIPFRQ(void);
+extern void cmd_GBIPFRQ(void);
+extern void cmd_SBIPSLEW(void);
+extern void cmd_GBIPSLEW(void);
+extern void cmd_GBIPSST(void);
+extern void cmd_GVBAK(void);
 
 #endif	/* COMMAND_H */

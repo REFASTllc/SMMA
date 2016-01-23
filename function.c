@@ -24,7 +24,7 @@
  *                          - funct_IOhandler
  *                          - funct_StoreWdayIntoRSbuffer
  *                          - funct_StoreMonthIntoRSbuffer
- *                          - SaveMeasuresPWM
+ *                          - funct_ADCtoMiliUnit
 ***********************************************************************************************************************/
 
 
@@ -1018,26 +1018,56 @@ void funct_StoreMonthIntoRSbuffer(void)
     }
 }   //end of funct_StoreMonthIntoRSbuffer
 
-/**********************************************************************************************************************
- * Routine:                 SaveMeasuresPWM
 
- * Description:             Save all values measured regarding to measure of a PWM
+/**********************************************************************************************************************
+ * Routine:                 funct_ADCtoMiliUnit
+
+ * Description:
+ * Use this routine to convert any ADC values to a result in mili, for example mV, mA, etc.
+ * The subroutine needs the read ADC value and the ADC step which is the conversion factor.
  * 
- * Creator:                 J. Rebetez
- * Date of creation:        20.01.2016
- * Last modification on:    -
- * Modified by:             - 
+ * ADCstep:
+ * If the read value is not counterfeit, means you did not use a resistance divider to change the real value,
+ * then it will be always the ADCres / Vnom, here = 1024 / 3.3 = 310.3 = 310
+ * If for example a resistance divider was used of 15, the ADCstep will be:
+ *      ADCres =        2^10 = 1024
+ *      ResDivFact =    15
+ *      ADC supply =    3.3
+ *      Vnom =          3.3 * 15 = 49.5
+ *      ADCstep =       ADCres / Vnom = 1024 / 49.5 = 20.69 = 21   
+ *      ERRnom = 100% - [(100% * (1024/21)) / 49.5] = 1.49%
  * 
- * Input:                   data (pointer of type S_MEAS_PWM)
- * Output:                  -
+ * Creator:                 A. Staub
+ * Date of creation:        23.12.2015
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   uint32_msTime
+ * Output:                  uint32_WB
 ***********************************************************************************************************************/
-void SaveMeasuresPWM(S_MEAS_PWM *data)
+unsigned long int funct_ADCtoMiliUnit(unsigned long int uint32_ADCvalue,unsigned short int uint16_ADCstep)
 {
-    data->firstMeasure = IC1BUF;
-    data->secondMeasure = IC2BUF;
-    data->thirdMeasure = IC3BUF;
-    data->timeHigh = IC1BUF;
-    data->timeLow = secondMeasure - firstMeasure;
-    data->timeTotal = data->timeHigh + data->timeLow;
-    data->frequency = 1 / data->timeTotal;
-}
+    auto unsigned long int uint32_WB = 0;   //local work register for the result
+    
+    //1000m range
+    uint32_WB = (uint32_ADCvalue / uint16_ADCstep) * 1000;
+    uint32_ADCvalue %= uint16_ADCstep;
+    uint32_ADCvalue *= 10;
+    
+    //100m range
+    uint32_WB += (uint32_ADCvalue / uint16_ADCstep) * 100;
+    uint32_ADCvalue %= uint16_ADCstep;
+    uint32_ADCvalue *= 10;
+    
+    //10m range
+    uint32_WB += (uint32_ADCvalue / uint16_ADCstep) * 10;
+    uint32_ADCvalue %= uint16_ADCstep;
+    uint32_ADCvalue *= 10;
+    
+    //1m range
+    uint32_WB += (uint32_ADCvalue / uint16_ADCstep);
+    uint32_ADCvalue %= uint16_ADCstep;
+    uint32_ADCvalue *= 10;
+    
+    return uint32_WB;       //send back the result 
+}   //end of funct_ADCtoMiliUnit
