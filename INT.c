@@ -26,6 +26,7 @@
 
 #include "includes.h" // File which contain all includes files
 
+S_MEAS_PWM DataPWM;
 extern Si2c1 g_i2c1;
 extern STimer1 g_Timer1;
 extern SUART2txd g_UART2txd;
@@ -970,7 +971,7 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
     unsigned short int average = 0;
     IFS0bits.IC1IF = 0;
     
-    average = (IC1BUF + IC2BUF + IC3BUF + IC4BUF) / 4;
+    SaveMeasuresPWM(DataPWM);
 }
 
 /**********************************************************************************************************************

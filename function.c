@@ -24,6 +24,7 @@
  *                          - funct_IOhandler
  *                          - funct_StoreWdayIntoRSbuffer
  *                          - funct_StoreMonthIntoRSbuffer
+ *                          - SaveMeasuresPWM
 ***********************************************************************************************************************/
 
 
@@ -1016,3 +1017,27 @@ void funct_StoreMonthIntoRSbuffer(void)
             break;
     }
 }   //end of funct_StoreMonthIntoRSbuffer
+
+/**********************************************************************************************************************
+ * Routine:                 SaveMeasuresPWM
+
+ * Description:             Save all values measured regarding to measure of a PWM
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        20.01.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   data (pointer of type S_MEAS_PWM)
+ * Output:                  -
+***********************************************************************************************************************/
+void SaveMeasuresPWM(S_MEAS_PWM *data)
+{
+    data->firstMeasure = IC1BUF;
+    data->secondMeasure = IC2BUF;
+    data->thirdMeasure = IC3BUF;
+    data->timeHigh = IC1BUF;
+    data->timeLow = secondMeasure - firstMeasure;
+    data->timeTotal = data->timeHigh + data->timeLow;
+    data->frequency = 1 / data->timeTotal;
+}

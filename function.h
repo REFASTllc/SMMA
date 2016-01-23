@@ -47,6 +47,21 @@ extern unsigned char funct_IOhandler(unsigned char uint8_ToDo,unsigned char uint
 extern void funct_StoreWdayIntoRSbuffer(void);
 extern void funct_StoreMonthIntoRSbuffer(void);
 
+/**********************************************************************************************************************
+ * Routine:                 SaveMeasuresPWM
+
+ * Description:             Save all values measured regarding to measure of a PWM
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        20.01.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   data (pointer of type S_MEAS_PWM)
+ * Output:                  -
+***********************************************************************************************************************/
+void SaveMeasuresPWM(S_MEAS_PWM *data);
+
 #define _Active         1           //used for variable uint8_sending
 #define _Inactive       0           //used for variable uint8_sending
 #define _Acc            1           //acceleration used for variable uint8_kind

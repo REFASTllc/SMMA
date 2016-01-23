@@ -40,7 +40,6 @@
 
 //project related header files
 #include "defines.h"
-#include "function.h"
 #include "system.h"
 #include "timers.h"
 #include "INT.h"
@@ -55,6 +54,7 @@
 #include "adc.h"
 #include "outputCompare.h"
 #include "inputCapture.h"
+#include "function.h"
 //Extern devices header files
 #include "periph.h"
 #include "A3981.h"

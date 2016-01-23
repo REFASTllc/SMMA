@@ -24,6 +24,17 @@
 #define _ENABLE     1
 #define _DISABLE    0
 
+typedef struct
+{
+    unsigned short int firstMeasure;
+    unsigned short int secondMeasure;
+    unsigned short int thirdMeasure;
+    unsigned short int timeHigh;
+    unsigned short int timeLow;
+    unsigned short int timeTotal;
+    float frequency;
+} S_MEAS_PWM;
+
 
 /********************************************************************************************************************/
 /*  Purpose of the function:    Header of the function InitInputCapturexModule                                                   
