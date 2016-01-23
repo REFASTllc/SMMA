@@ -142,6 +142,8 @@ extern void param_init(void);
 #define _LinLengthMax       40          //range for the lin slave answer
 #define _LinParaMin         0           //range for the lin parameter
 #define _LinParaMax         255         //range for the lin parameter
+#define _LinResMin          0           //range for the lin response
+#define _LinResMax          1           //range for the lin response
 #define _BipSyrMin          0           //range for the bipolar SYR
 #define _BipSyrMax          1           //range for the bipolar SYR
 #define _BipDcyMin          0           //range for the bipolar DCY
@@ -253,6 +255,7 @@ typedef struct                      //definitions of multiple variable for comma
     volatile unsigned char uint8_LinStatus;         //status of the lin driver
     volatile unsigned long int uint32_LinSpd;       //speed (baud rate) of the lin driver
     volatile unsigned short int uint16_LinTO;       //timeout for the lin bus communication
+    volatile unsigned char uint8_LinRes;            //response mode for the lin bus communication
     volatile unsigned char uint8_SYR;               //bipolar synchronous rectification mode
     volatile unsigned char uint8_DCY;               //bipolar decay mode selection
     volatile unsigned char uint8_HLR;               //bipolar selects slow decay and brake recirculation path

@@ -93,6 +93,7 @@
  *                          - cmd_GBIPSLEW
  *                          - cmd_GBIPSST
  *                          - cmd_GVBAK
+ *                          - cmd_SRESLIN
 ***********************************************************************************************************************/
 
 
@@ -3907,66 +3908,77 @@ void cmd_SLIN(void)
     auto unsigned char uint8_Result = 0;    //local work byte
     auto unsigned char uint8_WB;            //local work byte
     
-    //number of received characters OK?
-    if((g_CmdChk.uint8_ParamPos >= 3) && (g_CmdChk.uint8_ParamPos <= 42))        
+    //lin bus communication not busy?
+    if(!g_LIN.uint8_LinBusy)
     {
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_LinLengthMin,_LinLengthMax);
-        g_LIN.uint8_SlaveReceiveCounter = g_CmdChk.uint32_TempPara[1];  //store lenght of the lin answer
-        if(g_LIN.uint8_SlaveReceiveCounter) //answer from slave requested
+        //number of received characters OK?
+        if((g_CmdChk.uint8_ParamPos >= 3) && (g_CmdChk.uint8_ParamPos <= 42))        
         {
-            g_LIN.uint8_SlaveAnswerRequested = 1;
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_LinLengthMin,_LinLengthMax);
+            g_LIN.uint8_SlaveReceiveCounter = g_CmdChk.uint32_TempPara[1];  //store lenght of the lin answer
+            if(g_LIN.uint8_SlaveReceiveCounter) //answer from slave requested
+            {
+                g_LIN.uint8_SlaveAnswerRequested = 1;
+            }
+            else
+            {
+                g_LIN.uint8_SlaveAnswerRequested = 0;
+            }
+
+            g_LIN.uint8_SlaveAnswerFinish = 0;      //reset variable
+            g_LIN.uint8_SlaveTimeout = 0;           //reset variable
+            g_UART1rxd.uint8_BufEmpty = 1;          //receive buffer empty
+            g_UART1rxd.uint16_Wch = 0;              //write-pointer of the ring buffer at position 0
+            g_UART1rxd.uint16_Rch = 0;              //read-pointer of the ring buffer at position 0
+
+            //ToDo:
+            //verify each received parameter with the tolerance (start with the 3rd parameter)
+            //store directly the characters into the sendbuffer
+            //Until:
+            //the local work byte has the same size as number of received characters
+            uint8_WB = 2;   //start with the first parameter to verify 
+            g_LIN.uint8_MasterSendCounter = 1;  //1 because the first parameter is the start break
+            g_LIN.uint8_MasterSendCounter = 0;  //reset the counter
+            
+            do
+            {
+                uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[uint8_WB],_LinParaMin,_LinParaMax);
+                uart1_sendbuffer(g_CmdChk.uint32_TempPara[uint8_WB]);
+                uint8_WB++; //increment with 1 to take out the next parameter
+                g_LIN.uint8_MasterSendCounter++;    //increment the counter
+            }
+            while(uint8_WB < g_CmdChk.uint8_ParamPos);
+
+            //each parameter within the tolerance (uint8_WB - 1), because the 1st parameter is the cmd ID)?
+            if(uint8_Result == (uint8_WB-1))
+            {
+                g_LIN.uint8_LinBreakToSend = 1;             //enable LIN break to send
+                IEC0bits.U1TXIE = 1;                        //enable the send interrupt
+                g_LIN.uint8_LinBusy = 1;                    //set busy flag
+                //send back a first result
+                uart2_sendbuffer('E');      //first the letter E
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _OutOfTolSLIN;      //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                g_UART1txd.uint8_BufEmpty = 1;              //send buffer empty
+                g_UART1txd.uint16_Rch = 0;                  //read pointer = 0
+                g_UART1txd.uint16_Wch = 0;                  //write pointer = 0
+            }
         }
         else
         {
-            g_LIN.uint8_SlaveAnswerRequested = 0;
-        }
-        
-        g_LIN.uint8_SlaveAnswerFinish = 0;      //reset variable
-        g_LIN.uint8_SlaveTimeout = 0;           //reset variable
-        g_UART1rxd.uint8_BufEmpty = 1;          //receive buffer empty
-        g_UART1rxd.uint16_Wch = 0;              //write-pointer of the ring buffer at position 0
-        g_UART1rxd.uint16_Rch = 0;              //read-pointer of the ring buffer at position 0
-        
-        //ToDo:
-        //verify each received parameter with the tolerance (start with the 3rd parameter)
-        //store directly the characters into the sendbuffer
-        //Until:
-        //the local work byte has the same size as number of received characters
-        uint8_WB = 2;   //start with the first parameter to verify 
-        g_LIN.uint8_MasterSendCounter = 1;  //1 because the first parameter is the start break
-        g_LIN.uint8_MasterSendCounter = 0;  //reset the counter
-        do
-        {
-            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[uint8_WB],_LinParaMin,_LinParaMax);
-            uart1_sendbuffer(g_CmdChk.uint32_TempPara[uint8_WB]);
-            uint8_WB++; //increment with 1 to take out the next parameter
-            g_LIN.uint8_MasterSendCounter++;    //increment the counter
-        }
-        while(uint8_WB < g_CmdChk.uint8_ParamPos);
-        
-        //each parameter within the tolerance (uint8_WB - 1), because the 1st parameter is teh cmd ID)?
-        if(uint8_Result == (uint8_WB-1))
-        {
-            g_LIN.uint8_LinBreakToSend = 1;             //enable LIN break to send
-            IEC0bits.U1TXIE = 1;                        //enable the send interrupt
-            //send back a first result
-            uart2_sendbuffer('E');      //first the letter E
-            uart2_sendbuffer(13);       //then the CR
-        }
-        else
-        {
-            g_Param.uint8_ErrCode = _OutOfTolSLIN;      //set error code
+            g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-            g_UART1txd.uint8_BufEmpty = 1;              //send buffer empty
-            g_UART1txd.uint16_Rch = 0;                  //read pointer = 0
-            g_UART1txd.uint16_Wch = 0;                  //write pointer = 0
-        }
+        } 
     }
     else
     {
         g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
-        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-    } 
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine   
+    }
 }   //end of cmd_SLIN
 
 
@@ -4813,3 +4825,81 @@ void cmd_GVBAK(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   //end of cmd_GVBAK
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SRESLIN
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance then set
+ * up the response mode for the lin bus communication
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        23.01.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SRESLIN(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    
+    if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipSlewMin,_BipSlewMax);
+        
+        if(uint8_Result == 1)       //verify the result
+        {
+            //store the new timeout
+            g_Param.uint8_LinRes = g_CmdChk.uint32_TempPara[1];
+            
+            uart2_sendbuffer('E');      //first the letter E
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSRESLIN;   //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_SRESLIN
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GRESLIN
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then send back the lin bus response mode
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        23.01.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GRESLIN(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        uart2_sendbuffer('E');      //first the letter E
+        uart2_sendbuffer(',');      //then the comma
+        funct_IntToAscii(g_Param.uint8_LinRes,_Active);
+        uart2_sendbuffer(13);      //then the CR
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GRESLIN

@@ -32,8 +32,8 @@
 
 
 // Compilation variables
-#define _BIPOLAR
-//#define _LIN
+//#define _BIPOLAR
+#define _LIN
 //#define _UNIPOLAR
 
 
@@ -169,6 +169,7 @@
 #define _OutOfTolSTOLIN     156             //STOLIN, parameter out of range
 #define _OutOfTolSLIN       157             //SLIN, parameter out of range
 #define _LinTO              158             //SLIN (indirect), timeout, no answer from slave
+#define _OutOfTolSRESLIN    159             //SRESLIN, parameter out of range
                             //command errors
 #define _NumbRecCharNotOK   254             //number of received characters/parameters not OK
 #define _UnknownCmd         255             //unknown or not implemented command
@@ -285,6 +286,8 @@
 #define _IdGBIPSLEW         106             //get bipolar slew rate mode
 #define _IdGBIPSST          107             //get bipolar status stall
 #define _IdGVBAK            108             //get the backup voltage of the button cell
+#define _IdSRESLIN          109             //set the response mode for the lin bus
+#define _IdGRESLIN          110             //get the response mode for the lin bus
 
 #endif	/* DEFINES_H */
 

@@ -679,6 +679,14 @@ void cmdchk_check(void)
                 case (_IdGVBAK):        //command GVBAK
                     cmd_GVBAK();        //call subroutine
                     break;
+                    
+                case (_IdSRESLIN):      //command SRESLIN
+                    cmd_SRESLIN();      //call subroutine
+                    break;
+                    
+                case (_IdGRESLIN):      //command GRESLIN
+                    cmd_GRESLIN();      //call subroutine
+                    break;
                                      
                 default:    //command ID does not exist
                     //do nothing - error has to be send before this routine
@@ -1343,6 +1351,14 @@ void cmdchk_def(void)
                                 
                             case (0x47535044):  //cmd is = GSPDLIN
                                 g_CmdChk.uint8_CmdID = _IdGSPDLIN;
+                                break;
+                                
+                            case (0x53524553):  //cmd is = SRESLIN
+                                g_CmdChk.uint8_CmdID = _IdSRESLIN;
+                                break;
+                                
+                            case (0x47524553):  //cmd is = GRESLIN
+                                g_CmdChk.uint8_CmdID = _IdGRESLIN;
                                 break;
                                 
                             default:    //error - command is not defined
