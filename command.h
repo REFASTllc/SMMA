@@ -115,5 +115,7 @@ extern void cmd_SBIPSLEW(void);
 extern void cmd_GBIPSLEW(void);
 extern void cmd_GBIPSST(void);
 extern void cmd_GVBAK(void);
+extern void cmd_SRESLIN(void);
+extern void cmd_GRESLIN(void);
 
 #endif	/* COMMAND_H */

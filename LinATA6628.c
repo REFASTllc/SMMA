@@ -49,6 +49,7 @@ void LINATA6628_init(void)
     oEnaLINDriver = 1;          //enable LIN driver
     
     //reset variables
+    g_LIN.uint8_LinBusy = 0;
     g_LIN.uint8_SlaveReceiveCounter = 0;
     g_LIN.uint8_SlaveTimeout = 0;
     g_LIN.uint8_SlaveAnswerFinish = 0;
@@ -87,13 +88,40 @@ void LINATA6629_SendBackSlaveAnswer(void)
         if(g_LIN.uint8_SlaveAnswerFinish)   //slave answer received
         {
             uart2_sendbuffer('E');      //first the letter E
+            
+            if(g_Param.uint8_LinRes)        //slave answer with master telegram?
+            {
+                //do nothing
+            }
+            else
+            {
+                g_LIN.uint8_MasterSendCounter += 1; //add one because the first is the lin break
+                g_UART1rxd.uint16_Rch += g_LIN.uint8_MasterSendCounter;      
+            }
         }
         else
         {
             uart2_sendbuffer('X');      //first the letter E
-            uart2_sendbuffer(',');      //add a comma
             g_Param.uint8_ErrCode = _LinTO;          //set error code
             uart2_sendbuffer(g_Param.uint8_ErrCode); //add error code
+            
+            if(g_Param.uint8_LinRes)        //slave answer with master telegram?
+            {
+                uart2_sendbuffer(',');      //add a comma
+            }
+            else
+            {
+                g_LIN.uint8_MasterSendCounter += 1; //add one because the first is the lin break
+                g_UART1rxd.uint16_Rch += g_LIN.uint8_MasterSendCounter; 
+                if(g_UART1rxd.uint16_Rch == g_UART1rxd.uint16_Wch)
+                {
+                    g_UART1rxd.uint8_BufEmpty = 0;  //buffer empty
+                }
+                else
+                {
+                    uart2_sendbuffer(',');      //add a comma
+                }
+            }
         }
     }
     

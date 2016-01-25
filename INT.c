@@ -776,6 +776,7 @@ void __ISR(_TIMER_1_VECTOR, IPL5AUTO) __IntTimer1Handler(void)
 //add here some flags / register for your application (LIN, etc. )
             //LIN:
             g_LIN.uint8_SlaveTimeout = 1;   //timeout occured
+            g_LIN.uint8_LinBusy = 0;        //reset busy flag
             
             
             break;
@@ -843,6 +844,7 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
         else
         {
             g_LIN.uint8_SlaveAnswerFinish = 1;      //slave answer finish
+            g_LIN.uint8_LinBusy = 0;                //reset busy flag
         }
     }
     
@@ -892,7 +894,8 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
             }
             else
             {
-                //do nothing
+                //reset the busy flag
+                g_LIN.uint8_LinBusy = 0;
             }
         }
     }

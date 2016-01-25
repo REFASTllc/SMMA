@@ -141,6 +141,7 @@ void param_init(void)
     g_Param.uint8_LinStatus = 0;        //reset the lin bus status
     g_Param.uint32_LinSpd = 9600;       //baud rate of the lin bus
     g_Param.uint16_LinTO = 500;         //timeout for the communication = 500ms
+    g_Param.uint8_LinRes = 0;           //lin containts only the slave answer
     
     //reset or define the bipolar flag's and default values
     g_Param.uint8_SYR = 0;               //bipolar synchronous rectification mode
