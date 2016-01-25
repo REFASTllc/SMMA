@@ -26,13 +26,10 @@
 
 typedef struct
 {
-    unsigned short int firstMeasure;
-    unsigned short int secondMeasure;
-    unsigned short int thirdMeasure;
-    unsigned short int timeHigh;
-    unsigned short int timeLow;
-    unsigned short int timeTotal;
-    float frequency;
+    long timeHigh[10];
+    long timeLow;
+    long timeTotal[10];
+    long frequency[10];
 } S_MEAS_PWM;
 
 
@@ -80,5 +77,26 @@ void InitInputCapture5Module(void);
 /*  Remark:                     -										    
 /********************************************************************************************************************/
 void InitInterruptInputCaptureModule(unsigned char module, unsigned char status);
+
+/********************************************************************************************************************/
+/*  Name of the function:       ResetInputCaptureModule									    
+/*  Purpose of the function:    Reset of the module in case of buffer overflow
+/*  Parameters:													    
+/*      IN:                     - module: select the module to initialize	    
+/*      OUT:                    -			
+/* 							    See the .h file for the list of all defines.
+/*														    
+/*  Used global variables:      -										    
+/*														    
+/*  Creator:                    julien_rebetez								    
+/*  Date of creation:           January 23, 2016								    
+/*														    
+/*  Last modified on:           -										    
+/*  Modified by:                -										    
+/*  Version:                    -										    
+/*														    
+/*  Remark:                     -										    
+/********************************************************************************************************************/
+void ResetInputCaptureModule(unsigned char module);
 
 #endif	/* INPUTCAPTURE_H */

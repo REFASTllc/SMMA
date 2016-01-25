@@ -26,7 +26,7 @@
 
 #include "includes.h" // File which contain all includes files
 
-S_MEAS_PWM DataPWM;
+S_MEAS_PWM DataPWM, DataFreq;
 extern Si2c1 g_i2c1;
 extern STimer1 g_Timer1;
 extern SUART2txd g_UART2txd;
@@ -968,10 +968,8 @@ void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
 ***********************************************************************************************************************/
 void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
 {
-    unsigned short int average = 0;
     IFS0bits.IC1IF = 0;
-    
-    SaveMeasuresPWM(DataPWM);
+
 }
 
 /**********************************************************************************************************************
@@ -990,8 +988,35 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
 ***********************************************************************************************************************/
 void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL2AUTO) __IntInputCapture2Handler(void)
 {
-    unsigned short int average = 0;
+    static unsigned char nbreMeasure = 0, index = 0;
     IFS0bits.IC2IF = 0;
     
-    average = (IC1BUF + IC2BUF + IC3BUF + IC4BUF) / 4;
+    if(IC2CONbits.ICBNE)
+    {
+        if(!nbreMeasure) // Measure of high state time
+        {
+            DataFreq.timeHigh[index] = (long)IC2BUF;
+            nbreMeasure = !nbreMeasure;
+            IC2CONbits.ON = 0;
+            IC2CONbits.ICM = 3; // Detection of rising edges
+            TMR2 = 0;
+            IC2CONbits.ON = 1;
+        }
+        else // Measure of period time
+        {
+            DataFreq.timeTotal[index] = (long)IC2BUF;
+            DataFreq.frequency[index] = 1 / DataFreq.timeTotal[index];
+            nbreMeasure = !nbreMeasure;
+            IC2CONbits.ON = 0;
+            IC2CONbits.ICM = 6; // Detection of rising and falling edges. Starting with rising edge.
+            TMR2 = 0;
+            IC2CONbits.ON = 1;
+        }
+        if(index == 9)
+            index = 0;
+        else if(!nbreMeasure)
+            index ++;
+    }
+    if(IC2CONbits.ICOV)
+        ResetInputCaptureModule(_IC_2);
 }

@@ -120,8 +120,8 @@ void InitTimer(unsigned char timerx)
                                 //    0 = Gated time accumulation is disabled
 
         T2CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
-        T2CONbits.TCKPS1 = 1;   // 110 = 1:64 prescale value
-        T2CONbits.TCKPS0 = 1;   // 101 = 1:32 prescale value
+        T2CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
+        T2CONbits.TCKPS0 = 0;   // 101 = 1:32 prescale value
                                 // 100 = 1:16 prescale value
                                 // 011 = 1:8 prescale value
                                 // 010 = 1:4 prescale value
@@ -383,15 +383,15 @@ void InitInterruptTimer(unsigned char timerx, unsigned char action)
  * Start / stop and choose time for each 16bits timers.
  * Timer 1: used with a time base of 3.2us
  * 
- * Timer 2: used in combination; see Timer 23
+ * Timer 2: used for PWM and frequency measure (Input capture module)
+ * 
+ * Timer 3: not used
+ * 
+ * Timer 4: used in combination; see Timer 45
  * DON'T USE THIS SUBROUTINE FOR TIMER 2! This timer is used in a special way for the unipolar driver.
  * 
- * Timer 3: used in combination; see Timer 23
+ * Timer 5: used in combination; see Timer 45
  * DON'T USE THIS SUBROUTINE FOR TIMER 2! This timer is used in a special way for the unipolar driver.
- * 
- * Timer 4: not used
- * 
- * Timer 5: not used
  * 
  * Timer 23 (timer 2 in 32-bit): not used
  * 
@@ -457,54 +457,60 @@ void SetTimer(unsigned char timer, unsigned char status, unsigned long int value
             //do nothing because if the safety flag is set then it is not allowed to change 
             //this interrupt configuration 
         }
-		break;
-	case _TIMER2:	if(status)
-			{
-                            TMR2 = valueTMRReg;
-                            PR2 = valuePRReg;
-                            T2CONbits.ON = 1;
-			}
-			else T2CONbits.ON = 0;
-			break;
-	case _TIMER3:	if(status)
-        		{
-                            TMR3 = valueTMRReg;
-                            PR3 = valuePRReg;
-                            T3CONbits.ON = 1;
-			}
-			else T3CONbits.ON = 0;
-			break;
-	case _TIMER4:	if(status)
-			{
-                            TMR4 = valueTMRReg;
-                            PR4 = valuePRReg;
-                            T4CONbits.ON = 1;
-			}
-			else T4CONbits.ON = 0;
-			break;
-	case _TIMER5:	if(status)
-			{
-                            TMR5 = valueTMRReg;
-                            PR5 = valuePRReg;
-                            T5CONbits.ON = 1;
-			}
-			else T5CONbits.ON = 0;
-			break;
-        case _TIMER23:	if(status)
-			{
-                            TMR2 = valueTMRReg;
-                            PR2 = valuePRReg;
-                            T2CONbits.ON = 1;
-			}
-			else T2CONbits.ON = 0;
-			break;
-	case _TIMER45:	if(status)
-			{
-                            TMR4 = valueTMRReg;
-                            PR4 = valuePRReg;
-                            T4CONbits.ON = 1;
-			}
-			else T4CONbits.ON = 0;
-			break;
+    break;
+	case _TIMER2:	
+        if(status)
+        {
+            TMR2 = valueTMRReg;
+            PR2 = valuePRReg;
+            T2CONbits.ON = 1;
+        }
+        else T2CONbits.ON = 0;
+	break;
+	case _TIMER3:	
+        if(status)
+        {
+            TMR3 = valueTMRReg;
+            PR3 = valuePRReg;
+            T3CONbits.ON = 1;
+        }
+        else T3CONbits.ON = 0;
+    break;
+	case _TIMER4:	
+        if(status)
+        {
+            TMR4 = valueTMRReg;
+            PR4 = valuePRReg;
+            T4CONbits.ON = 1;
+        }
+        else T4CONbits.ON = 0;
+    break;
+	case _TIMER5:	
+        if(status)
+        {
+            TMR5 = valueTMRReg;
+            PR5 = valuePRReg;
+            T5CONbits.ON = 1;
+        }
+        else T5CONbits.ON = 0;
+    break;
+    case _TIMER23:	
+        if(status)
+        {
+            TMR2 = valueTMRReg;
+            PR2 = valuePRReg;
+            T2CONbits.ON = 1;
+        }
+        else T2CONbits.ON = 0;
+    break;
+	case _TIMER45:	
+        if(status)
+        {
+            TMR4 = valueTMRReg;
+            PR4 = valuePRReg;
+            T4CONbits.ON = 1;
+        }
+        else T4CONbits.ON = 0;
+    break;
     }
 }

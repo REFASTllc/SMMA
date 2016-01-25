@@ -41,12 +41,20 @@ extern SADC g_ADC;
 ***********************************************************************************************************************/
 void main(void)
 {   
-    unsigned short int enaLed1 = 0;
+    volatile unsigned char tempchar, tempint, tempshortint, tempshort, templong, templongint, tempfloat, tempdouble;
     
     system_init();          //call subroutine
           
     asm("ei");              //enable all interrupts (code in assembler) use declaration "di" to disable all interrupts
     
+    tempchar = sizeof(char);
+    tempint = sizeof(int);
+    tempshortint = sizeof(short int);
+    tempshort = sizeof(short);
+    templong = sizeof(long);
+    templongint = sizeof(long int);
+    tempfloat = sizeof(float);
+    tempdouble = sizeof(double);
     
  //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!
  //we both play with the switch for the supply. I am still testing the LIN bus driver.

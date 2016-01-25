@@ -122,7 +122,7 @@ void InitInputCapture2Module(void)
                             // 0 = Timer3 is the counter source for capture
                             // 1 = Timer2 is the counter source for capture
 
-    IC2CONbits.ICI = 3;     // Interrupt Control bits
+    IC2CONbits.ICI = 0;     // Interrupt Control bits
                             // 11 = Interrupt on every fourth capture event
                             // 10 = Interrupt on every third capture event
                             // 01 = Interrupt on every second capture event
@@ -136,7 +136,7 @@ void InitInputCapture2Module(void)
                             // 1 = Input capture buffer is not empty; at least one more capture value can be read
                             // 0 = Input capture buffer is empty
     
-    IC2CONbits.ICM = 3;     // Input Capture Mode Select bits
+    IC2CONbits.ICM = 6;     // Input Capture Mode Select bits
                             // 111 = Interrupt-Only mode (only supported while in Sleep mode or Idle mode)
                             // 110 = Simple Capture Event mode ? every edge, specified edge first and every edge thereafter
                             // 101 = Prescaled Capture Event mode ? every sixteenth rising edge
@@ -449,5 +449,64 @@ void InitInterruptInputCaptureModule(unsigned char module, unsigned char status)
             IEC0bits.IC5IE = 0;
             IFS0bits.IC5IF = 0;
         }
+    }
+}
+
+/********************************************************************************************************************/
+/*  Name of the function:       ResetInputCaptureModule									    
+/*  Purpose of the function:    Reset of the module in case of buffer overflow
+/*  Parameters:													    
+/*      IN:                     - module: select the module to initialize	    
+/*      OUT:                    -			
+/* 							    See the .h file for the list of all defines.
+/*														    
+/*  Used global variables:      -										    
+/*														    
+/*  Creator:                    julien_rebetez								    
+/*  Date of creation:           January 23, 2016								    
+/*														    
+/*  Last modified on:           -										    
+/*  Modified by:                -										    
+/*  Version:                    -										    
+/*														    
+/*  Remark:                     -										    
+/********************************************************************************************************************/
+void ResetInputCaptureModule(unsigned char module)
+{
+    unsigned int i = 0;
+    switch(module)
+    {
+        case _IC_1: 
+            IC1CONbits.ON = 0;
+            for(;i<5000;i++)
+                Nop();
+            IC1CONbits.ON = 1;          
+        break;
+        case _IC_2:
+            IC2CONbits.ON = 0;
+            for(;i<5000;i++)
+                Nop();
+            IC2CONbits.ON = 1; 
+        break;
+        case _IC_3:
+            IC3CONbits.ON = 0;
+            for(;i<5000;i++)
+                Nop();
+            IC3CONbits.ON = 1; 
+        break;
+        case _IC_4:
+            IC4CONbits.ON = 0;
+            for(;i<5000;i++)
+                Nop();
+            IC4CONbits.ON = 1; 
+        break;
+        case _IC_5:
+            IC5CONbits.ON = 0;
+            for(;i<5000;i++)
+                Nop();
+            IC5CONbits.ON = 1; 
+        break;
+        default:
+        break;
     }
 }

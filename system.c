@@ -127,12 +127,13 @@ void system_init(void)
     // Initialization of timer 2 (used for input capture module)
     InitTimer(_TIMER2);
     InitInterruptTimer(_TIMER2, _DISABLE);
+    SetTimer(_TIMER2, _ENABLE, 0, 0xffff);
     // Initialization of input capture modules 1 & 2
     InitInputCapture1Module();
     InitInputCapture2Module();
-    InitInterruptInputCaptureModule(_IC_1, _ENABLE);
+  //  InitInterruptInputCaptureModule(_IC_1, _ENABLE);
     InitInterruptInputCaptureModule(_IC_2, _ENABLE);
-    IC1CONbits.ON = 1;
+    IC2CONbits.ON = 1;
    // IC2CONbits.ON = 1;
 //switch off the debugging LED's
     oTestLed1 = 0;                          //switch on the output for the test LED1
