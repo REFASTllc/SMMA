@@ -3938,7 +3938,6 @@ void cmd_SLIN(void)
             //the local work byte has the same size as number of received characters
             uint8_WB = 2;   //start with the first parameter to verify 
             g_LIN.uint8_MasterSendCounter = 1;  //1 because the first parameter is the start break
-            g_LIN.uint8_MasterSendCounter = 0;  //reset the counter
             
             do
             {
@@ -3949,7 +3948,10 @@ void cmd_SLIN(void)
             }
             while(uint8_WB < g_CmdChk.uint8_ParamPos);
 
-            //each parameter within the tolerance (uint8_WB - 1), because the 1st parameter is the cmd ID)?
+            //add the real answer length, like the TxD will be received as well
+            g_LIN.uint8_SlaveReceiveCounter += g_LIN.uint8_MasterSendCounter;
+            
+            //each parameter within the tolerance (uint8_WB - 1), because the 1st parameter is the cmd ID
             if(uint8_Result == (uint8_WB-1))
             {
                 g_LIN.uint8_LinBreakToSend = 1;             //enable LIN break to send
