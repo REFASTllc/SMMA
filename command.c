@@ -529,7 +529,7 @@ void cmd_SRDEC(void)
 void cmd_RUN(void)
 {
     auto unsigned char uint8_Result = 0;    //local work byte for the result 
-    auto unsigned char uint1_UniErrConfig = 0;  //local bool for error configuration unipolar
+    auto unsigned char uint8_UniErrConfig = 0;  //local work byte for error configuration unipolar
     
     g_Bipol.uint1_ErrConfig = 0;
     
@@ -588,6 +588,10 @@ void cmd_RUN(void)
                 {
                     //to decide what is to do when motor type changes
                     g_Param.uint8_MotTyp = g_CmdChk.uint32_TempPara[1] & 0xFF;
+                    //call subroutine to switch on/off the outputs for the motor type
+                    funct_CheckMotType(g_Param.uint8_MotTyp);
+                    
+                    
                     // Set the step mode
                     switch(g_Param.uint8_StepMode)
                     {
@@ -648,10 +652,10 @@ void cmd_RUN(void)
                 else if((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
                 {
                     //to decide what is to do when motor type changes
-                    g_Param.uint8_MotTyp = g_CmdChk.uint32_TempPara[1] & 0xFF;    
+                    g_Param.uint8_MotTyp = g_CmdChk.uint32_TempPara[1] & 0xFF;  
+                    //call subroutine to switch on/off the outputs for the motor type
+                    funct_CheckMotType(g_Param.uint8_MotTyp);
                            
-                    //g_Uni.uint8_Settings |= 0x01;   //enable run bit
-          
                     if(g_Param.uint8_StepMode == 0) //which step mode?
                     {
                         g_Uni.uint8_Settings &= 0xFB;   //enable full step
@@ -669,7 +673,7 @@ void cmd_RUN(void)
                     else
                     {
                         //error - definition is half step compensated or micro step send error later
-                        uint1_UniErrConfig = 1;     //set error
+                        uint8_UniErrConfig = 1;     //set error
                         g_Uni.uint8_Settings = 0;   //erase settings
                     }
           
@@ -711,7 +715,7 @@ void cmd_RUN(void)
                     else
                     {
                         //error - definition is unknown send error later
-                        uint1_UniErrConfig = 1;     //set error
+                        uint8_UniErrConfig = 1;     //set error
                         g_Uni.uint8_Settings = 0;   //erase settings
                     }
                     // TODO: test to do
@@ -722,7 +726,7 @@ void cmd_RUN(void)
                     //define switch OFF time - first convert and then store it
                     g_Uni.uint32_SwOffTime = funct_msToTimer23(g_Param.uint16_DecOffDelay);
           
-                    if(uint1_UniErrConfig)  //verify if we had an configuration error
+                    if(uint8_UniErrConfig)  //verify if we had an configuration error
                     {
                         //error detected, send error code
                         g_Param.uint8_ErrCode = _OutOfTolRUN;       //set error code
@@ -889,15 +893,15 @@ void cmd_RAZ(void)
  * Routine:                 cmd_SMTYP
 
  * Description:
- * Only allowed if the motor is not in run. Before the system changes to another driver (switching on the
- * output/supply) it verifies if the set limits are within the tolerances. If one parameter/limit is not
- * within the tolerance, the system changes nothing and send back the corresponding error. 
- * If all is correct, it sends back an E<CR>. 
+ * Only allowed if the motor is not in run. If all is correct, it sends back an E<CR>. 
+ * 
+ * Modification 25.01.2016 / A. Staub
+ * Routine is much smaller now, because we don't need to verify the limits. 
  * 
  * Creator:                 A. Staub
  * Date of creation:        19.10.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    25.01.2016
+ * Modified by:             A. Staub
  * 
  * Input:                   -
  * Output:                  -
@@ -906,7 +910,7 @@ void cmd_SMTYP(void)
 {
     auto unsigned char uint8_Result = 0;        //local work byte for the result 
   
-    if(g_CmdChk.uint8_ParamPos == 2)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 2)            //number of received characters OK?
     {
         if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
         {
@@ -915,17 +919,11 @@ void cmd_SMTYP(void)
         }
         else
         {
-            uint8_Result = funct_CheckCmdSMTYP();   //call subroutine
-            
-            if(uint8_Result == 5)   //each parameter within the tolerance?
-            {
-                uart2_sendbuffer('E');          //first the letter E
-                uart2_sendbuffer(13);           //with CR at the end
-            }
-            else
-            {
-                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-            }                  
+            //call subroutine to switch on/off the outputs for the motor type
+            funct_CheckMotType(g_CmdChk.uint32_TempPara[1]);
+                        
+            uart2_sendbuffer('E');                  //first the letter E
+            uart2_sendbuffer(13);                   //with CR at the end                  
         }      
     }
     else

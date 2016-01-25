@@ -138,6 +138,10 @@ void system_init(void)
     oTestLed1 = 0;                          //switch on the output for the test LED1
     oTestLed2 = 0;                          //switch on the output for the test LED2
     
+    oVmotOnOff = 0;
+    oBiEnaVmot = 0;
+    oEnaVLINSupply = 0;
+    
     // Front LED => Green
     FrontLED(_GREEN);
 }   //end of system_init

@@ -17,7 +17,7 @@
  *                          - funct_msToTimer23
  *                          - funct_ReadRamp
  *                          - funct_CheckCmdSILIM
- *                          - funct_CheckCmdSMTYP
+ *                          - funct_CheckMotType
  *                          - funct_LoadDeviceInfo  
  *                          - funct_FrontLED
  *                          - funct_OutputHandler
@@ -418,107 +418,64 @@ unsigned char funct_CheckCmdSILIM(void)
 
 
 /**********************************************************************************************************************
- * Routine:                 funct_CheckCmdSMTYP
+ * Routine:                 funct_CheckMotType
 
  * Description:
- * This subroutine compares the currently limits with the minimum and maximal tolerance, depending on the whished
- * application. Every good result increments the counter. It is used with the follow command(s):
- *  - cmd_SMTYP
- * This subroutine is quite the same as funct_CheckActApplTol instead of that we don't compare the received
- * parameters. Here we compare the values that are stored inside the g_Param.xxxxx
- * If the user wants to switch from unipolar to LIN and the parameters are not correct, then nothing is done.
- * If all is correct, then the system switch on the needed output. 
+ * This small subroutine switch off or on the outputs needed for the different motor types. 
  * 
  * Creator:                 A. Staub
- * Date of creation:        17.10.2015
+ * Date of creation:        25.01.2016
  * Last modification on:    -
  * Modified by:             - 
  * 
  * Input:                   -
- * Output:                  uint8_Result
+ * Output:                  -
 ***********************************************************************************************************************/
-unsigned char funct_CheckCmdSMTYP(void)
+void funct_CheckMotType(unsigned char uint8_MotType)
 {
-    auto unsigned char uint8_Result = 0;
-    
-    //verify if main supply is switched off or unipolar application is selected
-    if(g_CmdChk.uint32_TempPara[1] == 'N')     
+    if(uint8_MotType == 'N')                //switch off the main supply  
     {
-        //switch off each output
-        g_Param.uint8_MotTyp = 'N';
-        uint8_Result = 5;   //set to 5 for that the result pass
+        g_Param.uint8_MotTyp = 'N';         //set the motor type
+        oVmotOnOff = 0;                     //switch off the main supply
+        oEnaVLINSupply = 0;                 //switch off the lin supply
+        oBiEnaVmot = 0;                     //switch off the bipolar supply     
     }
-    else if ((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
+    else if (uint8_MotType == 'U')          //switch on the unipolar part
     {
-        //then verify the stored parameters
-        uint8_Result += funct_CheckTol(g_Param.uint16_Imin,_Imin,_Imax);
-        uint8_Result += funct_CheckTol(g_Param.uint16_Imax,_Imin,_Imax);
-        uint8_Result += funct_CheckTol(g_Param.uint16_Umot,_UmotMin,_UmotMax);
-        uint8_Result += funct_CheckTol(g_Param.uint16_SCiLevel,_SCiLevelMin,_SCiLevelMax);
-        uint8_Result += funct_CheckTol(g_Param.uint8_SCtLevel,_SCtLevelMin,_SCtLevelMax);          
-                
-        if(uint8_Result == 5)   //each parameter within the tolerance?
-        {
-            //for security switch off each output instead the main supply and switch on "unipolar"
-            
-            if(g_CmdChk.uint32_TempPara[1] == 'U')
-            {
-                g_Param.uint8_MotTyp = 'U';
-            }
-            else
-            {
-                g_Param.uint8_MotTyp = 'M';
-            }
-        }
-        else
-        { 
-            g_Param.uint8_ErrCode = _UniSMTYP;  //set error code
-        }
+        g_Param.uint8_MotTyp = 'U';         //set the motor type
+        oVmotOnOff = 1;                     //switch on the main supply
+        oEnaVLINSupply = 0;                 //switch off the lin supply
+        oBiEnaVmot = 0;                     //switch off the bipolar supply
     }
-    else if(g_CmdChk.uint32_TempPara[1] == 'B')     //verify limits for the bipolar application
+    else if (uint8_MotType == 'M')
     {
-        uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint16_Imin,_Imin,_Imax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint16_Imax,_Imin,_Imax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint16_Umot,_UmotMin,_UmotBipMax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint16_SCiLevel,_SCiLevelMin,_SCiLevelMax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint8_SCtLevel,_SCtLevelMin,_SCtLevelMax);          
-               
-
-        if(uint8_Result == 5)   //each parameter within the tolerance
-        {
-            //for security switch off each output instead the main supply and switch on "bipolar"
-            g_Param.uint8_MotTyp = 'B';
-        }
-        else
-        {
-            g_Param.uint8_ErrCode = _BipSMTYP;  //set error code
-        }   
+        g_Param.uint8_MotTyp = 'M';         //set the motor type
+        oVmotOnOff = 1;                     //switch on the main supply
+        oEnaVLINSupply = 0;                 //switch off the lin supply
+        oBiEnaVmot = 0;                     //switch off the bipolar supply
     }
-    else if(g_CmdChk.uint32_TempPara[1] == 'L')     //verify limits for the LIN application
+    else if(uint8_MotType == 'B')           //verify limits for the bipolar application
     {
-        uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint16_Imin,_Imin,_ImotLinMax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint16_Imax,_Imin,_ImotLinMax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint16_Umot,_UmotMin,_UmotLinMax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint16_SCiLevel,_SCiLevelMin,_ImotLinSCiLevelMax);
-        uint8_Result = uint8_Result + funct_CheckTol(g_Param.uint8_SCtLevel,_SCtLevelMin,_SCtLevelMax);          
-                
-        if(uint8_Result == 5)   //each parameter within the tolerance
-        {
-            //for security switch off each output instead the main supply and switch on "LIN"
-            g_Param.uint8_MotTyp = 'L';
-        }
-        else
-        {
-        g_Param.uint8_ErrCode = _LinSMTYP;  //set error code
-        } 
+        g_Param.uint8_MotTyp = 'B';         //set the motor type
+        oEnaVLINSupply = 0;                 //switch off the lin supply
+        oBiEnaVmot = 1;                     //switch on the bipolar supply 
+        oVmotOnOff = 1;                     //switch on the main supply 
+    }
+    else if(uint8_MotType == 'L')           //verify limits for the LIN application
+    {
+        g_Param.uint8_MotTyp = 'L';         //set the motor type
+        oBiEnaVmot = 0;                     //switch off the bipolar supply 
+        oEnaVLINSupply = 1;                 //switch on the lin supply
+        oVmotOnOff = 1;                     //switch on the main supply
     }
     else
     {
-        g_Param.uint8_ErrCode = _UnknownMotTyp; //set error code
+        g_Param.uint8_MotTyp = 'N';         //set the motor type
+        oVmotOnOff = 0;                     //switch off the main supply
+        oEnaVLINSupply = 0;                 //switch off the lin supply
+        oBiEnaVmot = 0;                     //switch off the bipolar supply 
     }
-    
-    return uint8_Result;
-}   //end of funct_CheckActApplTol
+}   //end of funct_CheckMotType
 
 
 /**********************************************************************************************************************

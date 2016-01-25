@@ -39,7 +39,7 @@ extern unsigned long int funct_FreqToTimer23(unsigned long int uint32_Freq);
 extern unsigned long int funct_msToTimer23(unsigned long int uint32_msTime);
 extern unsigned short int funct_ReadRamp(unsigned char uint8_kind,unsigned char uint8_sort,unsigned char uint8_ArrPos);
 extern unsigned char funct_CheckCmdSILIM(void);
-extern unsigned char funct_CheckCmdSMTYP(void);
+extern void funct_CheckMotType(unsigned char uint8_MotType);
 extern void funct_LoadDeviceInfo(void);
 extern void FrontLED(unsigned char uint8_color);
 extern void funct_OutputHandler(unsigned char uint8_ToDo,unsigned char uint8_value);
