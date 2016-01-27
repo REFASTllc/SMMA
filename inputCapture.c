@@ -138,12 +138,12 @@ void InitInputCapture2Module(void)
     
     IC2CONbits.ICM = 6;     // Input Capture Mode Select bits
                             // 111 = Interrupt-Only mode (only supported while in Sleep mode or Idle mode)
-                            // 110 = Simple Capture Event mode ? every edge, specified edge first and every edge thereafter
-                            // 101 = Prescaled Capture Event mode ? every sixteenth rising edge
-                            // 100 = Prescaled Capture Event mode ? every fourth rising edge
-                            // 011 = Simple Capture Event mode ? every rising edge
-                            // 010 = Simple Capture Event mode ? every falling edge
-                            // 001 = Edge Detect mode ? every edge (rising and falling)
+                            // 110 = Simple Capture Event mode - every edge, specified edge first and every edge thereafter
+                            // 101 = Prescaled Capture Event mode - every sixteenth rising edge
+                            // 100 = Prescaled Capture Event mode - every fourth rising edge
+                            // 011 = Simple Capture Event mode - every rising edge
+                            // 010 = Simple Capture Event mode - every falling edge
+                            // 001 = Edge Detect mode - every edge (rising and falling)
                             // 000 = Capture Disable mode
     
     TRISDbits.TRISD9 = 1;   // Set PIN RD9 (IC2) as input

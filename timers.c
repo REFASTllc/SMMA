@@ -21,7 +21,7 @@ STimer1 g_Timer1;     //global variables for struct
 
 
 /**********************************************************************************************************************
- * Routine:                 InitTimer
+ * Routine:                 InitTimerX
 
  * Description:
  * Initialization of the timers of the microcontroller.
@@ -57,217 +57,300 @@ STimer1 g_Timer1;     //global variables for struct
  * Modification (29.12.2015 / A. Staub):
  * Timer 2 and 3 changed to timer 4 and 5, because of the input capture issue. 
  * 
+ * Modification (27.01.2016 / J. Rebetez):
+ * Function InitTimer has been splited in different InitTimerX functions to be more memory efficient. 
  * 
  * Creator:                 J. Rebetez
  * Date of creation:        08.08.2015
  * Last modification on:    29.12.2015
  * Modified by:             A. Staub
  * 
- * Input:                   timerx  (selected timer)
+ * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void InitTimer(unsigned char timerx)
+void InitTimer1(void)
 {
-    if(timerx == _TIMER1)
-    {
-        T1CONbits.ON = 0;       // 1 = Timer is enabled
-                                // 0 = Timer is disabled
+    T1CONbits.ON = 0;       // 1 = Timer is enabled
+                            // 0 = Timer is disabled
 
-        T1CONbits.SIDL = 1;     // 1 = Discontinue operation when device enters Idle mode
-                                // 0 = Continue operation when device enters Idle mode
+    T1CONbits.SIDL = 1;     // 1 = Discontinue operation when device enters Idle mode
+                            // 0 = Continue operation when device enters Idle mode
 
-        T1CONbits.TWDIS = 0;    // 1 = Writes to TMR1 are ignored until pending write operation completes
-                                // 0 = Back-to-back writes are enabled (Legacy Asynchronous Timer functionality)
+    T1CONbits.TWDIS = 0;    // 1 = Writes to TMR1 are ignored until pending write operation completes
+                            // 0 = Back-to-back writes are enabled (Legacy Asynchronous Timer functionality)
 
-        T1CONbits.TWIP = 1;     // In Asynchronous Timer mode:
-                                //    1 = Asynchronous write to TMR1 register in progress
-                                //    0 = Asynchronous write to TMR1 register complete
-                                // In Synchronous Timer mode: This bit is read as ?0?.
+    T1CONbits.TWIP = 1;     // In Asynchronous Timer mode:
+                            //    1 = Asynchronous write to TMR1 register in progress
+                            //    0 = Asynchronous write to TMR1 register complete
+                            // In Synchronous Timer mode: This bit is read as ?0?.
 
-        T1CONbits.TGATE = 0;    // When TCS = 1: This bit is ignored.
-                                // When TCS = 0:
-                                //    1 = Gated time accumulation is enabled
-                                //    0 = Gated time accumulation is disabled
+    T1CONbits.TGATE = 0;    // When TCS = 1: This bit is ignored.
+                            // When TCS = 0:
+                            //    1 = Gated time accumulation is enabled
+                            //    0 = Gated time accumulation is disabled
 
-        T1CONbits.TCKPS1 = 1;   // 11 = 1:256 prescale value
-        T1CONbits.TCKPS0 = 1;   // 10 = 1:64 prescale value
-                                // 01 = 1:8 prescale value
-                                // 00 = 1:1 prescale value
+    T1CONbits.TCKPS1 = 1;   // 11 = 1:256 prescale value
+    T1CONbits.TCKPS0 = 1;   // 10 = 1:64 prescale value
+                            // 01 = 1:8 prescale value
+                            // 00 = 1:1 prescale value
 
-        T1CONbits.TSYNC = 0;    // When TCS = 1:
-                                //    1 = External clock input is synchronized
-                                //    0 = External clock input is not synchronized
-                                // When TCS = 0: This bit is ignored.
+    T1CONbits.TSYNC = 0;    // When TCS = 1:
+                            //    1 = External clock input is synchronized
+                            //    0 = External clock input is not synchronized
+                            // When TCS = 0: This bit is ignored.
 
-        T1CONbits.TCS = 0;      // 1 = External clock from TxCKI pin
-                                // 0 = Internal peripheral clock
+    T1CONbits.TCS = 0;      // 1 = External clock from TxCKI pin
+                            // 0 = Internal peripheral clock
 
-        TMR1 = 0;
-        PR1 = 0;
-        g_Timer1.uint8_Timer1SafFlag = 0;   //reset safety flag
-    }
-    else if(timerx == _TIMER2)
-    {
-        T2CONbits.ON = 0;       // 1 = Module is enabled
-                                // 0 = Module is disabled
+    TMR1 = 0;
+    PR1 = 0;
+    g_Timer1.uint8_Timer1SafFlag = 0;   //reset safety flag
+}
 
-        T2CONbits.SIDL = 0;     // 1 = Discontinue operation when device enters Idle mode
-                                // 0 = Continue operation when device enters Idle mode
+/**********************************************************************************************************************
+ * Routine:                 InitTimer2
+ *
+ * Description:             Initialization of the timer 2 (16 bits) of the microcontroller.
+ *
+ * Creator:                 J. Rebetez
+ * Date of creation:        27.01.2016
+ * Last modification on:    -
+ * Modified by:             -
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void InitTimer2(void)
+{
+    T2CONbits.ON = 0;       // 1 = Module is enabled
+                            // 0 = Module is disabled
 
-        T2CONbits.TGATE = 0;    // When TCS = 1: This bit is ignored and is read as ?0?.
-                                // When TCS = 0:
-                                //    1 = Gated time accumulation is enabled
-                                //    0 = Gated time accumulation is disabled
+    T2CONbits.SIDL = 0;     // 1 = Discontinue operation when device enters Idle mode
+                            // 0 = Continue operation when device enters Idle mode
 
-        T2CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
-        T2CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
-        T2CONbits.TCKPS0 = 0;   // 101 = 1:32 prescale value
-                                // 100 = 1:16 prescale value
-                                // 011 = 1:8 prescale value
-                                // 010 = 1:4 prescale value
-                                // 001 = 1:2 prescale value
-                                // 000 = 1:1 prescale value
+    T2CONbits.TGATE = 0;    // When TCS = 1: This bit is ignored and is read as ?0?.
+                            // When TCS = 0:
+                            //    1 = Gated time accumulation is enabled
+                            //    0 = Gated time accumulation is disabled
 
-        T2CONbits.T32 = 0;      // 1 = TMRx and TMRy form a 32-bit timer
-                                // 0 = TMRx and TMRy form separate 16-bit timer
+    T2CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
+    T2CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
+    T2CONbits.TCKPS0 = 0;   // 101 = 1:32 prescale value
+                            // 100 = 1:16 prescale value
+                            // 011 = 1:8 prescale value
+                            // 010 = 1:4 prescale value
+                            // 001 = 1:2 prescale value
+                            // 000 = 1:1 prescale value
 
-        T2CONbits.TCS = 0;      // 1 = External clock from TxCK pin
-                                // 0 = Internal peripheral clock
+    T2CONbits.T32 = 0;      // 1 = TMRx and TMRy form a 32-bit timer
+                            // 0 = TMRx and TMRy form separate 16-bit timer
 
-        TMR2 = 0;               //clear counter
-        PR2 = 100;              //set comperator to 10us (100 * 100ns)
-    }
-    else if(timerx == _TIMER3)
-    {
-        T3CON = 0x8020;
-        PR3 = 40000;
-        TMR3 = 0;
-        /*
-        T3CONbits.ON = 0;       // 1 = Module is enabled
-                                // 0 = Module is disabled
+    T2CONbits.TCS = 0;      // 1 = External clock from TxCK pin
+                            // 0 = Internal peripheral clock
 
-        T3CONbits.SIDL = 1;     // 1 = Discontinue operation when device enters Idle mode
-                                // 0 = Continue operation when device enters Idle mode
+    TMR2 = 0;               //clear counter
+    PR2 = 100;              //set comparator to 10us (100 * 100ns)
+}
 
-        T3CONbits.TGATE = 1;    // When TCS = 1: This bit is ignored and is read as ?0?.
-                                // When TCS = 0:
-                                //    1 = Gated time accumulation is enabled
-                                //    0 = Gated time accumulation is disabled
+/**********************************************************************************************************************
+ * Routine:                 InitTimer3
+ *
+ * Description:             Initialization of the timer 3 (16 bits) of the microcontroller.
+ *
+ * Creator:                 J. Rebetez
+ * Date of creation:        27.01.2016
+ * Last modification on:    -
+ * Modified by:             -
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void InitTimer3(void)
+{
+    T3CON = 0x8020;
+    PR3 = 40000;
+    TMR3 = 0;
+    /*
+    T3CONbits.ON = 0;       // 1 = Module is enabled
+                            // 0 = Module is disabled
 
-        T3CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
-        T3CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
-        T3CONbits.TCKPS0 = 0;   // 101 = 1:32 prescale value
-                                // 100 = 1:16 prescale value
-                                // 011 = 1:8 prescale value
-                                // 010 = 1:4 prescale value
-                                // 001 = 1:2 prescale value
-                                // 000 = 1:1 prescale value
+    T3CONbits.SIDL = 1;     // 1 = Discontinue operation when device enters Idle mode
+                            // 0 = Continue operation when device enters Idle mode
 
-        T3CONbits.TCS = 0;      // 1 = External clock from TxCK pin
-                                // 0 = Internal peripheral clock
+    T3CONbits.TGATE = 1;    // When TCS = 1: This bit is ignored and is read as ?0?.
+                            // When TCS = 0:
+                            //    1 = Gated time accumulation is enabled
+                            //    0 = Gated time accumulation is disabled
 
-        TMR3 = 0;
-        PR3 = 0;*/
-    }
-    else if(timerx == _TIMER4)
-    {
-        T4CONbits.ON = 0;       // 1 = Module is enabled
-                                // 0 = Module is disabled
+    T3CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
+    T3CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
+    T3CONbits.TCKPS0 = 0;   // 101 = 1:32 prescale value
+                            // 100 = 1:16 prescale value
+                            // 011 = 1:8 prescale value
+                            // 010 = 1:4 prescale value
+                            // 001 = 1:2 prescale value
+                            // 000 = 1:1 prescale value
 
-        T4CONbits.SIDL = 1;     // 1 = Discontinue operation when device enters Idle mode
-                                // 0 = Continue operation when device enters Idle mode
+    T3CONbits.TCS = 0;      // 1 = External clock from TxCK pin
+                            // 0 = Internal peripheral clock
 
-        T4CONbits.TGATE = 1;    // When TCS = 1: This bit is ignored and is read as ?0?.
-                                // When TCS = 0:
-                                //    1 = Gated time accumulation is enabled
-                                //    0 = Gated time accumulation is disabled
+    TMR3 = 0;
+    PR3 = 0;*/
+}
 
-        T4CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
-        T4CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
-        T4CONbits.TCKPS0 = 0;   // 101 = 1:32 prescale value
-                                // 100 = 1:16 prescale value
-                                // 011 = 1:8 prescale value
-                                // 010 = 1:4 prescale value
-                                // 001 = 1:2 prescale value
-                                // 000 = 1:1 prescale value
+/**********************************************************************************************************************
+ * Routine:                 InitTimer4
+ *
+ * Description:             Initialization of the timer 4 (16 bits) of the microcontroller.
+ *
+ * Creator:                 J. Rebetez
+ * Date of creation:        27.01.2016
+ * Last modification on:    -
+ * Modified by:             -
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void InitTimer4(void)
+{
+    T4CONbits.ON = 0;       // 1 = Module is enabled
+                            // 0 = Module is disabled
 
-        T4CONbits.T32 = 0;      // 1 = TMRx and TMRy form a 32-bit timer
-                                // 0 = TMRx and TMRy form separate 16-bit timer
+    T4CONbits.SIDL = 1;     // 1 = Discontinue operation when device enters Idle mode
+                            // 0 = Continue operation when device enters Idle mode
 
-        T4CONbits.TCS = 0;      // 1 = External clock from TxCK pin
-                                // 0 = Internal peripheral clock
+    T4CONbits.TGATE = 1;    // When TCS = 1: This bit is ignored and is read as ?0?.
+                            // When TCS = 0:
+                            //    1 = Gated time accumulation is enabled
+                            //    0 = Gated time accumulation is disabled
 
-        TMR4 = 0;
-        PR4 = 0;
-    }
-    else if(timerx == _TIMER5)
-    {
-        T5CONbits.ON = 0;       // 1 = Module is enabled
-                                // 0 = Module is disabled
+    T4CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
+    T4CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
+    T4CONbits.TCKPS0 = 0;   // 101 = 1:32 prescale value
+                            // 100 = 1:16 prescale value
+                            // 011 = 1:8 prescale value
+                            // 010 = 1:4 prescale value
+                            // 001 = 1:2 prescale value
+                            // 000 = 1:1 prescale value
 
-        T5CONbits.SIDL = 1;     // 1 = Discontinue operation when device enters Idle mode
-                                // 0 = Continue operation when device enters Idle mode
+    T4CONbits.T32 = 0;      // 1 = TMRx and TMRy form a 32-bit timer
+                            // 0 = TMRx and TMRy form separate 16-bit timer
 
-        T5CONbits.TGATE = 1;    // When TCS = 1: This bit is ignored and is read as ?0?.
-                                // When TCS = 0:
-                                //    1 = Gated time accumulation is enabled
-                                //    0 = Gated time accumulation is disabled
+    T4CONbits.TCS = 0;      // 1 = External clock from TxCK pin
+                            // 0 = Internal peripheral clock
 
-        T5CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
-        T5CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
-        T5CONbits.TCKPS0 = 0;   // 101 = 1:32 prescale value
-                                // 100 = 1:16 prescale value
-                                // 011 = 1:8 prescale value
-                                // 010 = 1:4 prescale value
-                                // 001 = 1:2 prescale value
-                                // 000 = 1:1 prescale value
+    TMR4 = 0;
+    PR4 = 0;
+}
 
-        T5CONbits.TCS = 0;      // 1 = External clock from TxCK pin
-                                // 0 = Internal peripheral clock
+/**********************************************************************************************************************
+ * Routine:                 InitTimer5
+ *
+ * Description:             Initialization of the timer 5 (16 bits) of the microcontroller.
+ *
+ * Creator:                 J. Rebetez
+ * Date of creation:        27.01.2016
+ * Last modification on:    -
+ * Modified by:             -
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void InitTimer5(void)
+{
+    T5CONbits.ON = 0;       // 1 = Module is enabled
+                            // 0 = Module is disabled
 
-        TMR5 = 0;
-        PR5 = 0;
-    }
-    else if(timerx == _TIMER23)
-    {
-        T2CONbits.T32 = 1;  // Timer in 32 bits mode
-        T2CONbits.ON = 0;   // Timer is OFF
-        T3CON = 0;          // Has no effect in 32 bits mode
+    T5CONbits.SIDL = 1;     // 1 = Discontinue operation when device enters Idle mode
+                            // 0 = Continue operation when device enters Idle mode
 
-        T2CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
-        T2CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
-        T2CONbits.TCKPS0 = 1;   // 101 = 1:32 prescale value
-                                // 100 = 1:16 prescale value
-                                // 011 = 1:8 prescale value
-                                // 010 = 1:4 prescale value
-                                // 001 = 1:2 prescale value
-                                // 000 = 1:1 prescale value
+    T5CONbits.TGATE = 1;    // When TCS = 1: This bit is ignored and is read as ?0?.
+                            // When TCS = 0:
+                            //    1 = Gated time accumulation is enabled
+                            //    0 = Gated time accumulation is disabled
 
-        TMR2 = 0;           // LSB --> clear counter
-        TMR3 = 0;           // MSB --> clear counter
-        PR2 = 400;          // LSB --> set to 10us
-        PR3 = 0;            // MSB --> (400 * 25ns)
-    }
-    else if(timerx == _TIMER45)
-    {
-        T4CONbits.T32 = 1;  // Timer in 32 bits mode
-        T4CONbits.ON = 0;   // Timer is OFF
-        T5CON = 0;          // Has no effect in 32 bits mode
+    T5CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
+    T5CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
+    T5CONbits.TCKPS0 = 0;   // 101 = 1:32 prescale value
+                            // 100 = 1:16 prescale value
+                            // 011 = 1:8 prescale value
+                            // 010 = 1:4 prescale value
+                            // 001 = 1:2 prescale value
+                            // 000 = 1:1 prescale value
 
-        T4CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
-        T4CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
-        T4CONbits.TCKPS0 = 1;   // 101 = 1:32 prescale value
-                                // 100 = 1:16 prescale value
-                                // 011 = 1:8 prescale value
-                                // 010 = 1:4 prescale value
-                                // 001 = 1:2 prescale value
-                                // 000 = 1:1 prescale value
+    T5CONbits.TCS = 0;      // 1 = External clock from TxCK pin
+                            // 0 = Internal peripheral clock
 
-        TMR4 = 0;           // LSB --> clear counter
-        TMR5 = 0;           // MSB --> clear counter
-        PR4 = 400;          // LSB --> set to 10us
-        PR5 = 0;            // MSB --> (400 * 25ns)
-    }
+    TMR5 = 0;
+    PR5 = 0;
+}
+
+/**********************************************************************************************************************
+ * Routine:                 InitTimer23
+ *
+ * Description:             Initialization of the timer 23 (32 bits) of the microcontroller.
+ *
+ * Creator:                 J. Rebetez
+ * Date of creation:        27.01.2016
+ * Last modification on:    -
+ * Modified by:             -
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void InitTimer23(void)
+{
+    T2CONbits.T32 = 1;  // Timer in 32 bits mode
+    T2CONbits.ON = 0;   // Timer is OFF
+    T3CON = 0;          // Has no effect in 32 bits mode
+
+    T2CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
+    T2CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
+    T2CONbits.TCKPS0 = 0;   // 101 = 1:32 prescale value
+                            // 100 = 1:16 prescale value
+                            // 011 = 1:8 prescale value
+                            // 010 = 1:4 prescale value
+                            // 001 = 1:2 prescale value
+                            // 000 = 1:1 prescale value
+
+    TMR2 = 0;           // LSB --> clear counter
+    TMR3 = 0;           // MSB --> clear counter
+    PR2 = 400;          // LSB --> set to 10us
+    PR3 = 0;            // MSB --> (400 * 25ns)
+}
+
+/**********************************************************************************************************************
+ * Routine:                 InitTimer45
+ *
+ * Description:             Initialization of the timer 45 (32 bits) of the microcontroller.
+ *
+ * Creator:                 J. Rebetez
+ * Date of creation:        27.01.2016
+ * Last modification on:    -
+ * Modified by:             -
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void InitTimer45(void)
+{
+    T4CONbits.T32 = 1;  // Timer in 32 bits mode
+    T4CONbits.ON = 0;   // Timer is OFF
+    T5CON = 0;          // Has no effect in 32 bits mode
+
+    T4CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
+    T4CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
+    T4CONbits.TCKPS0 = 1;   // 101 = 1:32 prescale value
+                            // 100 = 1:16 prescale value
+                            // 011 = 1:8 prescale value
+                            // 010 = 1:4 prescale value
+                            // 001 = 1:2 prescale value
+                            // 000 = 1:1 prescale value
+
+    TMR4 = 0;           // LSB --> clear counter
+    TMR5 = 0;           // MSB --> clear counter
+    PR4 = 400;          // LSB --> set to 10us
+    PR5 = 0;            // MSB --> (400 * 25ns)
 }
 
 /**********************************************************************************************************************
@@ -319,40 +402,50 @@ void InitInterruptTimer(unsigned char timerx, unsigned char action)
         IFS0bits.T1IF = 0;
         IPC1bits.T1IP = 5;
         IPC1bits.T1IS = 3;
-        if(action == _ENABLE) IEC0bits.T1IE = 1;
-        else IEC0bits.T1IE = 0;
+        if(action == _ENABLE) 
+            IEC0bits.T1IE = 1;
+        else
+            IEC0bits.T1IE = 0;
     }
     else if(timerx == _TIMER2)
     {
         IFS0bits.T2IF = 0;
         IPC2bits.T2IP = 1;
         IPC2bits.T2IS = 3;
-        if(action == _ENABLE) IEC0bits.T2IE = 1;
-        else IEC0bits.T2IE = 0;
+        if(action == _ENABLE)
+            IEC0bits.T2IE = 1;
+        else
+            IEC0bits.T2IE = 0;
     }
     else if(timerx == _TIMER3)
     {
         IFS0bits.T3IF = 0;
         IPC3bits.T3IP = 1;
         IPC3bits.T3IS = 3;
-        if(action == _ENABLE) IEC0bits.T3IE = 1;
-        else IEC0bits.T3IE = 0;
+        if(action == _ENABLE)
+            IEC0bits.T3IE = 1;
+        else
+            IEC0bits.T3IE = 0;
     }
     else if(timerx == _TIMER4)
     {
         IFS0bits.T4IF = 0;
         IPC4bits.T4IP = 7;
         IPC4bits.T4IS = 3;
-        if(action == _ENABLE) IEC0bits.T4IE = 1;
-        else IEC0bits.T4IE = 0;
+        if(action == _ENABLE)
+            IEC0bits.T4IE = 1;
+        else
+            IEC0bits.T4IE = 0;
     }
     else if(timerx == _TIMER5)
     {
         IFS0bits.T5IF = 0;
         IPC5bits.T5IP = 7;
         IPC5bits.T5IS = 3;
-        if(action == _ENABLE) IEC0bits.T5IE = 1;
-        else IEC0bits.T5IE = 0;
+        if(action == _ENABLE)
+            IEC0bits.T5IE = 1;
+        else
+            IEC0bits.T5IE = 0;
     }
     else if(timerx == _TIMER23)
     {
@@ -360,8 +453,10 @@ void InitInterruptTimer(unsigned char timerx, unsigned char action)
         IFS0bits.T3IF = 0;
         IPC3bits.T3IP = 1;
         IPC3bits.T3IS = 3;
-        if(action == _ENABLE) IEC0bits.T3IE = 1;
-        else IEC0bits.T3IE = 0;
+        if(action == _ENABLE)
+            IEC0bits.T3IE = 1;
+        else 
+            IEC0bits.T3IE = 0;
     }
     else if(timerx == _TIMER45)
     {
@@ -369,8 +464,10 @@ void InitInterruptTimer(unsigned char timerx, unsigned char action)
         IFS0bits.T5IF = 0;
         IPC5bits.T5IP = 6;
         IPC5bits.T5IS = 3;
-        if(action == _ENABLE) IEC0bits.T5IE = 1;
-        else IEC0bits.T5IE = 0;
+        if(action == _ENABLE)
+            IEC0bits.T5IE = 1;
+        else
+            IEC0bits.T5IE = 0;
     }
 
 }

@@ -956,6 +956,26 @@ void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
 }   //end of __IntADCHandler
 
 /**********************************************************************************************************************
+ * Routine:                 __IntTimer2Handler
+
+ * Description:
+ * ...
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        25.01.2016
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+static unsigned short nbreOverflowTMR2 = 0;
+void __ISR(_TIMER_2_VECTOR, IPL1AUTO) __IntTimer2Handler(void)
+{
+    IFS0bits.T2IF = 0;
+    nbreOverflowTMR2++;
+}
+/**********************************************************************************************************************
  * Routine:                 __IntInputCapture1Handler
 
  * Description:
@@ -971,8 +991,7 @@ void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
 ***********************************************************************************************************************/
 void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
 {
-    IFS0bits.IC1IF = 0;
-
+    IFS0bits.IC1IF = 0;  
 }
 
 /**********************************************************************************************************************
@@ -990,36 +1009,27 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
  * Output:                  -
 ***********************************************************************************************************************/
 void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL2AUTO) __IntInputCapture2Handler(void)
-{
-    static unsigned char nbreMeasure = 0, index = 0;
-    IFS0bits.IC2IF = 0;
+{   
+    static unsigned char nbreMeasure = 0;
+    static S_PWM dataPWM;
+    static long *pMeasure = &dataPWM.timeHigh;
     
     if(IC2CONbits.ICBNE)
     {
-        if(!nbreMeasure) // Measure of high state time
+        if(++nbreMeasure % 2 == 0)
+            *pMeasure++ = (long)IC2BUF + nbreOverflowTMR2 * 0xffff;
+        if(nbreMeasure == 2)
+            IC2CONbits.ICM = 3;
+        else if(nbreMeasure == 4)
         {
-            DataFreq.timeHigh[index] = (long)IC2BUF;
-            nbreMeasure = !nbreMeasure;
-            IC2CONbits.ON = 0;
-            IC2CONbits.ICM = 3; // Detection of rising edges
-            TMR2 = 0;
-            IC2CONbits.ON = 1;
+        //    IC2CONbits.ON = 0;
+            IC2CONbits.ICM = 6;
+            pMeasure = &dataPWM.timeHigh;
+            nbreMeasure = 0;
         }
-        else // Measure of period time
-        {
-            DataFreq.timeTotal[index] = (long)IC2BUF;
-            DataFreq.frequency[index] = 1 / DataFreq.timeTotal[index];
-            nbreMeasure = !nbreMeasure;
-            IC2CONbits.ON = 0;
-            IC2CONbits.ICM = 6; // Detection of rising and falling edges. Starting with rising edge.
-            TMR2 = 0;
-            IC2CONbits.ON = 1;
-        }
-        if(index == 9)
-            index = 0;
-        else if(!nbreMeasure)
-            index ++;
+        TMR2 = 0;
+        IFS0bits.T2IF = 0;
+        IFS0bits.IC2IF = 0;
+        nbreOverflowTMR2 = 0;
     }
-    if(IC2CONbits.ICOV)
-        ResetInputCaptureModule(_IC_2);
 }

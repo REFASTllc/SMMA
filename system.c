@@ -106,7 +106,7 @@ void system_init(void)
     uart_InitInterrupt(_UART2_,_ENABLE);
     uart_enable(_UART2_);
     // Initialization of timers 4 & 5 as a 32 bits timer (used for timebase of motors operations)
-    InitTimer(_TIMER45);
+    InitTimer45();
     InitInterruptTimer(_TIMER45,_ENABLE);
     // Initialization of SPI
     InitSPI(_SPI_1);
@@ -122,19 +122,17 @@ void system_init(void)
     uart_InitInterrupt(_UART1_,_ENABLE);
     uart_enable(_UART1_);
     // Initialization of timer 1 (used for 1ms interrupts)
-    InitTimer(_TIMER1);
+    InitTimer1();
     InitInterruptTimer(_TIMER1,_ENABLE);
     // Initialization of timer 2 (used for input capture module)
-    InitTimer(_TIMER2);
-    InitInterruptTimer(_TIMER2, _DISABLE);
+    InitTimer2();
+    InitInterruptTimer(_TIMER2, _ENABLE);
     SetTimer(_TIMER2, _ENABLE, 0, 0xffff);
     // Initialization of input capture modules 1 & 2
     InitInputCapture1Module();
     InitInputCapture2Module();
-  //  InitInterruptInputCaptureModule(_IC_1, _ENABLE);
+    InitInterruptInputCaptureModule(_IC_1, _ENABLE);
     InitInterruptInputCaptureModule(_IC_2, _ENABLE);
-    IC2CONbits.ON = 1;
-   // IC2CONbits.ON = 1;
 //switch off the debugging LED's
     oTestLed1 = 0;                          //switch on the output for the test LED1
     oTestLed2 = 0;                          //switch on the output for the test LED2

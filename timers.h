@@ -30,7 +30,26 @@
 #ifndef TIMERS_H
 #define	TIMERS_H
 
-extern void InitTimer(unsigned char timerx);
+/**********************************************************************************************************************
+ * Routine:                 InitTimerX
+ *
+ * Description:             Initialization of the timer X (16 bits / 32 bits) of the microcontroller.
+ *
+ * Creator:                 J. Rebetez
+ * Date of creation:        27.01.2016
+ * Last modification on:    -
+ * Modified by:             -
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+extern void InitTimer1(void);
+extern void InitTimer2(void);
+extern void InitTimer3(void);
+extern void InitTimer4(void);
+extern void InitTimer5(void);
+extern void InitTimer23(void);
+extern void InitTimer45(void);
 extern void InitInterruptTimer(unsigned char timerx, unsigned char action);
 extern void SetTimer(unsigned char timer, unsigned char status, unsigned long int valueTMRReg, unsigned long int valuePRReg);
 extern void timer1_LaunchMsTime(unsigned short int uint16_time);

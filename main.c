@@ -85,6 +85,16 @@ void main(void)
 //    DAC7571_WrByte(_NormalMode, 992);  // 0V8
     DAC7571_WrByte(_NormalMode, 2113);  // 1.7V
  
+    IFS0bits.T2IF = 0;
+    TMR2 = 0;
+    IC2CONbits.ON = 1;
+    T2CONbits.ON = 1;
+    
+    
+    
+    
+    
+    
     while(1)
     {        
         if(g_Uni.uint8_Settings & 0x01) //verify if the unipolar motor has to move

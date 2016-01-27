@@ -96,17 +96,17 @@ void InitPWM(unsigned char pwmx)
     //--- If PWM is in 32-bit initialized, timer is also in 32-bit initialized. ---//
         if(OC1CONbits.OC32)
         {
-            InitTimer(_TIMER23);
+            InitTimer23();
             PR2 = 0;
         }
         else if(OC1CONbits.OCTSEL)
         {
-            InitTimer(_TIMER3);
+            InitTimer3();
             PR3 = 0;
         }
         else
         {
-            InitTimer(_TIMER2);
+            InitTimer2();
             PR2 = 0;
         }
     }
@@ -156,17 +156,17 @@ void InitPWM(unsigned char pwmx)
     //--- If PWM is in 32-bit initialized, timer is also in 32-bit initialized. ---//
         if(OC2CONbits.OC32)
         {
-            InitTimer(_TIMER23);
+            InitTimer23();
             PR2 = 0;
         }
         else if(OC2CONbits.OCTSEL)
         {
-            InitTimer(_TIMER3);
+            InitTimer3();
             PR3 = 0;
         }
         else
         {
-            InitTimer(_TIMER2);
+            InitTimer2();
             PR2 = 0;
         }
     }
@@ -216,17 +216,17 @@ void InitPWM(unsigned char pwmx)
     //--- If PWM is in 32-bit initialized, timer is also in 32-bit initialized. ---//
         if(OC3CONbits.OC32)
         {
-            InitTimer(_TIMER23);
+            InitTimer23();
             PR2 = 0;
         }
         else if(OC3CONbits.OCTSEL)
         {
-            InitTimer(_TIMER3);
+            InitTimer3();
             PR3 = 0;
         }
         else
         {
-            InitTimer(_TIMER2);
+            InitTimer2();
             PR2 = 0;
         }
     }
@@ -275,17 +275,17 @@ void InitPWM(unsigned char pwmx)
     //--- If PWM is in 32-bit initialized, timer is also in 32-bit initialized. ---//
         if(OC4CONbits.OC32)
         {
-            InitTimer(_TIMER23);
+            InitTimer23();
             PR2 = 0;
         }
         else if(OC4CONbits.OCTSEL)
         {
-            InitTimer(_TIMER3);
+            InitTimer3();
             PR3 = 0;
         }
         else
         {
-            InitTimer(_TIMER2);
+            InitTimer2();
             PR2 = 0;
         }
     }
@@ -335,17 +335,17 @@ void InitPWM(unsigned char pwmx)
     //--- If PWM is in 32-bit initialized, timer is also in 32-bit initialized. ---//
         if(OC5CONbits.OC32)
         {
-            InitTimer(_TIMER23);
+            InitTimer23();
             PR2 = 0;
         }
         else if(OC5CONbits.OCTSEL)
         {
-            InitTimer(_TIMER3);
+            InitTimer3();
             PR3 = 0;
         }
         else
         {
-            InitTimer(_TIMER2);
+            InitTimer2();
             PR2 = 0;
         }
     }
