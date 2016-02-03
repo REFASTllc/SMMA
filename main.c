@@ -70,7 +70,7 @@ void main(void)
     oEnaVLINSupply = 0;
 #endif*/
  //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!   
-   /* 
+    /*
     periph_init();
 //    DAC7571_WrByte(_NormalMode, 1240);  // 1V
 //    DAC7571_WrByte(_NormalMode, 2381);  // 2V
