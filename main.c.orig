@@ -41,8 +41,7 @@ extern SADC g_ADC;
  * Output:                  -
 ***********************************************************************************************************************/
 void main(void)
-{  
-    unsigned short int temp = 0; 
+{   
     
     system_init();          //call subroutine
           
@@ -113,5 +112,11 @@ void main(void)
             IC2CONbits.ON = 1;
             T2CONbits.ON = 1;
         }
+<<<<<<< HEAD
     }*/
+=======
+        if(IC2CONbits.ICOV)
+            IC2CONbits.ON = 0;
+    }
+>>>>>>> 88cd5d5b9c64ada0bfca0c3f031c03a5013e7944
 }   //end of main
