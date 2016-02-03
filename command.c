@@ -2318,22 +2318,30 @@ void cmd_GPWMPOS(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
+S_PWM dataPWM;
 void cmd_GPWMVAL(void)
 {    
+    double temp;
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
-        if(funct_CheckTol(g_Param.uint16_SwPWMval,470,530))
+        IC2CONbits.ON = 1;
+        T2CONbits.ON = 1;
+        dataPWM.timeoutMeas = 1;
+        SetTimer(_TIMER1, _ENABLE, 0, 1500);
+        while(IC2CONbits.ON && dataPWM.timeoutMeas);
+        temp = 10 * (double)((100 * dataPWM.timeHigh) / (100 * dataPWM.periodeTime));
+        if(funct_CheckTol(g_Param.uint16_SwPWMval, 1, 999))
         {
             uart2_sendbuffer('E');          //first the letter E
         }
-        else
+      /*  else
         {
             uart2_sendbuffer('X');  //add the comma
             g_Param.uint8_ErrCode = _OutOfTolGPWMVAL;  //set error code
             uart2_sendbuffer(',');  //add the comma
             funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
         }   
-        uart2_sendbuffer(',');  //add the comma
+    */    uart2_sendbuffer(',');  //add the comma
         //convert the parameter and store it into the send buffer
         funct_IntToAscii(g_Param.uint16_SwPWMval,_Inactive);
         do{

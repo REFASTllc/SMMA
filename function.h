@@ -47,8 +47,6 @@ extern unsigned char funct_IOhandler(unsigned char uint8_ToDo,unsigned char uint
 extern void funct_StoreWdayIntoRSbuffer(void);
 extern void funct_StoreMonthIntoRSbuffer(void);
 extern unsigned long int funct_ADCtoMiliUnit(unsigned long int uint32_ADCvalue,unsigned short int uint16_ADCstep);
-void SaveMeasuresPWM(S_MEAS_PWM *data);
-
 
 #define _Active         1           //used for variable uint8_sending
 #define _Inactive       0           //used for variable uint8_sending

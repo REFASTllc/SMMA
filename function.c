@@ -194,8 +194,9 @@ unsigned long funct_AsciiToInt(void)
  * 
  * Creator:                 A. Staub
  * Date of creation:        30.09.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    30.01.2016
+ * Modified by:             J. Rebetez
+ * Modification:            Optimization of the function. This one don't use a local variable anymore.
  * 
  * Input:                   uint32_Value
  *                          uint32_Min
@@ -203,19 +204,11 @@ unsigned long funct_AsciiToInt(void)
  * Output:                  uint8_Result
 ***********************************************************************************************************************/
 unsigned char funct_CheckTol(unsigned long uint32_Value, unsigned long uint32_Min, unsigned long uint32_Max)
-{
-    auto unsigned char uint8_Result;        //local work byte
-  
+{ 
     if((uint32_Value >= uint32_Min) && (uint32_Value <= uint32_Max))
-    {
-        uint8_Result = 1;                   //result is within the tolerance
-    }
+        return 1;                   //result is within the tolerance
     else
-    {
-        uint8_Result = 0;                   //result is not within the tolerance
-    }
-  
-    return uint8_Result;    
+        return 0;                   //result is not within the tolerance
 }   //end of funct_CheckTol
 
 

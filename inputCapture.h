@@ -26,31 +26,9 @@
 
 typedef struct
 {
-    unsigned long timing;
-    unsigned short nbreOverflowTMR2;
-} S_TIMING;
-
-typedef struct
-{
-    struct
-    {
-        S_TIMING risingEdge;
-        S_TIMING fallingEdge;
-        unsigned long timeHigh;
-    } highState;
-    struct
-    {
-        S_TIMING firstEdge;
-        S_TIMING secondEdge;
-    } totalTime;
-    unsigned long total;
-    float frequency;
-} S_MEAS_PWM;
-
-typedef struct
-{
     unsigned long timeHigh;
     unsigned long periodeTime;
+    unsigned char timeoutMeas;
 } S_PWM;
 
 

@@ -26,7 +26,6 @@
 
 #include "includes.h" // File which contain all includes files
 
-S_MEAS_PWM DataPWM, DataFreq;
 extern Si2c1 g_i2c1;
 extern STimer1 g_Timer1;
 extern SUART2txd g_UART2txd;
@@ -40,6 +39,7 @@ extern SLin g_LIN;
 extern SUART1txd g_UART1txd;      
 extern SUART1rxd g_UART1rxd;
 extern SADC g_ADC;
+extern S_PWM dataPWM;
 
 /**********************************************************************************************************************
  * Routine:                 INT_init
@@ -777,6 +777,7 @@ void __ISR(_TIMER_1_VECTOR, IPL5AUTO) __IntTimer1Handler(void)
             //LIN:
             g_LIN.uint8_SlaveTimeout = 1;   //timeout occured
             g_LIN.uint8_LinBusy = 0;        //reset busy flag
+            dataPWM.timeoutMeas = 0;        // Timeout measure of PWM signal
             
             
             break;
@@ -969,7 +970,7 @@ void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-static unsigned short nbreOverflowTMR2 = 0;
+unsigned short nbreOverflowTMR2 = 0;
 void __ISR(_TIMER_2_VECTOR, IPL1AUTO) __IntTimer2Handler(void)
 {
     IFS0bits.T2IF = 0;
@@ -1010,26 +1011,25 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
 ***********************************************************************************************************************/
 void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL2AUTO) __IntInputCapture2Handler(void)
 {   
-    static unsigned char nbreMeasure = 0;
-    static S_PWM dataPWM;
-    static long *pMeasure = &dataPWM.timeHigh;
+    unsigned char i = 0;
+    unsigned long time[3] = {0};
+    static unsigned char valueTMR2[3] = {0};
+    static unsigned char nbreINT = 0;
     
-    if(IC2CONbits.ICBNE)
+    if(++nbreINT <= 3)
     {
-        if(++nbreMeasure % 2 == 0)
-            *pMeasure++ = (long)IC2BUF + nbreOverflowTMR2 * 0xffff;
-        if(nbreMeasure == 2)
-            IC2CONbits.ICM = 3;
-        else if(nbreMeasure == 4)
-        {
-        //    IC2CONbits.ON = 0;
-            IC2CONbits.ICM = 6;
-            pMeasure = &dataPWM.timeHigh;
-            nbreMeasure = 0;
-        }
-        TMR2 = 0;
-        IFS0bits.T2IF = 0;
+        valueTMR2[nbreINT - 1] = nbreOverflowTMR2;
+        time[nbreINT - 1] = IC2BUF;
+    }
+    if(nbreINT == 3)
+    {
+        for(; i < 3; i++)
+            time[i] += valueTMR2[i] * 0xffff;
+        time[1] = time[1] - time[0];
+        time[2] = time[2] - time[0];
         IFS0bits.IC2IF = 0;
-        nbreOverflowTMR2 = 0;
+        IC2CONbits.ON = 0;
+        T2CONbits.ON = 0;
+        nbreINT = 0;
     }
 }

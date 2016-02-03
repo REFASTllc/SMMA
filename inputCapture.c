@@ -272,7 +272,7 @@ void InitInputCapture4Module(void)
                             // 1 = Input capture buffer is not empty; at least one more capture value can be read
                             // 0 = Input capture buffer is empty
     
-    IC4CONbits.ICM = 3;     // Input Capture Mode Select bits
+    IC4CONbits.ICM = 6;     // Input Capture Mode Select bits
                             // 111 = Interrupt-Only mode (only supported while in Sleep mode or Idle mode)
                             // 110 = Simple Capture Event mode ? every edge, specified edge first and every edge thereafter
                             // 101 = Prescaled Capture Event mode ? every sixteenth rising edge

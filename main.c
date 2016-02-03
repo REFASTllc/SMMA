@@ -16,6 +16,7 @@
 
 #include "includes.h"
 
+extern unsigned short nbreOverflowTMR2;
 extern SUART2txd g_UART2txd;
 extern SUART2rxd g_UART2rxd;
 extern SUni g_Uni;
@@ -47,15 +48,6 @@ void main(void)
           
     asm("ei");              //enable all interrupts (code in assembler) use declaration "di" to disable all interrupts
     
-    tempchar = sizeof(char);
-    tempint = sizeof(int);
-    tempshortint = sizeof(short int);
-    tempshort = sizeof(short);
-    templong = sizeof(long);
-    templongint = sizeof(long int);
-    tempfloat = sizeof(float);
-    tempdouble = sizeof(double);
-    
  //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!
  //we both play with the switch for the supply. I am still testing the LIN bus driver.
  //please inform me if you increase the voltage higher than 24V!!!
@@ -78,23 +70,13 @@ void main(void)
     oEnaVLINSupply = 0;
 #endif
  //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!   
-    
+   /* 
     periph_init();
 //    DAC7571_WrByte(_NormalMode, 1240);  // 1V
 //    DAC7571_WrByte(_NormalMode, 2381);  // 2V
 //    DAC7571_WrByte(_NormalMode, 992);  // 0V8
     DAC7571_WrByte(_NormalMode, 2113);  // 1.7V
- 
-    IFS0bits.T2IF = 0;
-    TMR2 = 0;
-    IC2CONbits.ON = 1;
-    T2CONbits.ON = 1;
-    
-    
-    
-    
-    
-    
+        
     while(1)
     {        
         if(g_Uni.uint8_Settings & 0x01) //verify if the unipolar motor has to move
@@ -122,6 +104,16 @@ void main(void)
             }
             else
                 temp++;
+        }
+    }*/
+    while(1)
+    {
+        if(!IC2CONbits.ON)
+        {
+            IC2CONbits.ON = 1;
+            T2CONbits.ON = 1;
+            TMR2 = 0;
+            nbreOverflowTMR2 = 0;
         }
     }
 }   //end of main
