@@ -65,7 +65,7 @@ extern unsigned char uart1_receivebuffer(void);
 
 
 //UART module 1
-#define _TxDRxD_BUFSIZE 50          //size of the send and receive buffer
+#define _TxDRxD_BUFSIZE 100       //size of the send and receive buffer
 
 //uart1 - txd
 typedef struct                    //definitions of multiple variable for uart2 txd

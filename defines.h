@@ -33,7 +33,7 @@
 
 // Compilation variables
 //#define _BIPOLAR
-#define _LIN
+//#define _LIN
 //#define _UNIPOLAR
 
 

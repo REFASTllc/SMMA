@@ -21,6 +21,7 @@ SCmdChk g_CmdChk;           //global variables for struct
 extern SFunct g_Funct;
 extern SParam g_Param;
 extern SUART2rxd g_UART2rxd;
+
 /**********************************************************************************************************************
  * Routine:                 cmdchk_init
 
@@ -250,7 +251,11 @@ void cmdchk_check(void)
                     break;
                 
                 case (_IdSPHC):         //command SPHC
-                    cmd_SPHC();         //call subroutine
+                    //command is not anymore supported with the new driver. 
+                    //I let it anyway here, if once we have to re-use it
+                    //cmd_SPHC();         //call subroutine
+                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
                 
                 case (_IdGVER):         //command GVER
@@ -278,7 +283,11 @@ void cmdchk_check(void)
                     break;
                 
                 case (_IdGPHC):         //command GPHC
-                    cmd_GPHC();         //call subroutine
+                    //command is not anymore supported with the new driver. 
+                    //I let it anyway here, if once we have to re-use it
+                    //cmd_GPHC();         //call subroutine
+                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
                 
                 case (_IdSIRUN):        //command SIRUN (not used anymore)
@@ -440,11 +449,19 @@ void cmdchk_check(void)
                     break;
                 
                 case (_IdSMCRSTP):      //command SMCRSTP
-                    cmd_SMCRSTP();      //call subroutine
+                    //command is not anymore supported with the new driver. 
+                    //I let it anyway here, if once we have to re-use it
+                    //cmd_SMCRSTP();      //call subroutine
+                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
                 
                 case (_IdGMCRSTP):      //command GMCRSTP
-                    cmd_GMCRSTP();      //call subroutine
+                    //command is not anymore supported with the new driver. 
+                    //I let it anyway here, if once we have to re-use it
+                    //cmd_GMCRSTP();      //call subroutine
+                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
                 
                 case (_IdSSWLIM):       //command SSWLIM

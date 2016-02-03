@@ -777,7 +777,6 @@ void __ISR(_TIMER_1_VECTOR, IPL5AUTO) __IntTimer1Handler(void)
             //LIN:
             g_LIN.uint8_SlaveTimeout = 1;   //timeout occured
             g_LIN.uint8_LinBusy = 0;        //reset busy flag
-            dataPWM.timeoutMeas = 0;        // Timeout measure of PWM signal
             
             
             break;

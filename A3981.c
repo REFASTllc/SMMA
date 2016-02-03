@@ -35,6 +35,10 @@ T_A3981 A3981;
 /********************************************************************************************************************/
 void InitA3981(void)
 {   
+    //set output's
+    oBiResetSignal = 1;
+    oBiPhCurrCtrl = 0;
+    
 //--- Configuration register 0 ---//
     A3981.CONFIG0.BITS.ADR = 0;         // Register address
     A3981.CONFIG0.BITS.SYR = 1;         // Synchronous rectification

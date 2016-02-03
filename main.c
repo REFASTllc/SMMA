@@ -54,7 +54,7 @@ void main(void)
  //otherwise I think nothing will happen if we switch on both supplies (bipolar & lin)
  //but I switched off your supply to be sure! 
     //bipolar
-#ifdef _BIPOLAR
+/*#ifdef _BIPOLAR
     oBiResetSignal = 1;
     oVmotOnOff = 1;
     oBiEnaVmot = 1;
@@ -68,7 +68,7 @@ void main(void)
 #ifdef _UNIPOLAR
     oVmotOnOff = 1;
     oEnaVLINSupply = 0;
-#endif
+#endif*/
  //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!   
    /* 
     periph_init();
@@ -78,7 +78,7 @@ void main(void)
     DAC7571_WrByte(_NormalMode, 2113);  // 1.7V
         
     while(1)
-    {        
+    {      
         if(g_Uni.uint8_Settings & 0x01) //verify if the unipolar motor has to move
             uni_move();                 //then call the subroutine
         if(g_Bipol.uint1_IsBipolEnabled)
