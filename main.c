@@ -42,7 +42,6 @@ extern SADC g_ADC;
 ***********************************************************************************************************************/
 void main(void)
 {   
-    volatile unsigned char tempchar, tempint, tempshortint, tempshort, templong, templongint, tempfloat, tempdouble;
     
     system_init();          //call subroutine
           
@@ -112,8 +111,8 @@ void main(void)
         {
             IC2CONbits.ON = 1;
             T2CONbits.ON = 1;
-            TMR2 = 0;
-            nbreOverflowTMR2 = 0;
         }
+        if(IC2CONbits.ICOV)
+            IC2CONbits.ON = 0;
     }
 }   //end of main
