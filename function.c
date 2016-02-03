@@ -981,18 +981,19 @@ void funct_StoreMonthIntoRSbuffer(void)
  * then it will be always the ADCres / Vnom, here = 1024 / 3.3 = 310.3 = 310
  * If for example a resistance divider was used of 15, the ADCstep will be:
  *      ADCres =        2^10 = 1024
- *      ResDivFact =    15
+ *      ResDivFact =    (R259 + R262) / R259 = (390k + 24k) / 24k = 17.25 
  *      ADC supply =    3.3
- *      Vnom =          3.3 * 15 = 49.5
- *      ADCstep =       ADCres / Vnom = 1024 / 49.5 = 20.69 = 21   
- *      ERRnom = 100% - [(100% * (1024/21)) / 49.5] = 1.49%
+ *      Vnom =          3.3 * 17.25 = 56.925
+ *      ADCstep =       ADCres / Vnom = 1024 / 56.925 = 17.99 = 18  
+ *      ERRnom =        100% - [(100% * (1024/18)) / 56.925] = 0.063%
  * 
  * Creator:                 A. Staub
  * Date of creation:        23.12.2015
  * Last modification on:    
  * Modified by:             
  * 
- * Input:                   uint32_msTime
+ * Input:                   uint32_ADCvalue
+ *                          uint16_ADCstep
  * Output:                  uint32_WB
 ***********************************************************************************************************************/
 unsigned long int funct_ADCtoMiliUnit(unsigned long int uint32_ADCvalue,unsigned short int uint16_ADCstep)

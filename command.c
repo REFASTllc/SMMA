@@ -1385,7 +1385,7 @@ void cmd_MUMOT(void)
         //measure here the voltage or take the last measured parameter and send it back!
         
         //convert the result in mV
-        uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint16_Vmot,21);
+        uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint16_Vmot,18);
         
         //send back the needed informations
         uart2_sendbuffer('E');                          //first the letter E
