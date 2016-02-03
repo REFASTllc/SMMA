@@ -969,12 +969,13 @@ void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-unsigned short nbreOverflowTMR2 = 0;
+unsigned int nbreTMR2Overflow;
 void __ISR(_TIMER_2_VECTOR, IPL1AUTO) __IntTimer2Handler(void)
 {
     IFS0bits.T2IF = 0;
-    nbreOverflowTMR2++;
+    nbreTMR2Overflow++;
 }
+
 /**********************************************************************************************************************
  * Routine:                 __IntInputCapture1Handler
 
@@ -1008,37 +1009,35 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-unsigned long time[3] = {0};
+unsigned long eventTime[3] = {0}, finalResult[10] = {0};
+unsigned short eventMultiplicator[3] = {0};
 void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL2AUTO) __IntInputCapture2Handler(void)
 {   
-    unsigned char i = 0;
-    for(; i < 3;i++)
-        time[i] = (long)IC2BUF;
-        time[1] = time[1] - time[0];
-        time[2] = time[2] - time[0];
-        IC2CONbits.ON = 0;
-        T2CONbits.ON = 0;
-    /*
-    unsigned char i = 0;
-    unsigned long time[3] = {0};
-    static unsigned char valueTMR2[3] = {0};
-    static unsigned char nbreINT = 0;
+    static unsigned char nbreEvent = 0, i = 0, j = 0;
     
-    if(++nbreINT <= 3)
+    if(!IC2CONbits.ICBNE)
+        Nop();
+    if(++nbreEvent <= 3)
     {
-        valueTMR2[nbreINT - 1] = nbreOverflowTMR2;
-        time[nbreINT - 1] = IC2BUF;
+        eventTime[nbreEvent - 1] = IC2BUF;
+        eventMultiplicator[nbreEvent -1] = nbreTMR2Overflow;
     }
-    if(nbreINT == 3)
+    else
     {
-        for(; i < 3; i++)
-            time[i] += valueTMR2[i] * 0xffff;
-        time[1] = time[1] - time[0];
-        time[2] = time[2] - time[0];
-        IFS0bits.IC2IF = 0;
+        for(i=0;i<3;i++)
+            eventTime[i] += eventMultiplicator[i] * 0xffff;
+        eventTime[1] -= eventTime[0];
+        eventTime[2] -= eventTime[0];
         IC2CONbits.ON = 0;
         T2CONbits.ON = 0;
-        nbreINT = 0;
-    }*/
-    IC2CONbits.ON = 0;
+        IFS0bits.T2IF = 0;
+        TMR2 = 0;
+        nbreTMR2Overflow = 0;
+        nbreEvent = 0;
+        if(++j <= 10)
+            finalResult[j-1] = eventTime[2];
+        else
+            j = 0;
+    }
+    IFS0bits.IC2IF = 0;
 }
