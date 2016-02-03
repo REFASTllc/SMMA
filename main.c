@@ -70,14 +70,14 @@ void main(void)
     oEnaVLINSupply = 0;
 #endif*/
  //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!   
-   
+    /*
     periph_init();
 //    DAC7571_WrByte(_NormalMode, 1240);  // 1V
 //    DAC7571_WrByte(_NormalMode, 2381);  // 2V
 //    DAC7571_WrByte(_NormalMode, 992);  // 0V8
     DAC7571_WrByte(_NormalMode, 2113);  // 1.7V
         
-    /*while(1)
+    while(1)
     {      
         if(g_Uni.uint8_Settings & 0x01) //verify if the unipolar motor has to move
             uni_move();                 //then call the subroutine

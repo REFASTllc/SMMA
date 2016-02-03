@@ -1008,8 +1008,17 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
+unsigned long time[3] = {0};
 void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL2AUTO) __IntInputCapture2Handler(void)
 {   
+    unsigned char i = 0;
+    for(; i < 3;i++)
+        time[i] = (long)IC2BUF;
+        time[1] = time[1] - time[0];
+        time[2] = time[2] - time[0];
+        IC2CONbits.ON = 0;
+        T2CONbits.ON = 0;
+    /*
     unsigned char i = 0;
     unsigned long time[3] = {0};
     static unsigned char valueTMR2[3] = {0};
@@ -1030,5 +1039,6 @@ void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL2AUTO) __IntInputCapture2Handler(void)
         IC2CONbits.ON = 0;
         T2CONbits.ON = 0;
         nbreINT = 0;
-    }
+    }*/
+    IC2CONbits.ON = 0;
 }

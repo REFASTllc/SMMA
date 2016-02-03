@@ -122,7 +122,7 @@ void InitInputCapture2Module(void)
                             // 0 = Timer3 is the counter source for capture
                             // 1 = Timer2 is the counter source for capture
 
-    IC2CONbits.ICI = 0;     // Interrupt Control bits
+    IC2CONbits.ICI = 2;     // Interrupt Control bits
                             // 11 = Interrupt on every fourth capture event
                             // 10 = Interrupt on every third capture event
                             // 01 = Interrupt on every second capture event
