@@ -265,6 +265,9 @@ void __ISR(_SPI_1_VECTOR, IPL4AUTO) __IntSPI1Handler(void)
  * Modification (29.12.2015 / A. Staub)
  * Timer changed from timer 2 and 3 to 4 and 5. 
  * 
+ * Modification (06.02.2016 / A. Staub)
+ * Run Frequency on output 1 if active.  
+ * 
  * Creator:                 J. Rebetez
  * Date of creation:        08.08.2015
  * Last modification on:    29.12.2015
@@ -423,7 +426,17 @@ void __ISR(_TIMER_5_VECTOR, IPL6AUTO) __IntTimer45Handler(void)
                             //nothing is done
                             break;
                     }
-                }       
+                }      
+                
+                if(g_Param.uint8_FRQ)       //frequency bit set for output 1?
+                {
+                    oSinkSource1 = !oSinkSource1;
+                }
+                else
+                {
+                    //do nothing
+                }
+                
                 //write the new values to the outputs
                 oUniCoilA1 = g_Uni.uint8_PhA1;
                 oUniCoilA2 = g_Uni.uint8_PhA2;

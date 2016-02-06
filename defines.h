@@ -109,6 +109,7 @@
 //error code definition
                             //general errors
 #define _GlobalLock         0               //driver detected a POR; user configuration not guaranteed
+#define _OutOfTolSFRQBIT    20              //SFRQBIT, parameter out of range
 #define _OutOfTolSYEAR      21              //SYEAR, parameter out of range
 #define _OutOfTolSMONTH     22              //SMONTH, parameter out of range
 #define _OutOfTolSWDAY      23              //SWDAY, parameter out of range
@@ -120,11 +121,11 @@
 #define _BusCollSROMRROM    29              //SROM,RROM; bus collision error
 #define _AckSROMRROM        30              //SROM,RROM; acknowledge error - no answer from EEPROM
 #define _OutOfTolSROMRROM   31              //SROM,RROM; received parameters out of tolerance
-#define _OutOfTolSSWTYP     32              // SSWTYP; parameter out of range
-#define _OutOfTolGPWMVAL    33              // GPWMVAL; parameter(s) out of range
-#define _OutOfTolGPWMPOS    34              // GPWMPOS; parameter(s) out of range
-#define _OutOfTolSPWMLIM    35              // SPWMLIM; parameter(s) out of range
-#define _OutOfTolGSWPOS     36              // GSWPOS; parameter(s) out of range
+#define _OutOfTolSSWTYP     32              //SSWTYP; parameter out of range
+#define _OutOfTolGPWMVAL    33              //GPWMVAL; parameter(s) out of range
+#define _OutOfTolGPWMPOS    34              //GPWMPOS; parameter(s) out of range
+#define _OutOfTolSPWMLIM    35              //SPWMLIM; parameter(s) out of range
+#define _OutOfTolGSWPOS     36              //GSWPOS; parameter(s) out of range
 #define _OutOfTolSSWLIM     37              //SSWLIM; received parameters out of tolerance
 #define _MotTypSCOILON      38              //SCOILON; try to execute the command with motor type = 'N'
 #define _OutOfTolSMCRSTP    39              //SMCRSTP; received parameters out of tolerance 
@@ -288,6 +289,8 @@
 #define _IdGVBAK            108             //get the backup voltage of the button cell
 #define _IdSRESLIN          109             //set the response mode for the lin bus
 #define _IdGRESLIN          110             //get the response mode for the lin bus
+#define _IdSFRQBIT          111             //enable the frequency bit
+#define _IdGFRQBIT          112             //disable the frequency bit
 
 #endif	/* DEFINES_H */
 

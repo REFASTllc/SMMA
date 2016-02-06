@@ -704,6 +704,14 @@ void cmdchk_check(void)
                 case (_IdGRESLIN):      //command GRESLIN
                     cmd_GRESLIN();      //call subroutine
                     break;
+                    
+                case (_IdSFRQBIT):      //command SFRQBIT
+                    cmd_SFRQBIT();      //call subroutine
+                    break;
+                    
+                case (_IdGFRQBIT):      //command GFRQBIT
+                    cmd_GFRQBIT();      //call subroutine
+                    break;
                                      
                 default:    //command ID does not exist
                     //do nothing - error has to be send before this routine
@@ -1581,6 +1589,24 @@ void cmdchk_def(void)
                             case (0x47424950):  //cmd is = GBIPSST
                                 g_CmdChk.uint8_CmdID = _IdGBIPSST;
                                 break;    
+                                
+                            default:    //error - command is not defined
+                                g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID
+                                g_Param.uint8_ErrCode = _UnknownCmd;    //set error code
+                                break;
+                        }
+                        break;
+                        
+                    case (0x424954):  //letter BIT?
+                        switch(g_CmdChk.uint32_Cmd1st4)
+                        {
+                            case (0x53465251):  //cmd is = SFRQBIT
+                                g_CmdChk.uint8_CmdID = _IdSFRQBIT;
+                                break;    
+                                
+                            case (0x47465251):  //cmd is = GFRQBIT
+                                g_CmdChk.uint8_CmdID = _IdGFRQBIT;
+                                break;  
                                 
                             default:    //error - command is not defined
                                 g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID

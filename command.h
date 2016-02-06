@@ -117,5 +117,7 @@ extern void cmd_GBIPSST(void);
 extern void cmd_GVBAK(void);
 extern void cmd_SRESLIN(void);
 extern void cmd_GRESLIN(void);
+extern void cmd_SFRQBIT(void);
+extern void cmd_GFRQBIT(void);
 
 #endif	/* COMMAND_H */
