@@ -2316,18 +2316,23 @@ void cmd_GPWMPOS(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-S_PWM dataPWM;
 void cmd_GPWMVAL(void)
-{    
-    double temp;
+{
+    S_PWM dataPWM;
+    unsigned char nbreSamples = 1, actualSample;
+    
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
-        IC2CONbits.ON = 1;
-        T2CONbits.ON = 1;
         dataPWM.timeoutMeas = 1;
         SetTimer(_TIMER1, _ENABLE, 0, 1500);
-        while(IC2CONbits.ON && dataPWM.timeoutMeas);
-        temp = 10 * (double)((100 * dataPWM.timeHigh) / (100 * dataPWM.periodeTime));
+        IC2CONbits.ON = 1;
+        T2CONbits.ON = 1;
+        for(actualSample = 0; actualSample < nbreSamples; actualSample++)
+        {
+            while(IC2CONbits.ON && dataPWM.timeoutMeas);
+            FormatBufToRealValues(&actualSample, &dataPWM);
+        }
+        SetTimer(_TIMER1, _DISABLE, 0, 1500);
         if(funct_CheckTol(g_Param.uint16_SwPWMval, 1, 999))
         {
             uart2_sendbuffer('E');          //first the letter E
@@ -2341,7 +2346,7 @@ void cmd_GPWMVAL(void)
         }   
     */    uart2_sendbuffer(',');  //add the comma
         //convert the parameter and store it into the send buffer
-        funct_IntToAscii(g_Param.uint16_SwPWMval,_Inactive);
+        funct_IntToAscii(dataPWM.frequency,_Inactive);
         do{
             g_Funct.uint8_ArrAsciiPos--;
             uart2_sendbuffer(g_Funct.uint8_ArrAscii[g_Funct.uint8_ArrAsciiPos]);

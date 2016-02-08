@@ -510,3 +510,35 @@ void ResetInputCaptureModule(unsigned char module)
         break;
     }
 }
+
+/********************************************************************************************************************/
+/*  Name of the function:       FormatBufToRealValues									    
+/*  Purpose of the function:    Formatting the values returned by the interrupt in a timing values
+/*  Parameters:													    
+/*      IN:                     - 	    
+/*      OUT:                    -			
+/* 							    See the .h file for the list of all defines.
+/*														    
+/*  Used global variables:      -										    
+/*														    
+/*  Creator:                    julien_rebetez								    
+/*  Date of creation:           06.02.2016								    
+/*														    
+/*  Last modified on:           -										    
+/*  Modified by:                -										    
+/*  Version:                    -										    
+/*														    
+/*  Remark:                     -										    
+/********************************************************************************************************************/
+unsigned long eventTime[3] = {0};
+unsigned short eventMultiplicator[3] = {0};
+void FormatBufToRealValues(unsigned char *dataIndex, S_PWM *dataPWM)
+{
+    unsigned char i = 0;   
+    
+    for(;i<3;i++)
+        eventTime[i] += eventMultiplicator[i] * 0xffff;
+    dataPWM->timeHigh[dataIndex] = eventTime[1] - eventTime[0];
+    dataPWM->periodeTime[dataIndex] = eventTime[2] - eventTime[0];
+    dataPWM->frequency[dataIndex] = 1/(eventTime[2] * 10);
+}

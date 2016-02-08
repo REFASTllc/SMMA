@@ -39,7 +39,6 @@ extern SLin g_LIN;
 extern SUART1txd g_UART1txd;      
 extern SUART1rxd g_UART1rxd;
 extern SADC g_ADC;
-extern S_PWM dataPWM;
 
 /**********************************************************************************************************************
  * Routine:                 INT_init
@@ -1009,11 +1008,11 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-unsigned long eventTime[3] = {0}, finalResult[10] = {0};
-unsigned short eventMultiplicator[3] = {0};
+extern unsigned long eventTime[3];
+extern unsigned short eventMultiplicator[3];
 void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL2AUTO) __IntInputCapture2Handler(void)
 {   
-    static unsigned char nbreEvent = 0, i = 0, j = 0;
+    static unsigned char nbreEvent = 0;
     
     if(!IC2CONbits.ICBNE)
         Nop();
@@ -1024,20 +1023,12 @@ void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL2AUTO) __IntInputCapture2Handler(void)
     }
     else
     {
-        for(i=0;i<3;i++)
-            eventTime[i] += eventMultiplicator[i] * 0xffff;
-        eventTime[1] -= eventTime[0];
-        eventTime[2] -= eventTime[0];
         IC2CONbits.ON = 0;
         T2CONbits.ON = 0;
         IFS0bits.T2IF = 0;
         TMR2 = 0;
         nbreTMR2Overflow = 0;
         nbreEvent = 0;
-        if(++j <= 10)
-            finalResult[j-1] = eventTime[2];
-        else
-            j = 0;
     }
     IFS0bits.IC2IF = 0;
 }
