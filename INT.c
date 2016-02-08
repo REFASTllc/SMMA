@@ -946,8 +946,6 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
 ***********************************************************************************************************************/
 void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
 { 
-    IEC1bits.AD1IE = 0;     //interrupt disable
-    IFS1bits.AD1IF = 0;     //clear interrupt flag 
     oTestLed2 = 0;
        
     switch(g_ADC.uint8_MeasuredValueID)
@@ -971,6 +969,10 @@ void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
         default:    //do nothing
             break;
     }  
+    
+    IFS1bits.AD1IF = 0;     //clear interrupt flag
+    IEC1bits.AD1IE = 0;     //interrupt disable 
+    
     AD1CON1bits.ON = 0;     //disable ADC module because we will change later the configuration
                             //for the scan and supply reference
     g_ADC.uint8_ConvStarted = 0;    //signal that conversion is done
