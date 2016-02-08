@@ -98,13 +98,15 @@ void main(void)
             static unsigned short int temp = 0;
             if(temp >= 10000)
             { 
-                adc_LaunchNextMeasure();    //call subroutine 
+                //adc_LaunchNextMeasure();    //call subroutine 
                 oTestLed1 =! oTestLed1;
                 temp = 0;
             }
             else
                 temp++;
         }
+        adc_LaunchNextMeasure();    //call subroutine 
+        
     }
     /*while(1)
     {

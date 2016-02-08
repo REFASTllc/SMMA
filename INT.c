@@ -950,7 +950,7 @@ void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
     IFS1bits.AD1IF = 0;     //clear interrupt flag 
     oTestLed2 = 0;
        
-    switch(g_ADC.uint8_ChannelSelect)
+    switch(g_ADC.uint8_MeasuredValueID)
     {
         case (0):   //results are for the first scan 
             g_ADC.uint16_UniIcoilA2 = ADC1BUF0;
@@ -974,7 +974,7 @@ void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
     AD1CON1bits.ON = 0;     //disable ADC module because we will change later the configuration
                             //for the scan and supply reference
     g_ADC.uint8_ConvStarted = 0;    //signal that conversion is done
-    g_ADC.uint8_ChannelSelect++;    //increment the channel select variable
+    g_ADC.uint8_MeasuredValueID++;  //increment the value ID variable
 }   //end of __IntADCHandler
 
 /**********************************************************************************************************************
