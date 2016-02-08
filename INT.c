@@ -144,7 +144,7 @@ void __ISR(_UART_2_VECTOR, IPL2AUTO) __IntUart2Handler(void)
         
         //store received data byte into receive buffer
         *(g_UART2rxd.uint8_Bufptr + g_UART2rxd.uint16_Wch) = U2RXREG;
-       
+        
         //increment the write-pointer of the ring buffer
         g_UART2rxd.uint16_Wch++;
     
@@ -946,9 +946,17 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
 ***********************************************************************************************************************/
 void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
 { 
+    volatile unsigned char uint8_WB;    //local work byte 
+    volatile unsigned short int uint16_WB;
+    
+    AD1CON1bits.ON = 0;     //disable ADC module because we will change later the configuration
+                            //for the scan and supply reference
+    AD1CON1bits.ASAM = 0;   //disable the ASAM bit
     oTestLed2 = 0;
-       
-    switch(g_ADC.uint8_MeasuredValueID)
+    
+    uint8_WB = g_ADC.uint8_MeasuredValueID % 2;
+    
+    switch(uint8_WB)
     {
         case (0):   //results are for the first scan 
             g_ADC.uint16_UniIcoilA2 = ADC1BUF0;
@@ -956,28 +964,52 @@ void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
             g_ADC.uint16_UniIcoilB2 = ADC1BUF2;
             g_ADC.uint16_UniIcoilB1 = ADC1BUF3;
             g_ADC.uint16_BipIcoilB = ADC1BUF4;
-            g_ADC.uint16_BipIcoilA = ADC1BUF5;           
+            g_ADC.uint16_BipIcoilA = ADC1BUF5;
+            uint16_WB = ADC1BUF6;
+            uint16_WB = ADC1BUF7;
+            uint16_WB = ADC1BUF8;
+            uint16_WB = ADC1BUF9;
+            uint16_WB = ADC1BUFA;
+            uint16_WB = ADC1BUFB;
+            uint16_WB = ADC1BUFC;
+            uint16_WB = ADC1BUFD;
+            uint16_WB = ADC1BUFE;
+            uint16_WB = ADC1BUFF;
             break;
                 
         case (1):   //results are for the second scan
             g_ADC.uint16_BipVref = ADC1BUF0;
             g_ADC.uint16_Vmot = ADC1BUF1;
             g_ADC.uint16_Imot = ADC1BUF2;
-            g_ADC.uint16_Battery = ADC1BUF3;        
+            g_ADC.uint16_Battery = ADC1BUF3; 
+            uint16_WB = ADC1BUF4;
+            uint16_WB = ADC1BUF5;
+            uint16_WB = ADC1BUF6;
+            uint16_WB = ADC1BUF7;
+            uint16_WB = ADC1BUF8;
+            uint16_WB = ADC1BUF9;
+            uint16_WB = ADC1BUFA;
+            uint16_WB = ADC1BUFB;
+            uint16_WB = ADC1BUFC;
+            uint16_WB = ADC1BUFD;
+            uint16_WB = ADC1BUFE;
+            uint16_WB = ADC1BUFF;
             break;
                 
         default:    //do nothing
             break;
     }  
     
-    IFS1bits.AD1IF = 0;     //clear interrupt flag
-    IEC1bits.AD1IE = 0;     //interrupt disable 
-    
-    AD1CON1bits.ON = 0;     //disable ADC module because we will change later the configuration
-                            //for the scan and supply reference
     g_ADC.uint8_ConvStarted = 0;    //signal that conversion is done
     g_ADC.uint8_MeasuredValueID++;  //increment the value ID variable
+    
+    IEC1bits.AD1IE = 0;     //interrupt disable
+    IFS1bits.AD1IF = 0;     //clear interrupt flag 
+    
+    //AD1CON1bits.ON = 0;     //disable ADC module because we will change later the configuration
+                            //for the scan and supply reference
 }   //end of __IntADCHandler
+
 
 /**********************************************************************************************************************
  * Routine:                 __IntTimer2Handler
@@ -1000,6 +1032,7 @@ void __ISR(_TIMER_2_VECTOR, IPL1AUTO) __IntTimer2Handler(void)
     nbreTMR2Overflow++;
 }
 
+
 /**********************************************************************************************************************
  * Routine:                 __IntInputCapture1Handler
 
@@ -1018,6 +1051,7 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
 {
     IFS0bits.IC1IF = 0;  
 }
+
 
 /**********************************************************************************************************************
  * Routine:                 __IntInputCapture2Handler

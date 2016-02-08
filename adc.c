@@ -208,7 +208,7 @@ void InitADInterrupt(void)
     IFS1bits.AD1IF = 0; // Interrupt flag bit
 
     IPC6bits.AD1IP = 2; // Interrupt priority bits (7 = high, 0 = no interrupt)
-    IPC6bits.AD1IS = 3; // Interrupt sub-priority bits (3 = high priority)
+    IPC6bits.AD1IS = 2; // Interrupt sub-priority bits (3 = high priority)
 
     IEC1bits.AD1IE = 0; // Interrupt disable
 }
@@ -349,7 +349,7 @@ void adc_LaunchNextMeasure(void)
     }
     else
     {
-        uint8_WB1 = g_ADC.uint8_NextMeasureID % 2;
+        uint8_WB1 = g_ADC.uint8_NextMeasureID % 101;
         g_ADC.uint8_NextMeasureID++;
         uint8_WB2 = g_ADC.uint8_MeasuredValueID % 2;
         
@@ -435,7 +435,7 @@ void adc_LaunchNextMeasure(void)
                 IEC1bits.AD1IE = 1;     //interrupt enable
                 break;
             
-            case (1):   //launch new measure
+            case (100):   //launch new measure
                 g_ADC.uint8_ConvStarted = 1;    //signal that a conversion is started     
                 AD1CON1bits.ASAM = 1;           //launch the conversion
                                                 //note this bit is set back to 0 automatic after 
