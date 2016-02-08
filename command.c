@@ -94,6 +94,9 @@
  *                          - cmd_GBIPSST
  *                          - cmd_GVBAK
  *                          - cmd_SRESLIN
+ *                          - cmd_GRESLIN
+ *                          - cmd_SFRQBIT
+ *                          - cmd_GFRQBIT
 ***********************************************************************************************************************/
 
 
@@ -4916,3 +4919,81 @@ void cmd_GRESLIN(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
 }   //end of cmd_GRESLIN
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SFRQBIT
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance then set
+ * up the frequency bit
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        06.02.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SFRQBIT(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    
+    if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_SFRQbitMin,_SFRQbitMax);
+        
+        if(uint8_Result == 1)       //verify the result
+        {
+            //store the new timeout
+            g_Param.uint8_FRQ = g_CmdChk.uint32_TempPara[1];
+            
+            uart2_sendbuffer('E');      //first the letter E
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSFRQBIT;   //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_SFRQBIT
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GFRQBIT
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then send back the state of the frequency bit
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        06.02.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GFRQBIT(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        uart2_sendbuffer('E');      //first the letter E
+        uart2_sendbuffer(',');      //then the comma
+        funct_IntToAscii(g_Param.uint8_FRQ,_Active);
+        uart2_sendbuffer(13);      //then the CR
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GFRQBIT

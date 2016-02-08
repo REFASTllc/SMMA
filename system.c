@@ -87,7 +87,7 @@ void system_init(void)
     //AD module must be initialize  after the system_IOs because we define here which pin is used 
     //in analog mode
     InitADModule(); 
-//    InitADInterrupt();
+    InitADInterrupt();
     // Initialization of interrupts
     INT_init();
     // Initialization of functions

@@ -24,10 +24,10 @@ SADC g_ADC;
  * Routine:                 InitADModule
 
  * Description:
- * Initialization of the AD module. At the end the ADC module will be enabled for that it starts operating. 
+ * Initialization of the AD module.  
  * 
- * Creator:                 J. Rebetez
- * Date of creation:        17.08.2015
+ * Creator:                 A. Staub
+ * Date of creation:        08.02.2016
  * Last modification on:    
  * Modified by:             
  * 
@@ -183,8 +183,9 @@ void InitADModule(void)
     
     //AD1CON1bits.ON = 1;     //ADC module is operating
     
-    g_ADC.uint8_ConvStarted = 0;    //reset variable
-    g_ADC.uint8_ChannelSelect = 0;  //reset variable
+    g_ADC.uint8_ConvStarted = 0;        //reset variable
+    g_ADC.uint8_NextMeasureID = 0;      //reset variable
+    g_ADC.uint8_MeasuredValueID = 0;    //reset variable
 }
 
 
@@ -212,6 +213,7 @@ void InitADInterrupt(void)
     IEC1bits.AD1IE = 0; // Interrupt disable
 }
 
+
 /**********************************************************************************************************************
  * Routine:                 SetChannelAD
 
@@ -230,7 +232,7 @@ void InitADInterrupt(void)
  * Remark:                  If the AD module was actived (AD1CON1bits.ON = 1), then module will be also reactived. 
  *                          If not, the AD module will stay deactived.
 ***********************************************************************************************************************/
-signed char SetChannelAD(unsigned char channel)
+/*signed char SetChannelAD(unsigned char channel)
 {
     unsigned char statusAD = AD1CON1bits.ON;
     // Disable AD module before doing any operation
@@ -249,7 +251,7 @@ signed char SetChannelAD(unsigned char channel)
     
     // Return the module in the default status (before this function)
     AD1CON1bits.ON = statusAD;
-}
+}*/
 
 /**********************************************************************************************************************
  * Routine:                 SetSamplingType
@@ -268,7 +270,7 @@ signed char SetChannelAD(unsigned char channel)
  * Remark:                  If the AD module was actived (AD1CON1bits.ON = 1), then module will be also reactived. 
  *                          If not, the AD module will stay deactived.
 ***********************************************************************************************************************/
-signed char SetSamplingType(unsigned char sampleType)
+/*signed char SetSamplingType(unsigned char sampleType)
 {
     unsigned char statusAD = AD1CON1bits.ON;
     // Disable AD module before doing any operation
@@ -290,7 +292,7 @@ signed char SetSamplingType(unsigned char sampleType)
         return 1;
     }
     return -1;
-}
+}*/
 
 /**********************************************************************************************************************
  * Routine:                 SetNbrConvertPerInt
@@ -309,7 +311,7 @@ signed char SetSamplingType(unsigned char sampleType)
  * Remark:                  If the AD module was actived (AD1CON1bits.ON = 1), then module will be also reactived. 
  *                          If not, the AD module will stay deactived.
 ***********************************************************************************************************************/
-signed char SetNbrConvertPerInt(unsigned char nbrConvert)
+/*signed char SetNbrConvertPerInt(unsigned char nbrConvert)
 {
     unsigned char statusAD = AD1CON1bits.ON;
     // Disable AD module before doing any operation
@@ -319,7 +321,8 @@ signed char SetNbrConvertPerInt(unsigned char nbrConvert)
     AD1CON2bits.SMPI = nbrConvert - 1;
     // Return the module in the default status (before this function)
     AD1CON1bits.ON = statusAD;
-}
+}*/
+
 
 /**********************************************************************************************************************
  * Routine:                 adc_LaunchNextMeasure
@@ -327,7 +330,7 @@ signed char SetNbrConvertPerInt(unsigned char nbrConvert)
  * Description:
  * ...
  * 
- * Creator:                 J. Rebetez
+ * Creator:                 A. Staub
  * Date of creation:        17.08.2015
  * Last modification on:    
  * Modified by:             
@@ -337,21 +340,129 @@ signed char SetNbrConvertPerInt(unsigned char nbrConvert)
 ***********************************************************************************************************************/
 void adc_LaunchNextMeasure(void)
 {
-    volatile unsigned char uint8_WB;    //local work byte
+    volatile unsigned char uint8_WB1;   //local work byte 1
+    volatile unsigned char uint8_WB2;   //local work byte 2
     
-    if(g_ADC.uint8_ConvStarted)     //conversion in progress
+    if(g_ADC.uint8_ConvStarted)         //conversion in progress
     {
-
+        //do nothing
     }
     else
     {
-        if(AD1CON1bits.ON)
-            AD1CON1bits.ON = 0;
-        while(AD1CON1bits.ON);
+        uint8_WB1 = g_ADC.uint8_NextMeasureID % 2;
+        g_ADC.uint8_NextMeasureID++;
+        uint8_WB2 = g_ADC.uint8_MeasuredValueID % 2;
         
-        g_ADC.uint8_ChannelSelect =! g_ADC.uint8_ChannelSelect;
+        switch(uint8_WB1)
+        {
+            case (0):   //set the reference voltage and interrupt condition
+                switch (uint8_WB2)
+                {
+                    case (0):   //reference = 2.048V
+                        //set reference voltage to external VREF+ and VREF-
+                        AD1CON2bits.VCFG2 = 0;  //      ADC VR+             ADC VR-
+                        AD1CON2bits.VCFG1 = 1;  // 000  AVDD                AVSS
+                        AD1CON2bits.VCFG0 = 1;  // 001  External VREF+ pin  AVSS
+                                                // 010  AVDD                External VREF- pin
+                                                // 011  External VREF+ pin  External VREF- pin
+                                                // 1xx  AVDD                AVSS
+
+                        //set scanning channels
+                        AD1CSSLbits.CSSL0 = 0;  //skip AN0 for input scan
+                        AD1CSSLbits.CSSL1 = 0;  //skip AN1 for input scan
+                        AD1CSSLbits.CSSL2 = 1;  //unipolar; Icoil A2
+                        AD1CSSLbits.CSSL3 = 1;  //unipolar; Icoil A1
+                        AD1CSSLbits.CSSL4 = 1;  //unipolar; Icoil B2
+                        AD1CSSLbits.CSSL5 = 1;  //unipolar; Icoil B1
+                        AD1CSSLbits.CSSL6 = 1;  //bipolar; Icoil B
+                        AD1CSSLbits.CSSL7 = 0;  //bipolar; Vref
+                        AD1CSSLbits.CSSL8 = 0;  //Vmot
+                        AD1CSSLbits.CSSL9 = 0;  //Imot
+                        AD1CSSLbits.CSSL10 = 1; //bipolar; Icoil A
+                        AD1CSSLbits.CSSL11 = 0; //battery
+                        AD1CSSLbits.CSSL12 = 0; //skip AN12 for input scan
+                        AD1CSSLbits.CSSL13 = 0; //skip AN13 for input scan
+                        AD1CSSLbits.CSSL14 = 0; //skip AN14 for input scan
+                        AD1CSSLbits.CSSL15 = 0; //skip AN15 for input scan
+
+                        //set that interrupt should occur after 6 measured values
+                        AD1CON2bits.SMPI3 = 0;  
+                        AD1CON2bits.SMPI2 = 1;  
+                        AD1CON2bits.SMPI1 = 1;  
+                        AD1CON2bits.SMPI0 = 0;   
+                        break;
+                        
+                    case (1):   //reference = 3.3V
+                        //set reference voltage to external AVDD and AVSS
+                        AD1CON2bits.VCFG2 = 0;  //      ADC VR+             ADC VR-
+                        AD1CON2bits.VCFG1 = 0;  // 000  AVDD                AVSS
+                        AD1CON2bits.VCFG0 = 0;  // 001  External VREF+ pin  AVSS
+                                                // 010  AVDD                External VREF- pin
+                                                // 011  External VREF+ pin  External VREF- pin
+                                                // 1xx  AVDD                AVSS
+
+                        //set scanning channels
+                        AD1CSSLbits.CSSL0 = 0;  //skip AN0 for input scan
+                        AD1CSSLbits.CSSL1 = 0;  //skip AN1 for input scan
+                        AD1CSSLbits.CSSL2 = 0;  //unipolar; Icoil A2
+                        AD1CSSLbits.CSSL3 = 0;  //unipolar; Icoil A1
+                        AD1CSSLbits.CSSL4 = 0;  //unipolar; Icoil B2
+                        AD1CSSLbits.CSSL5 = 0;  //unipolar; Icoil B1
+                        AD1CSSLbits.CSSL6 = 0;  //bipolar; Icoil B
+                        AD1CSSLbits.CSSL7 = 1;  //bipolar; Vref
+                        AD1CSSLbits.CSSL8 = 1;  //Vmot
+                        AD1CSSLbits.CSSL9 = 1;  //Imot
+                        AD1CSSLbits.CSSL10 = 0; //bipolar; Icoil A
+                        AD1CSSLbits.CSSL11 = 1; //battery
+                        AD1CSSLbits.CSSL12 = 0; //skip AN12 for input scan
+                        AD1CSSLbits.CSSL13 = 0; //skip AN13 for input scan
+                        AD1CSSLbits.CSSL14 = 0; //skip AN14 for input scan
+                        AD1CSSLbits.CSSL15 = 0; //skip AN15 for input scan
+
+                        //set that interrupt should occur after 4 measured values
+                        AD1CON2bits.SMPI3 = 0;  
+                        AD1CON2bits.SMPI2 = 1;  
+                        AD1CON2bits.SMPI1 = 0;  
+                        AD1CON2bits.SMPI0 = 0; 
+                        break;
+                
+                    default:
+                        break;                    
+                }
+                
+                AD1CON1bits.ON = 1;     //enable ADC module
+                IFS1bits.AD1IF = 0;     //clear interrupt flag
+                IEC1bits.AD1IE = 1;     //interrupt enable
+                break;
+            
+            case (1):   //launch new measure
+                g_ADC.uint8_ConvStarted = 1;    //signal that a conversion is started     
+                AD1CON1bits.ASAM = 1;           //launch the conversion
+                                                //note this bit is set back to 0 automatic after 
+                                                //the interrupt is generated
+                oTestLed2 = 1;
+                break;
+                
+            default:    //do nothing
+                break;
+        }
+    }
+    
+    
+    /*if(g_ADC.uint8_ConvStarted)         //conversion in progress
+    {
+        //do nothing
+    }
+    else
+    {
+        //if(AD1CON1bits.ON)
+        //    AD1CON1bits.ON = 0;
+        //while(AD1CON1bits.ON);
         
-        switch(g_ADC.uint8_ChannelSelect)
+        //g_ADC.uint8_ChannelSelect =! g_ADC.uint8_ChannelSelect;
+        uint8_WB = g_ADC.uint8_MeasuredValueID % 2;
+        
+        switch(g_ADC.uint8_MeasuredValueID)
         {
             case (0):   //unipolar; Icoil A2
                 //set reference voltage to external VREF+ and VREF-
@@ -426,7 +537,6 @@ void adc_LaunchNextMeasure(void)
         }
         //launch new measure
         g_ADC.uint8_ConvStarted = 1;    //signal that a conversion is started
-      //  g_ADC.uint8_ChannelSelect++;    //increment channel select
         AD1CON1bits.ON = 1;     //enable ADC module
         IFS1bits.AD1IF = 0;     //clear interrupt flag
         IEC1bits.AD1IE = 1;     //interrupt enable
@@ -434,5 +544,5 @@ void adc_LaunchNextMeasure(void)
                                 //note this bit is set back to 0 automatic after 
                                 //the interrupt is generated
         oTestLed2 = 1;
-    }
+    }*/
 }   //end of adc_LaunchNextMeasure

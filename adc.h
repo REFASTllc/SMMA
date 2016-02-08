@@ -42,7 +42,8 @@ extern void adc_LaunchNextMeasure(void);
 typedef struct                  //definitions of multiple variable for timer2
 {
     volatile unsigned char uint8_ConvStarted;       //1= conversion started / 0= conversion not started
-    volatile unsigned char uint8_ChannelSelect;     //variable is used to select the channel
+    //volatile unsigned char uint8_ChannelSelect;     //variable is used to select the channel
+    volatile unsigned char uint8_NextMeasureID;     //help variable for measure ID
     volatile unsigned char uint8_MeasuredValueID;   //variable to know for what the ADC value stands
     volatile unsigned short int uint16_UniIcoilA2;  
     volatile unsigned short int uint16_UniIcoilA1;

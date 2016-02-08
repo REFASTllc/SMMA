@@ -119,7 +119,7 @@ void bi_move(void)
                 T4CONbits.ON = 0;               //switch off timer 4
                 TMR4 = 0;                       //reset LSB counter
                 TMR5 = 0;                       //reset MSB counter
-                PR4 = 400;                      //load LSB register with start condition
+                PR4 = 400;                      //load LSB register with start condition (10us)
                 PR5 = 0;                        //load MSB register with 0 
                 g_Bipol.uint1_IntTimeExpiredFlag = 1;   //force the interrupt routine to load the new time
                 A3981.RUN.BITS.EN = 0;
@@ -164,7 +164,7 @@ void bi_move(void)
                     T4CONbits.ON = 0;               //switch off the timer
                     TMR4 = 0;                       //reset LSB counter
                     TMR5 = 0;                       //reset MSB counter
-                    PR4 = 400;                      //load LSB register with start condition
+                    PR4 = 400;                      //load LSB register with start condition (10us)
                     PR5 = 0;                        //load MSB register with 0
                     g_Bipol.uint1_IntTimeExpiredFlag = 1;    //force the interrupt routine to load the new time
           
