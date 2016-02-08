@@ -466,7 +466,7 @@ void __ISR(_TIMER_5_VECTOR, IPL6AUTO) __IntTimer45Handler(void)
         }
         else
         {
-            PR4 = 8000;  //load interrupt time with 10us
+            PR4 = 8000;  //load interrupt time with 200us
             //force the interrupt routine to load the correct time (next time)
             g_Bipol.uint1_IntTimeExpiredFlag = 1;   
                 
@@ -483,7 +483,15 @@ void __ISR(_TIMER_5_VECTOR, IPL6AUTO) __IntTimer45Handler(void)
                 }
                 else        //otherwise do...
                 {
-                    g_Bipol.uint32_RealPos++;       //increment real position with 1      
+                    g_Bipol.uint32_RealPos++;       //increment real position with 1  
+                    if(g_Param.uint8_FRQ)           //frequency bit set for output 1?
+                    {
+                        oSinkSource1 = !oSinkSource1;
+                    }
+                    else
+                    {
+                        //do nothing
+                    }
                     oBiStepSignal = 1;              //execute one step
                 }
             }
@@ -966,6 +974,7 @@ void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
     AD1CON1bits.ON = 0;     //disable ADC module because we will change later the configuration
                             //for the scan and supply reference
     g_ADC.uint8_ConvStarted = 0;    //signal that conversion is done
+    g_ADC.uint8_ChannelSelect++;    //increment the channel select variable
 }   //end of __IntADCHandler
 
 /**********************************************************************************************************************

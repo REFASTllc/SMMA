@@ -230,7 +230,7 @@ void InitADInterrupt(void)
  * Remark:                  If the AD module was actived (AD1CON1bits.ON = 1), then module will be also reactived. 
  *                          If not, the AD module will stay deactived.
 ***********************************************************************************************************************/
-signed char SetChannelAD(unsigned char channel)
+/*signed char SetChannelAD(unsigned char channel)
 {
     unsigned char statusAD = AD1CON1bits.ON;
     // Disable AD module before doing any operation
@@ -249,7 +249,7 @@ signed char SetChannelAD(unsigned char channel)
     
     // Return the module in the default status (before this function)
     AD1CON1bits.ON = statusAD;
-}
+}*/
 
 /**********************************************************************************************************************
  * Routine:                 SetSamplingType
@@ -268,7 +268,7 @@ signed char SetChannelAD(unsigned char channel)
  * Remark:                  If the AD module was actived (AD1CON1bits.ON = 1), then module will be also reactived. 
  *                          If not, the AD module will stay deactived.
 ***********************************************************************************************************************/
-signed char SetSamplingType(unsigned char sampleType)
+/*signed char SetSamplingType(unsigned char sampleType)
 {
     unsigned char statusAD = AD1CON1bits.ON;
     // Disable AD module before doing any operation
@@ -290,7 +290,7 @@ signed char SetSamplingType(unsigned char sampleType)
         return 1;
     }
     return -1;
-}
+}*/
 
 /**********************************************************************************************************************
  * Routine:                 SetNbrConvertPerInt
@@ -309,7 +309,7 @@ signed char SetSamplingType(unsigned char sampleType)
  * Remark:                  If the AD module was actived (AD1CON1bits.ON = 1), then module will be also reactived. 
  *                          If not, the AD module will stay deactived.
 ***********************************************************************************************************************/
-signed char SetNbrConvertPerInt(unsigned char nbrConvert)
+/*signed char SetNbrConvertPerInt(unsigned char nbrConvert)
 {
     unsigned char statusAD = AD1CON1bits.ON;
     // Disable AD module before doing any operation
@@ -319,7 +319,8 @@ signed char SetNbrConvertPerInt(unsigned char nbrConvert)
     AD1CON2bits.SMPI = nbrConvert - 1;
     // Return the module in the default status (before this function)
     AD1CON1bits.ON = statusAD;
-}
+}*/
+
 
 /**********************************************************************************************************************
  * Routine:                 adc_LaunchNextMeasure
@@ -339,17 +340,18 @@ void adc_LaunchNextMeasure(void)
 {
     volatile unsigned char uint8_WB;    //local work byte
     
-    if(g_ADC.uint8_ConvStarted)     //conversion in progress
+    if(g_ADC.uint8_ConvStarted)         //conversion in progress
     {
-
+        //do nothing
     }
     else
     {
-        if(AD1CON1bits.ON)
-            AD1CON1bits.ON = 0;
-        while(AD1CON1bits.ON);
+        //if(AD1CON1bits.ON)
+        //    AD1CON1bits.ON = 0;
+        //while(AD1CON1bits.ON);
         
-        g_ADC.uint8_ChannelSelect =! g_ADC.uint8_ChannelSelect;
+        //g_ADC.uint8_ChannelSelect =! g_ADC.uint8_ChannelSelect;
+        uint8_WB = g_ADC.uint8_ChannelSelect % 2;
         
         switch(g_ADC.uint8_ChannelSelect)
         {
