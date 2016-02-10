@@ -39,6 +39,7 @@ extern SLin g_LIN;
 extern SUART1txd g_UART1txd;      
 extern SUART1rxd g_UART1rxd;
 extern SADC g_ADC;
+extern S_IC dataIC;
 
 /**********************************************************************************************************************
  * Routine:                 INT_init
@@ -788,7 +789,7 @@ void __ISR(_EXTERNAL_2_VECTOR, IPL3SOFT) IntINT2handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void __ISR(_TIMER_1_VECTOR, IPL5AUTO) __IntTimer1Handler(void)
+void __ISR(_TIMER_1_VECTOR, IPL1SOFT) IntTimer1Handler(void)
 { 
     T1CONbits.ON = 0;       //disable timer 1
     TMR1 = 0;               //reset counter
@@ -804,7 +805,6 @@ void __ISR(_TIMER_1_VECTOR, IPL5AUTO) __IntTimer1Handler(void)
             //LIN:
             g_LIN.uint8_SlaveTimeout = 1;   //timeout occured
             g_LIN.uint8_LinBusy = 0;        //reset busy flag
-            dataIC.timeoutMeas = 0;        // Timeout during trying to measure PWM/freq signal
             
             
             break;
@@ -1054,25 +1054,11 @@ void __ISR(_TIMER_2_VECTOR, IPL2SOFT) IntTimer2Handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
+extern unsigned long eventTime[3];
+extern unsigned short eventMultiplicator[3];
+void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL1SOFT) IntInputCapture1Handler(void)
 {
-    static unsigned char nbreEvent = 0;
-    
-    IFS0bits.IC1IF = 0; 
-    if(++nbreEvent <= 2)
-    {
-        eventTime[nbreEvent-1] = IC1BUF;
-        eventMultiplicator[nbreEvent-1] = nbreTMR2Overflow;
-    }
-    if(nbreEvent == 3)
-    {    
-        IC1CONbits.ON = 0;
-        T2CONbits.ON = 0;
-        IFS0bits.T2IF = 0;
-        TMR2 = 0;
-        nbreTMR2Overflow = 0;
-        nbreEvent = 0;
-    }
+    IFS0bits.IC1IF = 0;  
 }
 
 
@@ -1090,13 +1076,10 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-unsigned long eventTime[3] = {0}, finalResult[10] = {0};
-unsigned short eventMultiplicator[3] = {0};
-void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL2AUTO) __IntInputCapture2Handler(void)
+void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL1SOFT) IntInputCapture2Handler(void)
 {   
     static unsigned char nbreEvent = 0;
     
-    IFS0bits.IC2IF = 0;
     if(!IC2CONbits.ICBNE)
         Nop();
     if(++nbreEvent <= 3)
@@ -1113,4 +1096,5 @@ void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL2AUTO) __IntInputCapture2Handler(void)
         nbreTMR2Overflow = 0;
         nbreEvent = 0;
     }
+    IFS0bits.IC2IF = 0;
 }

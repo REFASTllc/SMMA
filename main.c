@@ -71,11 +71,11 @@ void main(void)
 #endif*/
  //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!   
     
-    periph_init();
+//    periph_init();
 //    DAC7571_WrByte(_NormalMode, 1240);  // 1V
 //    DAC7571_WrByte(_NormalMode, 2381);  // 2V
 //    DAC7571_WrByte(_NormalMode, 992);  // 0V8
-    DAC7571_WrByte(_NormalMode, 2113);  // 1.7V
+//    DAC7571_WrByte(_NormalMode, 2113);  // 1.7V
       
     while(1)
     {      

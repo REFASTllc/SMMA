@@ -81,6 +81,7 @@
 ***********************************************************************************************************************/
 void system_init(void)
 {   
+    CPUSpeedOptimization();
     // Initialization of the system    
     system_osc();
     system_IOs();
@@ -93,9 +94,9 @@ void system_init(void)
     // Initialization of functions
     funct_init();
     // Initialization of unipolar
-    uni_init();
+//    uni_init();
     // Initialization of bipolar
-    bi_init();
+//    bi_init();
     // Initialization of user parameters
     param_init();
     // Initialization of command check function
@@ -106,33 +107,33 @@ void system_init(void)
     uart_InitInterrupt(_UART2_,_ENABLE);
     uart_enable(_UART2_);
     // Initialization of timers 4 & 5 as a 32 bits timer (used for timebase of motors operations)
-    InitTimer45();
-    InitInterruptTimer(_TIMER45,_ENABLE);
+//    InitTimer45();
+//    InitInterruptTimer(_TIMER45,_ENABLE);
     // Initialization of SPI
-    InitSPI(_SPI_1);
-    InitSPIInterrupt(_SPI_1, _ENABLE);
-    EnableSPI1();
+//    InitSPI(_SPI_1);
+//    InitSPIInterrupt(_SPI_1, _ENABLE);
+//    EnableSPI1();
     // Initialization of I2C module
-    i2c_init(_i2c1);
-    i2c_enable(_i2c1);
-    i2c_InitInterrupt(_i2c1,_i2cENABLE,_i2cMASTER);
+//    i2c_init(_i2c1);
+//    i2c_enable(_i2c1);
+//    i2c_InitInterrupt(_i2c1,_i2cENABLE,_i2cMASTER);
     // Initialization of UART1 module
-    uart_init(_UART1_);
-    uart_set(_UART1_,_NONE,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,9600);
-    uart_InitInterrupt(_UART1_,_ENABLE);
-    uart_enable(_UART1_);
+//    uart_init(_UART1_);
+//    uart_set(_UART1_,_NONE,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,9600);
+//    uart_InitInterrupt(_UART1_,_ENABLE);
+//    uart_enable(_UART1_);
     // Initialization of timer 1 (used for 1ms interrupts)
-    InitTimer1();
-    InitInterruptTimer(_TIMER1,_ENABLE);
+//    InitTimer1();
+//    InitInterruptTimer(_TIMER1,_ENABLE);
     // Initialization of timer 2 (used for input capture module)
-    InitTimer2();
-    InitInterruptTimer(_TIMER2, _ENABLE);
-    SetTimer(_TIMER2, _ENABLE, 0, 0xffff);
+//    InitTimer2();
+//    InitInterruptTimer(_TIMER2, _ENABLE);
+//    SetTimer(_TIMER2, _ENABLE, 0, 0xffff);
     // Initialization of input capture modules 1 & 2
-    InitInputCapture1Module();
-    InitInputCapture2Module();
-    InitInterruptInputCaptureModule(_IC_1, _ENABLE);
-    InitInterruptInputCaptureModule(_IC_2, _ENABLE);
+//    InitInputCapture1Module();
+//    InitInputCapture2Module();
+//    InitInterruptInputCaptureModule(_IC_1, _ENABLE);
+//    InitInterruptInputCaptureModule(_IC_2, _ENABLE);
 //switch off the debugging LED's
     oTestLed1 = 0;                          //switch on the output for the test LED1
     oTestLed2 = 0;                          //switch on the output for the test LED2
@@ -145,6 +146,33 @@ void system_init(void)
     FrontLED(_GREEN);
 }   //end of system_init
 
+/**********************************************************************************************************************
+ * Routine:                 CPUSpeedOptimization
+
+ * Description:             Optimization of the CPU speed
+ *                          - I Cache is disabled,
+ *                          - PFM wait States set to max setting (7 = too slow!!!)
+ *                          - Data Memory SRAM wait states set to max setting (1 = too slow!!!)
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        10.02.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void CPUSpeedOptimization(void)
+{
+    // Data Memory SRAM wait states: Default Setting = 1; set it to 0
+    BMXCONbits.BMXWSDRM = 0;
+
+    // Flash PM Wait States: MX Flash runs at 2 wait states @ 80 MHz
+    CHECONbits.PFMWS = 2;
+
+    // Prefetch-cache: Enable prefetch for cacheable PFM instructions
+    CHECONbits.PREFEN = 1;
+}
 
 /**********************************************************************************************************************
  * Routine:                 system_osc
