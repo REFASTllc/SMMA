@@ -512,7 +512,7 @@ void uart_InitInterrupt(unsigned char uartx, unsigned char action)
         IFS0bits.U1EIF = 0;
         if(action == _ENABLE)
         {
-            IPC6bits.U1IP = 2;
+            IPC6bits.U1IP = 3;
             IPC6bits.U1IS = 3;
             IEC0bits.U1RXIE = 1;    
             IEC0bits.U1TXIE = 0;    //this bit is controlled externally - don't set it 
@@ -536,7 +536,7 @@ void uart_InitInterrupt(unsigned char uartx, unsigned char action)
             IPC8bits.U2IS = 3;
             IEC1bits.U2RXIE = 1;
             IEC1bits.U2TXIE = 0;    //this bit is controlled externally - don't set it
-            IEC1bits.U2EIE = 0;     //at the moment disabled
+            IEC1bits.U2EIE = 1;     
         }
         else
         {
