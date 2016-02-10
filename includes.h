@@ -38,6 +38,7 @@
 //#include <math.h>
 
 //project related header files
+#include "exception.h"
 #include "defines.h"
 #include "system.h"
 #include "timers.h"

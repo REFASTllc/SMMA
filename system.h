@@ -31,6 +31,7 @@
 #define	SYSTEM_H
 
 extern void system_init(void);
+void CPUSpeedOptimization(void);
 extern void system_osc(void);
 extern void system_IOs(void);
 extern void system_NoticeModule(void);

@@ -24,12 +24,17 @@
 #define _ENABLE     1
 #define _DISABLE    0
 
+#define _MEAS_PWM   3
+#define _MEAS_FREQ  2
+
 typedef struct
 {
     unsigned long timeHigh;
     unsigned long periodeTime;
+    unsigned long frequency;
+    unsigned short dutyCycle;
     unsigned char timeoutMeas;
-} S_PWM;
+} S_IC;
 
 
 /********************************************************************************************************************/
@@ -97,5 +102,26 @@ void InitInterruptInputCaptureModule(unsigned char module, unsigned char status)
 /*  Remark:                     -										    
 /********************************************************************************************************************/
 void ResetInputCaptureModule(unsigned char module);
+
+/********************************************************************************************************************/
+/*  Name of the function:       FormatBufToRealValues									    
+/*  Purpose of the function:    Formatting the values returned by the interrupt in a timing values
+/*  Parameters:													    
+/*      IN:                     - 	    
+/*      OUT:                    -			
+/* 							    See the .h file for the list of all defines.
+/*														    
+/*  Used global variables:      -										    
+/*														    
+/*  Creator:                    julien_rebetez								    
+/*  Date of creation:           06.02.2016								    
+/*														    
+/*  Last modified on:           -										    
+/*  Modified by:                -										    
+/*  Version:                    -										    
+/*														    
+/*  Remark:                     -										    
+/********************************************************************************************************************/
+void FormatBufToRealValues(S_IC *data, unsigned char typeMeasure);
 
 #endif	/* INPUTCAPTURE_H */

@@ -54,7 +54,7 @@ void InitInputCapture1Module(void)
                             // 0 = Timer3 is the counter source for capture
                             // 1 = Timer2 is the counter source for capture
 
-    IC1CONbits.ICI = 3;     // Interrupt Control bits
+    IC1CONbits.ICI = 1;     // Interrupt Control bits
                             // 11 = Interrupt on every fourth capture event
                             // 10 = Interrupt on every third capture event
                             // 01 = Interrupt on every second capture event
@@ -68,7 +68,7 @@ void InitInputCapture1Module(void)
                             // 1 = Input capture buffer is not empty; at least one more capture value can be read
                             // 0 = Input capture buffer is empty
     
-    IC1CONbits.ICM = 6;     // Input Capture Mode Select bits
+    IC1CONbits.ICM = 3;     // Input Capture Mode Select bits
                             // 111 = Interrupt-Only mode (only supported while in Sleep mode or Idle mode)
                             // 110 = Simple Capture Event mode ? every edge, specified edge first and every edge thereafter
                             // 101 = Prescaled Capture Event mode ? every sixteenth rising edge
@@ -508,5 +508,47 @@ void ResetInputCaptureModule(unsigned char module)
         break;
         default:
         break;
+    }
+}
+
+/********************************************************************************************************************/
+/*  Name of the function:       FormatBufToRealValues									    
+/*  Purpose of the function:    Formatting the values returned by the interrupt in a timing values
+/*  Parameters:													    
+/*      IN:                     - 	    
+/*      OUT:                    -			
+/* 							    See the .h file for the list of all defines.
+/*														    
+/*  Used global variables:      -										    
+/*														    
+/*  Creator:                    julien_rebetez								    
+/*  Date of creation:           06.02.2016								    
+/*														    
+/*  Last modified on:           -										    
+/*  Modified by:                -										    
+/*  Version:                    -										    
+/*														    
+/*  Remark:                     -										    
+/********************************************************************************************************************/
+unsigned long eventTime[3] = {0};
+unsigned short eventMultiplicator[3] = {0};
+void FormatBufToRealValues(S_IC *data, unsigned char typeMeasure)
+{
+    unsigned char i = 0;   
+    
+    for(;i<typeMeasure;i++)
+        eventTime[i] += eventMultiplicator[i] * 0xffff;
+    
+    if(typeMeasure == _MEAS_PWM)
+    {
+        data->timeHigh = eventTime[1] - eventTime[0];
+        data->periodeTime = eventTime[2] - eventTime[0];
+        data->frequency = 1/((1/_FREQ_OSC)*(data->periodeTime * 100));
+        data->dutyCycle = (data->timeHigh * 1000) / data->periodeTime;
+    }
+    else if(typeMeasure == _MEAS_FREQ)
+    {
+        data->periodeTime = eventTime[1] - eventTime[0];
+        data->frequency = (1/((1/_FREQ_OSC)*(data->periodeTime * 100))) * 100;
     }
 }
