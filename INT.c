@@ -781,6 +781,7 @@ void __ISR(_EXTERNAL_2_VECTOR, IPL3AUTO) __IntINT2handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
+extern S_IC dataIC;
 void __ISR(_TIMER_1_VECTOR, IPL5AUTO) __IntTimer1Handler(void)
 { 
     T1CONbits.ON = 0;       //disable timer 1
@@ -797,6 +798,7 @@ void __ISR(_TIMER_1_VECTOR, IPL5AUTO) __IntTimer1Handler(void)
             //LIN:
             g_LIN.uint8_SlaveTimeout = 1;   //timeout occured
             g_LIN.uint8_LinBusy = 0;        //reset busy flag
+            dataIC.timeoutMeas = 0;        // Timeout during trying to measure PWM/freq signal
             
             
             break;
@@ -1011,9 +1013,27 @@ void __ISR(_TIMER_2_VECTOR, IPL1AUTO) __IntTimer2Handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
+extern unsigned long eventTime[3];
+extern unsigned short eventMultiplicator[3];
 void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
 {
-    IFS0bits.IC1IF = 0;  
+    static unsigned char nbreEvent = 0;
+    
+    IFS0bits.IC1IF = 0; 
+    if(++nbreEvent <= 2)
+    {
+        eventTime[nbreEvent-1] = IC1BUF;
+        eventMultiplicator[nbreEvent-1] = nbreTMR2Overflow;
+    }
+    if(nbreEvent == 3)
+    {    
+        IC1CONbits.ON = 0;
+        T2CONbits.ON = 0;
+        IFS0bits.T2IF = 0;
+        TMR2 = 0;
+        nbreTMR2Overflow = 0;
+        nbreEvent = 0;
+    }
 }
 
 /**********************************************************************************************************************
@@ -1030,12 +1050,11 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-extern unsigned long eventTime[3];
-extern unsigned short eventMultiplicator[3];
 void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL2AUTO) __IntInputCapture2Handler(void)
 {   
     static unsigned char nbreEvent = 0;
     
+    IFS0bits.IC2IF = 0;
     if(!IC2CONbits.ICBNE)
         Nop();
     if(++nbreEvent <= 3)
@@ -1052,5 +1071,4 @@ void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL2AUTO) __IntInputCapture2Handler(void)
         nbreTMR2Overflow = 0;
         nbreEvent = 0;
     }
-    IFS0bits.IC2IF = 0;
 }

@@ -24,13 +24,17 @@
 #define _ENABLE     1
 #define _DISABLE    0
 
+#define _MEAS_PWM   3
+#define _MEAS_FREQ  2
+
 typedef struct
 {
     unsigned long timeHigh;
     unsigned long periodeTime;
     unsigned long frequency;
+    unsigned short dutyCycle;
     unsigned char timeoutMeas;
-} S_PWM;
+} S_IC;
 
 
 /********************************************************************************************************************/
@@ -118,6 +122,6 @@ void ResetInputCaptureModule(unsigned char module);
 /*														    
 /*  Remark:                     -										    
 /********************************************************************************************************************/
-void FormatBufToRealValues(unsigned char *dataIndex, S_PWM *dataPWM);
+void FormatBufToRealValues(S_IC *data, unsigned char typeMeasure);
 
 #endif	/* INPUTCAPTURE_H */

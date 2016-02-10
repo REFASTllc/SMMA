@@ -108,12 +108,4 @@ void main(void)
         adc_LaunchNextMeasure();    //call subroutine 
         
     }
-    /*while(1)
-    {
-        if(!IC2CONbits.ON)
-        {
-            IC2CONbits.ON = 1;
-            T2CONbits.ON = 1;
-        }
-    }*/
 }   //end of main

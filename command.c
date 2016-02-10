@@ -2319,46 +2319,48 @@ void cmd_GPWMPOS(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
+extern unsigned int nbreTMR2Overflow;
+S_IC dataIC;
 void cmd_GPWMVAL(void)
 {
-    S_PWM dataPWM;
     unsigned char nbreSamples = 1, actualSample;
     
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
-        dataPWM.timeoutMeas = 1;
+        dataIC.timeoutMeas = 1;
+        nbreTMR2Overflow = 0;
         SetTimer(_TIMER1, _ENABLE, 0, 1500);
         IC2CONbits.ON = 1;
         T2CONbits.ON = 1;
         for(actualSample = 0; actualSample < nbreSamples; actualSample++)
         {
-            while(IC2CONbits.ON && dataPWM.timeoutMeas);
-            FormatBufToRealValues(&actualSample, &dataPWM);
+            while(IC2CONbits.ON && dataIC.timeoutMeas);
+            FormatBufToRealValues(&dataIC, _MEAS_PWM);
         }
         SetTimer(_TIMER1, _DISABLE, 0, 1500);
-        if(funct_CheckTol(g_Param.uint16_SwPWMval, 1, 999))
+        if(dataIC.timeoutMeas)
         {
             uart2_sendbuffer('E');          //first the letter E
+            uart2_sendbuffer(',');  //add the comma
+            //convert the parameter and store it into the send buffer
+            funct_IntToAscii(dataIC.dutyCycle,_Inactive);
+            do{
+                g_Funct.uint8_ArrAsciiPos--;
+                uart2_sendbuffer(g_Funct.uint8_ArrAscii[g_Funct.uint8_ArrAsciiPos]);
+                if(g_Funct.uint8_ArrAsciiPos == 1)
+                {
+                    uart2_sendbuffer('.');
+                }
+            }while(g_Funct.uint8_ArrAsciiPos);
+            uart2_sendbuffer(13);   //add the CR at the end
         }
-      /*  else
+        else
         {
             uart2_sendbuffer('X');  //add the comma
             g_Param.uint8_ErrCode = _OutOfTolGPWMVAL;  //set error code
             uart2_sendbuffer(',');  //add the comma
             funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
         }   
-    */    uart2_sendbuffer(',');  //add the comma
-        //convert the parameter and store it into the send buffer
-        funct_IntToAscii(dataPWM.frequency,_Inactive);
-        do{
-            g_Funct.uint8_ArrAsciiPos--;
-            uart2_sendbuffer(g_Funct.uint8_ArrAscii[g_Funct.uint8_ArrAsciiPos]);
-            if(g_Funct.uint8_ArrAsciiPos == 1)
-            {
-                uart2_sendbuffer('.');
-            }
-        }while(g_Funct.uint8_ArrAsciiPos);
-        uart2_sendbuffer(13);   //add the CR at the end
     } 
     else
     {
@@ -2454,17 +2456,31 @@ void cmd_GFRQVAL(void)
 {    
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
+        while(IC1CONbits.ICBNE)
+        {
+            volatile unsigned short temp = IC1BUF;
+        }
+        dataIC.timeoutMeas = 1;
+        nbreTMR2Overflow = 0;
+        TMR2 = 0;
+        SetTimer(_TIMER1, _ENABLE, 0, 5000);
+        IFS0bits.T2IF = 0;
+        T2CONbits.ON = 1;
+        IC1CONbits.ON = 1;
+        while(IC1CONbits.ON && dataIC.timeoutMeas);
+        SetTimer(_TIMER1, _DISABLE, 0, 1500);
+        FormatBufToRealValues(&dataIC, _MEAS_FREQ);
         uart2_sendbuffer('E');
         uart2_sendbuffer(',');  //add the comma
-        funct_IntToAscii(g_Param.uint32_SwFrqVal,_Inactive);
-        do{
+        funct_IntToAscii(dataIC.frequency, _Active);
+     /*   do{
             g_Funct.uint8_ArrAsciiPos--;
             uart2_sendbuffer(g_Funct.uint8_ArrAscii[g_Funct.uint8_ArrAsciiPos]);
             if(g_Funct.uint8_ArrAsciiPos == 1)
             {
                 uart2_sendbuffer('.');
             }
-        }while(g_Funct.uint8_ArrAsciiPos);
+        }while(g_Funct.uint8_ArrAsciiPos);*/
         uart2_sendbuffer(13);
     } 
     else
