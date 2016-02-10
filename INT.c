@@ -57,6 +57,20 @@ extern S_PWM dataPWM;
 ***********************************************************************************************************************/
 void INT_init(void)
 {
+    /*unsigned int temp_CP0;              //temporary register for CP0 reg storing
+    
+    asm volatile ("di");                //disable all interrupts
+    asm volatile ("ehb");               //disable all interrupt
+    
+    _CP0_SET_EBASE(0x9FC01000);         //set an EBase value of 0x9FC01000
+    
+    temp_CP0 = _CP0_GET_CAUSE();        //get cause
+    temp_CP0 |= 0x00800000;             //set IV
+    _CP0_SET_CAUSE(temp_CP0);           //update cause
+    
+    INTCONCLR = _INTCON_MVEC_MASK;      //clear the MVEC bit*/
+    
+    
     INTCONbits.SS0 = 0;     // Single Vector Shadow Register Set bit
                             // 1 = Single vector is presented with a shadow register set
                             // 0 = Single vector is not presented with a shadow register set
@@ -74,7 +88,7 @@ void INT_init(void)
                             // 010 = Interrupts of group priority 2 or lower start the Interrupt Proximity timer
                             // 001 = Interrupts of group priority 1 start the Interrupt Proximity timer 
                             // 000 = Disables Interrupt Proximity timer
-
+    
     INTCONbits.INT4EP = 1;  // External Interrupt 4 Edge Polarity Control bit
                             // 1= Risingedge 
                             // 0= Fallingedge
@@ -94,17 +108,19 @@ void INT_init(void)
     INTCONbits.INT0EP = 1;  // External Interrupt 0 Edge Polarity Control bit
                             // 1= Risingedge
                             // 0= Fallingedge
+    
+    IPTMR = 0xFFFFFFFF;     //interrupt proximity timer reload bits
 
     //INTCONbits.FRZ = ?;
 
-    if(!INTCONbits.MVEC)
+    /*if(!INTCONbits.MVEC)
     {
         INTSTATbits.SRIPL = 0;  // Requested Priority Level bits for Single Vector Mode bits
                                 // 000-111 = The priority level of the latest interrupt presented to the CPU
 
         INTSTATbits.VEC = 0;    // Interrupt Vector bits
                                 // 11111-00000 = The interrupt vector that is presented to the CPU
-    }
+    }*/
 }
 
 
@@ -141,8 +157,12 @@ void __ISR(_UART_2_VECTOR, IPL2SOFT) IntUart2Handler(void)
     
 //--- Is this an RX interrupt? ---//
     if(IFS1bits.U2RXIF)
-    {
-        IFS1bits.U2RXIF = 0;        //clear interrupt bit
+    {     
+        /*if(U2STAbits.OERR)
+        {
+            oTestLed1 = 1;
+        }
+        uint8_WB = U2STAbits.OERR;*/
         
         //store received data byte into receive buffer
         *(g_UART2rxd.uint8_Bufptr + g_UART2rxd.uint16_Wch) = U2RXREG;
@@ -154,7 +174,9 @@ void __ISR(_UART_2_VECTOR, IPL2SOFT) IntUart2Handler(void)
         g_UART2rxd.uint16_Wch = g_UART2rxd.uint16_Wch % _RxD2_BUFSIZE;
     
         //receive buffer not empty
-        g_UART2rxd.uint8_BufEmpty = 0;        
+        g_UART2rxd.uint8_BufEmpty = 0;    
+        
+        IFS1bits.U2RXIF = 0;        //clear interrupt bit
     }
     
 //--- Is this an Tx interrupt? ---//    
@@ -194,7 +216,6 @@ void __ISR(_UART_2_VECTOR, IPL2SOFT) IntUart2Handler(void)
     if(IFS1bits.U2EIF)
     {
         uint8_WB = U2RXREG;     //read out the character but make nothing with it
-        oTestLed1 = 1;
         
         IFS1bits.U2EIF = 0;     //clear the interrupt bit
     }
@@ -697,7 +718,7 @@ void __ISR(_I2C_1_VECTOR, IPL4SOFT) IntI2cHandler(void)
 //--- Is this a slave interrupt request? ---//    
     if(IFS0bits.I2C1SIF)
     {
-        IFS0bits.I2C1SIF  = 0;      //clear interrupt bit
+        IFS0bits.I2C1SIF = 0;       //clear interrupt bit
         
         //not programmed yet   
     }
@@ -742,7 +763,6 @@ void __ISR(_I2C_1_VECTOR, IPL4SOFT) IntI2cHandler(void)
 void __ISR(_EXTERNAL_2_VECTOR, IPL3SOFT) IntINT2handler(void)
 {
     IFS0bits.INT2IF = 0;    //clear the interrupt flag
-    
     //add here an alarm!!!
     
 //first enable again the RV30xx chip because the interrupt signaled a "system reset detection"
@@ -767,7 +787,6 @@ void __ISR(_EXTERNAL_2_VECTOR, IPL3SOFT) IntINT2handler(void)
         //do nothing...
     }
     while(g_i2c1.uint8_Busy);   //until the transfer is finished
-    
     
 }   //end of IntINT2handler
 
@@ -850,8 +869,6 @@ void __ISR(_UART_1_VECTOR, IPL3SOFT) IntUart1Handler(void)
 //--- Is this an RX interrupt? ---//
     if(IFS0bits.U1RXIF)
     {
-        IFS0bits.U1RXIF = 0;        //clear interrupt bit
-        
         //store received data byte into receive buffer
         *(g_UART1rxd.uint8_Bufptr + g_UART1rxd.uint16_Wch) = U1RXREG;
        
@@ -874,6 +891,8 @@ void __ISR(_UART_1_VECTOR, IPL3SOFT) IntUart1Handler(void)
             g_LIN.uint8_SlaveAnswerFinish = 1;      //slave answer finish
             g_LIN.uint8_LinBusy = 0;                //reset busy flag
         }
+        
+        IFS0bits.U1RXIF = 0;        //clear interrupt bit
     }
     
 //--- Is this an Tx interrupt? ---//    
@@ -1011,6 +1030,7 @@ void __ISR(_ADC_VECTOR, IPL2SOFT) IntADCHandler(void)
     g_ADC.uint8_MeasuredValueID++;  //increment the value ID variable
     
     IEC1bits.AD1IE = 0;     //interrupt disable
+    //IFS1CLR = 0x0000002;    //clear interrupt flag
     IFS1bits.AD1IF = 0;     //clear interrupt flag 
     
     //AD1CON1bits.ON = 0;     //disable ADC module because we will change later the configuration

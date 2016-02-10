@@ -44,8 +44,10 @@ void main(void)
 {  
     unsigned short int temp = 0; 
     
-    system_init();          //call subroutine
-          
+    //SYSTEMConfigPerformance(80000000);
+   
+    system_init();          //call subroutine    
+    
     asm("ei");              //enable all interrupts (code in assembler) use declaration "di" to disable all interrupts
     
  //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!
@@ -76,7 +78,7 @@ void main(void)
 //    DAC7571_WrByte(_NormalMode, 2381);  // 2V
 //    DAC7571_WrByte(_NormalMode, 992);  // 0V8
     DAC7571_WrByte(_NormalMode, 2113);  // 1.7V
-      
+    
     while(1)
     {      
         if(g_Uni.uint8_Settings & 0x01) //verify if the unipolar motor has to move
