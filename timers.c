@@ -400,7 +400,7 @@ void InitInterruptTimer(unsigned char timerx, unsigned char action)
     if(timerx == _TIMER1)
     {
         IFS0bits.T1IF = 0;
-        IPC1bits.T1IP = 5;
+        IPC1bits.T1IP = 1;
         IPC1bits.T1IS = 3;
         if(action == _ENABLE) 
             IEC0bits.T1IE = 1;
@@ -410,7 +410,7 @@ void InitInterruptTimer(unsigned char timerx, unsigned char action)
     else if(timerx == _TIMER2)
     {
         IFS0bits.T2IF = 0;
-        IPC2bits.T2IP = 1;
+        IPC2bits.T2IP = 2;
         IPC2bits.T2IS = 3;
         if(action == _ENABLE)
             IEC0bits.T2IE = 1;

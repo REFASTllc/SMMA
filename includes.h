@@ -33,9 +33,8 @@
 #define _XTAL_FREQ 80000000
 
 //system header files
-#include <xc.h>                   
-#include "attribs.h"                                        
-#include <p32mx360f512l.h>
+#include <xc.h>
+#include <sys/attribs.h>
 //#include <math.h>
 
 //project related header files

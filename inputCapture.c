@@ -380,7 +380,7 @@ void InitInterruptInputCaptureModule(unsigned char module, unsigned char status)
         if(status == _ENABLE)
         {
             IFS0bits.IC1IF = 0;
-            IPC1bits.IC1IP = 2;
+            IPC1bits.IC1IP = 1;
             IPC1bits.IC1IS = 3;
             IEC0bits.IC1IE = 1;
         }
@@ -395,7 +395,7 @@ void InitInterruptInputCaptureModule(unsigned char module, unsigned char status)
         if(status == _ENABLE)
         {
             IFS0bits.IC2IF = 0;
-            IPC2bits.IC2IP = 2;
+            IPC2bits.IC2IP = 1;
             IPC2bits.IC2IS = 3;
             IEC0bits.IC2IE = 1;
         }

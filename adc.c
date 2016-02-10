@@ -208,7 +208,7 @@ void InitADInterrupt(void)
     IFS1bits.AD1IF = 0; // Interrupt flag bit
 
     IPC6bits.AD1IP = 2; // Interrupt priority bits (7 = high, 0 = no interrupt)
-    IPC6bits.AD1IS = 3; // Interrupt sub-priority bits (3 = high priority)
+    IPC6bits.AD1IS = 2; // Interrupt sub-priority bits (3 = high priority)
 
     IEC1bits.AD1IE = 0; // Interrupt disable
 }
@@ -349,7 +349,7 @@ void adc_LaunchNextMeasure(void)
     }
     else
     {
-        uint8_WB1 = g_ADC.uint8_NextMeasureID % 2;
+        uint8_WB1 = g_ADC.uint8_NextMeasureID % 101;
         g_ADC.uint8_NextMeasureID++;
         uint8_WB2 = g_ADC.uint8_MeasuredValueID % 2;
         
@@ -435,7 +435,7 @@ void adc_LaunchNextMeasure(void)
                 IEC1bits.AD1IE = 1;     //interrupt enable
                 break;
             
-            case (1):   //launch new measure
+            case (100):   //launch new measure
                 g_ADC.uint8_ConvStarted = 1;    //signal that a conversion is started     
                 AD1CON1bits.ASAM = 1;           //launch the conversion
                                                 //note this bit is set back to 0 automatic after 
@@ -447,102 +447,4 @@ void adc_LaunchNextMeasure(void)
                 break;
         }
     }
-    
-    
-    /*if(g_ADC.uint8_ConvStarted)         //conversion in progress
-    {
-        //do nothing
-    }
-    else
-    {
-        //if(AD1CON1bits.ON)
-        //    AD1CON1bits.ON = 0;
-        //while(AD1CON1bits.ON);
-        
-        //g_ADC.uint8_ChannelSelect =! g_ADC.uint8_ChannelSelect;
-        uint8_WB = g_ADC.uint8_MeasuredValueID % 2;
-        
-        switch(g_ADC.uint8_MeasuredValueID)
-        {
-            case (0):   //unipolar; Icoil A2
-                //set reference voltage to external VREF+ and VREF-
-                AD1CON2bits.VCFG2 = 0;  //      ADC VR+             ADC VR-
-                AD1CON2bits.VCFG1 = 1;  // 000  AVDD                AVSS
-                AD1CON2bits.VCFG0 = 1;  // 001  External VREF+ pin  AVSS
-                                        // 010  AVDD                External VREF- pin
-                                        // 011  External VREF+ pin  External VREF- pin
-                                        // 1xx  AVDD                AVSS
-                
-                //set scanning channels
-                AD1CSSLbits.CSSL0 = 0;  //skip AN0 for input scan
-                AD1CSSLbits.CSSL1 = 0;  //skip AN1 for input scan
-                AD1CSSLbits.CSSL2 = 1;  //unipolar; Icoil A2
-                AD1CSSLbits.CSSL3 = 1;  //unipolar; Icoil A1
-                AD1CSSLbits.CSSL4 = 1;  //unipolar; Icoil B2
-                AD1CSSLbits.CSSL5 = 1;  //unipolar; Icoil B1
-                AD1CSSLbits.CSSL6 = 1;  //bipolar; Icoil B
-                AD1CSSLbits.CSSL7 = 0;  //bipolar; Vref
-                AD1CSSLbits.CSSL8 = 0;  //Vmot
-                AD1CSSLbits.CSSL9 = 0;  //Imot
-                AD1CSSLbits.CSSL10 = 1; //bipolar; Icoil A
-                AD1CSSLbits.CSSL11 = 0; //battery
-                AD1CSSLbits.CSSL12 = 0; //skip AN12 for input scan
-                AD1CSSLbits.CSSL13 = 0; //skip AN13 for input scan
-                AD1CSSLbits.CSSL14 = 0; //skip AN14 for input scan
-                AD1CSSLbits.CSSL15 = 0; //skip AN15 for input scan
-                
-                //set that interrupt should occur after 6 measured values
-                AD1CON2bits.SMPI3 = 0;  
-                AD1CON2bits.SMPI2 = 1;  
-                AD1CON2bits.SMPI1 = 1;  
-                AD1CON2bits.SMPI0 = 0;   
-                break;
-                
-            case (1):   //unipolar; Icoil A1
-                //set reference voltage to external AVDD and AVSS
-                AD1CON2bits.VCFG2 = 0;  //      ADC VR+             ADC VR-
-                AD1CON2bits.VCFG1 = 0;  // 000  AVDD                AVSS
-                AD1CON2bits.VCFG0 = 0;  // 001  External VREF+ pin  AVSS
-                                        // 010  AVDD                External VREF- pin
-                                        // 011  External VREF+ pin  External VREF- pin
-                                        // 1xx  AVDD                AVSS
-                
-                //set scanning channels
-                AD1CSSLbits.CSSL0 = 0;  //skip AN0 for input scan
-                AD1CSSLbits.CSSL1 = 0;  //skip AN1 for input scan
-                AD1CSSLbits.CSSL2 = 0;  //unipolar; Icoil A2
-                AD1CSSLbits.CSSL3 = 0;  //unipolar; Icoil A1
-                AD1CSSLbits.CSSL4 = 0;  //unipolar; Icoil B2
-                AD1CSSLbits.CSSL5 = 0;  //unipolar; Icoil B1
-                AD1CSSLbits.CSSL6 = 0;  //bipolar; Icoil B
-                AD1CSSLbits.CSSL7 = 1;  //bipolar; Vref
-                AD1CSSLbits.CSSL8 = 1;  //Vmot
-                AD1CSSLbits.CSSL9 = 1;  //Imot
-                AD1CSSLbits.CSSL10 = 0; //bipolar; Icoil A
-                AD1CSSLbits.CSSL11 = 1; //battery
-                AD1CSSLbits.CSSL12 = 0; //skip AN12 for input scan
-                AD1CSSLbits.CSSL13 = 0; //skip AN13 for input scan
-                AD1CSSLbits.CSSL14 = 0; //skip AN14 for input scan
-                AD1CSSLbits.CSSL15 = 0; //skip AN15 for input scan
-                
-                //set that interrupt should occur after 4 measured values
-                AD1CON2bits.SMPI3 = 0;  
-                AD1CON2bits.SMPI2 = 1;  
-                AD1CON2bits.SMPI1 = 0;  
-                AD1CON2bits.SMPI0 = 0; 
-                break;
-                               
-            default:    //do nothing
-                break;
-        }
-        //launch new measure
-        g_ADC.uint8_ConvStarted = 1;    //signal that a conversion is started
-        AD1CON1bits.ON = 1;     //enable ADC module
-        IFS1bits.AD1IF = 0;     //clear interrupt flag
-        IEC1bits.AD1IE = 1;     //interrupt enable
-        AD1CON1bits.ASAM = 1;   //launch the conversion
-                                //note this bit is set back to 0 automatic after 
-                                //the interrupt is generated
-        oTestLed2 = 1;
-    }*/
 }   //end of adc_LaunchNextMeasure

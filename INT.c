@@ -10,16 +10,16 @@
  *                          Copyright (c) 2015 REFAST GmbH
 ***********************************************************************************************************************
  * Content overview:        - INT_init
- *                          - __IntUart2Handler
- *                          - __IntSPI1Handler
- *                          - __IntRTCCHandler
- *                          - __IntTimer45Handler
- *                          - __IntPWM1Handler
- *                          - __IntI2cHandler
- *                          - __IntINT2handler
- *                          - __IntTimer1Handler
- *                          - __IntUart1Handler
- *                          - __IntADCHandler
+ *                          - IntUart2Handler
+ *                          - IntSPI1Handler
+ *                          - IntRTCCHandler
+ *                          - IntTimer45Handler
+ *                          - IntPWM1Handler
+ *                          - IntI2cHandler
+ *                          - IntINT2handler
+ *                          - IntTimer1Handler
+ *                          - IntUart1Handler
+ *                          - IntADCHandler
  * //_ADC_VECTOR
 ***********************************************************************************************************************/
 
@@ -108,7 +108,7 @@ void INT_init(void)
 
 
 /**********************************************************************************************************************
- * Routine:                 __IntUart2Handler
+ * Routine:                 IntUart2Handler
 
  * Description:
  * Manage Rx and Tx interrupts on UART2 
@@ -134,8 +134,10 @@ void INT_init(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void __ISR(_UART_2_VECTOR, IPL2AUTO) __IntUart2Handler(void)
+void __ISR(_UART_2_VECTOR, IPL2SOFT) IntUart2Handler(void)
 {
+    unsigned char uint8_WB; //local work byte
+    
 //--- Is this an RX interrupt? ---//
     if(IFS1bits.U2RXIF)
     {
@@ -143,7 +145,7 @@ void __ISR(_UART_2_VECTOR, IPL2AUTO) __IntUart2Handler(void)
         
         //store received data byte into receive buffer
         *(g_UART2rxd.uint8_Bufptr + g_UART2rxd.uint16_Wch) = U2RXREG;
-       
+        
         //increment the write-pointer of the ring buffer
         g_UART2rxd.uint16_Wch++;
     
@@ -190,9 +192,12 @@ void __ISR(_UART_2_VECTOR, IPL2AUTO) __IntUart2Handler(void)
 //--- Is this an error request interrupt? ---//
     if(IFS1bits.U2EIF)
     {
-        IFS1bits.U2EIF = 0;
+        uint8_WB = U2RXREG;     //read out the character but make nothing with it
+        oTestLed1 = 1;
+        
+        IFS1bits.U2EIF = 0;     //clear the interrupt bit
     }
-}   //end of __IntUart2Handler
+}   //end of IntUart2Handler
 
 #ifdef SPI_H
 
@@ -200,7 +205,7 @@ extern T_SPI SPI1;
 /****************************************************************************/
 /*  Purpose of the INT routine:  Manage SPI 1 Rx interrupts                 */
 /****************************************************************************/
-void __ISR(_SPI_1_VECTOR, IPL4AUTO) __IntSPI1Handler(void)
+void __ISR(_SPI_1_VECTOR, IPL4SOFT) IntSPI1Handler(void)
 {
     if(IFS0bits.SPI1RXIF)
     {
@@ -225,8 +230,9 @@ void __ISR(_SPI_1_VECTOR, IPL4AUTO) __IntSPI1Handler(void)
 }
 #endif
 
+
 /**********************************************************************************************************************
- * Routine:                 __IntTimer45Handler
+ * Routine:                 IntTimer45Handler
 
  * Description:
  * -old text deleted- 
@@ -275,7 +281,7 @@ void __ISR(_SPI_1_VECTOR, IPL4AUTO) __IntSPI1Handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void __ISR(_TIMER_5_VECTOR, IPL6AUTO) __IntTimer45Handler(void)
+void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
 {
     auto unsigned char uint8_WB1;       //local variabel 'WorkByte1'
     
@@ -505,10 +511,11 @@ void __ISR(_TIMER_5_VECTOR, IPL6AUTO) __IntTimer45Handler(void)
     }
     
     T4CONbits.ON = 1;           //enable interrupt module    
-}   //end of __IntTimer2Handler
+}   //end of IntTimer2Handler
+
 
 /**********************************************************************************************************************
- * Routine:                 __IntI2cHandler
+ * Routine:                 IntI2cHandler
 
  * Description:
  * Manage I2C modul 1 interrupt
@@ -567,7 +574,7 @@ void __ISR(_TIMER_5_VECTOR, IPL6AUTO) __IntTimer45Handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
+void __ISR(_I2C_1_VECTOR, IPL4SOFT) IntI2cHandler(void)
 {
     
 //--- Is this a master interrupt request? ---//
@@ -710,11 +717,11 @@ void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
             g_i2c1.uint8_BusCollCount++;        //increment the counter
         }       
     }
-}   //end of __IntI2cHandler
+}   //end of IntI2cHandler
 
 
 /**********************************************************************************************************************
- * Routine:                 __IntINT2handler
+ * Routine:                 IntINT2handler
 
  * Description:
  * This interrupt occurs if the external output signal from the RV30xx changes from high to low. 
@@ -731,7 +738,7 @@ void __ISR(_I2C_1_VECTOR, IPL4AUTO) __IntI2cHandler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void __ISR(_EXTERNAL_2_VECTOR, IPL3AUTO) __IntINT2handler(void)
+void __ISR(_EXTERNAL_2_VECTOR, IPL3SOFT) IntINT2handler(void)
 {
     IFS0bits.INT2IF = 0;    //clear the interrupt flag
     
@@ -761,11 +768,11 @@ void __ISR(_EXTERNAL_2_VECTOR, IPL3AUTO) __IntINT2handler(void)
     while(g_i2c1.uint8_Busy);   //until the transfer is finished
     
     
-}   //end of __IntINT2handler
+}   //end of IntINT2handler
 
 
 /**********************************************************************************************************************
- * Routine:                 __IntTimer1Handler
+ * Routine:                 IntTimer1Handler
 
  * Description:
  * First we reset the interrupt flag and disable the interrupt as well.
@@ -781,7 +788,6 @@ void __ISR(_EXTERNAL_2_VECTOR, IPL3AUTO) __IntINT2handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-extern S_IC dataIC;
 void __ISR(_TIMER_1_VECTOR, IPL5AUTO) __IntTimer1Handler(void)
 { 
     T1CONbits.ON = 0;       //disable timer 1
@@ -809,14 +815,14 @@ void __ISR(_TIMER_1_VECTOR, IPL5AUTO) __IntTimer1Handler(void)
             T1CONbits.ON = 1;               //enable timer 1
             break;
     }
-}   //end of __IntTimer1Handler
+}   //end of IntTimer1Handler
 
 
 /**********************************************************************************************************************
- * Routine:                 __IntUart1Handler
+ * Routine:                 IntUart1Handler
 
  * Description:
- * Manage Rx and Tx interrupts on UART2 
+ * Manage Rx and Tx interrupts on UART1
  * Rx:
  * Store received data byte into the receive buffer. Set the write-pointer of the receive buffer to 0 if it is 
  * on the end position. Clear BufEmpty to 0 --> Receive buffer not more empty. Otherwise check out 'uart1_error'
@@ -839,7 +845,7 @@ void __ISR(_TIMER_1_VECTOR, IPL5AUTO) __IntTimer1Handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
+void __ISR(_UART_1_VECTOR, IPL3SOFT) IntUart1Handler(void)
 {
 //--- Is this an RX interrupt? ---//
     if(IFS0bits.U1RXIF)
@@ -928,11 +934,11 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
         IFS0bits.U1EIF = 0;
         //at the moment we do nothing by an error, just clear the interrupt flag
     }
-}   //end of __IntUart1Handler
+}   //end of IntUart1Handler
 
 
 /**********************************************************************************************************************
- * Routine:                 __IntADCHandler
+ * Routine:                 IntADCHandler
 
  * Description:
  * ...
@@ -945,13 +951,19 @@ void __ISR(_UART_1_VECTOR, IPL2AUTO) __IntUart1Handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
+void __ISR(_ADC_VECTOR, IPL2SOFT) IntADCHandler(void)
 { 
-    IEC1bits.AD1IE = 0;     //interrupt disable
-    IFS1bits.AD1IF = 0;     //clear interrupt flag 
+    volatile unsigned char uint8_WB;    //local work byte 
+    volatile unsigned short int uint16_WB;
+    
+    AD1CON1bits.ON = 0;     //disable ADC module because we will change later the configuration
+                            //for the scan and supply reference
+    AD1CON1bits.ASAM = 0;   //disable the ASAM bit
     oTestLed2 = 0;
-       
-    switch(g_ADC.uint8_MeasuredValueID)
+    
+    uint8_WB = g_ADC.uint8_MeasuredValueID % 2;
+    
+    switch(uint8_WB)
     {
         case (0):   //results are for the first scan 
             g_ADC.uint16_UniIcoilA2 = ADC1BUF0;
@@ -959,27 +971,55 @@ void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
             g_ADC.uint16_UniIcoilB2 = ADC1BUF2;
             g_ADC.uint16_UniIcoilB1 = ADC1BUF3;
             g_ADC.uint16_BipIcoilB = ADC1BUF4;
-            g_ADC.uint16_BipIcoilA = ADC1BUF5;           
+            g_ADC.uint16_BipIcoilA = ADC1BUF5;
+            uint16_WB = ADC1BUF6;
+            uint16_WB = ADC1BUF7;
+            uint16_WB = ADC1BUF8;
+            uint16_WB = ADC1BUF9;
+            uint16_WB = ADC1BUFA;
+            uint16_WB = ADC1BUFB;
+            uint16_WB = ADC1BUFC;
+            uint16_WB = ADC1BUFD;
+            uint16_WB = ADC1BUFE;
+            uint16_WB = ADC1BUFF;
             break;
                 
         case (1):   //results are for the second scan
             g_ADC.uint16_BipVref = ADC1BUF0;
             g_ADC.uint16_Vmot = ADC1BUF1;
             g_ADC.uint16_Imot = ADC1BUF2;
-            g_ADC.uint16_Battery = ADC1BUF3;        
+            g_ADC.uint16_Battery = ADC1BUF3; 
+            uint16_WB = ADC1BUF4;
+            uint16_WB = ADC1BUF5;
+            uint16_WB = ADC1BUF6;
+            uint16_WB = ADC1BUF7;
+            uint16_WB = ADC1BUF8;
+            uint16_WB = ADC1BUF9;
+            uint16_WB = ADC1BUFA;
+            uint16_WB = ADC1BUFB;
+            uint16_WB = ADC1BUFC;
+            uint16_WB = ADC1BUFD;
+            uint16_WB = ADC1BUFE;
+            uint16_WB = ADC1BUFF;
             break;
                 
         default:    //do nothing
             break;
     }  
-    AD1CON1bits.ON = 0;     //disable ADC module because we will change later the configuration
-                            //for the scan and supply reference
+    
     g_ADC.uint8_ConvStarted = 0;    //signal that conversion is done
     g_ADC.uint8_MeasuredValueID++;  //increment the value ID variable
-}   //end of __IntADCHandler
+    
+    IEC1bits.AD1IE = 0;     //interrupt disable
+    IFS1bits.AD1IF = 0;     //clear interrupt flag 
+    
+    //AD1CON1bits.ON = 0;     //disable ADC module because we will change later the configuration
+                            //for the scan and supply reference
+}   //end of IntADCHandler
+
 
 /**********************************************************************************************************************
- * Routine:                 __IntTimer2Handler
+ * Routine:                 IntTimer2Handler
 
  * Description:
  * ...
@@ -993,14 +1033,15 @@ void __ISR(_ADC_VECTOR, IPL2AUTO) __IntADCHandler(void)
  * Output:                  -
 ***********************************************************************************************************************/
 unsigned int nbreTMR2Overflow;
-void __ISR(_TIMER_2_VECTOR, IPL1AUTO) __IntTimer2Handler(void)
+void __ISR(_TIMER_2_VECTOR, IPL2SOFT) IntTimer2Handler(void)
 {
     IFS0bits.T2IF = 0;
     nbreTMR2Overflow++;
 }
 
+
 /**********************************************************************************************************************
- * Routine:                 __IntInputCapture1Handler
+ * Routine:                 IntInputCapture1Handler
 
  * Description:
  * ...
@@ -1013,8 +1054,6 @@ void __ISR(_TIMER_2_VECTOR, IPL1AUTO) __IntTimer2Handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-extern unsigned long eventTime[3];
-extern unsigned short eventMultiplicator[3];
 void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
 {
     static unsigned char nbreEvent = 0;
@@ -1036,8 +1075,9 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
     }
 }
 
+
 /**********************************************************************************************************************
- * Routine:                 __IntInputCapture2Handler
+ * Routine:                 IntInputCapture2Handler
 
  * Description:
  * ...
@@ -1050,6 +1090,8 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL2AUTO) __IntInputCapture1Handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
+unsigned long eventTime[3] = {0}, finalResult[10] = {0};
+unsigned short eventMultiplicator[3] = {0};
 void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL2AUTO) __IntInputCapture2Handler(void)
 {   
     static unsigned char nbreEvent = 0;
