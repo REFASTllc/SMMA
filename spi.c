@@ -55,9 +55,9 @@ void InitSPI(unsigned char spix)
         
         SPI1CON = 0;
         tempData = SPI1BUF;
-        IFS0bits.SPI1EIF = 0;
-        IFS0bits.SPI1RXIF = 0;
-        IFS0bits.SPI1TXIF = 0;
+        IFS0CLR = _IFS0_SPI1EIF_MASK;
+        IFS0CLR = _IFS0_SPI1RXIF_MASK;
+        IFS0CLR = _IFS0_SPI1TXIF_MASK;
     //--- SPI1CON ---------------------------------------------------------------------------------------------------/
         SPI1CONbits.MSTEN = 1;	    // Master Mode Enable bit
                                     // 1 = Master mode
@@ -244,28 +244,28 @@ void InitSPIInterrupt(unsigned char spix, unsigned char action)
         if(action == _ENABLE)
         {
         //--- Error interrupt ---//
-            IFS0bits.SPI1EIF = 0;
+            IFS0CLR = _IFS0_SPI1EIF_MASK;
             IPC5bits.SPI1IP = 4;
             IPC5bits.SPI1IS = 3;
-            IEC0bits.SPI1EIE = 1;
+            IEC0SET = _IEC0_SPI1EIE_MASK;
         //--- Receive data interrupt ---//
-            IFS0bits.SPI1RXIF = 0;
-            IEC0bits.SPI1RXIE = 1;
+            IFS0CLR = _IFS0_SPI1RXIF_MASK;
+            IEC0SET = _IEC0_SPI1RXIE_MASK;
         //--- Transmit buffer empty interrupt ---//
-            IFS0bits.SPI1TXIF = 0;
-            IEC0bits.SPI1TXIE = 0;
+            IFS0CLR = _IFS0_SPI1TXIF_MASK;
+            IEC0CLR = _IEC0_SPI1TXIE_MASK;
         }
         else
         {
         //--- Error interrupt ---//
-            IFS0bits.SPI1EIF = 0;
-            IEC0bits.SPI1EIE = 0;
+            IFS0CLR = _IFS0_SPI1EIF_MASK;
+            IEC0CLR = _IEC0_SPI1EIE_MASK;
         //--- Receive data interrupt ---//
-            IFS0bits.SPI1RXIF = 0;
-            IEC0bits.SPI1RXIE = 0;
+            IFS0CLR = _IFS0_SPI1RXIF_MASK;
+            IEC0CLR = _IEC0_SPI1RXIE_MASK;
         //--- Transmit buffer empty interrupt ---//
-            IFS0bits.SPI1TXIF = 0;
-            IEC0bits.SPI1TXIE = 0;
+            IFS0CLR = _IFS0_SPI1TXIF_MASK;
+            IEC0CLR = _IEC0_SPI1TXIE_MASK;
         }
     }
     if(spix == _SPI_2)
@@ -273,28 +273,28 @@ void InitSPIInterrupt(unsigned char spix, unsigned char action)
         if(action == _ENABLE)
         {
         //--- Error interrupt ---//
-            IFS1bits.SPI2EIF = 0;
+            IFS1CLR = _IFS1_SPI2EIF_MASK;
             IPC7bits.SPI2IP = 7;
             IPC7bits.SPI2IS = 3;
-            IEC1bits.SPI2EIE = 1;
+            IEC1SET = _IEC1_SPI2EIE_MASK;
         //--- Receive data interrupt ---//
-            IFS1bits.SPI2RXIF = 0;
-            IEC1bits.SPI2RXIE = 1;
+            IFS1CLR = _IFS1_SPI2RXIF_MASK;
+            IEC1SET = _IEC1_SPI2RXIE_MASK;
         //--- Transmit buffer empty interrupt ---//
-            IFS1bits.SPI2TXIF = 0;
-            IEC1bits.SPI2TXIE = 1;
+            IFS1CLR = _IFS1_SPI2TXIF_MASK;
+            IEC1CLR = _IEC1_SPI2TXIE_MASK;
         }
         else
         {
         //--- Error interrupt ---//
-            IFS1bits.SPI2EIF = 0;
-            IEC1bits.SPI2EIE = 0;
+            IFS1CLR = _IFS1_SPI2EIF_MASK;
+            IEC1CLR = _IEC1_SPI2EIE_MASK;
         //--- Receive data interrupt ---//
-            IFS1bits.SPI2RXIF = 0;
-            IEC1bits.SPI2RXIE = 0;
+            IFS1CLR = _IFS1_SPI2RXIF_MASK;
+            IEC1CLR = _IEC1_SPI2RXIE_MASK;
         //--- Transmit buffer empty interrupt ---//
-            IFS1bits.SPI2TXIF = 0;
-            IEC1bits.SPI2TXIE = 0;
+            IFS1CLR = _IFS1_SPI2TXIF_MASK;
+            IEC1CLR = _IEC1_SPI2TXIE_MASK;
         }
     }
 }

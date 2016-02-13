@@ -202,12 +202,12 @@ void InitADModule(void)
 ***********************************************************************************************************************/
 void InitADInterrupt(void)
 {
-    IFS1bits.AD1IF = 0; // Interrupt flag bit
+    IFS1CLR = _IFS1_AD1IF_MASK; // Interrupt flag bit
 
-    IPC6bits.AD1IP = 2; // Interrupt priority bits (7 = high, 0 = no interrupt)
-    IPC6bits.AD1IS = 2; // Interrupt sub-priority bits (3 = high priority)
+    IPC6bits.AD1IP = 2;         // Interrupt priority bits (7 = high, 0 = no interrupt)
+    IPC6bits.AD1IS = 2;         // Interrupt sub-priority bits (3 = high priority)
 
-    IEC1bits.AD1IE = 1; // Interrupt enabled
+    IEC1SET = _IEC1_AD1IE_MASK; // Interrupt enabled
 }
 
 
@@ -228,13 +228,9 @@ void InitADInterrupt(void)
 void adc_EnableDisable(unsigned char uint8_ED)
 {
     if(uint8_ED)
-    {
         AD1CON1bits.ON = 1;     //ADC module is operating
-    }
     else
-    {
         AD1CON1bits.ON = 0;     //ADC module is not operating
-    }
 }   //end of adc_EnableDisable
 
 

@@ -188,19 +188,15 @@ void RV30xx_InitInterrupt(unsigned char uint8_action)
                             // 1= Risingedge 
                             // 0= Fallingedge
     
-    IFS0bits.INT2IF = 0;    //clear the interrupt flag
+    IFS0CLR = _IFS0_INT2IF_MASK;    //clear the interrupt flag
     
     IPC2bits.INT2IP = 3;    //interrupt priority = 3
     IPC2bits.INT2IS = 3;    //interrupt subpriority = 3
     
     if(uint8_action)        //enable interrupt?
-    {
-        IEC0bits.INT2IE = 1;    
-    }
+        IEC0SET = _IEC0_INT2IE_MASK;
     else                    //disable interrupt?
-    {
-        IEC0bits.INT2IE = 0;  
-    }
+        IEC0CLR = _IEC0_INT2IE_MASK;
     
 }   //end of RV30xx_InitInterrupt
 

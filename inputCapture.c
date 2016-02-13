@@ -379,75 +379,75 @@ void InitInterruptInputCaptureModule(unsigned char module, unsigned char status)
     {
         if(status == _ENABLE)
         {
-            IFS0bits.IC1IF = 0;
+            IFS0CLR = _IFS0_IC1IF_MASK;
             IPC1bits.IC1IP = 1;
             IPC1bits.IC1IS = 3;
-            IEC0bits.IC1IE = 1;
+            IEC0SET = _IEC0_IC1IE_MASK;
         }
         else
         {
-            IEC0bits.IC1IE = 0;
-            IFS0bits.IC1IF = 0;
+            IEC0CLR = _IEC0_IC1IE_MASK;
+            IFS0CLR = _IFS0_IC1IF_MASK;
         }
     }
     else if(module == _IC_2)
     {
         if(status == _ENABLE)
         {
-            IFS0bits.IC2IF = 0;
+            IFS0CLR = _IFS0_IC2IF_MASK;
             IPC2bits.IC2IP = 1;
             IPC2bits.IC2IS = 3;
-            IEC0bits.IC2IE = 1;
+            IEC0SET = _IEC0_IC2IE_MASK;
         }
         else
         {
-            IEC0bits.IC2IE = 0;
-            IFS0bits.IC2IF = 0;
+            IEC0CLR = _IEC0_IC2IE_MASK;
+            IFS0CLR = _IFS0_IC2IF_MASK;
         }
     }
     else if(module == _IC_3)
     {
         if(status == _ENABLE)
         {
-            IFS0bits.IC3IF = 0;
+            IFS0CLR = _IFS0_IC3IF_MASK;
             IPC3bits.IC3IP = 2;
             IPC3bits.IC3IS = 3;
-            IEC0bits.IC3IE = 1;
+            IEC0SET = _IEC0_IC3IE_MASK;
         }
         else
         {
-            IEC0bits.IC3IE = 0;
-            IFS0bits.IC3IF = 0;
+            IEC0CLR = _IEC0_IC3IE_MASK;
+            IFS0CLR = _IFS0_IC3IF_MASK;
         }
     }   
     else if(module == _IC_4)
     {
         if(status == _ENABLE)
         {
-            IFS0bits.IC4IF = 0;
+            IFS0CLR = _IFS0_IC4IF_MASK;
             IPC4bits.IC4IP = 2;
             IPC4bits.IC4IS = 3;
-            IEC0bits.IC4IE = 1;
+            IEC0SET = _IEC0_IC4IE_MASK;
         }
         else
         {
-            IEC0bits.IC4IE = 0;
-            IFS0bits.IC4IF = 0;
+            IEC0CLR = _IEC0_IC4IE_MASK;
+            IFS0CLR = _IFS0_IC4IF_MASK;
         }
     }
     else if(module == _IC_5)
     {
         if(status == _ENABLE)
         {
-            IFS0bits.IC5IF = 0;
+            IFS0CLR = _IFS0_IC5IF_MASK;
             IPC5bits.IC5IP = 2;
             IPC5bits.IC5IS = 3;
-            IEC0bits.IC5IE = 1;
+            IEC0SET = _IEC0_IC5IE_MASK;
         }
         else
         {
-            IEC0bits.IC5IE = 0;
-            IFS0bits.IC5IF = 0;
+            IEC0CLR = _IEC0_IC5IE_MASK;
+            IFS0CLR = _IFS0_IC5IF_MASK;
         }
     }
 }

@@ -507,42 +507,42 @@ void uart_InitInterrupt(unsigned char uartx, unsigned char action)
 {
     if(uartx == _UART1_)
     {
-        IFS0bits.U1RXIF = 0;
-        IFS0bits.U1TXIF = 1;    //this must be set for the first time - don't set it to 0
-        IFS0bits.U1EIF = 0;
+        IFS0CLR = _IFS0_U1RXIF_MASK;
+        IFS0SET = _IFS0_U1TXIF_MASK;    //this must be set for the first time - don't set it to 0
+        IFS0CLR = _IFS0_U1EIF_MASK;
         if(action == _ENABLE)
         {
             IPC6bits.U1IP = 3;
             IPC6bits.U1IS = 3;
-            IEC0bits.U1RXIE = 1;    
-            IEC0bits.U1TXIE = 0;    //this bit is controlled externally - don't set it 
-            IEC0bits.U1EIE = 0;     //at the moment disabled   
+            IEC0SET = _IEC0_U1RXIE_MASK; 
+            IEC0CLR = _IEC0_U1TXIE_MASK;    //this bit is controlled externally - don't set it 
+            IEC0CLR = _IEC0_U1RXIE_MASK;    //at the moment disabled   
         }
         else
         {
-            IEC0bits.U1RXIE = 0;
-            IEC0bits.U1TXIE = 0;
-            IEC0bits.U1EIE = 0;
+            IEC0CLR = _IEC0_U1RXIE_MASK; 
+            IEC0CLR = _IEC0_U1TXIE_MASK;
+            IEC0CLR = _IEC0_U1RXIE_MASK;
         }
     }
     else if(uartx == _UART2_)
     {
-        IFS1bits.U2RXIF = 0;
-        IFS1bits.U2TXIF = 1;    //this must be set for the first time - don't set it to 0
-        IFS1bits.U2EIF = 0;
+        IFS1CLR = _IFS1_U2RXIF_MASK;
+        IFS1SET = _IFS1_U2TXIF_MASK;    //this must be set for the first time - don't set it to 0
+        IFS1CLR = _IFS1_U2EIF_MASK;
         if(action == _ENABLE)
         {
             IPC8bits.U2IP = 2;
             IPC8bits.U2IS = 3;
-            IEC1bits.U2RXIE = 1;
-            IEC1bits.U2TXIE = 0;    //this bit is controlled externally - don't set it
-            IEC1bits.U2EIE = 1;     
+            IEC1SET = _IEC1_U2RXIE_MASK; 
+            IEC1CLR = _IEC1_U2TXIE_MASK;    //this bit is controlled externally - don't set it 
+            IEC1SET = _IEC1_U2RXIE_MASK;   
         }
         else
         {
-            IEC1bits.U2RXIE = 0;
-            IEC1bits.U2TXIE = 0;
-            IEC1bits.U2EIE = 0;
+            IEC1CLR = _IEC1_U2RXIE_MASK; 
+            IEC1CLR = _IEC1_U2TXIE_MASK;
+            IEC1CLR = _IEC1_U2RXIE_MASK;
         }
     }
 }
@@ -595,8 +595,10 @@ void uart_enable(unsigned char uartx)
 ***********************************************************************************************************************/
 void uart_disable(unsigned char uartx)
 {
-    if(uartx == _UART1_) U1MODEbits.ON = 1;
-    else if(uartx == _UART2_) U2MODEbits.ON = 1;
+    if(uartx == _UART1_) 
+        U1MODEbits.ON = 1;
+    else if(uartx == _UART2_) 
+        U2MODEbits.ON = 1;
 }
 
 
@@ -658,12 +660,12 @@ unsigned char uart_GetChar(void)
 {
     if(IFS0bits.U1RXIF)
     {
-       IFS0bits.U1RXIF = 0;
+       IFS0CLR = _IFS0_U1RXIF_MASK;
        return U1RXREG;
     }
     else if(IFS1bits.U2RXIF)
     {
-        IFS1bits.U2RXIF = 0;
+        IFS1CLR = _IFS1_U2RXIF_MASK;
         return U2RXREG;
     }
 }
@@ -691,15 +693,21 @@ unsigned char uart_status(unsigned char uartx)
     unsigned char temp = 0;
     if(uartx == _UART1_)
     {
-        if(U1STAbits.OERR) temp |= 0x01;
-        if(U1STAbits.FERR) temp |= 0x02;
-        if(U1STAbits.PERR) temp |= 0x04;
+        if(U1STAbits.OERR) 
+            temp |= 0x01;
+        if(U1STAbits.FERR) 
+            temp |= 0x02;
+        if(U1STAbits.PERR) 
+            temp |= 0x04;
     }
     else if(uartx == _UART2_)
     {
-        if(U2STAbits.OERR) temp |= 0x01;
-        if(U2STAbits.FERR) temp |= 0x02;
-        if(U2STAbits.PERR) temp |= 0x04;
+        if(U2STAbits.OERR) 
+            temp |= 0x01;
+        if(U2STAbits.FERR) 
+            temp |= 0x02;
+        if(U2STAbits.PERR) 
+            temp |= 0x04;
     }
     return temp;
 }

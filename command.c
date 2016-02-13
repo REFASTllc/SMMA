@@ -2464,7 +2464,7 @@ void cmd_GFRQVAL(void)
         nbreTMR2Overflow = 0;
         TMR2 = 0;
         SetTimer(_TIMER1, _ENABLE, 0, 5000);
-        IFS0bits.T2IF = 0;
+        IFS0CLR = _IFS0_T2IF_MASK;
         T2CONbits.ON = 1;
         IC1CONbits.ON = 1;
         while(IC1CONbits.ON && dataIC.timeoutMeas);
@@ -3985,7 +3985,7 @@ void cmd_SLIN(void)
             if(uint8_Result == (uint8_WB-1))
             {
                 g_LIN.uint8_LinBreakToSend = 1;             //enable LIN break to send
-                IEC0bits.U1TXIE = 1;                        //enable the send interrupt
+                IEC0SET = _IEC0_U1TXIE_MASK;                //enable the send interrupt
                 g_LIN.uint8_LinBusy = 1;                    //set busy flag
                 //send back a first result
                 uart2_sendbuffer('E');      //first the letter E

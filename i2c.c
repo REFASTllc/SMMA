@@ -327,67 +327,63 @@ void i2c_InitInterrupt(unsigned char uint8_i2cx, unsigned char uint8_action, uns
     {
         if(uint8_action)                //enable?
         {
-            IFS0bits.I2C1MIF = 0;       //I2C1 master interrupt request flag bit
-            IFS0bits.I2C1SIF = 0;       //I2C1 slave interrupt request flag bit
-            IFS0bits.I2C1BIF = 0;       //I2C1 bus collection interrupt request flag bit
+            IFS0CLR = _IFS0_I2C1MIF_MASK;       //I2C1 master interrupt request flag bit
+            IFS0CLR = _IFS0_I2C1SIF_MASK;       //I2C1 slave interrupt request flag bit
+            IFS0CLR = _IFS0_I2C1BIF_MASK;       //I2C1 bus collection interrupt request flag bit
             
             IPC6bits.I2C1IP = 4;        //interrupt priority = 4
             IPC6bits.I2C1IS = 3;        //interrupt subpriority = 3
             
             if(uint8_mode)              //master?
             {
-                IEC0bits.I2C1MIE = 1;   //master interrupt is enabled
-                IEC0bits.I2C1SIE = 0;   //slave interrupt is enabled
-                IEC0bits.I2C1BIE = 1;   //bus collision interrupt enabled
+                IEC0SET = _IEC0_I2C1MIE_MASK;   //master interrupt is enabled
+                IEC0CLR = _IEC0_I2C1SIE_MASK;   //slave interrupt is enabled
+                IEC0SET = _IEC0_I2C1BIE_MASK;   //bus collision interrupt enabled
             }
             else                        //slave?
             {
-                IEC0bits.I2C1MIE = 0;   //master interrupt is disabled
-                IEC0bits.I2C1SIE = 1;   //slave interrupt is enabled
-                IEC0bits.I2C1BIE = 0;   //bus collision interrupt disabled
+                IEC0CLR = _IEC0_I2C1MIE_MASK;   //master interrupt is disabled
+                IEC0SET = _IEC0_I2C1SIE_MASK;   //slave interrupt is enabled
+                IEC0CLR = _IEC0_I2C1BIE_MASK;   //bus collision interrupt disabled
             }
         }
         else                            //disable?
         {
-            IEC0bits.I2C1MIE = 0;       //master interrupt is disabled
-            IEC0bits.I2C1SIE = 0;       //slave interrupt is disabled
-            IEC0bits.I2C1BIE = 0;       //bus collision interrupt disabled
+            IEC0CLR = _IEC0_I2C1MIE_MASK;       //master interrupt is disabled
+            IEC0CLR = _IEC0_I2C1SIE_MASK;       //slave interrupt is disabled
+            IEC0CLR = _IEC0_I2C1BIE_MASK;       //bus collision interrupt disabled
         }
     }
     else if (uint8_i2cx == _i2c2)
     {
         if(uint8_action)                //enable?
         {
-            IFS1bits.I2C2MIF = 0;       //I2C1 master interrupt request flag bit
-            IFS1bits.I2C2SIF = 0;       //I2C1 slave interrupt request flag bit
-            IFS1bits.I2C2BIF = 0;       //I2C1 bus collection interrupt request flag bit
+            IFS1CLR = _IFS1_I2C2MIF_MASK;       //I2C2 master interrupt request flag bit
+            IFS1CLR = _IFS1_I2C2SIF_MASK;       //I2C2 slave interrupt request flag bit
+            IFS1CLR = _IFS1_I2C2BIF_MASK;       //I2C2 bus collection interrupt request flag bit
             
             IPC8bits.I2C2IP = 4;        //interrupt priority = 4
             IPC8bits.I2C2IS = 3;        //interrupt subpriority = 3
             
             if(uint8_mode)              //master?
             {
-                IEC1bits.I2C2MIE = 1;   //master interrupt is enabled
-                IEC1bits.I2C2SIE = 0;   //slave interrupt is enabled
-                IEC1bits.I2C2BIE = 1;   //bus collision interrupt enabled
+                IEC1SET = _IEC1_I2C2MIE_MASK;   //master interrupt is enabled
+                IEC1CLR = _IEC1_I2C2SIE_MASK;   //slave interrupt is enabled
+                IEC1SET = _IEC1_I2C2BIE_MASK;   //bus collision interrupt enabled
             }
             else                        //slave?
             {
-                IEC1bits.I2C2MIE = 0;   //master interrupt is disabled
-                IEC1bits.I2C2SIE = 1;   //slave interrupt is enabled
-                IEC1bits.I2C2BIE = 0;   //bus collision interrupt disabled
+                IEC1CLR = _IEC1_I2C2MIE_MASK;   //master interrupt is disabled
+                IEC1SET = _IEC1_I2C2SIE_MASK;   //slave interrupt is enabled
+                IEC1CLR = _IEC1_I2C2BIE_MASK;   //bus collision interrupt disabled
             }
         }
         else                            //disable?
         {
-            IEC1bits.I2C2MIE = 0;       //master interrupt is disabled
-            IEC1bits.I2C2SIE = 0;       //slave interrupt is disabled
-            IEC1bits.I2C2BIE = 0;       //bus collision interrupt disabled
+            IEC1CLR = _IEC1_I2C2MIE_MASK;       //master interrupt is disabled
+            IEC1CLR = _IEC1_I2C2SIE_MASK;       //slave interrupt is disabled
+            IEC1CLR = _IEC1_I2C2BIE_MASK;       //bus collision interrupt disabled
         }
-    }
-    else
-    {
-        //do nothing
     }
 }   //end of i2c_InitInterrupt
 

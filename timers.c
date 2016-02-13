@@ -399,75 +399,75 @@ void InitInterruptTimer(unsigned char timerx, unsigned char action)
 {
     if(timerx == _TIMER1)
     {
-        IFS0bits.T1IF = 0;
+        IFS0CLR = _IFS0_T1IF_MASK;
         IPC1bits.T1IP = 1;
         IPC1bits.T1IS = 3;
         if(action == _ENABLE) 
-            IEC0bits.T1IE = 1;
+            IEC0SET = _IEC0_T1IE_MASK;
         else
-            IEC0bits.T1IE = 0;
+            IEC0CLR = _IEC0_T1IE_MASK;
     }
     else if(timerx == _TIMER2)
     {
-        IFS0bits.T2IF = 0;
+        IFS0CLR = _IFS0_T2IF_MASK;
         IPC2bits.T2IP = 2;
         IPC2bits.T2IS = 3;
         if(action == _ENABLE)
-            IEC0bits.T2IE = 1;
+            IEC0SET = _IEC0_T2IE_MASK;
         else
-            IEC0bits.T2IE = 0;
+            IEC0CLR = _IEC0_T2IE_MASK;
     }
     else if(timerx == _TIMER3)
     {
-        IFS0bits.T3IF = 0;
+        IFS0CLR = _IFS0_T3IF_MASK;
         IPC3bits.T3IP = 1;
         IPC3bits.T3IS = 3;
         if(action == _ENABLE)
-            IEC0bits.T3IE = 1;
+            IEC0SET = _IEC0_T3IE_MASK;
         else
-            IEC0bits.T3IE = 0;
+            IEC0CLR = _IEC0_T3IE_MASK;
     }
     else if(timerx == _TIMER4)
     {
-        IFS0bits.T4IF = 0;
+        IFS0CLR = _IFS0_T4IF_MASK;
         IPC4bits.T4IP = 7;
         IPC4bits.T4IS = 3;
         if(action == _ENABLE)
-            IEC0bits.T4IE = 1;
+            IEC0SET = _IEC0_T4IE_MASK;
         else
-            IEC0bits.T4IE = 0;
+            IEC0CLR = _IEC0_T4IE_MASK;
     }
     else if(timerx == _TIMER5)
     {
-        IFS0bits.T5IF = 0;
+        IFS0CLR = _IFS0_T5IF_MASK;
         IPC5bits.T5IP = 7;
         IPC5bits.T5IS = 3;
         if(action == _ENABLE)
-            IEC0bits.T5IE = 1;
+            IEC0SET = _IEC0_T5IE_MASK;
         else
-            IEC0bits.T5IE = 0;
+            IEC0CLR = _IEC0_T5IE_MASK;
     }
     else if(timerx == _TIMER23)
     {
-        IFS0bits.T2IF = 0;  //just to be safe
-        IFS0bits.T3IF = 0;
+        IFS0CLR = _IFS0_T2IF_MASK;
+        IFS0CLR = _IFS0_T3IF_MASK;
         IPC3bits.T3IP = 1;
         IPC3bits.T3IS = 3;
         if(action == _ENABLE)
-            IEC0bits.T3IE = 1;
-        else 
-            IEC0bits.T3IE = 0;
+            IEC0SET = _IEC0_T3IE_MASK;
+        else
+            IEC0CLR = _IEC0_T3IE_MASK;
     }
     else if(timerx == _TIMER45)
     {
-        IFS0bits.T4IF = 0;  //just to be safe
-        IFS0bits.T5IF = 0;
+        IFS0CLR = _IFS0_T4IF_MASK;
+        IFS0CLR = _IFS0_T5IF_MASK;
         IPC5bits.T5IP = 6;
         IPC5bits.T5IS = 3;
         if(action == _ENABLE)
-            IEC0bits.T5IE = 1;
+            IEC0SET = _IEC0_T5IE_MASK;
         else
-            IEC0bits.T5IE = 0;
+            IEC0CLR = _IEC0_T5IE_MASK;
     }
 
 }

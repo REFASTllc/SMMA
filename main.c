@@ -97,7 +97,6 @@ void main(void)
         }
         if(!g_UART2txd.uint8_BufEmpty)  //send buffer not empty?
         {
-            //IEC1bits.U2TXIE = 1;        //enable the send interrupt
             IEC1SET = _IEC1_U2TXIE_MASK;         
         }
         if(!g_UART2rxd.uint8_BufEmpty)  //receive buffer not empty?

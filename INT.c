@@ -70,6 +70,8 @@ void INT_init(void)
     
     INTCONCLR = _INTCON_MVEC_MASK;      //clear the MVEC bit*/
     
+    INTCONCLR = 0xFFFFFFFF;
+    INTSTAT = 0;
     
     INTCONbits.SS0 = 0;     // Single Vector Shadow Register Set bit
                             // 1 = Single vector is presented with a shadow register set
@@ -155,6 +157,8 @@ void __ISR(_UART_2_VECTOR, IPL2SOFT) IntUart2Handler(void)
 {
     unsigned char uint8_WB; //local work byte
     
+    asm("di");
+    LOGP(ENTER_IN_ISR);
     U2STAbits.OERR = 0;     //reset this bit according to the errata file
     
 //--- Is this an RX interrupt? ---//
@@ -179,14 +183,14 @@ void __ISR(_UART_2_VECTOR, IPL2SOFT) IntUart2Handler(void)
         //receive buffer not empty
         g_UART2rxd.uint8_BufEmpty = 0;    
         
-        IFS1bits.U2RXIF = 0;        //clear interrupt bit
+        IFS1CLR = _IFS1_U2RXIF_MASK;
     }
     
 //--- Is this an Tx interrupt? ---//    
     if(IFS1bits.U2TXIF)
     {
         LOGP(TX_UART2);
-        IFS1bits.U2TXIF = 0;        //clear interrupt bit
+        IFS1CLR = _IFS1_U2TXIF_MASK;
         
         if(!g_UART2txd.uint8_BufEmpty)      //send buffer not empty?
         {
@@ -211,8 +215,8 @@ void __ISR(_UART_2_VECTOR, IPL2SOFT) IntUart2Handler(void)
         }
         else
         {
-            IEC1bits.U2TXIE = 0;    //disable the send interrupt
-            IFS1bits.U2TXIF = 1;    //enable interrupt flag for the next time
+            IEC1CLR = _IEC1_U2TXIE_MASK;
+            IFS1SET = _IFS1_U2TXIF_MASK;
         }     
     }
     
@@ -221,8 +225,10 @@ void __ISR(_UART_2_VECTOR, IPL2SOFT) IntUart2Handler(void)
     {
         uint8_WB = U2RXREG;     //read out the character but make nothing with it
         
-        IFS1bits.U2EIF = 0;     //clear the interrupt bit
+        IFS1CLR = _IFS1_U2EIF_MASK;
     }
+    LOGP(OUT_OF_ISR);
+    asm("ei");
 }   //end of IntUart2Handler
 
 #ifdef SPI_H
@@ -233,6 +239,7 @@ extern T_SPI SPI1;
 /****************************************************************************/
 void __ISR(_SPI_1_VECTOR, IPL4SOFT) IntSPI1Handler(void)
 {
+    asm("di");
     LOGP(ENTER_IN_ISR);
 
     if(IFS0bits.SPI1RXIF)
@@ -247,20 +254,21 @@ void __ISR(_SPI_1_VECTOR, IPL4SOFT) IntSPI1Handler(void)
             SPI1.bufferFull = 1;
         }
         SPI1.lastRxWrong = 0;
-        IFS0bits.SPI1RXIF = 0;
+        IFS0CLR = _IFS0_SPI1RXIF_MASK;
     }
     else if(IFS0bits.SPI1TXIF)
     {
         LOGP(TX_SPI1);
-        IFS0bits.SPI1TXIF = 0;
+        IFS0CLR = _IFS0_SPI1TXIF_MASK;
     }
     else if(IFS0bits.SPI1EIF)
     {
         LOGP(ERR_SPI1);
         SPI1.lastRxWrong = 1;
-        IFS0bits.SPI1EIF = 0;
+        IFS0CLR = _IFS0_SPI1EIF_MASK;
     }
     LOGP(OUT_OF_ISR);
+    asm("ei");
 }
 #endif
 
@@ -319,11 +327,12 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
 {
     auto unsigned char uint8_WB1;       //local variabel 'WorkByte1'
     
+    asm("di");
     LOGP(ENTER_IN_ISR);
     LOGP(TIMER45);
     
     T4CONbits.ON = 0;           //disable interrupt module
-    IFS0bits.T5IF = 0;          //clear interrupt flag of timer 5
+    IFS0CLR = _IFS0_T5IF_MASK;
     TMR4 = 0;                   //reset LSB counter
     TMR5 = 0;                   //reset MSB counter
     
@@ -549,6 +558,7 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
     
     T4CONbits.ON = 1;           //enable interrupt module   
     LOGP(OUT_OF_ISR);
+    asm("ei");
 }   //end of IntTimer2Handler
 
 
@@ -614,12 +624,13 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
 ***********************************************************************************************************************/
 void __ISR(_I2C_1_VECTOR, IPL4SOFT) IntI2cHandler(void)
 {
+    asm("di");
     LOGP(ENTER_IN_ISR);
     LOGP(I2C1);
 //--- Is this a master interrupt request? ---//
     if(IFS0bits.I2C1MIF)
     {
-        IFS0bits.I2C1MIF = 0;       //clear interrupt bit
+        IFS0CLR = _IFS0_I2C1MIF_MASK;
         
         if(I2C1STATbits.P)          //stop condition detected?
         {
@@ -735,7 +746,7 @@ void __ISR(_I2C_1_VECTOR, IPL4SOFT) IntI2cHandler(void)
 //--- Is this a slave interrupt request? ---//    
     if(IFS0bits.I2C1SIF)
     {
-        IFS0bits.I2C1SIF = 0;       //clear interrupt bit
+        IFS0CLR = _IFS0_I2C1SIF_MASK;
         
         //not programmed yet   
     }
@@ -743,7 +754,7 @@ void __ISR(_I2C_1_VECTOR, IPL4SOFT) IntI2cHandler(void)
 //--- Is this a BUS collision interrupt request? ---//
     if(IFS0bits.I2C1BIF)
     {
-        IFS0bits.I2C1BIF = 0;       //clear interrupt bit
+        IFS0CLR = _IFS0_I2C1BIF_MASK;
         g_i2c1.uint8_BusColl = 1;   //set bus collision flag
         g_i2c1.uint8_Busy = 0;      //i2c finished the transfer, because there was a coll. err. 
         
@@ -757,6 +768,7 @@ void __ISR(_I2C_1_VECTOR, IPL4SOFT) IntI2cHandler(void)
         }       
     }
     LOGP(OUT_OF_ISR);
+    asm("ei");
 }   //end of IntI2cHandler
 
 
@@ -780,9 +792,10 @@ void __ISR(_I2C_1_VECTOR, IPL4SOFT) IntI2cHandler(void)
 ***********************************************************************************************************************/
 void __ISR(_EXTERNAL_2_VECTOR, IPL3SOFT) IntINT2handler(void)
 {
+    asm("di");
     LOGP(ENTER_IN_ISR);
     LOGP(EXT_INT2);
-    IFS0bits.INT2IF = 0;    //clear the interrupt flag
+    IFS0CLR = _IFS0_INT2IF_MASK;
     //add here an alarm!!!
     
 //first enable again the RV30xx chip because the interrupt signaled a "system reset detection"
@@ -808,6 +821,7 @@ void __ISR(_EXTERNAL_2_VECTOR, IPL3SOFT) IntINT2handler(void)
     }
     while(g_i2c1.uint8_Busy);   //until the transfer is finished
     LOGP(OUT_OF_ISR);
+    asm("ei");
 }   //end of IntINT2handler
 
 
@@ -830,11 +844,12 @@ void __ISR(_EXTERNAL_2_VECTOR, IPL3SOFT) IntINT2handler(void)
 ***********************************************************************************************************************/
 void __ISR(_TIMER_1_VECTOR, IPL1SOFT) IntTimer1Handler(void)
 { 
+    asm("di");
     LOGP(ENTER_IN_ISR);
     LOGP(TIMER1);
     T1CONbits.ON = 0;       //disable timer 1
     TMR1 = 0;               //reset counter
-    IFS0bits.T1IF = 0;      //clear interrupt flag
+    IFS0CLR = _IFS0_T1IF_MASK;
     
     switch (g_Timer1.uint8_200msCount)  //verify the value of how much time we have to wait the 200ms
     {
@@ -857,6 +872,7 @@ void __ISR(_TIMER_1_VECTOR, IPL1SOFT) IntTimer1Handler(void)
             break;
     }
     LOGP(OUT_OF_ISR);
+    asm("ei");
 }   //end of IntTimer1Handler
 
 
@@ -889,6 +905,7 @@ void __ISR(_TIMER_1_VECTOR, IPL1SOFT) IntTimer1Handler(void)
 ***********************************************************************************************************************/
 void __ISR(_UART_1_VECTOR, IPL3SOFT) IntUart1Handler(void)
 {
+    asm("di");
     U1STAbits.OERR = 0;     //reset this bit according to the errata file
     
 //--- Is this an RX interrupt? ---//
@@ -917,15 +934,14 @@ void __ISR(_UART_1_VECTOR, IPL3SOFT) IntUart1Handler(void)
             g_LIN.uint8_SlaveAnswerFinish = 1;      //slave answer finish
             g_LIN.uint8_LinBusy = 0;                //reset busy flag
         }
-        
-        IFS0bits.U1RXIF = 0;        //clear interrupt bit
+        IFS0CLR = _IFS0_U1RXIF_MASK;
     }
     
 //--- Is this an Tx interrupt? ---//    
     if(IFS0bits.U1TXIF)
     {
         LOGP(TX_UART1);
-        IFS0bits.U1TXIF = 0;        //clear interrupt bit
+        IFS0CLR = _IFS0_U1TXIF_MASK;
         
         if(!g_UART1txd.uint8_BufEmpty)  //send buffer is not empty
         {
@@ -959,8 +975,8 @@ void __ISR(_UART_1_VECTOR, IPL3SOFT) IntUart1Handler(void)
         }
         else        //send buffer is empty
         {
-            IEC0bits.U1TXIE = 0;    //disable the send interrupt
-            IFS0bits.U1TXIF = 1;    //enable interrupt flag for the next time
+            IEC0CLR = _IEC0_U1TXIE_MASK;
+            IFS0SET = _IFS0_U1TXIF_MASK;
             //enable timeout for slave answer if needed
             if(g_LIN.uint8_SlaveAnswerRequested)
             {
@@ -978,10 +994,11 @@ void __ISR(_UART_1_VECTOR, IPL3SOFT) IntUart1Handler(void)
     if(IFS0bits.U1EIF)
     {
         LOGP(ERR_UART1);
-        IFS0bits.U1EIF = 0;
+        IFS0CLR = _IFS0_U1EIF_MASK;
         //at the moment we do nothing by an error, just clear the interrupt flag
     }
     LOGP(OUT_OF_ISR);
+    asm("ei");
 }   //end of IntUart1Handler
 
 
@@ -1003,6 +1020,9 @@ void __ISR(_ADC_VECTOR, IPL2SOFT) IntADCHandler(void)
 { 
     volatile unsigned long int uint32_emptyADCbuffer;
     
+    asm("di");
+    LOGP(ENTER_IN_ISR);
+    LOGP(ADC);
     AD1CON1bits.ASAM = 0;   //disable the ASAM bit
     
     //read out the complet buffer
@@ -1025,7 +1045,9 @@ void __ISR(_ADC_VECTOR, IPL2SOFT) IntADCHandler(void)
     
     g_ADC.uint8_ConvStarted = 0;    //signal that conversion is done
     oTestLed2 = 0;
-    IFS1bits.AD1IF = 0;     //clear interrupt flag 
+    IFS1CLR = _IFS1_AD1IF_MASK;
+    LOGP(OUT_OF_ISR);
+    asm("ei");
 }   //end of IntADCHandler
 
 
@@ -1046,11 +1068,13 @@ void __ISR(_ADC_VECTOR, IPL2SOFT) IntADCHandler(void)
 unsigned int nbreTMR2Overflow;
 void __ISR(_TIMER_2_VECTOR, IPL2SOFT) IntTimer2Handler(void)
 {
+    asm("di");
     LOGP(ENTER_IN_ISR);
     LOGP(TIMER2);
-    IFS0bits.T2IF = 0;
+    IFS0CLR = _IFS0_T2IF_MASK;
     nbreTMR2Overflow++;
     LOGP(OUT_OF_ISR);
+    asm("ei");
 }
 
 
@@ -1072,10 +1096,12 @@ extern unsigned long eventTime[3];
 extern unsigned short eventMultiplicator[3];
 void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL1SOFT) IntInputCapture1Handler(void)
 {
+    asm("di");
     LOGP(ENTER_IN_ISR);
     LOGP(IC1);
-    IFS0bits.IC1IF = 0;  
+    IFS0CLR = _IFS0_IC1IF_MASK;
     LOGP(OUT_OF_ISR);
+    asm("ei");
 }
 
 
@@ -1096,6 +1122,7 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL1SOFT) IntInputCapture1Handler(void)
 void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL1SOFT) IntInputCapture2Handler(void)
 {   
     static unsigned char nbreEvent = 0;
+    asm("di");
     LOGP(ENTER_IN_ISR);
     LOGP(IC2);
     if(!IC2CONbits.ICBNE)
@@ -1114,6 +1141,129 @@ void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL1SOFT) IntInputCapture2Handler(void)
         nbreTMR2Overflow = 0;
         nbreEvent = 0;
     }
-    IFS0bits.IC2IF = 0;
+    IFS0CLR = _IFS0_IC2IF_MASK;
     LOGP(OUT_OF_ISR);
+    asm("ei");
+}
+
+/********************** I S R   N O T   U S E D *******************************/
+void __ISR(_CORE_TIMER_VECTOR, IPL1SOFT) CoreTimerHandler(void)
+{
+    Nop();
+}
+void __ISR(_CORE_SOFTWARE_0_VECTOR, IPL1SOFT) CoreSoftwareInt1Handler(void)
+{
+    Nop();
+}
+void __ISR(_CORE_SOFTWARE_1_VECTOR, IPL1SOFT) CoreSoftwareInt2Handler(void)
+{
+    Nop();
+}
+void __ISR(_EXTERNAL_0_VECTOR, IPL1SOFT) ExternalInt0Handler(void)
+{
+    Nop();
+}
+void __ISR(_OUTPUT_COMPARE_1_VECTOR, IPL1SOFT) OutputCapt1IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_EXTERNAL_1_VECTOR, IPL1SOFT) ExternalInt1Handler(void)
+{
+    Nop();
+}
+void __ISR(_OUTPUT_COMPARE_2_VECTOR, IPL1SOFT) OutputCapt2IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_TIMER_3_VECTOR, IPL1SOFT) Timer3IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL1SOFT) InputCapt3IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_OUTPUT_COMPARE_3_VECTOR, IPL1SOFT) OutputCapt3IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_EXTERNAL_3_VECTOR, IPL1SOFT) ExternalInt3Handler(void)
+{
+    Nop();
+}
+void __ISR(_TIMER_4_VECTOR, IPL1SOFT) Timer4IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_INPUT_CAPTURE_4_VECTOR, IPL1SOFT) InputCapt4IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_OUTPUT_COMPARE_4_VECTOR, IPL1SOFT) OutputCapt4IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_EXTERNAL_4_VECTOR, IPL1SOFT) ExternalInt4Handler(void)
+{
+    Nop();
+}
+void __ISR(_INPUT_CAPTURE_5_VECTOR, IPL1SOFT) InputCapt5IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_OUTPUT_COMPARE_5_VECTOR, IPL1SOFT) OutputCapt5IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_CHANGE_NOTICE_VECTOR, IPL1SOFT) ChangeNoticeHandler(void)
+{
+    Nop();
+}
+void __ISR(_PMP_VECTOR, IPL1SOFT) PMPHandler(void)
+{
+    Nop();
+}
+void __ISR(_COMPARATOR_1_VECTOR, IPL1SOFT) CMP1IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_COMPARATOR_2_VECTOR, IPL1SOFT) CMP2IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_SPI_2_VECTOR, IPL1SOFT) SPI2IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_I2C_2_VECTOR, IPL1SOFT) I2C2IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_FAIL_SAFE_MONITOR_VECTOR, IPL1SOFT) FailSafeMonIntHandler(void)
+{
+    Nop();
+}
+void __ISR(_RTCC_VECTOR, IPL1SOFT) RTCIntHandler(void)
+{
+    Nop();
+}
+void __ISR(_DMA_0_VECTOR, IPL1SOFT) DMACh0IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_DMA_1_VECTOR, IPL1SOFT) DMACh1IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_DMA_2_VECTOR, IPL1SOFT) DMACh2IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_DMA_3_VECTOR, IPL1SOFT) DMACh3IntHandler(void)
+{
+    Nop();
+}
+void __ISR(_FCE_VECTOR, IPL1SOFT) FlashCtrEventIntHandler(void)
+{
+    Nop();
 }
