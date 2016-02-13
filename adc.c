@@ -112,9 +112,9 @@ void InitADModule(void)
                             // 1 = ADC is currently filling buffer 0x8-0xF, user should access data in 0x0-0x7
                             // 0 = ADC is currently filling buffer 0x0-0x7, user should access data in 0x8-0xF
 
-    AD1CON2bits.SMPI3 = 0;  // 1111 = Interrupts at the completion of conversion for each 16th sample/convert sequence
+    AD1CON2bits.SMPI3 = 1;  // 1111 = Interrupts at the completion of conversion for each 16th sample/convert sequence
     AD1CON2bits.SMPI2 = 0;  // .... 
-    AD1CON2bits.SMPI1 = 0;  // 0001 = Interrupts at the completion of conversion for each 2nd sample/convert sequence
+    AD1CON2bits.SMPI1 = 1;  // 0001 = Interrupts at the completion of conversion for each 2nd sample/convert sequence
     AD1CON2bits.SMPI0 = 0;  // 0000 = Interrupts at the completion of conversion for each sample/convert sequence
                             
     AD1CON2bits.BUFM = 0;   // 1 = Buffer configured as two 8-word buffers, ADC1BUF(7...0), ADC1BUF(15...8)
@@ -134,15 +134,17 @@ void InitADModule(void)
     AD1CON3bits.SAMC1 = 1;  // 00001 = 1 TAD 
     AD1CON3bits.SAMC0 = 1;  // 00000 = 0 TAD (Not allowed)
 
-    //ADCS = 40 (refer to the document "ADC calculations" for more details)
+    //ADCS = 18 (refer to the document "ADC calculations" for more details)
     AD1CON3bits.ADCS7 = 0;  // 11111111 = TPB ? 2 ? (ADCS<7:0> + 1) = 512 ? TPB = TAD
     AD1CON3bits.ADCS6 = 0;  // ...
-    AD1CON3bits.ADCS5 = 1;  // ...
-    AD1CON3bits.ADCS4 = 0;  // ...
-    AD1CON3bits.ADCS3 = 1;  // 00000001 = TPB ? 2 ? (ADCS<7:0> + 1) = 4 ? TPB = TAD
+    AD1CON3bits.ADCS5 = 0;  // ...
+    AD1CON3bits.ADCS4 = 1;  // ...
+    AD1CON3bits.ADCS3 = 0;  // 00000001 = TPB ? 2 ? (ADCS<7:0> + 1) = 4 ? TPB = TAD
     AD1CON3bits.ADCS2 = 0;  // 00000000 = TPB ? 2 ? (ADCS<7:0> + 1) = 2 ? TPB = TAD
-    AD1CON3bits.ADCS1 = 0;  // TPB is the PIC32 Peripheral Bus clock time period.
+    AD1CON3bits.ADCS1 = 1;  // TPB is the PIC32 Peripheral Bus clock time period.
     AD1CON3bits.ADCS0 = 0;  // Refer to Section 6. ?Oscillator? (DS61112) for more information.
+    
+    //With that we have a sampling rate around 50ksps per channel. 
     
 //AD1CHS: ADC input select register
     AD1CHSbits.CH0NB = 0;   //negative input select for MUX B bit
