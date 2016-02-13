@@ -835,7 +835,7 @@ void cmd_GVER(void)
 {
     if(g_CmdChk.uint8_ParamPos == 1)    //number of received characters OK?
     {   
-//        RV30xx_TempMeas();
+        RV30xx_TempMeas();
         funct_LoadDeviceInfo();     //call subroutine 
     }
     else
