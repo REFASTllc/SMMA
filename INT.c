@@ -861,6 +861,7 @@ void __ISR(_TIMER_1_VECTOR, IPL1SOFT) IntTimer1Handler(void)
             //LIN:
             g_LIN.uint8_SlaveTimeout = 1;   //timeout occured
             g_LIN.uint8_LinBusy = 0;        //reset busy flag
+            dataIC.timeoutMeas = 0;         // Timeout occurs during measure of PWM / frequency
             
             
             break;
@@ -1136,7 +1137,7 @@ void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL1SOFT) IntInputCapture2Handler(void)
     {
         IC2CONbits.ON = 0;
         T2CONbits.ON = 0;
-        IFS0bits.T2IF = 0;
+        IFS0CLR = _IFS0_IC2IF_MASK;
         TMR2 = 0;
         nbreTMR2Overflow = 0;
         nbreEvent = 0;
@@ -1145,8 +1146,9 @@ void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL1SOFT) IntInputCapture2Handler(void)
     LOGP(OUT_OF_ISR);
     asm("ei");
 }
-
+/******************************************************************************/
 /********************** I S R   N O T   U S E D *******************************/
+/******************************************************************************/
 void __ISR(_CORE_TIMER_VECTOR, IPL1SOFT) CoreTimerHandler(void)
 {
     Nop();
