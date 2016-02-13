@@ -260,10 +260,102 @@ void adc_LaunchNextMeasure(void)
     }
     else
     {
-        g_ADC.uint8_ConvStarted = 1;    //signal that a conversion is started     
-        AD1CON1bits.ASAM = 1;           //launch the conversion
-                                        //note this bit is set back to 0 automatic after 
-                                        //the interrupt is generated
-        //oTestLed2 = 1;
+        uint8_WB1 = g_ADC.uint8_NextMeasureID % 101;
+        g_ADC.uint8_NextMeasureID++;
+        uint8_WB2 = g_ADC.uint8_MeasuredValueID % 2;
+        
+        switch(uint8_WB1)
+        {
+            case (0):   //set the reference voltage and interrupt condition
+                switch (uint8_WB2)
+                {
+                    case (0):   //reference = 2.048V
+                        //set reference voltage to external VREF+ and VREF-
+                        AD1CON2bits.VCFG2 = 0;  //      ADC VR+             ADC VR-
+                        AD1CON2bits.VCFG1 = 1;  // 000  AVDD                AVSS
+                        AD1CON2bits.VCFG0 = 1;  // 001  External VREF+ pin  AVSS
+                                                // 010  AVDD                External VREF- pin
+                                                // 011  External VREF+ pin  External VREF- pin
+                                                // 1xx  AVDD                AVSS
+
+                        //set scanning channels
+                        AD1CSSLbits.CSSL0 = 0;  //skip AN0 for input scan
+                        AD1CSSLbits.CSSL1 = 0;  //skip AN1 for input scan
+                        AD1CSSLbits.CSSL2 = 1;  //unipolar; Icoil A2
+                        AD1CSSLbits.CSSL3 = 1;  //unipolar; Icoil A1
+                        AD1CSSLbits.CSSL4 = 1;  //unipolar; Icoil B2
+                        AD1CSSLbits.CSSL5 = 1;  //unipolar; Icoil B1
+                        AD1CSSLbits.CSSL6 = 1;  //bipolar; Icoil B
+                        AD1CSSLbits.CSSL7 = 0;  //bipolar; Vref
+                        AD1CSSLbits.CSSL8 = 0;  //Vmot
+                        AD1CSSLbits.CSSL9 = 0;  //Imot
+                        AD1CSSLbits.CSSL10 = 1; //bipolar; Icoil A
+                        AD1CSSLbits.CSSL11 = 0; //battery
+                        AD1CSSLbits.CSSL12 = 0; //skip AN12 for input scan
+                        AD1CSSLbits.CSSL13 = 0; //skip AN13 for input scan
+                        AD1CSSLbits.CSSL14 = 0; //skip AN14 for input scan
+                        AD1CSSLbits.CSSL15 = 0; //skip AN15 for input scan
+
+                        //set that interrupt should occur after 6 measured values
+                        AD1CON2bits.SMPI3 = 0;  
+                        AD1CON2bits.SMPI2 = 1;  
+                        AD1CON2bits.SMPI1 = 1;  
+                        AD1CON2bits.SMPI0 = 0;   
+                        break;
+                        
+                    case (1):   //reference = 3.3V
+                        //set reference voltage to external AVDD and AVSS
+                        AD1CON2bits.VCFG2 = 0;  //      ADC VR+             ADC VR-
+                        AD1CON2bits.VCFG1 = 0;  // 000  AVDD                AVSS
+                        AD1CON2bits.VCFG0 = 0;  // 001  External VREF+ pin  AVSS
+                                                // 010  AVDD                External VREF- pin
+                                                // 011  External VREF+ pin  External VREF- pin
+                                                // 1xx  AVDD                AVSS
+
+                        //set scanning channels
+                        AD1CSSLbits.CSSL0 = 0;  //skip AN0 for input scan
+                        AD1CSSLbits.CSSL1 = 0;  //skip AN1 for input scan
+                        AD1CSSLbits.CSSL2 = 0;  //unipolar; Icoil A2
+                        AD1CSSLbits.CSSL3 = 0;  //unipolar; Icoil A1
+                        AD1CSSLbits.CSSL4 = 0;  //unipolar; Icoil B2
+                        AD1CSSLbits.CSSL5 = 0;  //unipolar; Icoil B1
+                        AD1CSSLbits.CSSL6 = 0;  //bipolar; Icoil B
+                        AD1CSSLbits.CSSL7 = 1;  //bipolar; Vref
+                        AD1CSSLbits.CSSL8 = 1;  //Vmot
+                        AD1CSSLbits.CSSL9 = 1;  //Imot
+                        AD1CSSLbits.CSSL10 = 0; //bipolar; Icoil A
+                        AD1CSSLbits.CSSL11 = 1; //battery
+                        AD1CSSLbits.CSSL12 = 0; //skip AN12 for input scan
+                        AD1CSSLbits.CSSL13 = 0; //skip AN13 for input scan
+                        AD1CSSLbits.CSSL14 = 0; //skip AN14 for input scan
+                        AD1CSSLbits.CSSL15 = 0; //skip AN15 for input scan
+
+                        //set that interrupt should occur after 4 measured values
+                        AD1CON2bits.SMPI3 = 0;  
+                        AD1CON2bits.SMPI2 = 1;  
+                        AD1CON2bits.SMPI1 = 0;  
+                        AD1CON2bits.SMPI0 = 0; 
+                        break;
+                
+                    default:
+                        break;                    
+                }
+                
+                AD1CON1bits.ON = 1;     //enable ADC module
+                IFS1bits.AD1IF = 0;     //clear interrupt flag
+                IEC1bits.AD1IE = 1;     //interrupt enable
+                break;
+            
+            case (100):   //launch new measure
+                g_ADC.uint8_ConvStarted = 1;    //signal that a conversion is started     
+                AD1CON1bits.ASAM = 1;           //launch the conversion
+                                                //note this bit is set back to 0 automatic after 
+                                                //the interrupt is generated
+                oTestLed2 = 1;
+                break;
+                
+            default:    //do nothing
+                break;
+        }
     }
 }   //end of adc_LaunchNextMeasure

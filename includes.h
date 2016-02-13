@@ -62,6 +62,7 @@
 #include "DAC7571.h"
 #include "RV30xx.h"
 #include "LinATA6628.h"
+#include "DebugBuf.h"
 
 #endif	/* INCLUDES_H */
 

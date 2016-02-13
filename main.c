@@ -25,6 +25,7 @@ extern T_SPI SPI1;
 extern T_A3981 A3981;
 extern SLin g_LIN;
 extern SADC g_ADC;
+extern S_RING_BUF debugBuf;
 
 /**********************************************************************************************************************
  * Routine:                 main
@@ -44,8 +45,6 @@ void main(void)
 {  
     unsigned short int temp = 0; 
     
-    //SYSTEMConfigPerformance(80000000);
-   
     system_init();          //call subroutine    
     
     asm("ei");              //enable all interrupts (code in assembler) use declaration "di" to disable all interrupts
@@ -78,6 +77,13 @@ void main(void)
 //    DAC7571_WrByte(_NormalMode, 2381);  // 2V
 //    DAC7571_WrByte(_NormalMode, 992);  // 0V8
     //DAC7571_WrByte(_NormalMode, 2113);  // 1.7V
+    
+#ifdef DEBUG_ON
+    InitDebugBuf();
+#endif
+    
+    for(temp = 0; temp < LOG_BUF_DEPTH;temp++)
+        debugBuf.buffer[temp] = 0;
       
     while(1)
     {      

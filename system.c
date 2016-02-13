@@ -128,7 +128,7 @@ void system_init(void)
     // Initialization of timer 2 (used for input capture module)
     InitTimer2();
     InitInterruptTimer(_TIMER2, _ENABLE);
-    SetTimer(_TIMER2, _ENABLE, 0, 0xffff);
+    SetTimer(_TIMER2, _DISABLE, 0, 0xffff);
     // Initialization of input capture modules 1 & 2
     InitInputCapture1Module();
     InitInputCapture2Module();
