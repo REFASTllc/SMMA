@@ -122,7 +122,7 @@ void main(void)
                 temp++;
         }
         
-        //adc_LaunchNextMeasure();    //call subroutine
+        adc_LaunchNextMeasure();    //call subroutine
          
         
     }

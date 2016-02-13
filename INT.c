@@ -155,6 +155,8 @@ void __ISR(_UART_2_VECTOR, IPL2SOFT) IntUart2Handler(void)
 {
     unsigned char uint8_WB; //local work byte
     
+    U2STAbits.OERR = 0;     //reset this bit according to the errata file
+    
 //--- Is this an RX interrupt? ---//
     if(IFS1bits.U2RXIF)
     {     
@@ -887,6 +889,8 @@ void __ISR(_TIMER_1_VECTOR, IPL1SOFT) IntTimer1Handler(void)
 ***********************************************************************************************************************/
 void __ISR(_UART_1_VECTOR, IPL3SOFT) IntUart1Handler(void)
 {
+    U1STAbits.OERR = 0;     //reset this bit according to the errata file
+    
 //--- Is this an RX interrupt? ---//
     if(IFS0bits.U1RXIF)
     {
@@ -999,8 +1003,6 @@ void __ISR(_ADC_VECTOR, IPL2SOFT) IntADCHandler(void)
 { 
     volatile unsigned long int uint32_emptyADCbuffer;
     
-    AD1CON1bits.ON = 0;     //disable ADC module because we will change later the configuration
-                            //for the scan and supply reference
     AD1CON1bits.ASAM = 0;   //disable the ASAM bit
     
     //read out the complet buffer
@@ -1022,14 +1024,8 @@ void __ISR(_ADC_VECTOR, IPL2SOFT) IntADCHandler(void)
     uint32_emptyADCbuffer = ADC1BUFF;  
     
     g_ADC.uint8_ConvStarted = 0;    //signal that conversion is done
-    g_ADC.uint8_MeasuredValueID++;  //increment the value ID variable
-    
-    IEC1bits.AD1IE = 0;     //interrupt disable
-    //IFS1CLR = 0x0000002;    //clear interrupt flag
+    oTestLed2 = 0;
     IFS1bits.AD1IF = 0;     //clear interrupt flag 
-    
-    //AD1CON1bits.ON = 0;     //disable ADC module because we will change later the configuration
-                            //for the scan and supply reference
 }   //end of IntADCHandler
 
 
