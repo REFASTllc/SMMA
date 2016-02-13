@@ -154,6 +154,9 @@ void INT_init(void)
 void __ISR(_UART_2_VECTOR, IPL2SOFT) IntUart2Handler(void)
 {
     unsigned char uint8_WB; //local work byte
+    oTestLed2 = 1;
+    
+    U2STAbits.OERR = 0;     //clear the OERR bit according to the errata sheet
     
 //--- Is this an RX interrupt? ---//
     if(IFS1bits.U2RXIF)
@@ -207,7 +210,16 @@ void __ISR(_UART_2_VECTOR, IPL2SOFT) IntUart2Handler(void)
         }
         else
         {
-            IEC1bits.U2TXIE = 0;    //disable the send interrupt
+            IEC1CLR = _IEC1_U2TXIE_MASK;
+            //if(U2STAbits.TRMT)      //transmit shift register and transmit buffer emtpy?
+            //{
+                //IEC1bits.U2TXIE = 0;    //disable the send interrupt
+                //U2STAbits.UTXEN = 0;    //disable tx           
+            //}
+            //else
+            //{
+                //wait until last character was send out
+            //}
             IFS1bits.U2TXIF = 1;    //enable interrupt flag for the next time
         }     
     }
@@ -219,6 +231,7 @@ void __ISR(_UART_2_VECTOR, IPL2SOFT) IntUart2Handler(void)
         
         IFS1bits.U2EIF = 0;     //clear the interrupt bit
     }
+    oTestLed2 = 0;
 }   //end of IntUart2Handler
 
 #ifdef SPI_H
@@ -866,6 +879,8 @@ void __ISR(_TIMER_1_VECTOR, IPL1SOFT) IntTimer1Handler(void)
 ***********************************************************************************************************************/
 void __ISR(_UART_1_VECTOR, IPL3SOFT) IntUart1Handler(void)
 {
+    U1STAbits.OERR = 0;     //clear the OERR bit according to the errata sheet
+    
 //--- Is this an RX interrupt? ---//
     if(IFS0bits.U1RXIF)
     {
@@ -972,69 +987,31 @@ void __ISR(_UART_1_VECTOR, IPL3SOFT) IntUart1Handler(void)
 ***********************************************************************************************************************/
 void __ISR(_ADC_VECTOR, IPL2SOFT) IntADCHandler(void)
 { 
-    volatile unsigned char uint8_WB;    //local work byte 
-    volatile unsigned short int uint16_WB;
+    volatile unsigned long int uint32_emptyADCbuffer;
     
-    AD1CON1bits.ON = 0;     //disable ADC module because we will change later the configuration
-                            //for the scan and supply reference
     AD1CON1bits.ASAM = 0;   //disable the ASAM bit
-    oTestLed2 = 0;
     
-    uint8_WB = g_ADC.uint8_MeasuredValueID % 2;
-    
-    switch(uint8_WB)
-    {
-        case (0):   //results are for the first scan 
-            g_ADC.uint16_UniIcoilA2 = ADC1BUF0;
-            g_ADC.uint16_UniIcoilA1 = ADC1BUF1;
-            g_ADC.uint16_UniIcoilB2 = ADC1BUF2;
-            g_ADC.uint16_UniIcoilB1 = ADC1BUF3;
-            g_ADC.uint16_BipIcoilB = ADC1BUF4;
-            g_ADC.uint16_BipIcoilA = ADC1BUF5;
-            uint16_WB = ADC1BUF6;
-            uint16_WB = ADC1BUF7;
-            uint16_WB = ADC1BUF8;
-            uint16_WB = ADC1BUF9;
-            uint16_WB = ADC1BUFA;
-            uint16_WB = ADC1BUFB;
-            uint16_WB = ADC1BUFC;
-            uint16_WB = ADC1BUFD;
-            uint16_WB = ADC1BUFE;
-            uint16_WB = ADC1BUFF;
-            break;
-                
-        case (1):   //results are for the second scan
-            g_ADC.uint16_BipVref = ADC1BUF0;
-            g_ADC.uint16_Vmot = ADC1BUF1;
-            g_ADC.uint16_Imot = ADC1BUF2;
-            g_ADC.uint16_Battery = ADC1BUF3; 
-            uint16_WB = ADC1BUF4;
-            uint16_WB = ADC1BUF5;
-            uint16_WB = ADC1BUF6;
-            uint16_WB = ADC1BUF7;
-            uint16_WB = ADC1BUF8;
-            uint16_WB = ADC1BUF9;
-            uint16_WB = ADC1BUFA;
-            uint16_WB = ADC1BUFB;
-            uint16_WB = ADC1BUFC;
-            uint16_WB = ADC1BUFD;
-            uint16_WB = ADC1BUFE;
-            uint16_WB = ADC1BUFF;
-            break;
-                
-        default:    //do nothing
-            break;
-    }  
+    //read out the complet buffer
+    g_ADC.uint32_UniIcoilA2 = ADC1BUF0;
+    g_ADC.uint32_UniIcoilA1 = ADC1BUF1;
+    g_ADC.uint32_UniIcoilB2 = ADC1BUF2;
+    g_ADC.uint32_UniIcoilB1 = ADC1BUF3;
+    g_ADC.uint32_BipIcoilB = ADC1BUF4;
+    g_ADC.uint32_BipVref = ADC1BUF5;
+    g_ADC.uint32_Vmot = ADC1BUF6;
+    g_ADC.uint32_Imot = ADC1BUF7;
+    g_ADC.uint32_BipIcoilA = ADC1BUF8;
+    g_ADC.uint32_Battery = ADC1BUF9;
+    uint32_emptyADCbuffer = ADC1BUFA;
+    uint32_emptyADCbuffer = ADC1BUFB;
+    uint32_emptyADCbuffer = ADC1BUFC;
+    uint32_emptyADCbuffer = ADC1BUFD;
+    uint32_emptyADCbuffer = ADC1BUFE;
+    uint32_emptyADCbuffer = ADC1BUFF;  
     
     g_ADC.uint8_ConvStarted = 0;    //signal that conversion is done
-    g_ADC.uint8_MeasuredValueID++;  //increment the value ID variable
-    
-    IEC1bits.AD1IE = 0;     //interrupt disable
-    //IFS1CLR = 0x0000002;    //clear interrupt flag
+    //oTestLed2 = 0;
     IFS1bits.AD1IF = 0;     //clear interrupt flag 
-    
-    //AD1CON1bits.ON = 0;     //disable ADC module because we will change later the configuration
-                            //for the scan and supply reference
 }   //end of IntADCHandler
 
 

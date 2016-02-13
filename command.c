@@ -1388,7 +1388,7 @@ void cmd_MUMOT(void)
         //measure here the voltage or take the last measured parameter and send it back!
         
         //convert the result in mV
-        uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint16_Vmot,18);
+        uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);
         
         //send back the needed informations
         uart2_sendbuffer('E');                          //first the letter E
@@ -4831,11 +4831,11 @@ void cmd_GVBAK(void)
         //measure here the voltage or take the last measured parameter and send it back!
         
         //convert the result in mV
-        uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint16_Battery,310);
+        uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Battery,310);
         
         //Backup voltage less than the Vcut "cut-off" level
         //621 = (ADCres / 3.3V) * Vcut = (1024 / 3.3V) * 2.0V
-        if(g_ADC.uint16_Battery <= 621)
+        if(g_ADC.uint32_Battery <= 621)
         {
             uart2_sendbuffer('X');                      //first the letter X
             uart2_sendbuffer(',');                      //add the comma       

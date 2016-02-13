@@ -73,7 +73,7 @@ void main(void)
 #endif*/
  //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!   
     
-//    periph_init();
+      periph_init();
 //    DAC7571_WrByte(_NormalMode, 1240);  // 1V
 //    DAC7571_WrByte(_NormalMode, 2381);  // 2V
 //    DAC7571_WrByte(_NormalMode, 992);  // 0V8
@@ -82,13 +82,22 @@ void main(void)
     while(1)
     {      
         if(g_Uni.uint8_Settings & 0x01) //verify if the unipolar motor has to move
-            uni_move();                 //then call the subroutine
+        {
+            uni_move();                 //then call the subroutine            
+        }
         if(g_Bipol.uint1_IsBipolEnabled)
-            bi_move();
+        {
+            bi_move();           
+        }
         if(!g_UART2txd.uint8_BufEmpty)  //send buffer not empty?
-            IEC1bits.U2TXIE = 1;        //enable the send interrupt        
+        {
+            //IEC1bits.U2TXIE = 1;        //enable the send interrupt
+            IEC1SET = _IEC1_U2TXIE_MASK;         
+        }
         if(!g_UART2rxd.uint8_BufEmpty)  //receive buffer not empty?
-            cmdchk_check();             //call subroutine
+        {
+            cmdchk_check();             //call subroutine            
+        }
         if(g_LIN.uint8_SlaveAnswerRequested)    //answer from LIN slave requested
         {
             //timeout or slave answer received
@@ -100,7 +109,6 @@ void main(void)
             static unsigned short int temp = 0;
             if(temp >= 10000)
             { 
-                //adc_LaunchNextMeasure();    //call subroutine 
                 //oTestLed1 =! oTestLed1;
                 temp = 0;
             }
@@ -108,7 +116,7 @@ void main(void)
                 temp++;
         }
         
-        adc_LaunchNextMeasure();    //call subroutine
+        //adc_LaunchNextMeasure();    //call subroutine
          
         
     }

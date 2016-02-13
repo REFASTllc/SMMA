@@ -262,7 +262,7 @@ void uart_init(unsigned char uartx)
 
         U2STAbits.ADDR = 0xff;  // Automatic Address Mask bits
                                 // When the ADM_EN bit is ?1?, this value defines the address character to use for automatic address detection.
-
+                           //befor was 01
         U2STAbits.UTXISEL1 = 0; // UTXISEL<1:0>: TX Interrupt Mode Selection bits(4)
         U2STAbits.UTXISEL0 = 1; // For 4-level deep FIFO UART modules:
                                 // 11 = Reserved, do not use
@@ -290,7 +290,7 @@ void uart_init(unsigned char uartx)
         U2STAbits.UTXBRK = 0;   // Transmit Break bit
                                 // 1 = Send Break on next transmission. Start bit followed by twelve ?0? bits, followed by Stop bit; cleared by hardware upon completion
                                 // 0 = Break transmission is disabled or completed
-
+                          //befor was 1
         U2STAbits.UTXEN = 1;    // Transmit Enable bit
                                 // 1 = UARTx transmitter is enabled. UxTX pin is controlled by UARTx (if ON = 1)
                                 // 0 = UARTx transmitter is disabled. Any pending transmission is aborted and buffer is reset. UxTX pin is controlled by port.
@@ -302,7 +302,7 @@ void uart_init(unsigned char uartx)
         U2STAbits.TRMT = 0;     // Transmit Shift Register is Empty bit (read-only)
                                 // 1 = Transmit shift register is empty and transmit buffer is empty (the last transmission has completed)
                                 // 0 = Transmit shift register is not empty, a transmission is in progress or queued in the transmit buffer
-
+                         
         U2STAbits.URXISEL1 = 0; // Receive Interrupt Mode Selection bit(4)
         U2STAbits.URXISEL0 = 0; // For 4-level deep FIFO UART modules:
                                 // 11 = Interrupt flag bit is set when receive buffer becomes full (i.e., has 4 data characters)
@@ -572,7 +572,7 @@ void uart_enable(unsigned char uartx)
     }
     else if(uartx == _UART2_)
     {
-        U2STAbits.UTXEN = 1;  
+        U2STAbits.UTXEN = 1;                //befor was 1  
         U2STAbits.URXEN = 1;
         U2MODEbits.ON = 1;
     }
