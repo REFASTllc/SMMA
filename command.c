@@ -2329,6 +2329,8 @@ void cmd_GPWMVAL(void)
     {
         dataIC.timeoutMeas = 1;
         nbreTMR2Overflow = 0;
+        TMR2 = 0;
+        IFS0CLR = _IFS0_T2IF_MASK;
         SetTimer(_TIMER1, _ENABLE, 0, 1500);
         IC2CONbits.ON = 1;
         T2CONbits.ON = 1;
