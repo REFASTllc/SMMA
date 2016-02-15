@@ -712,6 +712,14 @@ void cmdchk_check(void)
                 case (_IdGFRQBIT):      //command GFRQBIT
                     cmd_GFRQBIT();      //call subroutine
                     break;
+                    
+                case (_IdSRUNBIT):      //command SRUNBIT
+                    cmd_SRUNBIT();      //call subroutine
+                    break;
+                    
+                case (_IdGRUNBIT):      //command GRUNBIT
+                    cmd_GRUNBIT();      //call subroutine
+                    break;
                                      
                 default:    //command ID does not exist
                     //do nothing - error has to be send before this routine
@@ -1607,6 +1615,14 @@ void cmdchk_def(void)
                             case (0x47465251):  //cmd is = GFRQBIT
                                 g_CmdChk.uint8_CmdID = _IdGFRQBIT;
                                 break;  
+                                
+                            case (0x5352554E):  //cmd is = SRUNBIT
+                                g_CmdChk.uint8_CmdID = _IdSRUNBIT;
+                                break;
+                                
+                            case (0x4752554E):  //cmd is = GRUNBIT
+                                g_CmdChk.uint8_CmdID = _IdGRUNBIT;
+                                break;
                                 
                             default:    //error - command is not defined
                                 g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID

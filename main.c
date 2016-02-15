@@ -107,7 +107,9 @@ void main(void)
         {
             //timeout or slave answer received
             if((g_LIN.uint8_SlaveTimeout) || (g_LIN.uint8_SlaveAnswerFinish))  
-                LINATA6629_SendBackSlaveAnswer();
+            {
+                LINATA6629_SendBackSlaveAnswer();           
+            }
         }
         else
         {

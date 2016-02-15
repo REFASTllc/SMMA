@@ -97,6 +97,8 @@
  *                          - cmd_GRESLIN
  *                          - cmd_SFRQBIT
  *                          - cmd_GFRQBIT
+ *                          - cmd_SRUNBIT
+ *                          - cmd_GRUNBIT
 ***********************************************************************************************************************/
 
 
@@ -4966,7 +4968,7 @@ void cmd_SFRQBIT(void)
         if(uint8_Result == 1)       //verify the result
         {
             //store the new timeout
-            g_Param.uint8_FRQ = g_CmdChk.uint32_TempPara[1];
+            g_Param.uint8_FreqBit = g_CmdChk.uint32_TempPara[1];
             
             uart2_sendbuffer('E');      //first the letter E
             uart2_sendbuffer(13);       //then the CR
@@ -5006,7 +5008,7 @@ void cmd_GFRQBIT(void)
     {
         uart2_sendbuffer('E');      //first the letter E
         uart2_sendbuffer(',');      //then the comma
-        funct_IntToAscii(g_Param.uint8_FRQ,_Active);
+        funct_IntToAscii(g_Param.uint8_FreqBit,_Active);
         uart2_sendbuffer(13);      //then the CR
     }
     else
@@ -5015,3 +5017,81 @@ void cmd_GFRQBIT(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
 }   //end of cmd_GFRQBIT
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SRUNBIT
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance then set
+ * up the run bit
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        15.02.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_SRUNBIT(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte
+    
+    if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
+    {
+        //verify the limits if they are inside the tolerance
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_SRUNbitMin,_SRUNbitMax);
+        
+        if(uint8_Result == 1)       //verify the result
+        {
+            //store the new timeout
+            g_Param.uint8_RunBit = g_CmdChk.uint32_TempPara[1];
+            
+            uart2_sendbuffer('E');      //first the letter E
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSRUNBIT;   //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_SRUNBIT
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_GRUNBIT
+
+ * Description:
+ * Verify the received parameters of this command, if all parameters are within the tolerance.
+ * If all is correct, then send back the state of the run bit
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        15.02.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_GRUNBIT(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        uart2_sendbuffer('E');      //first the letter E
+        uart2_sendbuffer(',');      //then the comma
+        funct_IntToAscii(g_Param.uint8_RunBit,_Active);
+        uart2_sendbuffer(13);      //then the CR
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_GRUNBIT

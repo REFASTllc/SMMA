@@ -119,5 +119,7 @@ extern void cmd_SRESLIN(void);
 extern void cmd_GRESLIN(void);
 extern void cmd_SFRQBIT(void);
 extern void cmd_GFRQBIT(void);
+extern void cmd_SRUNBIT(void);
+extern void cmd_GRUNBIT(void);
 
 #endif	/* COMMAND_H */

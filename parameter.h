@@ -170,6 +170,8 @@ extern void param_init(void);
 #define _BipSlewMax         1           //range for the bipolar SLEW
 #define _SFRQbitMin         0           //range for the frequency bit
 #define _SFRQbitMax         1           //range for the frequency bit
+#define _SRUNbitMin         0           //range for the run bit
+#define _SRUNbitMax         1           //range for the run bit
 
 
 /*
@@ -271,6 +273,7 @@ typedef struct                      //definitions of multiple variable for comma
     volatile unsigned char uint8_FRQ;               //bipolar frequency
     volatile unsigned char uint8_SLEW;              //bipolar select slow rate control 
     volatile unsigned char uint8_FreqBit;           //frequency bit on output 1
+    volatile unsigned char uint8_RunBit;            //run bit on output0
 }   SParam;                         //struct name is SParam (S for struct)
 
 #endif	/* PARAMETER_H */

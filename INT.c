@@ -479,7 +479,7 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
                     }
                 }      
                 
-                if(g_Param.uint8_FRQ)       //frequency bit set for output 1?
+                if(g_Param.uint8_FreqBit)   //frequency bit set for output 1?
                 {
                     oSinkSource1 = !oSinkSource1;
                 }
@@ -535,7 +535,7 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
                 else        //otherwise do...
                 {
                     g_Bipol.uint32_RealPos++;       //increment real position with 1  
-                    if(g_Param.uint8_FRQ)           //frequency bit set for output 1?
+                    if(g_Param.uint8_FreqBit)       //frequency bit set for output 1?
                     {
                         oSinkSource1 = !oSinkSource1;
                     }

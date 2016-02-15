@@ -125,6 +125,11 @@ void bi_move(void)
                 A3981.RUN.BITS.EN = 0;
                 SendOneDataSPI1(A3981.RUN.REG);
                 g_Bipol.uint1_IsBipolEnabled = 0;
+                
+                if(g_Param.uint8_RunBit)
+                {
+                    oSinkSource0 = 0;
+                }
             }     
         }
         else
@@ -140,6 +145,11 @@ void bi_move(void)
       
         //load the first switch on delay
         g_Bipol.uint32_IntTime = g_Bipol.uint32_SwOnTime;
+        
+        if(g_Param.uint8_RunBit)
+        {
+            oSinkSource0 = 1;
+        }
       
         SendOneDataSPI1(A3981.RUN.REG);
       
@@ -173,6 +183,11 @@ void bi_move(void)
                         //switch off all outputs
                         A3981.RUN.BITS.EN = 0;
                         SendOneDataSPI1(A3981.RUN.REG);
+                    }
+                    
+                    if(g_Param.uint8_RunBit)
+                    {
+                        oSinkSource0 = 0;
                     }
                  
                     g_Bipol.status.BITS.nextStepIsAllowed = 0;     //clear 'NS', 'DEC', 'ACC', 'GOAL' and 'LS' bit

@@ -157,5 +157,6 @@ void param_init(void)
     g_Param.uint8_FRQ = 6;               //bipolar frequency = 60us/16.7kHz
     g_Param.uint8_SLEW = 1;              //bipolar select slow rate control = enabled
     
-    g_Param.uint8_FreqBit = 0;           //frequency bit (out1) for run
+    g_Param.uint8_FreqBit = 1;           //frequency bit (out1) for run
+    g_Param.uint8_RunBit = 1;            //run bit (out0) for run 
 }   //end of param_init

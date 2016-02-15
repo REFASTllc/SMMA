@@ -145,6 +145,11 @@ void uni_move(void)
                 PR4 = 400;                      //load LSB register with start condition
                 PR5 = 0;                        //load MSB register with 0 
                 
+                if(g_Param.uint8_RunBit)
+                {
+                    oSinkSource0 = 0;
+                }
+                
                 //and switch off all outputs
                 oUniCoilA1 = _UniPhOFF;                 //output PhA1 = off
                 oUniCoilA2 = _UniPhOFF;                 //output PhA2 = off
@@ -165,6 +170,11 @@ void uni_move(void)
       
         //load the first switch on delay 
         g_Uni.uint32_IntTime = g_Uni.uint32_SwOnTime;
+        
+        if(g_Param.uint8_RunBit)
+        {
+            oSinkSource0 = 1;
+        }
       
         //prepare the start sequency
         oUniCoilA1 = g_Uni.uint8_PhA1;
@@ -206,6 +216,11 @@ void uni_move(void)
                         oUniCoilA2 = _UniPhOFF;     //output PhA2 = off
                         oUniCoilB1 = _UniPhOFF;     //output PhB1 = off
                         oUniCoilB2 = _UniPhOFF;     //output PhB2 = off
+                    }
+                    
+                    if(g_Param.uint8_RunBit)
+                    {
+                        oSinkSource0 = 0;
                     }
                  
                     g_Uni.uint8_Settings &= 0xFE;   //clear the 'RUN' bit
