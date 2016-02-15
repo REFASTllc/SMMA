@@ -576,7 +576,10 @@ void bi_CheckCalc(void)
         }
     
         //number of steps that we have to do greater then goal position?
-        if(uint32_PlausCheck > g_Bipol.uint32_GoalPos)
+        //if(uint32_PlausCheck > g_Bipol.uint32_GoalPos)
+        //re-use the code from above to use the plausibility check
+        //for the moment it is disabled
+        if(0)
         {
             //then signal an error and send back the error code
             g_Bipol.status.BITS.error = 1;

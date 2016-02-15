@@ -84,7 +84,7 @@ void main(void)
     
     for(temp = 0; temp < LOG_BUF_DEPTH;temp++)
         debugBuf.buffer[temp] = 0;
-      
+       
     while(1)
     {      
         if(g_Uni.uint8_Settings & 0x01) //verify if the unipolar motor has to move
@@ -123,8 +123,7 @@ void main(void)
                 temp++;
         }
         
-        adc_LaunchNextMeasure();    //call subroutine
-         
+        adc_LaunchNextMeasure();    //call subroutine 
         
     }
 }   //end of main
