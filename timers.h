@@ -69,6 +69,7 @@ typedef struct                  //definitions of multiple variable for timer2
 {
     volatile unsigned char uint8_Timer1SafFlag;         //timer 1 safety flag: 1 = enabled / 0 = disabled
     volatile unsigned char uint8_200msCount;            //how much time the 200ms are to wait (51s max. wait time)
+    volatile unsigned char uint8_TimeoutFlag;             //timeout flag for timer 1
 } STimer1;                      //struct name is STimer1 (S for struct)
 
 #endif	/* TIMERS_H */

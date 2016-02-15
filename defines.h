@@ -294,6 +294,7 @@
 #define _IdGFRQBIT          112             //disable the frequency bit
 #define _IdSRUNBIT          113             //enable the run bit
 #define _IdGRUNBIT          114             //disable the run bit
+#define _IdRTESTIN          115             //run the R-test
 
 #endif	/* DEFINES_H */
 

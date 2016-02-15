@@ -99,6 +99,7 @@
  *                          - cmd_GFRQBIT
  *                          - cmd_SRUNBIT
  *                          - cmd_GRUNBIT
+ *                          - cmd_RTESTIN
 ***********************************************************************************************************************/
 
 
@@ -115,6 +116,7 @@ extern SLin g_LIN;
 extern SUART1txd g_UART1txd;  
 extern SUART1rxd g_UART1rxd;
 extern SADC g_ADC;
+extern STimer1 g_Timer1;    
 
 /**********************************************************************************************************************
  * Routine:                 cmd_SILIM
@@ -5095,3 +5097,65 @@ void cmd_GRUNBIT(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
 }   //end of cmd_GRUNBIT
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_RTESTIN
+
+ * Description:
+ * ...
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        15.02.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_RTESTIN(void)
+{
+    volatile unsigned long int uint32_WB;
+    
+    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
+    {
+        if(g_Param.uint8_MotTyp == 'U')
+        {
+            //
+            oVmotOnOff = 0;
+            oBiEnaVmot = 0;
+            oEnaVLINSupply = 0;
+            oEnaCoilResMeas = 1;
+            oEnaCurrSource = 1;
+            oUniCoilA1 = 1;
+            g_Timer1.uint8_TimeoutFlag = 1;
+            SetTimer(_TIMER1,_ENABLE,0,2000);
+            
+            while(g_Timer1.uint8_TimeoutFlag)
+            {
+                adc_LaunchNextMeasure();    //call subroutine 
+            }
+            
+            oEnaCoilResMeas = 0;
+            oEnaCurrSource = 0;
+            oUniCoilA1 = 0;
+            
+            //convert the result in mV
+            uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310);
+
+            //send back the needed informations
+            uart2_sendbuffer('E');                          //first the letter E
+            uart2_sendbuffer(',');                          //add the comma
+            //funct_IntToAscii(g_Param.uint16_Ue,_Active);    //add the voltage
+            funct_IntToAscii(uint32_WB,_Active);            //add the voltage
+            uart2_sendbuffer('m');                          //add the m
+            uart2_sendbuffer('V');                          //add the V
+            uart2_sendbuffer(13);                           //add the CR at the end
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
+}   //end of cmd_RTESTIN

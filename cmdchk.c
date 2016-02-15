@@ -720,6 +720,10 @@ void cmdchk_check(void)
                 case (_IdGRUNBIT):      //command GRUNBIT
                     cmd_GRUNBIT();      //call subroutine
                     break;
+                    
+                case (_IdRTESTIN):      //command RTESTIN
+                    cmd_RTESTIN();      //call subroutine
+                    break;
                                      
                 default:    //command ID does not exist
                     //do nothing - error has to be send before this routine
@@ -930,6 +934,10 @@ void cmdchk_def(void)
                         {
                             case (0x45544553):  //cmd is = ETESTIN
                                 g_CmdChk.uint8_CmdID = _IdETESTIN;
+                                break;
+                                
+                            case (0x52544553):  //cmd is = RTESTIN
+                                g_CmdChk.uint8_CmdID = _IdRTESTIN;
                                 break;
             
                             default:  //error - command is not defined

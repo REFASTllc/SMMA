@@ -862,6 +862,7 @@ void __ISR(_TIMER_1_VECTOR, IPL1SOFT) IntTimer1Handler(void)
             g_LIN.uint8_SlaveTimeout = 1;   //timeout occured
             g_LIN.uint8_LinBusy = 0;        //reset busy flag
             dataIC.timeoutMeas = 0;         // Timeout occurs during measure of PWM / frequency
+            g_Timer1.uint8_TimeoutFlag = 0; //timeout flag
             
             
             break;

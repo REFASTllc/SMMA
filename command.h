@@ -121,5 +121,6 @@ extern void cmd_SFRQBIT(void);
 extern void cmd_GFRQBIT(void);
 extern void cmd_SRUNBIT(void);
 extern void cmd_GRUNBIT(void);
+extern void cmd_RTESTIN(void);
 
 #endif	/* COMMAND_H */
