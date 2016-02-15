@@ -85,6 +85,7 @@ void main(void)
     
     for(temp = 0; temp < LOG_BUF_DEPTH;temp++)
         debugBuf.buffer[temp] = 0;
+#endif
       
     while(1)
     {      
