@@ -54,7 +54,7 @@ void InitInputCapture1Module(void)
                             // 0 = Timer3 is the counter source for capture
                             // 1 = Timer2 is the counter source for capture
 
-    IC1CONbits.ICI = 1;     // Interrupt Control bits
+    IC1CONbits.ICI = 0;     // Interrupt Control bits
                             // 11 = Interrupt on every fourth capture event
                             // 10 = Interrupt on every third capture event
                             // 01 = Interrupt on every second capture event
@@ -536,19 +536,22 @@ void FormatBufToRealValues(S_IC *data, unsigned char typeMeasure)
 {
     unsigned char i = 0;   
     
-    for(;i<typeMeasure;i++)
-        eventTime[i] += eventMultiplicator[i] * 0xffff;
-    
-    if(typeMeasure == _MEAS_PWM)
+    if(data->timeoutMeas)
     {
-        data->timeHigh = eventTime[1] - eventTime[0];
-        data->periodeTime = eventTime[2] - eventTime[0];
-        data->frequency = 1/((1/_FREQ_OSC)*(data->periodeTime * 100));
-        data->dutyCycle = (data->timeHigh * 1000) / data->periodeTime;
-    }
-    else if(typeMeasure == _MEAS_FREQ)
-    {
-        data->periodeTime = eventTime[1] - eventTime[0];
-        data->frequency = (1/((1/_FREQ_OSC)*(data->periodeTime * 100))) * 100;
+        for(;i<typeMeasure;i++)
+            eventTime[i] += eventMultiplicator[i] * 0xffff;
+
+        if(typeMeasure == _MEAS_PWM)
+        {
+            data->timeHigh = eventTime[1] - eventTime[0];
+            data->periodeTime = eventTime[2] - eventTime[0];
+            data->frequency = 1/((1/_FREQ_OSC)*(data->periodeTime * 100));
+            data->dutyCycle = (data->timeHigh * 1000) / data->periodeTime;
+        }
+        else if(typeMeasure == _MEAS_FREQ)
+        {
+            data->periodeTime = eventTime[1] - eventTime[0];
+            data->frequency = (1/((1/_FREQ_OSC)*(data->periodeTime * 100))) * 100;
+        }
     }
 }

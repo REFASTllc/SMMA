@@ -25,8 +25,9 @@ extern T_SPI SPI1;
 extern T_A3981 A3981;
 extern SLin g_LIN;
 extern SADC g_ADC;
+#ifdef DEBUG_ON
 extern S_RING_BUF debugBuf;
-
+#endif
 /**********************************************************************************************************************
  * Routine:                 main
 
@@ -80,11 +81,12 @@ void main(void)
     
 #ifdef DEBUG_ON
     InitDebugBuf();
-#endif
+
     
     for(temp = 0; temp < LOG_BUF_DEPTH;temp++)
         debugBuf.buffer[temp] = 0;
-      
+#endif
+
     while(1)
     {      
         if(g_Uni.uint8_Settings & 0x01) //verify if the unipolar motor has to move
@@ -115,8 +117,7 @@ void main(void)
         {
             static unsigned short int temp = 0;
             if(temp >= 10000)
-            { 
-                //oTestLed1 =! oTestLed1;
+            {
                 temp = 0;
             }
             else

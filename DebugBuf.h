@@ -2,7 +2,7 @@
 #define DEBUG_BUF_H
 
 
-#define DEBUG_ON
+#define DEBUG_OFF
 
 #ifdef DEBUG_ON
 

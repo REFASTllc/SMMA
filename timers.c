@@ -149,7 +149,7 @@ void InitTimer2(void)
                             // 0 = Internal peripheral clock
 
     TMR2 = 0;               //clear counter
-    PR2 = 100;              //set comparator to 10us (100 * 100ns)
+    PR2 = 0xffff;           //set comparator to 10us (100 * 100ns)
 }
 
 /**********************************************************************************************************************

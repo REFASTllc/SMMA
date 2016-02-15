@@ -1098,9 +1098,25 @@ extern unsigned long eventTime[3];
 extern unsigned short eventMultiplicator[3];
 void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL1SOFT) IntInputCapture1Handler(void)
 {
+    static unsigned char nbreEvent = 0;
+    
     asm("di");
     LOGP(ENTER_IN_ISR);
     LOGP(IC1);
+
+    if(++nbreEvent <= 2)
+    {
+        eventTime[nbreEvent-1] = 0xFFFF & IC1BUF;
+        eventMultiplicator[nbreEvent-1] = nbreTMR2Overflow;
+    }
+    if(nbreEvent == 3)
+    {    
+        IC1CONbits.ON = 0;
+        T2CONbits.ON = 0;
+        TMR2 = 0;
+        nbreTMR2Overflow = 0;
+        nbreEvent = 0;
+    }
     IFS0CLR = _IFS0_IC1IF_MASK;
     LOGP(OUT_OF_ISR);
     asm("ei");
@@ -1131,7 +1147,7 @@ void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL1SOFT) IntInputCapture2Handler(void)
         Nop();
     if(++nbreEvent <= 3)
     {
-        eventTime[nbreEvent - 1] = IC2BUF;
+        eventTime[nbreEvent - 1] = 0xFFFF & IC2BUF;
         eventMultiplicator[nbreEvent -1] = nbreTMR2Overflow;
     }
     else
