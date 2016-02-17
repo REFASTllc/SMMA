@@ -720,6 +720,8 @@ void cmdchk_check(void)
                 case (_IdGRUNBIT):      //command GRUNBIT
                     cmd_GRUNBIT();      //call subroutine
                     break;
+                case (_IdSET_PROD_INFO): // Command SPRODINFOS
+                    cmd_SPRODINFOS();
                                      
                 default:    //command ID does not exist
                     //do nothing - error has to be send before this routine
@@ -898,8 +900,8 @@ void cmdchk_def(void)
         default:
             
             //from here - we know that the command does not exists or that
-            //is longer then 4 letters. As we can make some groupes with the 
-            //the second 4 letters, we verify first this and than again the
+            //is longer than 4 letters. As we can make some grupps with 
+            //the second 4 letters, we verify first this and then again the
             //first 4 letters. 
             
             //to save time, first verify if we have something in the 2nd part
@@ -1130,6 +1132,10 @@ void cmdchk_def(void)
             
                             case (0x47534D4F):  //cmd is = GSMOD
                                 g_CmdChk.uint8_CmdID = _IdGSMOD;
+                                break;
+                                
+                            case (0x5350524F):    // cmd is SPROD
+                                g_CmdChk.uint8_CmdID = _IdSET_PROD_INFO;
                                 break;
             
                             default:  //error - command is not defined

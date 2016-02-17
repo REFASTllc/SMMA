@@ -50,10 +50,6 @@ void ROM24LC256_WrByte(unsigned char uint8_AdrH, unsigned char uint8_AdrL, unsig
     
     i2c_StartTransfer(_i2c1);   //launch the transfer
     
-    do
-    {
-        //do nothing...
-    }
     while(g_i2c1.uint8_Busy);   //until the transfer is finished
     
 }   //end of ROM24LC256_WrByte
@@ -95,9 +91,8 @@ unsigned char ROM24LC256_RdByte(unsigned char uint8_AdrH, unsigned char uint8_Ad
     
     i2c_StartTransfer(_i2c1);   //launch the transfer 
     
-    do
-    {
-        //do nothing...
+    do{
+        
     }
     while(g_i2c1.uint8_Busy);   //until the transfer is finished
     

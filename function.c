@@ -485,10 +485,12 @@ void funct_CheckMotType(unsigned char uint8_MotType)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
+extern S_PROD prod;
 void funct_LoadDeviceInfo(void)
 {
     auto signed short int sint16_WB;    //local work integer
     auto unsigned short int uint16_WB;  //local work integer
+    unsigned char i = 0;
     
     uart2_sendbuffer('E');
     uart2_sendbuffer(',');
@@ -497,8 +499,33 @@ void funct_LoadDeviceInfo(void)
     uart2_sendbuffer('M');
     uart2_sendbuffer('A');
     uart2_sendbuffer(' ');
-    uart2_sendbuffer('V');
-    uart2_sendbuffer('0');
+    uart2_sendbuffer('S');
+    uart2_sendbuffer('/');
+    uart2_sendbuffer('N');
+    uart2_sendbuffer(' ');
+    funct_IntToAscii(prod.serialNumber, _Active);   // serial number
+    uart2_sendbuffer(' ');
+    uart2_sendbuffer('F');
+    uart2_sendbuffer('W');
+    uart2_sendbuffer(' ');
+    uart2_sendbuffer('v');
+    for(;i<5;i++)
+        uart2_sendbuffer(prod.fwVersion[i]);   // FW version
+    uart2_sendbuffer(' ');
+    uart2_sendbuffer('H');
+    uart2_sendbuffer('W');
+    uart2_sendbuffer(' ');
+    uart2_sendbuffer(prod.hwVersion);
+    uart2_sendbuffer(' ');
+    uart2_sendbuffer('S');
+    uart2_sendbuffer('T');
+    uart2_sendbuffer('A');
+    uart2_sendbuffer('T');
+    uart2_sendbuffer('U');
+    uart2_sendbuffer('S');
+    uart2_sendbuffer(' ');
+    funct_IntToAscii(prod.testStatus, _Active);
+ /*   uart2_sendbuffer('0');
     uart2_sendbuffer('1');
     uart2_sendbuffer('.');
     uart2_sendbuffer('0');
@@ -508,7 +535,7 @@ void funct_LoadDeviceInfo(void)
     uart2_sendbuffer('1');
     uart2_sendbuffer('/');
     uart2_sendbuffer('1');
-    uart2_sendbuffer('5');
+    uart2_sendbuffer('5');*/
     uart2_sendbuffer(' ');
     sint16_WB = g_Param.sint16_Temp;
     if(sint16_WB < 0)           //temp. smaller than 0°

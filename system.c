@@ -142,8 +142,8 @@ void system_init(void)
     oBiEnaVmot = 0;
     oEnaVLINSupply = 0;
     
-    // Front LED => Green
-    FrontLED(_GREEN);
+    // Front LED => RED until the end of the initialization of the device
+    FrontLED(_RED);
 }   //end of system_init
 
 /**********************************************************************************************************************

@@ -37,4 +37,6 @@ void periph_init(void)
     RV30xx_InitInterrupt(_Rv30xxENABLE);    //call subroutine
     
     LINATA6628_init();      //initialization of the ATA6628
+    
+    ReadProdInfoFromEEPROM();   // Readout of all production information
 }

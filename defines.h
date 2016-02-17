@@ -294,6 +294,7 @@
 #define _IdGFRQBIT          112             //disable the frequency bit
 #define _IdSRUNBIT          113             //enable the run bit
 #define _IdGRUNBIT          114             //disable the run bit
+#define _IdSET_PROD_INFO    115             // Write production information in serial EEPROM
 
 #endif	/* DEFINES_H */
 
