@@ -63,6 +63,7 @@
 #include "RV30xx.h"
 #include "LinATA6628.h"
 #include "DebugBuf.h"
+#include "productionInfo.h"
 
 #endif	/* INCLUDES_H */
 

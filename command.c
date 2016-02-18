@@ -99,7 +99,7 @@
  *                          - cmd_GFRQBIT
  *                          - cmd_SRUNBIT
  *                          - cmd_GRUNBIT
- *                          - cmd_RTESTIN
+ *                          - cmd_SPRODINFOS
 ***********************************************************************************************************************/
 
 
@@ -116,7 +116,6 @@ extern SLin g_LIN;
 extern SUART1txd g_UART1txd;  
 extern SUART1rxd g_UART1rxd;
 extern SADC g_ADC;
-extern STimer1 g_Timer1;    
 
 /**********************************************************************************************************************
  * Routine:                 cmd_SILIM
@@ -5098,64 +5097,106 @@ void cmd_GRUNBIT(void)
     } 
 }   //end of cmd_GRUNBIT
 
-
 /**********************************************************************************************************************
- * Routine:                 cmd_RTESTIN
+ * Routine:                 cmd_SPRODINFOS
 
- * Description:
- * ...
+ * Description:             Writing in EEPROM of all productions information.
  * 
- * Creator:                 A. Staub
- * Date of creation:        15.02.2016
+ * Creator:                 J. Rebetez
+ * Date of creation:        17.02.2016
  * Last modification on:    -
  * Modified by:             - 
  * 
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void cmd_RTESTIN(void)
+extern S_PROD newProdValues, prod;
+void cmd_SPRODINFOS(void)
 {
-    volatile unsigned long int uint32_WB;
+    unsigned char i, isError = 0, temp;
     
-    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 9)        //number of received characters OK?
     {
-        if(g_Param.uint8_MotTyp == 'U')
+        // Control of all received values
+        newProdValues.serialNumber = g_CmdChk.uint32_TempPara[1];
+        if(g_CmdChk.uint32_TempPara[2] <= 99)
+            newProdValues.Year = g_CmdChk.uint32_TempPara[2];
+        else
+            isError = 1;
+        if(g_CmdChk.uint32_TempPara[3] <= 52)
+            newProdValues.Week = g_CmdChk.uint32_TempPara[3];
+        else
+            isError = 1;
+        newProdValues.testStatus = g_CmdChk.uint32_TempPara[4];
+        newProdValues.fwVersion[0] = g_CmdChk.uint32_TempPara[5];
+        newProdValues.fwVersion[1] = g_CmdChk.uint32_TempPara[6];
+        newProdValues.fwVersion[2] = g_CmdChk.uint32_TempPara[7];
+        if(g_CmdChk.uint32_TempPara[8] >= 'A' && g_CmdChk.uint32_TempPara[8] <= 'Z')
+            newProdValues.hwVersion = g_CmdChk.uint32_TempPara[8];
+        else
+            isError = 1;
+        // If no error happens during control of values, then writing in EEPROM
+        if(isError == 0)
         {
-            //
-            oVmotOnOff = 0;
-            oBiEnaVmot = 0;
-            oEnaVLINSupply = 0;
-            oEnaCoilResMeas = 1;
-            oEnaCurrSource = 1;
-            oUniCoilA1 = 1;
-            g_Timer1.uint8_TimeoutFlag = 1;
-            SetTimer(_TIMER1,_ENABLE,0,2000);
-            
-            while(g_Timer1.uint8_TimeoutFlag)
+            // Writing of the serial number
+        /*    for(i = 4;i > 0; i--)
             {
-                adc_LaunchNextMeasure();    //call subroutine 
-            }
-            
-            oEnaCoilResMeas = 0;
-            oEnaCurrSource = 0;
-            oUniCoilA1 = 0;
-            
-            //convert the result in mV
-            uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310);
+                ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER + i - 1, newProdValues.serialNumber & 0xff);
+                newProdValues.serialNumber >> 8;
+            }*/
+            temp = newProdValues.serialNumber & 0xff;
+            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER, temp);
+            newProdValues.serialNumber >>= 8;
+            temp = newProdValues.serialNumber & 0xff;
+            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER + 1, temp);
+            newProdValues.serialNumber >>= 8;
+            temp = newProdValues.serialNumber & 0xff;
+            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER + 2, temp);
+            newProdValues.serialNumber >>= 8;
+            temp = newProdValues.serialNumber & 0xff;
+            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER + 3, temp);
+            // Writing of the production year
+            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_PROD_YEAR, newProdValues.Year);
+            // Writing of the production week
+            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_PROD_WEEK, newProdValues.Week);
+            // Writing of the test status
+            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_TEST_STATUS, newProdValues.testStatus);
+            // Writing of the FW version
+        /*    for(i = 0; i < 3; i++)
+                ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_FW_VERSION + i, newProdValues.fwVersion[i]); */
+            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_FW_VERSION, newProdValues.fwVersion[0]);
+            for(i=0;i<255;i++)
+                Nop();
+            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_FW_VERSION + 1, newProdValues.fwVersion[1]);
+            for(i=0;i<255;i++)
+                Nop();
+            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_FW_VERSION + 2, newProdValues.fwVersion[2]);
+            // Writing of the HW version
+            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_HW_VERSION, newProdValues.hwVersion);
+            // Answer to the user
+            uart2_sendbuffer('E');      //first the letter E
+            uart2_sendbuffer(13);      //then the CR
+            prod.Week = newProdValues.Week;
+            prod.Year = newProdValues.Year;
+            prod.fwVersion[0] = newProdValues.fwVersion[0];
+            prod.fwVersion[1] = '.';
+            prod.fwVersion[2] = newProdValues.fwVersion[1];
+            prod.fwVersion[3] = '.';
+            prod.fwVersion[4] = newProdValues.fwVersion[2];
+            prod.hwVersion = newProdValues.hwVersion;
+            prod.serialNumber = newProdValues.serialNumber;
+            prod.testStatus = newProdValues.testStatus;
 
-            //send back the needed informations
-            uart2_sendbuffer('E');                          //first the letter E
-            uart2_sendbuffer(',');                          //add the comma
-            //funct_IntToAscii(g_Param.uint16_Ue,_Active);    //add the voltage
-            funct_IntToAscii(uint32_WB,_Active);            //add the voltage
-            uart2_sendbuffer('m');                          //add the m
-            uart2_sendbuffer('V');                          //add the V
-            uart2_sendbuffer(13);                           //add the CR at the end
         }
+        else
+        {
+            // TODO: Return error code here
+        }
+        
     }
     else
     {
         g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-    }
-}   //end of cmd_RTESTIN
+    } 
+}

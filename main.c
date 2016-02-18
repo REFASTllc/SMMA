@@ -87,6 +87,7 @@ void main(void)
         debugBuf.buffer[temp] = 0;
 #endif
       
+    FrontLED(_GREEN);   // End of the initialization
     while(1)
     {      
         if(g_Uni.uint8_Settings & 0x01) //verify if the unipolar motor has to move
