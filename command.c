@@ -99,7 +99,8 @@
  *                          - cmd_GFRQBIT
  *                          - cmd_SRUNBIT
  *                          - cmd_GRUNBIT
- *                          - cmd_SPRODINFOS
+ *                          - cmd_RTESTIN
+ *                          - cmd_SPROD
 ***********************************************************************************************************************/
 
 
@@ -116,6 +117,7 @@ extern SLin g_LIN;
 extern SUART1txd g_UART1txd;  
 extern SUART1rxd g_UART1rxd;
 extern SADC g_ADC;
+extern STimer1 g_Timer1; 
 
 /**********************************************************************************************************************
  * Routine:                 cmd_SILIM
@@ -5097,8 +5099,196 @@ void cmd_GRUNBIT(void)
     } 
 }   //end of cmd_GRUNBIT
 
+
 /**********************************************************************************************************************
- * Routine:                 cmd_SPRODINFOS
+ * Routine:                 cmd_RTESTIN
+
+ * Description:
+ * This subroutine does first check if the test is for bipolar, unipolar or matrix motor. If not then it sends
+ * back an error. If true it switches off every supply and measures during 3s the supply Vmot. 
+ * If this supply goes under 0.3V then the tests starts. If not it sends back an error. 
+ * For the tests:
+ * One coil after one is switched on and off to measure the voltage by appling 10mA current source. 
+ * This gives us the resistor value at the end. Each coil measure takes around 100ms. 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        15.02.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_RTESTIN(void)
+{
+    volatile unsigned long int uint32_WB;   
+    
+    if(g_CmdChk.uint8_ParamPos == 2)   //number of received characters OK?
+    {
+        //test if unipolar, bipolar or matrix?
+        if((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'B') || 
+          (g_CmdChk.uint32_TempPara[1] == 'M'))
+        {
+            oVmotOnOff = 0;                 //switch off the main supply
+            oBiEnaVmot = 0;                 //switch off the bipolar supply
+            oEnaVLINSupply = 0;             //switch off the lin supply
+
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,3000);   //load the timer with an timeout of 3s
+
+            while(g_Timer1.uint8_TimeoutFlag)   //do this until the flag is low
+            {
+                adc_LaunchNextMeasure();        //call subroutine 
+                if(g_ADC.uint32_Vmot <= 100)    //voltage smaller than 0.322V
+                {
+                    g_Timer1.uint8_TimeoutFlag = 0; //clear timeout flag inside this loop
+                }
+            }
+
+            if(g_ADC.uint32_Vmot <= 100)    //test it again
+            {
+                oEnaCoilResMeas = 1;        //enable the relay for the resistor     
+                oEnaCurrSource = 1;         //enable the current source
+                    
+                if((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
+                {
+                    uart2_sendbuffer('E');              //first the letter E
+                    uart2_sendbuffer(',');              //add the comma
+                    
+                    //measure coil A1
+                    oUniCoilA1 = 1;                     //switch on coil A1
+                    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                    SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
+
+                    while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                    {
+                        adc_LaunchNextMeasure();        //call subroutine 
+                    }                              
+                    oUniCoilA1 = 0;                     //switch off coil A1
+
+                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+                    funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
+                    uart2_sendbuffer(',');              //add the comma
+                    
+                    //measure coil A2
+                    oUniCoilA2 = 1;                     //switch on coil A2
+                    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                    SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
+
+                    while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                    {
+                        adc_LaunchNextMeasure();        //call subroutine 
+                    }                              
+                    oUniCoilA2 = 0;                     //switch off coil A2
+
+                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+                    funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
+                    uart2_sendbuffer(',');              //add the comma
+                    
+                    //measure coil B1
+                    oUniCoilB1 = 1;                     //switch on coil B1
+                    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                    SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
+
+                    while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                    {
+                        adc_LaunchNextMeasure();        //call subroutine 
+                    }                              
+                    oUniCoilB1 = 0;                     //switch off coil B1
+
+                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+                    funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
+                    uart2_sendbuffer(',');              //add the comma
+                                    
+                    //measure coil B2
+                    oUniCoilB2 = 1;                     //switch on coil B2
+                    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                    SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
+
+                    while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                    {
+                        adc_LaunchNextMeasure();        //call subroutine 
+                    }                              
+                    oUniCoilB2 = 0;                     //switch off coil B2
+
+                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+                    funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
+                    uart2_sendbuffer(13);                           //add the CR at the end
+                }
+                else if (g_CmdChk.uint32_TempPara[1] == 'B')
+                {
+                    uart2_sendbuffer('E');              //first the letter E
+                    uart2_sendbuffer(',');              //add the comma
+                    
+                    //measure coil A
+                    oBiRelayCoilA = 1;                  //switch on relay for coil A
+                    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                    SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
+
+                    while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                    {
+                        adc_LaunchNextMeasure();        //call subroutine 
+                    }                              
+                    oBiRelayCoilA = 0;                  //switch off relay forcoil A
+
+                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+                    funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
+                    uart2_sendbuffer(',');              //add the comma
+                    
+                    //measure coil B
+                    oBiRelayCoilB = 1;                  //switch on relay for coil B
+                    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                    SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
+
+                    while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                    {
+                        adc_LaunchNextMeasure();        //call subroutine 
+                    }                              
+                    oBiRelayCoilB = 0;                  //switch off relay forcoil B
+
+                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+                    funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
+                    uart2_sendbuffer(13);                           //add the CR at the end
+                }
+                else
+                {
+                    //do nothing, error will be send before
+                }
+                   
+                oEnaCoilResMeas = 0;        //disable the relay for the resistor
+                oEnaCurrSource = 0;         //disable the current source
+            }
+            else
+            {
+                uart2_sendbuffer('X');                          //first the letter E
+                uart2_sendbuffer(',');                          //then the comma
+                g_Param.uint8_ErrCode = _RTESTINsupply;         //set error code
+                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+                uart2_sendbuffer(',');                          //then the comma
+                //convert the result in mV
+                uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);
+                funct_IntToAscii(uint32_WB,_Active);            //add the voltage
+                uart2_sendbuffer('m');                          //add the m
+                uart2_sendbuffer('V');                          //add the V
+                uart2_sendbuffer(13);                           //add the CR at the end
+            }
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _RTESTINnotPossible;    //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode);     //call subroutine
+        }
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    }
+}   //end of cmd_RTESTIN
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_SPROD
 
  * Description:             Writing in EEPROM of all productions information.
  * 
@@ -5111,7 +5301,7 @@ void cmd_GRUNBIT(void)
  * Output:                  -
 ***********************************************************************************************************************/
 extern S_PROD newProdValues, prod;
-void cmd_SPRODINFOS(void)
+void cmd_SPROD(void)
 {
     unsigned char i, isError = 0, temp;
     
@@ -5199,4 +5389,4 @@ void cmd_SPRODINFOS(void)
         g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
-}
+}   

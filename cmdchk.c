@@ -720,8 +720,13 @@ void cmdchk_check(void)
                 case (_IdGRUNBIT):      //command GRUNBIT
                     cmd_GRUNBIT();      //call subroutine
                     break;
-                case (_IdSET_PROD_INFO): // Command SPRODINFOS
-                    cmd_SPRODINFOS();
+                    
+                case (_IdRTESTIN):      //command RTESTIN
+                    cmd_RTESTIN();      //call subroutine
+                    break;
+                    
+                case (_IdSPROD):        // Command SPRODINFOS
+                    cmd_SPROD();
                                      
                 default:    //command ID does not exist
                     //do nothing - error has to be send before this routine
@@ -933,6 +938,10 @@ void cmdchk_def(void)
                             case (0x45544553):  //cmd is = ETESTIN
                                 g_CmdChk.uint8_CmdID = _IdETESTIN;
                                 break;
+                                
+                            case (0x52544553):  //cmd is = RTESTIN
+                                g_CmdChk.uint8_CmdID = _IdRTESTIN;
+                                break;
             
                             default:  //error - command is not defined
                                 g_CmdChk.uint8_CmdID = _IdNotAllow;        //clear the command ID
@@ -1135,7 +1144,7 @@ void cmdchk_def(void)
                                 break;
                                 
                             case (0x5350524F):    // cmd is SPROD
-                                g_CmdChk.uint8_CmdID = _IdSET_PROD_INFO;
+                                g_CmdChk.uint8_CmdID = _IdSPROD;
                                 break;
             
                             default:  //error - command is not defined

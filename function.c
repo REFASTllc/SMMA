@@ -25,6 +25,7 @@
  *                          - funct_StoreWdayIntoRSbuffer
  *                          - funct_StoreMonthIntoRSbuffer
  *                          - funct_ADCtoMiliUnit
+ *                          - funct_MiliVoltToOhm
 ***********************************************************************************************************************/
 
 
@@ -489,7 +490,6 @@ extern S_PROD prod;
 void funct_LoadDeviceInfo(void)
 {
     auto signed short int sint16_WB;    //local work integer
-    auto unsigned short int uint16_WB;  //local work integer
     unsigned char i = 0;
     
     uart2_sendbuffer('E');
@@ -1049,3 +1049,32 @@ unsigned long int funct_ADCtoMiliUnit(unsigned long int uint32_ADCvalue,unsigned
     
     return uint32_WB;       //send back the result 
 }   //end of funct_ADCtoMiliUnit
+
+
+/**********************************************************************************************************************
+ * Routine:                 funct_MiliVoltToOhm
+
+ * Description:
+ * This routine converts a voltage in mV to an ohm value. The current source is 10mA that is the reason why
+ * the result will be directly in ohm and stored into the sendbuffer of the UART with one number after the 
+ * comma. 
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        18.02.2016
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   uint32_Milivolt
+ * Output:                  uint32_WB
+***********************************************************************************************************************/
+void funct_MiliVoltToOhm(unsigned long int uint32_Milivolt)
+{
+    volatile unsigned long int uint32_WB;
+    
+    uint32_WB = uint32_Milivolt / 10;
+    funct_IntToAscii(uint32_WB,_Active);     
+    uart2_sendbuffer('.');    
+    uint32_WB = uint32_Milivolt % 10;
+    funct_IntToAscii(uint32_WB,_Active); 
+    uart2_sendbuffer('E'); 
+}   //end of funct_MiliVoltToOhm

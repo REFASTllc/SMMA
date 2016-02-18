@@ -109,6 +109,8 @@
 //error code definition
                             //general errors
 #define _GlobalLock         0               //driver detected a POR; user configuration not guaranteed
+#define _RTESTINsupply      17              //RTESTIN not possible to switch off the supply under 0.3V
+#define _RTESTINnotPossible 18              //RTESTIN not possible with this type of motor
 #define _OutOfTolSRUNBIT    19              //SRUNBIT, parameter out of range
 #define _OutOfTolSFRQBIT    20              //SFRQBIT, parameter out of range
 #define _OutOfTolSYEAR      21              //SYEAR, parameter out of range
@@ -294,7 +296,8 @@
 #define _IdGFRQBIT          112             //disable the frequency bit
 #define _IdSRUNBIT          113             //enable the run bit
 #define _IdGRUNBIT          114             //disable the run bit
-#define _IdSET_PROD_INFO    115             // Write production information in serial EEPROM
+#define _IdRTESTIN          115             //resistance test / measure
+#define _IdSPROD            116             // Write production information in serial EEPROM
 
 #endif	/* DEFINES_H */
 
