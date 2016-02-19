@@ -197,49 +197,168 @@ void cmd_SILIM(void)
 ***********************************************************************************************************************/
 void cmd_ETESTIN(void)
 {
-    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
-    {
-        if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
+    volatile unsigned long int uint32_WB1;
+    volatile unsigned long int uint32_WB2;
+    volatile unsigned long int uint32_WB3;
+    volatile unsigned long int uint32_WB4;
+    volatile unsigned char uint8_Result = 0;
+    
+    if(g_CmdChk.uint8_ParamPos == 2)   //number of received characters OK?
+    {   
+        if(g_CmdChk.uint32_TempPara[1] == 'L')          //is motor type = LIN?
         {
-            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            g_Param.uint8_ErrCode = _LinETESTIN;        //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
-        else
+        //is motor type = unipolar or matrix?
+        else if ((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
         {
-            if(g_Param.uint8_MotTyp == 'L')         //motor type = Lin?
+            //define the outputs
+            oVmotOnOff = 1;                 //switch off the main supply
+            oBiEnaVmot = 0;                 //switch off the bipolar supply
+            oEnaVLINSupply = 0;             //switch off the lin supply
+            
+            //measure coil A1
+            oUniCoilA1 = 1;                     //switch on coil A1
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
+            while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
             {
-                g_Param.uint8_ErrCode = _LinETESTIN;        //set error code
-                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine            
-            }
-            else if(g_Param.uint8_MotTyp == 'B')    //motor type = Bipolar?
+                adc_LaunchNextMeasure();        //call subroutine 
+            }                              
+            oUniCoilA1 = 0;                     //switch off coil A1
+            uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
+            
+            //measure coil A2
+            oUniCoilA2 = 1;                     //switch on coil A2
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
+            while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
             {
-                //starts the measure
+                adc_LaunchNextMeasure();        //call subroutine 
+            }                              
+            oUniCoilA2 = 0;                     //switch off coil A2
+            uint32_WB2 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
             
-                //convert the result
-            
-                //verify if within tolerance
-            
-                //send back the result
-                g_Param.uint8_ErrCode = _BipETESTIN;        //set error code
-                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-            }
-            else if((g_Param.uint8_MotTyp == 'U') || (g_Param.uint8_MotTyp == 'M'))    //motor type = Unipolar or matrix?
+            //measure coil B1
+            oUniCoilB1 = 1;                     //switch on coil B1
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
+            while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
             {
-                //starts the measure
+                adc_LaunchNextMeasure();        //call subroutine 
+            }                              
+            oUniCoilB1 = 0;                     //switch off coil B1
+            uint32_WB3 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
+                    
+            //measure coil B2
+            oUniCoilB2 = 1;                     //switch on coil B2
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
+            while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+            {
+                adc_LaunchNextMeasure();        //call subroutine 
+            }                              
+            oUniCoilB2 = 0;                     //switch off coil B2
+            uint32_WB4 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
             
-                //convert the result
-            
-                //verify if within tolerance
-            
-                //send back the result
-                g_Param.uint8_ErrCode = _UniETESTIN;        //set error code
-                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            //verify result
+            uint8_Result += funct_CheckTol(uint32_WB1,g_Param.uint16_Imin,g_Param.uint16_Imax);
+            uint8_Result += funct_CheckTol(uint32_WB2,g_Param.uint16_Imin,g_Param.uint16_Imax);
+            uint8_Result += funct_CheckTol(uint32_WB3,g_Param.uint16_Imin,g_Param.uint16_Imax);
+            uint8_Result += funct_CheckTol(uint32_WB4,g_Param.uint16_Imin,g_Param.uint16_Imax);
+            if(uint8_Result == 4)
+            {
+                uart2_sendbuffer('E');      //add an E
+                uart2_sendbuffer(',');      //add a ,
             }
             else
             {
-                g_Param.uint8_ErrCode = _UnknownMotTyp;        //set error code
-                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                uart2_sendbuffer('X');      //add an X
+                uart2_sendbuffer(',');      //add a ,
+                g_Param.uint8_ErrCode = _UniETESTIN;    //set error code
+                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);    //add the error code
+                uart2_sendbuffer(',');      //add a ,
             }
+            
+            funct_IntToAscii(uint32_WB1,_Active);   //add the first result
+            uart2_sendbuffer(',');      //add a ,
+            funct_IntToAscii(uint32_WB2,_Active);   //add the second result
+            uart2_sendbuffer(',');      //add a ,
+            funct_IntToAscii(uint32_WB3,_Active);   //add the third result
+            uart2_sendbuffer(',');      //add a ,
+            funct_IntToAscii(uint32_WB4,_Active);   //add the fourth result
+            uart2_sendbuffer(',');      //add a ,
+            
+            //convert Vmot
+            uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);
+            funct_IntToAscii(uint32_WB1,_Active);   //add the Vmot result
+            uart2_sendbuffer(13);      //add a CR     
+        }
+        else if (g_CmdChk.uint32_TempPara[1] == 'B')    //is motor type = bipolar
+        {
+            //define the outputs
+            oVmotOnOff = 1;                 //switch off the main supply
+            oBiEnaVmot = 0;                 //switch off the bipolar supply
+            oEnaVLINSupply = 0;             //switch off the lin supply
+            
+            //measure coil A
+            oBiRelayCoilA = 1;                  //switch on relay for coil A
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
+            while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+            {
+                adc_LaunchNextMeasure();        //call subroutine 
+            }                              
+            oBiRelayCoilA = 0;                  //switch off relay for coil A
+            uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
+            
+            //measure coil B
+            oBiRelayCoilB = 1;                  //switch on relay for coil B
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
+            while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+            {
+                adc_LaunchNextMeasure();        //call subroutine 
+            }                              
+            oBiRelayCoilB = 0;                  //switch off relay for coil B
+            uint32_WB2 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
+            
+            //verify result
+            uint8_Result += funct_CheckTol(uint32_WB1,g_Param.uint16_Imin,g_Param.uint16_Imax);
+            uint8_Result += funct_CheckTol(uint32_WB2,g_Param.uint16_Imin,g_Param.uint16_Imax);
+            if(uint8_Result == 2)
+            {
+                uart2_sendbuffer('E');      //add an E
+                uart2_sendbuffer(',');      //add a ,
+            }
+            else
+            {
+                uart2_sendbuffer('X');      //add an X
+                uart2_sendbuffer(',');      //add a ,
+                g_Param.uint8_ErrCode = _BipETESTIN;    //set error code
+                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);    //add the error code
+                uart2_sendbuffer(',');      //add a ,
+            }
+            
+            funct_IntToAscii(uint32_WB1,_Active);   //add the first result
+            uart2_sendbuffer(',');      //add a ,
+            funct_IntToAscii(uint32_WB1,_Active);   //add the first result
+            uart2_sendbuffer(',');      //add a ,
+            funct_IntToAscii(uint32_WB2,_Active);   //add the second result
+            uart2_sendbuffer(',');      //add a ,
+            funct_IntToAscii(uint32_WB2,_Active);   //add the second result
+            uart2_sendbuffer(',');      //add a ,
+            
+            //convert Vmot
+            uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);
+            funct_IntToAscii(uint32_WB1,_Active);   //add the Vmot result
+            uart2_sendbuffer(13);      //add a CR        
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _UnknownMotTyp;     //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }      
     }
     else

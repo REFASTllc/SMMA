@@ -1013,6 +1013,11 @@ void funct_StoreMonthIntoRSbuffer(void)
  *      Vnom =          3.3 * 17.25 = 56.925
  *      ADCstep =       ADCres / Vnom = 1024 / 56.925 = 17.99 = 18  
  *      ERRnom =        100% - [(100% * (1024/18)) / 56.925] = 0.063%
+ * Example with the current:
+ *      ADCres =        2^0 = 1024
+ *      Factor I =      INA193 * Rshunt = 20 * 0.05 = 1
+ *      Factor is 1, means there is not changing in the ADC value. The value is directly in mA
+ *      and as factor for ADCstep can be used 310.     
  * 
  * Creator:                 A. Staub
  * Date of creation:        23.12.2015
