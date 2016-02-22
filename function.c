@@ -1060,7 +1060,7 @@ unsigned long int funct_ADCtoMiliUnit(unsigned long int uint32_ADCvalue,unsigned
  * Routine:                 funct_MiliVoltToOhm
 
  * Description:
- * This routine converts a voltage in mV to an ohm value. The current source is 10mA that is the reason why
+ * This routine converts a voltage in mV to an ohm value. The current source is 9mA that is the reason why
  * the result will be directly in ohm and stored into the sendbuffer of the UART with one number after the 
  * comma. 
  * 
@@ -1076,10 +1076,10 @@ void funct_MiliVoltToOhm(unsigned long int uint32_Milivolt)
 {
     volatile unsigned long int uint32_WB;
     
-    uint32_WB = uint32_Milivolt / 10;
+    uint32_WB = uint32_Milivolt / 9;
     funct_IntToAscii(uint32_WB,_Active);     
     uart2_sendbuffer('.');    
-    uint32_WB = uint32_Milivolt % 10;
+    uint32_WB = uint32_Milivolt % 9;
     funct_IntToAscii(uint32_WB,_Active); 
     uart2_sendbuffer('E'); 
 }   //end of funct_MiliVoltToOhm
