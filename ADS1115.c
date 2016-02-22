@@ -3,42 +3,36 @@
                                             UBD - Unipolar Bipolar Driver
 
 ***********************************************************************************************************************
- * File name:               periph.c
- * Creation date:           07.12.2015
- * Main creator:            J. Rebetez
+ * File name:               ADS1115.c
+ * Creation date:           22.02.2016
+ * Main creator:            A. Staub
  * Company:                 REFAST GmbH
  *                          Copyright (c) 2015 REFAST GmbH
 ***********************************************************************************************************************
- * Content overview:        - 
+ * Content overview:        - ads1115_init
 ***********************************************************************************************************************/
+
 
 #include "includes.h"
 
+//Si2c1 g_i2c1;     //global variables for struct 
+
+
 /**********************************************************************************************************************
- * Routine:                 periph_init
+ * Routine:                 ads1115_init
 
  * Description:
- * This routine initialize all extern peripherics like RTCC, motor driver, ...
+ * Initialization of the ADS1115 adc. 
  * 
- * Creator:                 J. Rebetez
- * Date of creation:        07.12.2015
+ * Creator:                 A. Staub
+ * Date of creation:        22.02.2016
  * Last modification on:    -
  * Modified by:             - 
  * 
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void periph_init(void)
+void ads1115_init (void)
 {
-    InitA3981();
-    //release of the RTC chip
-    RV30xx_release();       //call subroutine
-    RV30xx_init();          //call subroutine
-    RV30xx_InitInterrupt(_Rv30xxENABLE);    //call subroutine
-    
-    LINATA6628_init();      //initialization of the ATA6628
-    
-    ads1115_init();         //initialization of the ADS1115
-    
-    ReadProdInfoFromEEPROM();   // Readout of all production information
-}
+    //
+}   //end of ads1115_init

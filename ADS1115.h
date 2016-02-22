@@ -3,42 +3,42 @@
                                             UBD - Unipolar Bipolar Driver
 
 ***********************************************************************************************************************
- * File name:               periph.c
- * Creation date:           07.12.2015
- * Main creator:            J. Rebetez
+ * File name:               ADS1115.h
+ * Creation date:           22.02.2016
+ * Main creator:            A. Staub
  * Company:                 REFAST GmbH
  *                          Copyright (c) 2015 REFAST GmbH
 ***********************************************************************************************************************
- * Content overview:        - 
+ * Content overview :       - ADS1115
 ***********************************************************************************************************************/
 
-#include "includes.h"
-
 /**********************************************************************************************************************
- * Routine:                 periph_init
+ * Routine:                 ADS1115_H
 
  * Description:
- * This routine initialize all extern peripherics like RTCC, motor driver, ...
+ * ...
  * 
- * Creator:                 J. Rebetez
- * Date of creation:        07.12.2015
+ * Creator:                 A. Staub
+ * Date of creation:        22.02.2016
  * Last modification on:    -
  * Modified by:             - 
  * 
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-void periph_init(void)
-{
-    InitA3981();
-    //release of the RTC chip
-    RV30xx_release();       //call subroutine
-    RV30xx_init();          //call subroutine
-    RV30xx_InitInterrupt(_Rv30xxENABLE);    //call subroutine
-    
-    LINATA6628_init();      //initialization of the ATA6628
-    
-    ads1115_init();         //initialization of the ADS1115
-    
-    ReadProdInfoFromEEPROM();   // Readout of all production information
-}
+
+#ifndef ADS1115_H
+#define	ADS1115_H
+
+
+extern void ads1115_init(void);
+
+
+#define _ADS1115Addr            0x90    //definition of the address for the ADS
+#define _PR_ConvReg             0x00    //pointer register on conversion register
+#define _PR_ConfReg             0x01    //pointer register on config register
+#define _PR_LoReg               0x02    //pointer register on lo tresh register
+#define _PR_HiReg               0x03    //pointer register on hi tresh register
+
+
+#endif	/* ADS1115_H */

@@ -64,6 +64,7 @@
 #include "LinATA6628.h"
 #include "DebugBuf.h"
 #include "productionInfo.h"
+#include "ADS1115.h"
 
 #endif	/* INCLUDES_H */
 
