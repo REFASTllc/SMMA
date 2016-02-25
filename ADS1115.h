@@ -34,7 +34,7 @@
 extern void ads1115_init(void);
 extern void ads1115_config(unsigned char uint8_MUX, unsigned char uint8_PGA, unsigned char uint8_Mode, unsigned char uint8_DR, unsigned char uint8_CompPol, unsigned long int uint8_CompLat, unsigned long int uint8_CompQue);
 extern unsigned short int ads1115_read(void);
-extern void ads1115_SetChannel(unsigned char uint8_MUX);
+extern void ads1115_SetChannel(unsigned char uint8_MUX, unsigned char uint8_PGA);
 
 
 #define _ADS1115Addr            0x90    //definition of the address for the ADS

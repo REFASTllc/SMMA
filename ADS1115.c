@@ -330,16 +330,17 @@ unsigned short int ads1115_read(void)
  * Modified by:             - 
  * 
  * Input:                   uint8_MUX
+ *                          uint8_PGA
  * Output:                  -
 ***********************************************************************************************************************/
-void ads1115_SetChannel(unsigned char uint8_MUX)
+void ads1115_SetChannel(unsigned char uint8_MUX, unsigned char uint8_PGA)
 {
     //put the pointer register on the config register
     i2c_SendBufWr(_i2c1,_ADS1115Addr);
     i2c_SendBufWr(_i2c1,_PR_ConfReg);
     
     //define the config register
-    ads1115_config(uint8_MUX,_FS4096mV,_CCM,_860SPS,_ActiveLow,_NonLatchingComp,_DC);
+    ads1115_config(uint8_MUX,uint8_PGA,_CCM,_860SPS,_ActiveLow,_NonLatchingComp,_DC);
     
     //add the registers
     i2c_SendBufWr(_i2c1,g_ADS1115.uint8_ConfigMSB);
