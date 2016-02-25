@@ -213,6 +213,8 @@ void cmd_ETESTIN(void)
         //is motor type = unipolar or matrix?
         else if ((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
         {
+            ads1115_SetChannel(_AIN0p_GND,_FS4096mV);   //set channel on Imot
+            
             //define the outputs
             oVmotOnOff = 1;                 //switch off the main supply
             oBiEnaVmot = 0;                 //switch off the bipolar supply
@@ -224,10 +226,12 @@ void cmd_ETESTIN(void)
             SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
             while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
             {
-                adc_LaunchNextMeasure();        //call subroutine 
-            }                              
+//                adc_LaunchNextMeasure();        //call subroutine 
+            }        
+            uint32_WB1 = ads1115_read();         //read out Vmot
             oUniCoilA1 = 0;                     //switch off coil A1
-            uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
+//            uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
+            uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,8000); //convert the result in mV
             
             //measure coil A2
             oUniCoilA2 = 1;                     //switch on coil A2
@@ -235,10 +239,12 @@ void cmd_ETESTIN(void)
             SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
             while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
             {
-                adc_LaunchNextMeasure();        //call subroutine 
-            }                              
+//                adc_LaunchNextMeasure();        //call subroutine 
+            }              
+            uint32_WB2 = ads1115_read();         //read out Vmot
             oUniCoilA2 = 0;                     //switch off coil A2
-            uint32_WB2 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
+//            uint32_WB2 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
+            uint32_WB2 = funct_ADCtoMiliUnit(uint32_WB2,8000); //convert the result in mV
             
             //measure coil B1
             oUniCoilB1 = 1;                     //switch on coil B1
@@ -246,10 +252,12 @@ void cmd_ETESTIN(void)
             SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
             while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
             {
-                adc_LaunchNextMeasure();        //call subroutine 
-            }                              
+//                adc_LaunchNextMeasure();        //call subroutine 
+            }
+            uint32_WB3 = ads1115_read();         //read out Vmot
             oUniCoilB1 = 0;                     //switch off coil B1
-            uint32_WB3 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
+//            uint32_WB3 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
+            uint32_WB3 = funct_ADCtoMiliUnit(uint32_WB3,8000); //convert the result in mV
                     
             //measure coil B2
             oUniCoilB2 = 1;                     //switch on coil B2
@@ -257,10 +265,12 @@ void cmd_ETESTIN(void)
             SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
             while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
             {
-                adc_LaunchNextMeasure();        //call subroutine 
-            }                              
+//                adc_LaunchNextMeasure();        //call subroutine 
+            }  
+            uint32_WB4 = ads1115_read();         //read out Vmot
             oUniCoilB2 = 0;                     //switch off coil B2
-            uint32_WB4 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
+//            uint32_WB4 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
+            uint32_WB4 = funct_ADCtoMiliUnit(uint32_WB4,8000); //convert the result in mV
             
             //verify result
             uint8_Result += funct_CheckTol(uint32_WB1,g_Param.uint16_Imin,g_Param.uint16_Imax);
@@ -297,6 +307,8 @@ void cmd_ETESTIN(void)
         }
         else if (g_CmdChk.uint32_TempPara[1] == 'B')    //is motor type = bipolar
         {
+            ads1115_SetChannel(_AIN0p_GND,_FS4096mV);   //set channel on Imot
+            
             //define the outputs
             oVmotOnOff = 1;                 //switch off the main supply
             oBiEnaVmot = 0;                 //switch off the bipolar supply
@@ -308,10 +320,12 @@ void cmd_ETESTIN(void)
             SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
             while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
             {
-                adc_LaunchNextMeasure();        //call subroutine 
-            }                              
+//                adc_LaunchNextMeasure();        //call subroutine 
+            } 
+            uint32_WB1 = ads1115_read();         //read out Vmot
             oBiRelayCoilA = 0;                  //switch off relay for coil A
-            uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
+//            uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
+            uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,8000); //convert the result in mV
             
             //measure coil B
             oBiRelayCoilB = 1;                  //switch on relay for coil B
@@ -319,10 +333,12 @@ void cmd_ETESTIN(void)
             SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
             while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
             {
-                adc_LaunchNextMeasure();        //call subroutine 
-            }                              
+//                adc_LaunchNextMeasure();        //call subroutine 
+            }   
+            uint32_WB2 = ads1115_read();         //read out Vmot
             oBiRelayCoilB = 0;                  //switch off relay for coil B
-            uint32_WB2 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
+//            uint32_WB2 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
+            uint32_WB2 = funct_ADCtoMiliUnit(uint32_WB2,8000); //convert the result in mV
             
             //verify result
             uint8_Result += funct_CheckTol(uint32_WB1,g_Param.uint16_Imin,g_Param.uint16_Imax);
@@ -359,7 +375,9 @@ void cmd_ETESTIN(void)
         {
             g_Param.uint8_ErrCode = _UnknownMotTyp;     //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-        }      
+        }
+        
+        ads1115_SetChannel(_AIN3p_GND,_FS4096mV);   //set channel on Vmot
     }
     else
     {
@@ -5270,6 +5288,8 @@ void cmd_RTESTIN(void)
             {
                 oEnaCoilResMeas = 1;        //enable the relay for the resistor     
                 oEnaCurrSource = 1;         //enable the current source
+                
+                ads1115_SetChannel(_AIN3p_GND,_FS4096mV);   //set channel on Vmot
                     
                 if((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
                 {
@@ -5283,11 +5303,13 @@ void cmd_RTESTIN(void)
 
                     while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
                     {
-                        adc_LaunchNextMeasure();        //call subroutine 
-                    }                              
+//                        adc_LaunchNextMeasure();        //old call subroutine 
+                    }  
+                    uint32_WB = ads1115_read();         //read out Vmot
                     oUniCoilA1 = 0;                     //switch off coil A1
 
-                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+//                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+                    uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
                     funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
                     uart2_sendbuffer(',');              //add the comma
                     
@@ -5298,11 +5320,13 @@ void cmd_RTESTIN(void)
 
                     while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
                     {
-                        adc_LaunchNextMeasure();        //call subroutine 
-                    }                              
+//                        adc_LaunchNextMeasure();        //call subroutine 
+                    }           
+                    uint32_WB = ads1115_read();         //read out Vmot
                     oUniCoilA2 = 0;                     //switch off coil A2
 
-                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+//                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+                    uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
                     funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
                     uart2_sendbuffer(',');              //add the comma
                     
@@ -5313,11 +5337,13 @@ void cmd_RTESTIN(void)
 
                     while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
                     {
-                        adc_LaunchNextMeasure();        //call subroutine 
-                    }                              
+//                        adc_LaunchNextMeasure();        //call subroutine 
+                    }               
+                    uint32_WB = ads1115_read();         //read out Vmot
                     oUniCoilB1 = 0;                     //switch off coil B1
 
-                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+//                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+                    uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
                     funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
                     uart2_sendbuffer(',');              //add the comma
                                     
@@ -5328,11 +5354,13 @@ void cmd_RTESTIN(void)
 
                     while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
                     {
-                        adc_LaunchNextMeasure();        //call subroutine 
-                    }                              
+//                        adc_LaunchNextMeasure();        //call subroutine 
+                    }    
+                    uint32_WB = ads1115_read();         //read out Vmot
                     oUniCoilB2 = 0;                     //switch off coil B2
 
-                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+//                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+                    uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
                     funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
                     uart2_sendbuffer(13);                           //add the CR at the end
                 }
@@ -5348,11 +5376,13 @@ void cmd_RTESTIN(void)
 
                     while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
                     {
-                        adc_LaunchNextMeasure();        //call subroutine 
-                    }                              
+//                        adc_LaunchNextMeasure();        //call subroutine 
+                    }         
+                    uint32_WB = ads1115_read();         //read out Vmot
                     oBiRelayCoilA = 0;                  //switch off relay forcoil A
 
-                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+//                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+                    uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
                     funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
                     uart2_sendbuffer(',');              //add the comma
                     
@@ -5363,11 +5393,13 @@ void cmd_RTESTIN(void)
 
                     while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
                     {
-                        adc_LaunchNextMeasure();        //call subroutine 
-                    }                              
+//                        adc_LaunchNextMeasure();        //call subroutine 
+                    } 
+                    uint32_WB = ads1115_read();         //read out Vmot
                     oBiRelayCoilB = 0;                  //switch off relay forcoil B
 
-                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+//                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
+                    uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
                     funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
                     uart2_sendbuffer(13);                           //add the CR at the end
                 }

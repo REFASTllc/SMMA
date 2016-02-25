@@ -1006,6 +1006,7 @@ void funct_StoreMonthIntoRSbuffer(void)
  * ADCstep:
  * If the read value is not counterfeit, means you did not use a resistance divider to change the real value,
  * then it will be always the ADCres / Vnom, here = 1024 / 3.3 = 310.3 = 310
+ * With the ADS it will be 32768 / 4.096 = 8000
  * If for example a resistance divider was used of 15, the ADCstep will be:
  *      ADCres =        2^10 = 1024
  *      ResDivFact =    (R259 + R262) / R259 = (390k + 24k) / 24k = 17.25 
@@ -1013,6 +1014,13 @@ void funct_StoreMonthIntoRSbuffer(void)
  *      Vnom =          3.3 * 17.25 = 56.925
  *      ADCstep =       ADCres / Vnom = 1024 / 56.925 = 17.99 = 18  
  *      ERRnom =        100% - [(100% * (1024/18)) / 56.925] = 0.063%
+ *      Same example with the ADS:
+ *      ADCres =        2^15 = 32768
+ *      ResDivFact =    (R259 + R262) / R259 = (390k + 24k) / 24k = 17.25 
+ *      ADC supply =    4.096
+ *      Vnom =          4.096 * 17.25 = 70.656
+ *      ADCstep =       ADCres / Vnom = 32768 / 70.656 = 463.768 = 464 
+ *      ERRnom =        100% - [(100% * (32768/464)) / 70.656] = 0.049%
  * Example with the current:
  *      ADCres =        2^0 = 1024
  *      Factor I =      INA193 * Rshunt = 20 * 0.05 = 1
@@ -1060,7 +1068,7 @@ unsigned long int funct_ADCtoMiliUnit(unsigned long int uint32_ADCvalue,unsigned
  * Routine:                 funct_MiliVoltToOhm
 
  * Description:
- * This routine converts a voltage in mV to an ohm value. The current source is 9mA that is the reason why
+ * This routine converts a voltage in mV to an ohm value. The current source is 10mA that is the reason why
  * the result will be directly in ohm and stored into the sendbuffer of the UART with one number after the 
  * comma. 
  * 
@@ -1076,10 +1084,10 @@ void funct_MiliVoltToOhm(unsigned long int uint32_Milivolt)
 {
     volatile unsigned long int uint32_WB;
     
-    uint32_WB = uint32_Milivolt / 9;
+    uint32_WB = uint32_Milivolt / 10;
     funct_IntToAscii(uint32_WB,_Active);     
     uart2_sendbuffer('.');    
-    uint32_WB = uint32_Milivolt % 9;
+    uint32_WB = uint32_Milivolt % 10;
     funct_IntToAscii(uint32_WB,_Active); 
     uart2_sendbuffer('E'); 
 }   //end of funct_MiliVoltToOhm
