@@ -33,78 +33,86 @@
 extern void param_init(void);  
 
 //definition of the corresponding application limits
-#define _UmotBipMax         30000   //<OK> maximum voltage for the bipolar application
-#define _UmotLinMax         24000   //<OK> maximum voltage for the Lin application
-#define _ImotLinMax         800     //<OK> maximum current for the Lin application
-#define _ImotLinSCiLevelMax 1000    //<OK> maximal short-circuit current limit for the Lin application
+#define _VmotBipMax         28000   //maximum voltage for the bipolar application
+#define _VmotBipMin         7000    //minimum voltage for the bipolar application
+#define _VmotUniMax         40000   //maximum voltage for the unipolar application
+#define _VmotUniMin         7000    //minimum voltage for the unipolar application
+#define _VmotLinMax         24000   //maximum voltage for the Lin application
+#define _VmotLinMin         5000    //minimum voltage for the lin application
+#define _ImotBipMax         3000    //maximum current for bipolar application
+#define _ImotBipMin         50      //minimum current for bipolar application
+#define _ImotUniMax         3000    //maximum current for unipolar application
+#define _ImotUniMin         50      //minimum current for unipolar application
+#define _ImotLinMax         800     //maximum current for the Lin application
+#define _ImotLinMin         50      //minimum current for the lin application
 
 //definition of the global limits
-#define _Imin               20          //<OK> minimal ON current for the coils in [mA]
-#define _Imax               2800        //<OK> maximal ON current for the coils in [mA]
-#define _UmotMin            7000        //<OK> minimal test voltage for the actuators in [mV]
-#define _UmotMax            45000       //<OK> maximal test voltage for the actuators in [mV]
-#define _SCiLevelMin        100         //<OK> minimal short-circuit current limit in [mA]
-#define _SCiLevelMax        3200        //<OK> maximal short-circuit current limit in [mA]
-#define _SCtLevelMin        1           //<OK> minimal short-circuit time in [ms]
-#define _SCtLevelMax        100         //<OK> maximal short-circuit time in [ms]
-#define _AccNumbStepMin     1           //<OK> minimal number of steps for the frequency for acceleration
-#define _AccNumbStepMax     1000        //<OK> maximal number of steps for the frequency for acceleration
-#define _AccFreqMin         1           //<OK> minimal frequency for the number of steps in [Hz] for acceleration
-#define _AccFreqMax         1000        //<OK> maximal frequency for the number of stpes in [Hz] for acceleration
-#define _DecNumbStepMin     1           //<OK> minimal number of steps for the frequency for deceleration
-#define _DecNumbStepMax     1000        //<OK> maximal number of steps for the frequency for deceleration
-#define _DecFreqMin         1           //<OK> minimal frequency for the number of steps in [Hz] for deceleration
-#define _DecFreqMax         1000        //<OK> maximal frequency for the number of stpes in [Hz] for deceleration
-#define _StepModeMin        0           //<OK> supported or minimal step mode for unipolar and matrix actuators
-#define _StepModeMax        5           //<OK> supported or maximal step mode for unipolar and matrix actuators
-#define _StepCountMin       0           //<OK> minimal step count 
-#define _StepCountMax       10000000    //<OK> maximal step count
-#define _RunFreqMin         1           //<OK> minimal run speed in [Hz]
-#define _RunFreqMax         1000        //<OK> maximal run speed in [Hz]
-#define _DirMin             0           //<OK> minimal for direction
-#define _DirMax             1           //<OK> maximal for direction
-#define _CoilStateMin       0           //<OK> minimal for coil state
-#define _CoilStateMax       1           //<OK> maximal for coil state
-#define _SelectRampMin      0           //<OK> minimal for select ramp
-#define _SelectRampMax      2           //<OK> maximal for select ramp
-#define _AccOnDelayMin      1           //<OK> minimal time before start the move in [ms]
-#define _AccOnDelayMax      1000        //<OK> maximal time before start the move in [ms]
-#define _DecOffDelayMin     1           //<OK> minimal time after the move is finished in [ms]
-#define _DecOffDelayMax     1000        //<OK> maximal time after the move is finished in [ms]
-#define _AckMin             0           //<OK> minimal for protocol
-#define _AckMax             1           //<OK> maximal for protocol
-#define _BipRunIMin         20          //<OK> minimal chopper current during move in [mA]
-#define _BipRunIMax         2800        //<OK> maximal chopper current during move in [mA]
-#define _BipHoldIMin        20          //<OK> minimal holding chopper current in [mA]
-#define _BipHoldIMax        2800        //<OK> maximal holding chopper current in [mA]
-#define _BipAccIMin         20          //<OK> minimal chopper current for acceleration in [mA]
-#define _BipAccIMax         2800        //<OK> maximal chopper current for acceleration in [mA]
-#define _BipDecIMin         20          //<OK> minimal chopper current for deceleration in [mA]
-#define _BipDecIMax         2800        //<OK> maximal chopper current for deceleration in [mA]
-#define _BipIPctMin         0           //<OK> minimal percentage for the half step compensated in [%]
-#define _BipIPctMax         100         //<OK> maximal percentage for the half step compensated in [%]
-#define _BipILevelMin       20          //<OK> minimal micro stepping current level in [mA]
-#define _BipILevelMax       2800        //<OK> maximal micro stepping current level in [mA]
-#define _BitMin             0           //<OK> minimal range in decimal for bit
-#define _BitMax             7           //<OK> maximal range in decimal for bit
-#define _ValPortMin         0           //<OK> minimal value in decimal from the I/O port 
-#define _ValPortMax         255         //<OK> maximal value in decimal from the I/O port
-#define _SW1min             0           //<OK> minimal limit low of the switch position 1 in steps
-#define _SW1max             300000      //<OK> maximal limit high of the switch position 1 in steps
-#define _SW2min             0           //<OK> minimal limit low of the switch position 2 in steps
-#define _SW2max             300000      //<OK> maximal limit high of the switch position 2 in steps
-#define _SWpwmMin           0           //<OK> minimal step position low by a PWM of 50% in steps
-#define _SWpwmMax           300000      //<OK> maximal step position high by a PWM of 50% in steps
-#define _SWpwmPosMin        0           //<OK> minimal position by 50% PWM of the hall-sensor in steps
-#define _SWpwmPosMax        300000      //<OK> maximal position by 50% PWM of the hall-sensor in steps
-#define _SWpwmValMin        0           //<OK> minimal % PWM of the hall-sensor 
-#define _SWpwmValMax        1000        //<OK> maximal % PWM of the hall-sensor (1000 means 100.0) 
-#define _SWtypeMin          0           //<OK> range for switch type --> minimum
-#define _SWtypeMax          3           //<OK> range for switch type --> maximum
-#define _RomAddrMin         0           //<OK> range of the EEPROM address 
-#define _RomAddrMax         32768       //<OK> range of the EEPROM adddress
-#define _RomValMin          0           //<OK> range of the data for the EEPROM
-#define _RomValMax          255         //<OK> range of the data for the EEPROM
+//#define _Imin               20          //<OK> minimal ON current for the coils in [mA]
+//#define _Imax               2800        //<OK> maximal ON current for the coils in [mA]
+//#define _UmotMin            7000        //<OK> minimal test voltage for the actuators in [mV]
+//#define _UmotMax            40000       //<OK> maximal test voltage for the actuators in [mV]
+#define _SCiLevelMin        100         //minimal short-circuit current limit in [mA]
+#define _SCiLevelMax        3200        //maximal short-circuit current limit in [mA]
+#define _SCtLevelMin        1           //minimal short-circuit time in [ms]
+#define _SCtLevelMax        100         //maximal short-circuit time in [ms]
+#define _AccNumbStepMin     1           //minimal number of steps for the frequency for acceleration
+#define _AccNumbStepMax     1000        //maximal number of steps for the frequency for acceleration
+#define _AccFreqMin         1           //minimal frequency for the number of steps in [Hz] for acceleration
+#define _AccFreqMax         1000        //maximal frequency for the number of stpes in [Hz] for acceleration
+#define _DecNumbStepMin     1           //minimal number of steps for the frequency for deceleration
+#define _DecNumbStepMax     1000        //maximal number of steps for the frequency for deceleration
+#define _DecFreqMin         1           //minimal frequency for the number of steps in [Hz] for deceleration
+#define _DecFreqMax         1000        //maximal frequency for the number of stpes in [Hz] for deceleration
+#define _StepModeMin        0           //supported or minimal step mode for unipolar and matrix actuators
+#define _StepModeMax        5           //supported or maximal step mode for unipolar and matrix actuators
+#define _StepCountMin       0           //minimal step count 
+#define _StepCountMax       10000000    //maximal step count
+#define _RunFreqMin         1           //minimal run speed in [Hz]
+#define _RunFreqMax         1000        //maximal run speed in [Hz]
+#define _DirMin             0           //minimal for direction
+#define _DirMax             1           //maximal for direction
+#define _CoilStateMin       0           //minimal for coil state
+#define _CoilStateMax       1           //maximal for coil state
+#define _SelectRampMin      0           //minimal for select ramp
+#define _SelectRampMax      2           //maximal for select ramp
+#define _AccOnDelayMin      1           //minimal time before start the move in [ms]
+#define _AccOnDelayMax      1000        //maximal time before start the move in [ms]
+#define _DecOffDelayMin     1           //minimal time after the move is finished in [ms]
+#define _DecOffDelayMax     1000        //maximal time after the move is finished in [ms]
+#define _AckMin             0           //minimal for protocol
+#define _AckMax             1           //maximal for protocol
+#define _BipRunIMin         20          //minimal chopper current during move in [mA]
+#define _BipRunIMax         2800        //maximal chopper current during move in [mA]
+#define _BipHoldIMin        20          //minimal holding chopper current in [mA]
+#define _BipHoldIMax        2800        //maximal holding chopper current in [mA]
+#define _BipAccIMin         20          //minimal chopper current for acceleration in [mA]
+#define _BipAccIMax         2800        //maximal chopper current for acceleration in [mA]
+#define _BipDecIMin         20          //minimal chopper current for deceleration in [mA]
+#define _BipDecIMax         2800        //maximal chopper current for deceleration in [mA]
+#define _BipIPctMin         0           //minimal percentage for the half step compensated in [%]
+#define _BipIPctMax         100         //maximal percentage for the half step compensated in [%]
+#define _BipILevelMin       20          //minimal micro stepping current level in [mA]
+#define _BipILevelMax       2800        //maximal micro stepping current level in [mA]
+#define _BitMin             0           //minimal range in decimal for bit
+#define _BitMax             7           //maximal range in decimal for bit
+#define _ValPortMin         0           //minimal value in decimal from the I/O port 
+#define _ValPortMax         255         //maximal value in decimal from the I/O port
+#define _SW1min             0           //minimal limit low of the switch position 1 in steps
+#define _SW1max             300000      //maximal limit high of the switch position 1 in steps
+#define _SW2min             0           //minimal limit low of the switch position 2 in steps
+#define _SW2max             300000      //maximal limit high of the switch position 2 in steps
+#define _SWpwmMin           0           //minimal step position low by a PWM of 50% in steps
+#define _SWpwmMax           300000      //maximal step position high by a PWM of 50% in steps
+#define _SWpwmPosMin        0           //minimal position by 50% PWM of the hall-sensor in steps
+#define _SWpwmPosMax        300000      //maximal position by 50% PWM of the hall-sensor in steps
+#define _SWpwmValMin        0           //minimal % PWM of the hall-sensor 
+#define _SWpwmValMax        1000        //maximal % PWM of the hall-sensor (1000 means 100.0) 
+#define _SWtypeMin          0           //range for switch type --> minimum
+#define _SWtypeMax          3           //range for switch type --> maximum
+#define _RomAddrMin         0           //range of the EEPROM address 
+#define _RomAddrMax         32768       //range of the EEPROM adddress
+#define _RomValMin          0           //range of the data for the EEPROM
+#define _RomValMax          255         //range of the data for the EEPROM
 #define _SecMin             0           //range for the seconds of the RTC
 #define _SecMax             59          //range for the seconds of the RTC
 #define _MinMin             0           //range for the minutes of the RTC
@@ -193,9 +201,9 @@ extern void param_init(void);
 typedef struct                      //definitions of multiple variable for command
 {
 //the follow parameters are used to protect the device
-    volatile unsigned short int uint16_UmotGlobMin;       //minimal actuator voltage in [mV]
-    volatile unsigned short int uint16_UmotGloMax;        //minimal actuator voltage in [mV]
-    volatile unsigned short int uint16_IGloMax;           //maximal actuator current in [mV]
+//    volatile unsigned short int uint16_UmotGlobMin;       //minimal actuator voltage in [mV]
+//    volatile unsigned short int uint16_UmotGloMax;        //minimal actuator voltage in [mV]
+//    volatile unsigned short int uint16_IGloMax;           //maximal actuator current in [mV]
 //the follow parameter is used for that the user knows there was a POR
     volatile unsigned char uint8_NotPOR;            //POR detection; 1 = OK no POR detected; 0 = POR detected
 //the follow parameters can be set by the customer

@@ -89,7 +89,10 @@ void main(void)
       
     FrontLED(_GREEN);   // End of the initialization
     while(1)
-    {      
+    {  
+        //launch this subroutine every time to protect our device from high voltage or current
+        funct_ProtDev();
+        
         if(g_Uni.uint8_Settings & 0x01) //verify if the unipolar motor has to move
         {
             uni_move();                 //then call the subroutine            

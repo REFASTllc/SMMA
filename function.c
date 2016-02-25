@@ -26,6 +26,7 @@
  *                          - funct_StoreMonthIntoRSbuffer
  *                          - funct_ADCtoMiliUnit
  *                          - funct_MiliVoltToOhm
+ *                          - funct_ProtDev
 ***********************************************************************************************************************/
 
 
@@ -37,6 +38,8 @@ extern SParam g_Param;
 extern SUni g_Uni;
 extern Sbipol g_Bipol;
 extern T_A3981 A3981;
+extern SADC g_ADC;  
+
 /**********************************************************************************************************************
  * Routine:                 funct_init
 
@@ -355,9 +358,9 @@ unsigned char funct_CheckCmdSILIM(void)
     if((g_Param.uint8_MotTyp == 'N') || (g_Param.uint8_MotTyp == 'U') || (g_Param.uint8_MotTyp == 'M'))     
     {
         //then verify the received parameters
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_Imin,_Imax);
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_Imin,_Imax);
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],_UmotMin,_UmotMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_ImotUniMin,_ImotUniMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_ImotUniMin,_ImotUniMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],_VmotUniMin,_VmotUniMax);
         uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[4],_SCiLevelMin,_SCiLevelMax);
         uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[5],_SCtLevelMin,_SCtLevelMax);          
                 
@@ -372,9 +375,9 @@ unsigned char funct_CheckCmdSILIM(void)
     }
     else if(g_Param.uint8_MotTyp == 'B')    //verify limits for the bipolar application
     {
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_Imin,_Imax);
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_Imin,_Imax);
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],_UmotMin,_UmotBipMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_ImotBipMin,_ImotBipMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_ImotBipMin,_ImotBipMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],_VmotBipMin,_VmotBipMax);
         uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[4],_SCiLevelMin,_SCiLevelMax);
         uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[5],_SCtLevelMin,_SCtLevelMax);          
                 
@@ -389,10 +392,10 @@ unsigned char funct_CheckCmdSILIM(void)
     }
     else if(g_Param.uint8_MotTyp == 'L')    //verify limits for the LIN application
     {
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_Imin,_ImotLinMax);
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_Imin,_ImotLinMax);
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],_UmotMin,_UmotLinMax);
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[4],_SCiLevelMin,_ImotLinSCiLevelMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_ImotLinMin,_ImotLinMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_ImotLinMin,_ImotLinMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],_VmotLinMin,_VmotLinMax);
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[4],_SCiLevelMin,_ImotLinMax);
         uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[5],_SCtLevelMin,_SCtLevelMax);          
                 
         if(uint8_Result == 5)   //each parameter within the tolerance
@@ -1091,3 +1094,91 @@ void funct_MiliVoltToOhm(unsigned long int uint32_Milivolt)
     funct_IntToAscii(uint32_WB,_Active); 
     uart2_sendbuffer('E'); 
 }   //end of funct_MiliVoltToOhm
+
+
+/**********************************************************************************************************************
+ * Routine:                 funct_ProtDev
+
+ * Description:
+ * This routine should protect our device from a high voltage or current. If a value goes over the limits, 
+ * then the device will switch off all supplies to protect the device.
+ * These limits are defined inside the parameter.h file
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        25.02.2016
+ * Last modification on:    
+ * Modified by:             
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void funct_ProtDev(void)
+{
+    volatile unsigned long int uint32_WB1;
+    volatile unsigned long int uint32_WB2;
+    
+    //actuator = unipolar or matrix?
+    if((g_Param.uint8_MotTyp == 'U') || (g_Param.uint8_MotTyp == 'M'))
+    {
+        uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);  //convert the result in mV
+        uint32_WB2 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mA
+        
+        //voltage or current higher than allowed?
+        if((uint32_WB1 >= _VmotUniMax) || (uint32_WB2 >= _ImotUniMax))
+        {
+            oVmotOnOff = 0;                 //switch off the main supply
+            oBiEnaVmot = 0;                 //switch off the bipolar supply
+            oEnaVLINSupply = 0;             //switch off the lin supply
+            g_Param.uint8_MotTyp = 'N';     //define motor type
+            
+        }
+        else
+        {
+            //nothing to do
+        }
+    }
+    //actuator = bipolar?
+    else if (g_Param.uint8_MotTyp == 'B')   
+    {
+        uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);  //convert the result in mV
+        uint32_WB2 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mA
+        
+        //voltage or current higher than allowed?
+        if((uint32_WB1 >= _VmotBipMax) || (uint32_WB2 >= _ImotBipMax))
+        {
+            oVmotOnOff = 0;                 //switch off the main supply
+            oBiEnaVmot = 0;                 //switch off the bipolar supply
+            oEnaVLINSupply = 0;             //switch off the lin supply
+            g_Param.uint8_MotTyp = 'N';     //define motor type
+            
+        }
+        else
+        {
+            //nothing to do
+        }
+    }
+    //actuator = lin?
+    else if (g_Param.uint8_MotTyp == 'L')
+    {
+        uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);  //convert the result in mV
+        uint32_WB2 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mA
+        
+        //voltage or current higher than allowed?
+        if((uint32_WB1 >= _VmotLinMax) || (uint32_WB2 >= _ImotLinMax))
+        {
+            oVmotOnOff = 0;                 //switch off the main supply
+            oBiEnaVmot = 0;                 //switch off the bipolar supply
+            oEnaVLINSupply = 0;             //switch off the lin supply
+            g_Param.uint8_MotTyp = 'N';     //define motor type
+            
+        }
+        else
+        {
+            //nothing to do
+        }
+    }
+    else 
+    {
+        //nothing to do
+    }
+}   //end of funct_ProtDev

@@ -151,7 +151,7 @@
 #define _BipSILIM           100             //received parameters not within the tolerance for SILIM
 #define _BipSMTYP           101             //parameters not within tolerance for switch on bipolar
 #define _BipETESTIN         102             //ETESTIN current measure not within the tolerance
-#define _BipSPHC            103             //SPHC parameter not within the tolerance
+//103 is free
 #define _BipPlausiCheck     104             //plausibility check not passed
 #define _BipSBIPPD          105             //SBIPPD parameters not within the tolerance
 #define _BipSBIPTSC         106             //SBIPTSC parameter not within the tolerance
@@ -175,6 +175,7 @@
 #define _LinTO              158             //SLIN (indirect), timeout, no answer from slave
 #define _OutOfTolSRESLIN    159             //SRESLIN, parameter out of range
                             //command errors
+#define _NotSupAnymore      253             //not supported anymore
 #define _NumbRecCharNotOK   254             //number of received characters/parameters not OK
 #define _UnknownCmd         255             //unknown or not implemented command
 

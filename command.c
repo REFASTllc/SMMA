@@ -944,8 +944,8 @@ void cmd_SPHC(void)
         }
         else
         { 
-            g_Param.uint8_ErrCode = _BipSPHC;           //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            //g_Param.uint8_ErrCode = _BipSPHC;           //set error code
+            //uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
     }
     else
@@ -1581,7 +1581,7 @@ void cmd_SCOILON(void)
         {
             //verify the limits if they are inside the tolerance
             uint8_WB = g_CmdChk.uint32_TempPara[1];
-            if((uint8_WB == 'N') || (uint8_WB == 'B') || (uint8_WB == 'M') || (uint8_WB == 'U'))
+            if((uint8_WB == 'B') || (uint8_WB == 'M') || (uint8_WB == 'U'))
             {
                 uint8_Result++;
             }
@@ -1609,12 +1609,74 @@ void cmd_SCOILON(void)
                 }
                 else if(g_CmdChk.uint32_TempPara[1] == 'B')    //type of motor = Bipolar?
                 {
-                    //switch off/on the inputs here
+                    //verify coil A
+                    if((g_CmdChk.uint32_TempPara[2] == 1) && (g_CmdChk.uint32_TempPara[3] == 1))
+                    {
+                        oBiRelayCoilA = 1;
+                    }
+                    else
+                    {
+                        oBiRelayCoilA = 0;
+                    }
+                    
+                    //verify coil B
+                    if((g_CmdChk.uint32_TempPara[4] == 1) && (g_CmdChk.uint32_TempPara[5] == 1))
+                    {
+                        oBiRelayCoilB = 1;
+                    }
+                    else
+                    {
+                        oBiRelayCoilB = 0;
+                    }
+                    
+                    uart2_sendbuffer('E');                  //first the letter E
+                    uart2_sendbuffer(13);                   //add the CR at the end
                 }
                 //type of motor = unipolar or matrix?
                 else if((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
                 {
-                    //switch off/on the inputs here
+                    //verify coil A1
+                    if(g_CmdChk.uint32_TempPara[2] == 1)
+                    {
+                        oUniCoilA1 = 1;
+                    }
+                    else
+                    {
+                        oUniCoilA1 = 0;
+                    }
+                    
+                    //verify coil A2
+                    if(g_CmdChk.uint32_TempPara[3] == 1)
+                    {
+                        oUniCoilA2 = 1;
+                    }
+                    else
+                    {
+                        oUniCoilA2 = 0;
+                    }
+                    
+                    //verify coil B1
+                    if(g_CmdChk.uint32_TempPara[4] == 1)
+                    {
+                        oUniCoilB1 = 1;
+                    }
+                    else
+                    {
+                        oUniCoilB1 = 0;
+                    }
+                    
+                    //verify coil B2
+                    if(g_CmdChk.uint32_TempPara[5] == 1)
+                    {
+                        oUniCoilB2 = 1;
+                    }
+                    else
+                    {
+                        oUniCoilB2 = 0;
+                    }
+                    
+                    uart2_sendbuffer('E');                  //first the letter E
+                    uart2_sendbuffer(13);                   //add the CR at the end
                 }
                 else
                 {
@@ -1764,10 +1826,14 @@ void cmd_GSMOD(void)
  * Verify the received parameters of this command, if all parameters are within the tolerance.
  * If all is correct, then set the corresponding bit / output 
  * 
+ * Modification 25.02.2016 / A. Staub:
+ * I changed the command to be compatible with the JE command. But the third parameter will
+ * be not use. 
+ * 
  * Creator:                 A. Staub
  * Date of creation:        28.11.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    25.02.2016
+ * Modified by:             A. Staub
  * 
  * Input:                   -
  * Output:                  -
@@ -1776,7 +1842,8 @@ void cmd_SBIT(void)
 {
     auto unsigned char uint8_Result = 0;    //local work byte
     
-    if(g_CmdChk.uint8_ParamPos == 2)           //number of received characters OK?
+    //number of received characters OK?
+    if((g_CmdChk.uint8_ParamPos == 2) || (g_CmdChk.uint8_ParamPos == 3))           
     {
         //verify the limits if they are inside the tolerance
         uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BitMin,_BitMax);
@@ -1809,12 +1876,16 @@ void cmd_SBIT(void)
 
  * Description:
  * Verify the received parameters of this command, if all parameters are within the tolerance.
- * If all is correct, then clear the corresponding bit / output 
+ * If all is correct, then clear the corresponding bit / output
+ * 
+ * Modification 25.02.2016 / A. Staub:
+ * I changed the command to be compatible with the JE command. But the third parameter will
+ * be not use.  
  * 
  * Creator:                 A. Staub
  * Date of creation:        28.11.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    25.02.2016
+ * Modified by:             A. Staub
  * 
  * Input:                   -
  * Output:                  -
@@ -1823,7 +1894,8 @@ void cmd_CBIT(void)
 {
     auto unsigned char uint8_Result = 0;    //local work byte
     
-    if(g_CmdChk.uint8_ParamPos == 2)           //number of received characters OK?
+    //number of received characters OK?
+    if((g_CmdChk.uint8_ParamPos == 2) || (g_CmdChk.uint8_ParamPos == 3))
     {
         //verify the limits if they are inside the tolerance
         uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BitMin,_BitMax);

@@ -37,9 +37,9 @@ void param_init(void)
     auto unsigned char uint8_WB;        //local work byte
   
 //initialize the variables to protect the device
-    g_Param.uint16_UmotGlobMin = 5000;  //minimal voltage to use the device
-    g_Param.uint16_UmotGloMax = 48000;  //maximal voltage to use the device
-    g_Param.uint16_IGloMax = 3200;      //maximal current to use the device
+//    g_Param.uint16_UmotGlobMin = 5000;  //minimal voltage to use the device
+//    g_Param.uint16_UmotGloMax = 48000;  //maximal voltage to use the device
+//    g_Param.uint16_IGloMax = 3200;      //maximal current to use the device
     
 //initialize the variable for that the user knows there was a POR
     g_Param.uint8_NotPOR = 0;           //POR detected

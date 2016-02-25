@@ -254,7 +254,7 @@ void cmdchk_check(void)
                     //command is not anymore supported with the new driver. 
                     //I let it anyway here, if once we have to re-use it
                     //cmd_SPHC();         //call subroutine
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;     //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
                 
@@ -286,17 +286,17 @@ void cmdchk_check(void)
                     //command is not anymore supported with the new driver. 
                     //I let it anyway here, if once we have to re-use it
                     //cmd_GPHC();         //call subroutine
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
                 
                 case (_IdSIRUN):        //command SIRUN (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
         
                 case (_IdGIRUN):        //command GIRUN
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
                 
@@ -309,7 +309,7 @@ void cmdchk_check(void)
                     break;
                 
                 case (_IdSRUN):         //command SRUN (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
                 
@@ -322,37 +322,37 @@ void cmdchk_check(void)
                     break;
                 
                 case (_IdCAL):          //command CAL (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
             
                 case (_IdVCAL):         //command VCAL (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
       
                 case (_IdSPRUN):        //command SPRUN (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
             
                 case (_IdGPRUN):        //command GPRUN (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
                 
                 case (_IdSUMOT):        //command SUMOT
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
       
                 case (_IdGUMOT):        //command GUMOT
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;  
                 
                 case (_IdCHKSC):        //command CHKSC (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
                 
@@ -361,7 +361,7 @@ void cmdchk_check(void)
                     break;
                 
                 case (_IdCHKUMOT):      //command CHKUMOT (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
                     
@@ -370,22 +370,22 @@ void cmdchk_check(void)
                     break;
                     
                 case (_IdSCACC):        //command SCACC (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
             
                 case (_IdGCACC):        //command GCACC (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
             
                 case (_IdSCDEC):        //command SCDEC (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
             
                 case (_IdGCDEC):        //command GCDEC (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
             
@@ -398,7 +398,7 @@ void cmdchk_check(void)
                     break;
             
                 case (_IdSERUN):        //command SERUN (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
                 /*
@@ -415,12 +415,12 @@ void cmdchk_check(void)
                     break;
                 */    
                 case (_IdSIMAN):        //command SIMAN (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
             
                 case (_IdGIMAN):        //command GIMAN (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
                 
@@ -452,7 +452,7 @@ void cmdchk_check(void)
                     //command is not anymore supported with the new driver. 
                     //I let it anyway here, if once we have to re-use it
                     //cmd_SMCRSTP();      //call subroutine
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
                 
@@ -460,7 +460,7 @@ void cmdchk_check(void)
                     //command is not anymore supported with the new driver. 
                     //I let it anyway here, if once we have to re-use it
                     //cmd_GMCRSTP();      //call subroutine
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
                 
@@ -505,18 +505,22 @@ void cmdchk_check(void)
                     break;
                 
                 case (_IdSPOSRUN):      //command SPOSRUN (not used anymore)
-                    g_Param.uint8_ErrCode = _UnknownCmd;        //set error code
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
-                /*
-                case (62):  //command GPOSRUN
-                    cmd_GPOSRUN();    //call subroutine
+                
+                case (_IdGPOSRUN):  //command GPOSRUN
+//                    cmd_GPOSRUN();    //call subroutine
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
                     
-                case (63):  //command POSRUN
-                    cmd_POSRUN();       //call subroutine
+                case (_IdPOSRUN):  //command POSRUN
+//                    cmd_POSRUN();       //call subroutine
+                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                     break;
-                */    
+                    
                 case (_IdGINPB):        //command GINPB                  
                     cmd_GINPB();        //call subroutine
                     break;
