@@ -25,7 +25,10 @@ typedef struct
 } S_PROD;
 
 #define EE_ADDR_H                   0x00
-#define EE_ADDR_L_SERIAL_NUMBER     0x00
+#define EE_ADDR_L_SERIAL_NUMBER1    0x00
+#define EE_ADDR_L_SERIAL_NUMBER2    0x01
+#define EE_ADDR_L_SERIAL_NUMBER3    0x02
+#define EE_ADDR_L_SERIAL_NUMBER4    0x03
 #define EE_ADDR_L_PROD_YEAR         0x04
 #define EE_ADDR_L_PROD_WEEK         0x05
 #define EE_ADDR_L_TEST_STATUS       0x06

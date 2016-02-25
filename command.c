@@ -5560,16 +5560,16 @@ void cmd_SPROD(void)
                 newProdValues.serialNumber >> 8;
             }*/
             temp = newProdValues.serialNumber & 0xff;
-            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER, temp);
+            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER1, temp);
             newProdValues.serialNumber >>= 8;
             temp = newProdValues.serialNumber & 0xff;
-            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER + 1, temp);
+            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER2, temp);
             newProdValues.serialNumber >>= 8;
             temp = newProdValues.serialNumber & 0xff;
-            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER + 2, temp);
+            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER3, temp);
             newProdValues.serialNumber >>= 8;
             temp = newProdValues.serialNumber & 0xff;
-            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER + 3, temp);
+            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER4, temp);
             // Writing of the production year
             ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_PROD_YEAR, newProdValues.Year);
             // Writing of the production week
@@ -5580,11 +5580,11 @@ void cmd_SPROD(void)
         /*    for(i = 0; i < 3; i++)
                 ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_FW_VERSION + i, newProdValues.fwVersion[i]); */
             ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_FW_VERSION, newProdValues.fwVersion[0]);
-            for(i=0;i<255;i++)
-                Nop();
+//            for(i=0;i<255;i++)
+//                Nop();
             ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_FW_VERSION + 1, newProdValues.fwVersion[1]);
-            for(i=0;i<255;i++)
-                Nop();
+//            for(i=0;i<255;i++)
+//                Nop();
             ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_FW_VERSION + 2, newProdValues.fwVersion[2]);
             // Writing of the HW version
             ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_HW_VERSION, newProdValues.hwVersion);

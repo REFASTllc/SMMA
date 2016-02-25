@@ -40,7 +40,7 @@ void ReadProdInfoFromEEPROM(void)
     for(i=4;i>0;i--)
     {
         prod.serialNumber <<= 8;
-        prod.serialNumber |= ROM24LC256_RdByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER + i - 1, 1);
+//        prod.serialNumber |= ROM24LC256_RdByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER + i - 1, 1);
     }
     // Readout of the production year
     prod.Year = ROM24LC256_RdByte(EE_ADDR_H, EE_ADDR_L_PROD_YEAR, 1);
