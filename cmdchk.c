@@ -44,6 +44,7 @@ void cmdchk_init(void)
   g_CmdChk.uint32_Cmd1st4 = 0;      //clear the first 4 letters of the command
   g_CmdChk.uint32_Cmd2nd4 = 0;      //clear the second 4 letters of the command
   g_CmdChk.uint8_CmdID = 0;         //clear command id
+  g_CmdChk.uint8_GlobalLock = 0;    //global lock not active
 }   //end of cmdchk_init
 
 

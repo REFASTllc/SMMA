@@ -22,6 +22,7 @@
 
 SUni g_Uni;                 //global variables for struct
 extern SParam g_Param;
+extern SCmdChk g_CmdChk;
 
 /**********************************************************************************************************************
  * Routine:                 uni_init
@@ -155,6 +156,8 @@ void uni_move(void)
                 oUniCoilA2 = _UniPhOFF;                 //output PhA2 = off
                 oUniCoilB1 = _UniPhOFF;                 //output PhB1 = off
                 oUniCoilB2 = _UniPhOFF;                 //output PhB2 = off
+                
+                g_CmdChk.uint8_GlobalLock = 0;  //disable global lock
             }     
         }
         else
@@ -235,7 +238,9 @@ void uni_move(void)
                     else
                     {
                         //nothing to send back
-                    }               
+                    }    
+                    
+                    g_CmdChk.uint8_GlobalLock = 0;  //global lock disable
                 }
                 else
                 {

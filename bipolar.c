@@ -23,6 +23,8 @@
 Sbipol g_Bipol;                 //global variables for struct
 extern SParam g_Param;
 extern T_A3981 A3981;
+extern SCmdChk g_CmdChk;
+
 /**********************************************************************************************************************
  * Routine:                 bi_init
 
@@ -130,6 +132,8 @@ void bi_move(void)
                 {
                     oSinkSource0 = 0;
                 }
+                
+                g_CmdChk.uint8_GlobalLock = 0;  //disable global lock
             }     
         }
         else
@@ -202,7 +206,9 @@ void bi_move(void)
                     {
                         uart2_sendbuffer('E');              //first the letter E
                         uart2_sendbuffer(13);               //with CR at the end
-                    }             
+                    }      
+                    
+                    g_CmdChk.uint8_GlobalLock = 0;  //disable global lock
                 }
                 else
                     g_Bipol.status.BITS.lastStepIsActived = 1;     //otherwise set the bit 'LS'

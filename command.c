@@ -144,9 +144,9 @@ void cmd_SILIM(void)
 {
     auto unsigned char uint8_Result = 0;        //local work byte for the result 
   
-    if(g_CmdChk.uint8_ParamPos == 6)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 6)            //number of received characters OK?
     {
-        if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
+        if(g_CmdChk.uint8_GlobalLock == 1)      //global lock active?
         {
             g_Param.uint8_ErrCode = _MotorInRun;        //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
@@ -154,7 +154,7 @@ void cmd_SILIM(void)
         else
         {
             uint8_Result = funct_CheckCmdSILIM();   //call subroutine
-            
+
             if(uint8_Result == 5)   //each parameter within the tolerance?
             {
                 //then store the parameters and send back the OK
@@ -163,7 +163,7 @@ void cmd_SILIM(void)
                 g_Param.uint16_Umot = g_CmdChk.uint32_TempPara[3] & 0xFFFF;
                 g_Param.uint16_SCiLevel = g_CmdChk.uint32_TempPara[4] & 0xFFFF;
                 g_Param.uint8_SCtLevel = g_CmdChk.uint32_TempPara[5] & 0xFF;
-      
+
                 uart2_sendbuffer('E');          //first the letter E
                 uart2_sendbuffer(13);           //with CR at the end
             }
@@ -205,180 +205,186 @@ void cmd_ETESTIN(void)
     volatile unsigned char uint8_Result = 0;
     
     if(g_CmdChk.uint8_ParamPos == 2)   //number of received characters OK?
-    {   
-        if(g_CmdChk.uint32_TempPara[1] == 'L')          //is motor type = LIN?
+    {  
+        if(g_CmdChk.uint8_GlobalLock == 1)      //global lock active?
         {
-            g_Param.uint8_ErrCode = _LinETESTIN;        //set error code
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-        }
-        //is motor type = unipolar or matrix?
-        else if ((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
-        {
-            ads1115_SetChannel(_AIN0p_GND,_FS4096mV);   //set channel on Imot
-            
-            //define the outputs
-            oVmotOnOff = 1;                 //switch off the main supply
-            oBiEnaVmot = 0;                 //switch off the bipolar supply
-            oEnaVLINSupply = 0;             //switch off the lin supply
-            
-            //measure coil A1
-            oUniCoilA1 = 1;                     //switch on coil A1
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
-            while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
-            {
-//                adc_LaunchNextMeasure();        //call subroutine 
-            }        
-            uint32_WB1 = ads1115_read();         //read out Vmot
-            oUniCoilA1 = 0;                     //switch off coil A1
-//            uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
-            uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,8000); //convert the result in mV
-            
-            //measure coil A2
-            oUniCoilA2 = 1;                     //switch on coil A2
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
-            while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
-            {
-//                adc_LaunchNextMeasure();        //call subroutine 
-            }              
-            uint32_WB2 = ads1115_read();         //read out Vmot
-            oUniCoilA2 = 0;                     //switch off coil A2
-//            uint32_WB2 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
-            uint32_WB2 = funct_ADCtoMiliUnit(uint32_WB2,8000); //convert the result in mV
-            
-            //measure coil B1
-            oUniCoilB1 = 1;                     //switch on coil B1
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
-            while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
-            {
-//                adc_LaunchNextMeasure();        //call subroutine 
-            }
-            uint32_WB3 = ads1115_read();         //read out Vmot
-            oUniCoilB1 = 0;                     //switch off coil B1
-//            uint32_WB3 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
-            uint32_WB3 = funct_ADCtoMiliUnit(uint32_WB3,8000); //convert the result in mV
-                    
-            //measure coil B2
-            oUniCoilB2 = 1;                     //switch on coil B2
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
-            while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
-            {
-//                adc_LaunchNextMeasure();        //call subroutine 
-            }  
-            uint32_WB4 = ads1115_read();         //read out Vmot
-            oUniCoilB2 = 0;                     //switch off coil B2
-//            uint32_WB4 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
-            uint32_WB4 = funct_ADCtoMiliUnit(uint32_WB4,8000); //convert the result in mV
-            
-            //verify result
-            uint8_Result += funct_CheckTol(uint32_WB1,g_Param.uint16_Imin,g_Param.uint16_Imax);
-            uint8_Result += funct_CheckTol(uint32_WB2,g_Param.uint16_Imin,g_Param.uint16_Imax);
-            uint8_Result += funct_CheckTol(uint32_WB3,g_Param.uint16_Imin,g_Param.uint16_Imax);
-            uint8_Result += funct_CheckTol(uint32_WB4,g_Param.uint16_Imin,g_Param.uint16_Imax);
-            if(uint8_Result == 4)
-            {
-                uart2_sendbuffer('E');      //add an E
-                uart2_sendbuffer(',');      //add a ,
-            }
-            else
-            {
-                uart2_sendbuffer('X');      //add an X
-                uart2_sendbuffer(',');      //add a ,
-                g_Param.uint8_ErrCode = _UniETESTIN;    //set error code
-                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);    //add the error code
-                uart2_sendbuffer(',');      //add a ,
-            }
-            
-            funct_IntToAscii(uint32_WB1,_Active);   //add the first result
-            uart2_sendbuffer(',');      //add a ,
-            funct_IntToAscii(uint32_WB2,_Active);   //add the second result
-            uart2_sendbuffer(',');      //add a ,
-            funct_IntToAscii(uint32_WB3,_Active);   //add the third result
-            uart2_sendbuffer(',');      //add a ,
-            funct_IntToAscii(uint32_WB4,_Active);   //add the fourth result
-            uart2_sendbuffer(',');      //add a ,
-            
-            //convert Vmot
-            uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);
-            funct_IntToAscii(uint32_WB1,_Active);   //add the Vmot result
-            uart2_sendbuffer(13);      //add a CR     
-        }
-        else if (g_CmdChk.uint32_TempPara[1] == 'B')    //is motor type = bipolar
-        {
-            ads1115_SetChannel(_AIN0p_GND,_FS4096mV);   //set channel on Imot
-            
-            //define the outputs
-            oVmotOnOff = 1;                 //switch off the main supply
-            oBiEnaVmot = 0;                 //switch off the bipolar supply
-            oEnaVLINSupply = 0;             //switch off the lin supply
-            
-            //measure coil A
-            oBiRelayCoilA = 1;                  //switch on relay for coil A
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
-            while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
-            {
-//                adc_LaunchNextMeasure();        //call subroutine 
-            } 
-            uint32_WB1 = ads1115_read();         //read out Vmot
-            oBiRelayCoilA = 0;                  //switch off relay for coil A
-//            uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
-            uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,8000); //convert the result in mV
-            
-            //measure coil B
-            oBiRelayCoilB = 1;                  //switch on relay for coil B
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
-            while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
-            {
-//                adc_LaunchNextMeasure();        //call subroutine 
-            }   
-            uint32_WB2 = ads1115_read();         //read out Vmot
-            oBiRelayCoilB = 0;                  //switch off relay for coil B
-//            uint32_WB2 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mV
-            uint32_WB2 = funct_ADCtoMiliUnit(uint32_WB2,8000); //convert the result in mV
-            
-            //verify result
-            uint8_Result += funct_CheckTol(uint32_WB1,g_Param.uint16_Imin,g_Param.uint16_Imax);
-            uint8_Result += funct_CheckTol(uint32_WB2,g_Param.uint16_Imin,g_Param.uint16_Imax);
-            if(uint8_Result == 2)
-            {
-                uart2_sendbuffer('E');      //add an E
-                uart2_sendbuffer(',');      //add a ,
-            }
-            else
-            {
-                uart2_sendbuffer('X');      //add an X
-                uart2_sendbuffer(',');      //add a ,
-                g_Param.uint8_ErrCode = _BipETESTIN;    //set error code
-                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);    //add the error code
-                uart2_sendbuffer(',');      //add a ,
-            }
-            
-            funct_IntToAscii(uint32_WB1,_Active);   //add the first result
-            uart2_sendbuffer(',');      //add a ,
-            funct_IntToAscii(uint32_WB1,_Active);   //add the first result
-            uart2_sendbuffer(',');      //add a ,
-            funct_IntToAscii(uint32_WB2,_Active);   //add the second result
-            uart2_sendbuffer(',');      //add a ,
-            funct_IntToAscii(uint32_WB2,_Active);   //add the second result
-            uart2_sendbuffer(',');      //add a ,
-            
-            //convert Vmot
-            uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);
-            funct_IntToAscii(uint32_WB1,_Active);   //add the Vmot result
-            uart2_sendbuffer(13);      //add a CR        
         }
         else
         {
-            g_Param.uint8_ErrCode = _UnknownMotTyp;     //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            g_CmdChk.uint8_GlobalLock = 1;              //set global lock
+            
+            if(g_CmdChk.uint32_TempPara[1] == 'L')          //is motor type = LIN?
+            {
+                g_Param.uint8_ErrCode = _LinETESTIN;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
+            //is motor type = unipolar or matrix?
+            else if ((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
+            {
+                ads1115_SetChannel(_AIN0p_GND,_FS4096mV);   //set channel on Imot
+
+                //define the outputs
+                oVmotOnOff = 1;                 //switch off the main supply
+                oBiEnaVmot = 0;                 //switch off the bipolar supply
+                oEnaVLINSupply = 0;             //switch off the lin supply
+
+                //measure coil A1
+                oUniCoilA1 = 1;                     //switch on coil A1
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
+                while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                {
+                    //do nothing
+                }        
+                uint32_WB1 = ads1115_read();         //read out Vmot
+                oUniCoilA1 = 0;                     //switch off coil A1
+                uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,8000); //convert the result in mV
+
+                //measure coil A2
+                oUniCoilA2 = 1;                     //switch on coil A2
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
+                while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                {
+                    //do nothing
+                }              
+                uint32_WB2 = ads1115_read();         //read out Vmot
+                oUniCoilA2 = 0;                     //switch off coil A2
+                uint32_WB2 = funct_ADCtoMiliUnit(uint32_WB2,8000); //convert the result in mV
+
+                //measure coil B1
+                oUniCoilB1 = 1;                     //switch on coil B1
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
+                while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                {
+                    //do nothing
+                }
+                uint32_WB3 = ads1115_read();         //read out Vmot
+                oUniCoilB1 = 0;                     //switch off coil B1
+                uint32_WB3 = funct_ADCtoMiliUnit(uint32_WB3,8000); //convert the result in mV
+
+                //measure coil B2
+                oUniCoilB2 = 1;                     //switch on coil B2
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
+                while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                {
+                    //do nothing
+                }  
+                uint32_WB4 = ads1115_read();         //read out Vmot
+                oUniCoilB2 = 0;                     //switch off coil B2
+                uint32_WB4 = funct_ADCtoMiliUnit(uint32_WB4,8000); //convert the result in mV
+
+                //verify result
+                uint8_Result += funct_CheckTol(uint32_WB1,g_Param.uint16_Imin,g_Param.uint16_Imax);
+                uint8_Result += funct_CheckTol(uint32_WB2,g_Param.uint16_Imin,g_Param.uint16_Imax);
+                uint8_Result += funct_CheckTol(uint32_WB3,g_Param.uint16_Imin,g_Param.uint16_Imax);
+                uint8_Result += funct_CheckTol(uint32_WB4,g_Param.uint16_Imin,g_Param.uint16_Imax);
+                if(uint8_Result == 4)
+                {
+                    uart2_sendbuffer('E');      //add an E
+                    uart2_sendbuffer(',');      //add a ,
+                }
+                else
+                {
+                    uart2_sendbuffer('X');      //add an X
+                    uart2_sendbuffer(',');      //add a ,
+                    g_Param.uint8_ErrCode = _UniETESTIN;    //set error code
+                    funct_IntToAscii(g_Param.uint8_ErrCode,_Active);    //add the error code
+                    uart2_sendbuffer(',');      //add a ,
+                }
+
+                funct_IntToAscii(uint32_WB1,_Active);   //add the first result
+                uart2_sendbuffer(',');      //add a ,
+                funct_IntToAscii(uint32_WB2,_Active);   //add the second result
+                uart2_sendbuffer(',');      //add a ,
+                funct_IntToAscii(uint32_WB3,_Active);   //add the third result
+                uart2_sendbuffer(',');      //add a ,
+                funct_IntToAscii(uint32_WB4,_Active);   //add the fourth result
+                uart2_sendbuffer(',');      //add a ,
+
+                //convert Vmot
+                uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);
+                funct_IntToAscii(uint32_WB1,_Active);   //add the Vmot result
+                uart2_sendbuffer(13);      //add a CR     
+            }
+            else if (g_CmdChk.uint32_TempPara[1] == 'B')    //is motor type = bipolar
+            {
+                ads1115_SetChannel(_AIN0p_GND,_FS4096mV);   //set channel on Imot
+
+                //define the outputs
+                oVmotOnOff = 1;                 //switch off the main supply
+                oBiEnaVmot = 0;                 //switch off the bipolar supply
+                oEnaVLINSupply = 0;             //switch off the lin supply
+
+                //measure coil A
+                oBiRelayCoilA = 1;                  //switch on relay for coil A
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
+                while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                {
+                    //do nothing
+                } 
+                uint32_WB1 = ads1115_read();         //read out Vmot
+                oBiRelayCoilA = 0;                  //switch off relay for coil A
+                uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,8000); //convert the result in mV
+
+                //measure coil B
+                oBiRelayCoilB = 1;                  //switch on relay for coil B
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
+                while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                {
+                    //do nothing 
+                }   
+                uint32_WB2 = ads1115_read();         //read out Vmot
+                oBiRelayCoilB = 0;                  //switch off relay for coil B
+                uint32_WB2 = funct_ADCtoMiliUnit(uint32_WB2,8000); //convert the result in mV
+
+                //verify result
+                uint8_Result += funct_CheckTol(uint32_WB1,g_Param.uint16_Imin,g_Param.uint16_Imax);
+                uint8_Result += funct_CheckTol(uint32_WB2,g_Param.uint16_Imin,g_Param.uint16_Imax);
+                if(uint8_Result == 2)
+                {
+                    uart2_sendbuffer('E');      //add an E
+                    uart2_sendbuffer(',');      //add a ,
+                }
+                else
+                {
+                    uart2_sendbuffer('X');      //add an X
+                    uart2_sendbuffer(',');      //add a ,
+                    g_Param.uint8_ErrCode = _BipETESTIN;    //set error code
+                    funct_IntToAscii(g_Param.uint8_ErrCode,_Active);    //add the error code
+                    uart2_sendbuffer(',');      //add a ,
+                }
+
+                funct_IntToAscii(uint32_WB1,_Active);   //add the first result
+                uart2_sendbuffer(',');      //add a ,
+                funct_IntToAscii(uint32_WB1,_Active);   //add the first result
+                uart2_sendbuffer(',');      //add a ,
+                funct_IntToAscii(uint32_WB2,_Active);   //add the second result
+                uart2_sendbuffer(',');      //add a ,
+                funct_IntToAscii(uint32_WB2,_Active);   //add the second result
+                uart2_sendbuffer(',');      //add a ,
+
+                //convert Vmot
+                uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);
+                funct_IntToAscii(uint32_WB1,_Active);   //add the Vmot result
+                uart2_sendbuffer(13);      //add a CR        
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _UnknownMotTyp;     //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
+
+            ads1115_SetChannel(_AIN3p_GND,_FS4096mV);   //set channel on Vmot
+            
+            g_CmdChk.uint8_GlobalLock = 0;  //clear global lock
         }
-        
-        ads1115_SetChannel(_AIN3p_GND,_FS4096mV);   //set channel on Vmot
     }
     else
     {
@@ -435,13 +441,15 @@ void cmd_SRACC(void)
     {
         if(g_CmdChk.uint8_ParamPos % 2)    //verify if the number of received parameters is odd-numbered (a pair) 
         {
-            if(g_Uni.uint8_Settings & 0x01)         //is motor in run mode?
+            if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
             {
                 g_Param.uint8_ErrCode = _MotorInRun;        //set error code
                 uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
             }
             else
             {
+                g_CmdChk.uint8_GlobalLock = 1;  //enable global lock
+                
                 //ToDo:
                 //verify each received parameter with the tolerance (start with the 2nd parameter)
                 //Until:
@@ -491,7 +499,9 @@ void cmd_SRACC(void)
                     g_Param.uint8_ErrCode = _OutOfTolSRACC;     //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                 }
-            }        
+                
+                g_CmdChk.uint8_GlobalLock = 0;  //disable global lock
+            }  
         }
         else    //otherwise send back the error code
         {
@@ -554,13 +564,15 @@ void cmd_SRDEC(void)
     {
         if(g_CmdChk.uint8_ParamPos % 2)    //verify if the number of received parameters is odd-numbered (a pair)
         {
-            if(g_Uni.uint8_Settings & 0x01)     //is motor in run mode?
+            if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
             {
                 g_Param.uint8_ErrCode = _MotorInRun;        //set error code
                 uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
             }
             else
             {
+                g_CmdChk.uint8_GlobalLock = 1;  //enable global lock
+                
                 //ToDo:
                 //verify each received parameter with the tolerance (start with the 2nd parameter)
                 //Until:
@@ -610,6 +622,8 @@ void cmd_SRDEC(void)
                     g_Param.uint8_ErrCode = _OutOfTolSRDEC;     //set error code
                     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                 }
+                
+                g_CmdChk.uint8_GlobalLock = 0;  //disable global lock
             }       
         } 
         else    //otherwise send back the error code
@@ -681,7 +695,7 @@ void cmd_RUN(void)
     
     if(g_CmdChk.uint8_ParamPos == 15)  //number of received characters OK?
     {
-        if(g_Uni.uint8_Settings & 0x01)         //is motor in run mode?
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
             g_Param.uint8_ErrCode = _MotorInRun;        //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
@@ -787,6 +801,9 @@ void cmd_RUN(void)
                         SendOneDataSPI1(A3981.CONFIG1.REG);
                         A3981.RUN.BITS.EN = 1;
                         g_Bipol.uint1_IsBipolEnabled = 1;
+                        
+                        //no error detected, so enable global lock
+                        g_CmdChk.uint8_GlobalLock = 1;
                     }
                     else
                     {
@@ -890,6 +907,9 @@ void cmd_RUN(void)
                     {
                         //nothing wrong, set the run bit
                         g_Uni.uint8_Settings |= 0x01;   //enable run bit
+                        
+                        //no error detected, so enable the global lock
+                        g_CmdChk.uint8_GlobalLock = 1;
                     }      
                 }
                 else
@@ -1008,7 +1028,7 @@ void cmd_RAZ(void)
 {
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
-        if(g_Uni.uint8_Settings & 0x01)                 //is motor in run mode?
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock enabled?
         {
             g_Param.uint8_ErrCode = _MotorInRun;        //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
@@ -1058,7 +1078,7 @@ void cmd_SMTYP(void)
   
     if(g_CmdChk.uint8_ParamPos == 2)            //number of received characters OK?
     {
-        if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
+        if(g_CmdChk.uint8_GlobalLock == 1)      //global lock active
         {
             g_Param.uint8_ErrCode = _MotorInRun;        //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
@@ -1129,20 +1149,22 @@ void cmd_STEST(void)
 {  
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
-    //--- Driving test of A3981 driver and indirectly of SPI 1 ---//
-        if(checkA3981() == -1)
-        {   
-            // TODO: measure voltage on the Vbb pin 
-            // if there is no voltage, then the status of the chip will be wrong (i.g. overvoltage, temperature errors)
-            if(A3981.FAULT0.BITS.TW == 2)    // Temperature error
-                // stop the device if possible
-                if(A3981.FAULT0.BITS.OV);     // Overvoltage error
-                
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock enable?
+        {
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
-        //to define!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    
-        uart2_sendbuffer('E');                      //first the letter E
-        uart2_sendbuffer(13);                       //add the CR at the end      
+        else
+        {
+            g_CmdChk.uint8_GlobalLock = 1;  //enable global lock
+
+            //to define!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+            uart2_sendbuffer('E');                      //first the letter E
+            uart2_sendbuffer(13);                       //add the CR at the end
+            
+            g_CmdChk.uint8_GlobalLock = 0;  //disable global lock
+        }
     }
     else
     {
@@ -1275,13 +1297,15 @@ void cmd_GRACC(void)
     
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
-        if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
             g_Param.uint8_ErrCode = _MotorInRun;        //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
+            g_CmdChk.uint8_GlobalLock = 1;  //enable global lock
+            
             //send back the needed informations
             uart2_sendbuffer('E');                      //first the letter E
            
@@ -1304,7 +1328,9 @@ void cmd_GRACC(void)
                     funct_IntToAscii(g_Param.uint16_AccFreq[uint8_WB],_Active);        
                 }
             }
-            uart2_sendbuffer(13);                       //add the CR at the end       
+            uart2_sendbuffer(13);                       //add the CR at the end
+            
+            g_CmdChk.uint8_GlobalLock = 0;  //disable global lock
         }      
     }
     else
@@ -1342,13 +1368,15 @@ void cmd_GRDEC(void)
     
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
-        if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
             g_Param.uint8_ErrCode = _MotorInRun;        //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
+            g_CmdChk.uint8_GlobalLock = 1;  //enable global lock
+            
             //send back the needed informations
             uart2_sendbuffer('E');                      //first the letter E
            
@@ -1371,7 +1399,9 @@ void cmd_GRDEC(void)
                     funct_IntToAscii(g_Param.uint16_DecFreq[uint8_WB],_Active);        
                 }
             }
-            uart2_sendbuffer(13);                       //add the CR at the end       
+            uart2_sendbuffer(13);                       //add the CR at the end 
+            
+            g_CmdChk.uint8_GlobalLock = 0;  //disable global lock
         }      
     }
     else
@@ -1492,13 +1522,18 @@ void cmd_BREAK(void)
         oBiEnaVmot = 0;
         A3981.RUN.BITS.EN = 0;
         SendOneDataSPI1(A3981.RUN.REG);
+        
     // Code for unipolar motor here below // 
+        //add here the conditions!!!!!
+        
+    // Code for LIN motor here below // 
         //add here the conditions!!!!!
         
         //send back the needed informations
         uart2_sendbuffer('E');                  //first the letter E
         uart2_sendbuffer(13);                   //add the CR at the end
         
+        g_CmdChk.uint8_GlobalLock = 0;  //disable global lock
     }
     else
     {
@@ -1532,7 +1567,6 @@ void cmd_MUMOT(void)
         uint32_WB = ads1115_read();     //read out Vmot
         
         //convert the result in mV
-        //uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);
         uint32_WB = funct_ADCtoMiliUnit(uint32_WB,464);
         
         //send back the needed informations
@@ -1573,7 +1607,7 @@ void cmd_SCOILON(void)
     
     if(g_CmdChk.uint8_ParamPos == 6)   //number of received characters OK?
     {
-        if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock enabled?
         {
             g_Param.uint8_ErrCode = _MotorInRun;        //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
@@ -1718,7 +1752,7 @@ void cmd_SSMOD(void)
 {
     if(g_CmdChk.uint8_ParamPos == 2)   //number of received characters OK?
     {
-        if(g_Uni.uint8_Settings & 0x01)             //is unipolar motor in run mode?
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock enabled?
         {
             g_Param.uint8_ErrCode = _MotorInRun;        //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
@@ -2135,13 +2169,15 @@ void cmd_SMCRSTP(void)
         //number of received characters are a pair of 4th, 8th or 17th (+1 with command ID)
         if((g_CmdChk.uint8_ParamPos == 5) || (g_CmdChk.uint8_ParamPos == 9) || (g_CmdChk.uint8_ParamPos == 17))
         {
-            if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
+            if(g_CmdChk.uint8_GlobalLock == 1)  //global lock enabled?
             {
                 g_Param.uint8_ErrCode = _MotorInRun;        //set error code
                 uart2_SendErrorCode(g_Param.uint8_ErrCode);  //call subroutine
             }
             else
             {
+                g_CmdChk.uint8_GlobalLock = 1;  //set global lock
+                
                 //ToDo: 
                 //verify each received parameter with the tolerance (start with the 2nd paramter)
                 //Until:
@@ -2177,6 +2213,8 @@ void cmd_SMCRSTP(void)
                     //send back the OK
                     uart2_sendbuffer('E');            //first the letter E
                     uart2_sendbuffer(13);             //then the CR at the end
+                    
+                    g_CmdChk.uint8_GlobalLock = 0;  //disable global lock
                 }
                 else
                 {
@@ -2219,13 +2257,15 @@ void cmd_GMCRSTP(void)
     
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
-        if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock enabled?
         {
             g_Param.uint8_ErrCode = _MotorInRun;        //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode);  //call subroutine
         }
         else 
         {
+            g_CmdChk.uint8_GlobalLock = 1;  //enable global lock
+            
             uart2_sendbuffer('E');          //first the letter E
             
             //read out the array
@@ -2244,6 +2284,8 @@ void cmd_GMCRSTP(void)
             }
             
             uart2_sendbuffer(13);           //add the <CR> at the end
+            
+            g_CmdChk.uint8_GlobalLock = 0;  //disable global lock
         }
     }
     else
@@ -2274,27 +2316,35 @@ void cmd_SSWLIM(void)
     
     if(g_CmdChk.uint8_ParamPos == 5)   //number of received characters OK?
     {
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_SW1min,_SW1max);
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_SW1min,_SW1max);
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],_SW2min,_SW2max);
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[4],_SW2min,_SW2max);
-        
-        if(uint8_Result == 4)   //received parameters are within the tolerance?
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            g_Param.uint32_Sw1min = g_CmdChk.uint32_TempPara[1];
-            g_Param.uint32_Sw1max = g_CmdChk.uint32_TempPara[2];
-            g_Param.uint32_Sw2min = g_CmdChk.uint32_TempPara[3];
-            g_Param.uint32_Sw2max = g_CmdChk.uint32_TempPara[4];
-            
-            //send back the needed informations
-            uart2_sendbuffer('E');                  //first the letter E
-            uart2_sendbuffer(13);                   //add the CR at the end
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _OutOfTolSSWLIM;  //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-        }   
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_SW1min,_SW1max);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_SW1min,_SW1max);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],_SW2min,_SW2max);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[4],_SW2min,_SW2max);
+
+            if(uint8_Result == 4)   //received parameters are within the tolerance?
+            {
+                g_Param.uint32_Sw1min = g_CmdChk.uint32_TempPara[1];
+                g_Param.uint32_Sw1max = g_CmdChk.uint32_TempPara[2];
+                g_Param.uint32_Sw2min = g_CmdChk.uint32_TempPara[3];
+                g_Param.uint32_Sw2max = g_CmdChk.uint32_TempPara[4];
+
+                //send back the needed informations
+                uart2_sendbuffer('E');                  //first the letter E
+                uart2_sendbuffer(13);                   //add the CR at the end
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _OutOfTolSSWLIM;  //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
+        }
     }
     else
     {
@@ -2408,23 +2458,31 @@ void cmd_SPWMLIM(void)
     
     if(g_CmdChk.uint8_ParamPos == 3)   //number of received characters OK?
     {
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_SWpwmMin,_SWpwmMax);
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_SWpwmMin,_SWpwmMax);
-        
-        if(uint8_Result == 2)   //received parameters are within the tolerance?
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            g_Param.uint32_SwPWMmin = g_CmdChk.uint32_TempPara[1];
-            g_Param.uint32_SwPWMmax = g_CmdChk.uint32_TempPara[2];
-            
-            //send back the needed informations
-            uart2_sendbuffer('E');                  //first the letter E
-            uart2_sendbuffer(13);                   //add the CR at the end
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _OutOfTolSPWMLIM;  //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-        }   
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_SWpwmMin,_SWpwmMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_SWpwmMin,_SWpwmMax);
+
+            if(uint8_Result == 2)   //received parameters are within the tolerance?
+            {
+                g_Param.uint32_SwPWMmin = g_CmdChk.uint32_TempPara[1];
+                g_Param.uint32_SwPWMmax = g_CmdChk.uint32_TempPara[2];
+
+                //send back the needed informations
+                uart2_sendbuffer('E');                  //first the letter E
+                uart2_sendbuffer(13);                   //add the CR at the end
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _OutOfTolSPWMLIM;  //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }   
+        }
     }
     else
     {
@@ -2606,19 +2664,27 @@ void cmd_SSWTYP(void)
 {
     if(g_CmdChk.uint8_ParamPos == 2)   //number of received characters OK?
     {
-        if(funct_CheckTol(g_CmdChk.uint32_TempPara[1],_SWtypeMin,_SWtypeMax))   //received parameters are within the tolerance?
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            g_Param.uint8_SwType = g_CmdChk.uint32_TempPara[1];
-            
-            //send back the needed informations
-            uart2_sendbuffer('E');                  //first the letter E
-            uart2_sendbuffer(13);                   //add the CR at the end
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _OutOfTolSSWTYP;  //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-        }   
+            if(funct_CheckTol(g_CmdChk.uint32_TempPara[1],_SWtypeMin,_SWtypeMax))   //received parameters are within the tolerance?
+            {
+                g_Param.uint8_SwType = g_CmdChk.uint32_TempPara[1];
+
+                //send back the needed informations
+                uart2_sendbuffer('E');                  //first the letter E
+                uart2_sendbuffer(13);                   //add the CR at the end
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _OutOfTolSSWTYP;  //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            } 
+        }
     }
     else
     {
@@ -2783,45 +2849,53 @@ void cmd_SROM(void)
     
     if(g_CmdChk.uint8_ParamPos == 3)           //number of received characters OK?
     {
-        //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_RomAddrMin,_RomAddrMax);
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_RomValMin,_RomValMax);
-        
-        if(uint8_Result == 2)       //verify the result
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            uint8_AdrH = g_CmdChk.uint32_TempPara[1];   //store address high and low into AdrH
-            uint8_AdrH = uint8_AdrH >> 8;               //shift AdrH 8 bits to right
-            uint8_AdrH &= 0x000000FF;                   //clear all bits after the first 8
-            
-            uint8_AdrL = g_CmdChk.uint32_TempPara[1];   //store address high and low into AdrL
-            uint8_AdrL &= 0x000000FF;                   //clear all bits after the first 8
-            
-            ROM24LC256_WrByte(uint8_AdrH,uint8_AdrL,g_CmdChk.uint32_TempPara[2]);
-            
-            if(g_i2c1.uint8_ErrACK)     //error acknowledge = no answer from the slave
-            {
-                uart2_sendbuffer('X');      //first the letter X
-                uart2_sendbuffer(',');      //then the comma
-                g_Param.uint8_ErrCode = _AckSROMRROM;   //set error code
-                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
-            }
-            else if(g_i2c1.uint8_BusColl)   //error bus collision 
-            {
-                uart2_sendbuffer('X');      //first the letter X
-                uart2_sendbuffer(',');      //then the comma
-                g_Param.uint8_ErrCode = _BusCollSROMRROM;   //set error code
-                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
-            }
-            else
-            {
-                uart2_sendbuffer('E');      //first the letter E
-            }
-            uart2_sendbuffer(13);                   //add the CR at the end        
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _OutOfTolSROMRROM;  //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            //verify the limits if they are inside the tolerance
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_RomAddrMin,_RomAddrMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_RomValMin,_RomValMax);
+
+            if(uint8_Result == 2)       //verify the result
+            {
+                uint8_AdrH = g_CmdChk.uint32_TempPara[1];   //store address high and low into AdrH
+                uint8_AdrH = uint8_AdrH >> 8;               //shift AdrH 8 bits to right
+                uint8_AdrH &= 0x000000FF;                   //clear all bits after the first 8
+
+                uint8_AdrL = g_CmdChk.uint32_TempPara[1];   //store address high and low into AdrL
+                uint8_AdrL &= 0x000000FF;                   //clear all bits after the first 8
+
+                ROM24LC256_WrByte(uint8_AdrH,uint8_AdrL,g_CmdChk.uint32_TempPara[2]);
+
+                if(g_i2c1.uint8_ErrACK)     //error acknowledge = no answer from the slave
+                {
+                    uart2_sendbuffer('X');      //first the letter X
+                    uart2_sendbuffer(',');      //then the comma
+                    g_Param.uint8_ErrCode = _AckSROMRROM;   //set error code
+                    funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+                }
+                else if(g_i2c1.uint8_BusColl)   //error bus collision 
+                {
+                    uart2_sendbuffer('X');      //first the letter X
+                    uart2_sendbuffer(',');      //then the comma
+                    g_Param.uint8_ErrCode = _BusCollSROMRROM;   //set error code
+                    funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+                }
+                else
+                {
+                    uart2_sendbuffer('E');      //first the letter E
+                }
+                uart2_sendbuffer(13);                   //add the CR at the end        
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _OutOfTolSROMRROM;  //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
         }
     }
     else
@@ -2855,47 +2929,55 @@ void cmd_RROM(void)
     
     if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
     {
-        //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_RomAddrMin,_RomAddrMax);
-        
-        if(uint8_Result == 1)       //verify the result
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            uint8_AdrH = g_CmdChk.uint32_TempPara[1];   //store address high and low into AdrH
-            uint8_AdrH = uint8_AdrH >> 8;               //shift AdrH 8 bits to right
-            uint8_AdrH &= 0x000000FF;                   //clear all bits after the first 8
-            
-            uint8_AdrL = g_CmdChk.uint32_TempPara[1];   //store address high and low into AdrL
-            uint8_AdrL &= 0x000000FF;                   //clear all bits after the first 8
-            
-            //read out one byte and store it into uin8_Result
-            uint8_Result = ROM24LC256_RdByte(uint8_AdrH,uint8_AdrL,1);  
-            
-            if(g_i2c1.uint8_ErrACK)     //error acknowledge = no answer from the slave
-            {
-                uart2_sendbuffer('X');      //first the letter X
-                uart2_sendbuffer(',');      //then the comma
-                g_Param.uint8_ErrCode = _AckSROMRROM;   //set error code
-                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
-            }
-            else if(g_i2c1.uint8_BusColl)   //error bus collision 
-            {
-                uart2_sendbuffer('X');      //first the letter X
-                uart2_sendbuffer(',');      //then the comma
-                g_Param.uint8_ErrCode = _BusCollSROMRROM;   //set error code
-                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
-            }
-            else
-            {
-                uart2_sendbuffer('E');      //first the letter E
-                uart2_sendbuffer(',');      //then the comma
-                funct_IntToAscii(uint8_Result,_Active);
-            }
-            uart2_sendbuffer(13);           //add the CR at the end
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _OutOfTolSROMRROM;  //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            //verify the limits if they are inside the tolerance
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_RomAddrMin,_RomAddrMax);
+
+            if(uint8_Result == 1)       //verify the result
+            {
+                uint8_AdrH = g_CmdChk.uint32_TempPara[1];   //store address high and low into AdrH
+                uint8_AdrH = uint8_AdrH >> 8;               //shift AdrH 8 bits to right
+                uint8_AdrH &= 0x000000FF;                   //clear all bits after the first 8
+
+                uint8_AdrL = g_CmdChk.uint32_TempPara[1];   //store address high and low into AdrL
+                uint8_AdrL &= 0x000000FF;                   //clear all bits after the first 8
+
+                //read out one byte and store it into uin8_Result
+                uint8_Result = ROM24LC256_RdByte(uint8_AdrH,uint8_AdrL,1);  
+
+                if(g_i2c1.uint8_ErrACK)     //error acknowledge = no answer from the slave
+                {
+                    uart2_sendbuffer('X');      //first the letter X
+                    uart2_sendbuffer(',');      //then the comma
+                    g_Param.uint8_ErrCode = _AckSROMRROM;   //set error code
+                    funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+                }
+                else if(g_i2c1.uint8_BusColl)   //error bus collision 
+                {
+                    uart2_sendbuffer('X');      //first the letter X
+                    uart2_sendbuffer(',');      //then the comma
+                    g_Param.uint8_ErrCode = _BusCollSROMRROM;   //set error code
+                    funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+                }
+                else
+                {
+                    uart2_sendbuffer('E');      //first the letter E
+                    uart2_sendbuffer(',');      //then the comma
+                    funct_IntToAscii(uint8_Result,_Active);
+                }
+                uart2_sendbuffer(13);           //add the CR at the end
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _OutOfTolSROMRROM;  //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
         }
     }
     else
@@ -3827,90 +3909,98 @@ void cmd_GTIME(void)
     
     if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
     {
-        uint8_WB = 7;                       //counter for do while
-        
-        do
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            switch (uint8_WB)
-            {
-                case 7:
-                    RV30xx_SetGetWday(_Get,0);      //read out the weekday
-                    break;
-                    
-                case 6:
-                    RV30xx_SetGetDay(_Get,0);       //read out the day
-                    break;
-                    
-                case 5:
-                    RV30xx_SetGetMonth(_Get,0);     //read out the month
-                    break;
-                    
-                case 4:
-                    RV30xx_SetGetYear(_Get,0);      //read out the year
-                    break;
-                    
-                case 3:
-                    RV30xx_SetGetHrs(_Get,0);       //read out the hours
-                    break;
-                    
-                case 2:
-                    RV30xx_SetGetMin(_Get,0);       //read out the minutes
-                    break;
-                    
-                case 1:
-                    RV30xx_SetGetSec(_Get,0);       //read out the seconds
-                    break;
-                    
-                default:
-                    //do nothing
-                    break;
-            }
-            
-            uint8_WB--;
-            
-            if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
-            {
-                //error occured, exit the while loop
-                uint8_WB = 0;
-            }
-            else
-            {
-                //do nothing
-            }
-        }
-        while(uint8_WB);    //until counter is not 0
-        
-        if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
-        {
-            uart2_sendbuffer('X');      //first the letter X
-            uart2_sendbuffer(',');      //then the comma
-            g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
-            funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
-            uart2_sendbuffer(13);       //then the CR
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            uart2_sendbuffer('E');      //first the letter X
-            uart2_sendbuffer(',');      //then the comma
-            funct_StoreWdayIntoRSbuffer();  //call subroutine
-            uart2_sendbuffer(' ');      //then the space
-            funct_IntToAscii(g_Param.uint8_Day,_Active);
-            uart2_sendbuffer('t');      //then the t
-            uart2_sendbuffer('h');      //then the h
-            uart2_sendbuffer(' ');      //then the space
-            funct_StoreMonthIntoRSbuffer(); //call subroutine
-            uart2_sendbuffer(' ');      //then the space
-            uart2_sendbuffer('2');      //then the 2
-            uart2_sendbuffer('0');      //then the 0
-            funct_IntToAscii(g_Param.uint8_Year,_Active);
-            uart2_sendbuffer(',');      //then the comma
-            uart2_sendbuffer(' ');      //then the space
-            funct_IntToAscii(g_Param.uint8_Hrs,_Active);
-            uart2_sendbuffer(':');      //then the double point
-            funct_IntToAscii(g_Param.uint8_Min,_Active);
-            uart2_sendbuffer(':');      //then the double point
-            funct_IntToAscii(g_Param.uint8_Sec,_Active);
-            uart2_sendbuffer(13);       //then the CR         
+            uint8_WB = 7;                       //counter for do while
+
+            do
+            {
+                switch (uint8_WB)
+                {
+                    case 7:
+                        RV30xx_SetGetWday(_Get,0);      //read out the weekday
+                        break;
+
+                    case 6:
+                        RV30xx_SetGetDay(_Get,0);       //read out the day
+                        break;
+
+                    case 5:
+                        RV30xx_SetGetMonth(_Get,0);     //read out the month
+                        break;
+
+                    case 4:
+                        RV30xx_SetGetYear(_Get,0);      //read out the year
+                        break;
+
+                    case 3:
+                        RV30xx_SetGetHrs(_Get,0);       //read out the hours
+                        break;
+
+                    case 2:
+                        RV30xx_SetGetMin(_Get,0);       //read out the minutes
+                        break;
+
+                    case 1:
+                        RV30xx_SetGetSec(_Get,0);       //read out the seconds
+                        break;
+
+                    default:
+                        //do nothing
+                        break;
+                }
+
+                uint8_WB--;
+
+                if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+                {
+                    //error occured, exit the while loop
+                    uint8_WB = 0;
+                }
+                else
+                {
+                    //do nothing
+                }
+            }
+            while(uint8_WB);    //until counter is not 0
+
+            if(g_i2c1.uint8_BusColl || g_i2c1.uint8_ErrACK)
+            {
+                uart2_sendbuffer('X');      //first the letter X
+                uart2_sendbuffer(',');      //then the comma
+                g_Param.uint8_ErrCode = _BusCollRTC;  //set error code
+                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                uart2_sendbuffer('E');      //first the letter X
+                uart2_sendbuffer(',');      //then the comma
+                funct_StoreWdayIntoRSbuffer();  //call subroutine
+                uart2_sendbuffer(' ');      //then the space
+                funct_IntToAscii(g_Param.uint8_Day,_Active);
+                uart2_sendbuffer('t');      //then the t
+                uart2_sendbuffer('h');      //then the h
+                uart2_sendbuffer(' ');      //then the space
+                funct_StoreMonthIntoRSbuffer(); //call subroutine
+                uart2_sendbuffer(' ');      //then the space
+                uart2_sendbuffer('2');      //then the 2
+                uart2_sendbuffer('0');      //then the 0
+                funct_IntToAscii(g_Param.uint8_Year,_Active);
+                uart2_sendbuffer(',');      //then the comma
+                uart2_sendbuffer(' ');      //then the space
+                funct_IntToAscii(g_Param.uint8_Hrs,_Active);
+                uart2_sendbuffer(':');      //then the double point
+                funct_IntToAscii(g_Param.uint8_Min,_Active);
+                uart2_sendbuffer(':');      //then the double point
+                funct_IntToAscii(g_Param.uint8_Sec,_Active);
+                uart2_sendbuffer(13);       //then the CR         
+            }
         }
     }
     else
@@ -3980,44 +4070,52 @@ void cmd_SSPDLIN(void)
     
     if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
     {
-        //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_LinSpdMin,_LinSpdMax);
-        
-        if(uint8_Result == 1)       //verify the result
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            //set up the new baud rate
-            uart_set(_UART1_,_NONE,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,g_CmdChk.uint32_TempPara[1]);
-            
-            //store the baud rate
-            g_Param.uint32_LinSpd = g_CmdChk.uint32_TempPara[1];
-            
-            if(g_Param.uint32_LinSpd <= 20000)  //baud rate smaller than 20kBaud
-            {
-                oSPModeSignalLIN = 0;   //disable high speed mode
-            }
-            else
-            {
-                oSPModeSignalLIN = 1;   //enable high speed mode
-            }
-            
-            //calculation of the error 
-            uint32_WLI1 = _FREQ_OSC / (16 * (U1BRG + 1)); //calculate the effective baud rage
-            uint32_WLI1 = uint32_WLI1 * 10000;                      
-            uint32_WLI2 = g_CmdChk.uint32_TempPara[1] * 10000;
-            //calculate the error between the desired and the effective baud rate
-            uint8_Err = (uint32_WLI1 - uint32_WLI2) / g_CmdChk.uint32_TempPara[1];
-            
-            uart2_sendbuffer('E');      //first the letter E
-            uart2_sendbuffer(',');      //add a comma
-            uart2_sendbuffer('0');      //add a 0
-            uart2_sendbuffer('.');      //add a point
-            funct_IntToAscii(uint8_Err,_Active);
-            uart2_sendbuffer(13);       //then the CR
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _OutOfTolSSPDLIN;     //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            //verify the limits if they are inside the tolerance
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_LinSpdMin,_LinSpdMax);
+
+            if(uint8_Result == 1)       //verify the result
+            {
+                //set up the new baud rate
+                uart_set(_UART1_,_NONE,_1_STOP,_NON_INVERTED,_NO_AUTOBAUD,g_CmdChk.uint32_TempPara[1]);
+
+                //store the baud rate
+                g_Param.uint32_LinSpd = g_CmdChk.uint32_TempPara[1];
+
+                if(g_Param.uint32_LinSpd <= 20000)  //baud rate smaller than 20kBaud
+                {
+                    oSPModeSignalLIN = 0;   //disable high speed mode
+                }
+                else
+                {
+                    oSPModeSignalLIN = 1;   //enable high speed mode
+                }
+
+                //calculation of the error 
+                uint32_WLI1 = _FREQ_OSC / (16 * (U1BRG + 1)); //calculate the effective baud rage
+                uint32_WLI1 = uint32_WLI1 * 10000;                      
+                uint32_WLI2 = g_CmdChk.uint32_TempPara[1] * 10000;
+                //calculate the error between the desired and the effective baud rate
+                uint8_Err = (uint32_WLI1 - uint32_WLI2) / g_CmdChk.uint32_TempPara[1];
+
+                uart2_sendbuffer('E');      //first the letter E
+                uart2_sendbuffer(',');      //add a comma
+                uart2_sendbuffer('0');      //add a 0
+                uart2_sendbuffer('.');      //add a point
+                funct_IntToAscii(uint8_Err,_Active);
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _OutOfTolSSPDLIN;     //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
         }
     }
     else
@@ -4081,21 +4179,29 @@ void cmd_STOLIN(void)
     
     if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
     {
-        //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_LinToMin,_LinToMax);
-        
-        if(uint8_Result == 1)       //verify the result
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            //store the new timeout
-            g_Param.uint16_LinTO = g_CmdChk.uint32_TempPara[1];
-            
-            uart2_sendbuffer('E');      //first the letter E
-            uart2_sendbuffer(13);       //then the CR
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _OutOfTolSTOLIN;     //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            //verify the limits if they are inside the tolerance
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_LinToMin,_LinToMax);
+
+            if(uint8_Result == 1)       //verify the result
+            {
+                //store the new timeout
+                g_Param.uint16_LinTO = g_CmdChk.uint32_TempPara[1];
+
+                uart2_sendbuffer('E');      //first the letter E
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _OutOfTolSTOLIN;     //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
         }
     }
     else
@@ -4358,24 +4464,32 @@ void cmd_SBIPPD(void)
     
     if(g_CmdChk.uint8_ParamPos == 4)        //number of received characters OK?
     {
-        //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipSyrMin,_BipSyrMax);
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_BipDcyMin,_BipDcyMax);
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],_BipHlrMin,_BipHlrMax);
-        
-        if(uint8_Result == 3)       //verify the result
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            A3981.CONFIG0.BITS.SYR = g_CmdChk.uint32_TempPara[1];
-            A3981.RUN.BITS.DCY = g_CmdChk.uint32_TempPara[2];
-            A3981.RUN.BITS.HLR = g_CmdChk.uint32_TempPara[3];
-            
-            uart2_sendbuffer('E');      //first the letter E
-            uart2_sendbuffer(13);       //then the CR
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _BipSBIPPD;         //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            //verify the limits if they are inside the tolerance
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipSyrMin,_BipSyrMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_BipDcyMin,_BipDcyMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],_BipHlrMin,_BipHlrMax);
+
+            if(uint8_Result == 3)       //verify the result
+            {
+                A3981.CONFIG0.BITS.SYR = g_CmdChk.uint32_TempPara[1];
+                A3981.RUN.BITS.DCY = g_CmdChk.uint32_TempPara[2];
+                A3981.RUN.BITS.HLR = g_CmdChk.uint32_TempPara[3];
+
+                uart2_sendbuffer('E');      //first the letter E
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _BipSBIPPD;         //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
         }
     }
     else
@@ -4443,20 +4557,28 @@ void cmd_SBIPTSC(void)
     
     if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
     {
-        //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipTscMin,_BipTscMax);
-        
-        if(uint8_Result == 1)       //verify the result
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            A3981.CONFIG1.BITS.TSC = g_CmdChk.uint32_TempPara[1];
-            
-            uart2_sendbuffer('E');      //first the letter E
-            uart2_sendbuffer(13);       //then the CR
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _BipSBIPTSC;        //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            //verify the limits if they are inside the tolerance
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipTscMin,_BipTscMax);
+
+            if(uint8_Result == 1)       //verify the result
+            {
+                A3981.CONFIG1.BITS.TSC = g_CmdChk.uint32_TempPara[1];
+
+                uart2_sendbuffer('E');      //first the letter E
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _BipSBIPTSC;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
         }
     }
     else
@@ -4520,20 +4642,28 @@ void cmd_SBIPOL(void)
     
     if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
     {
-        //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipOlMin,_BipOlMax);
-        
-        if(uint8_Result == 1)       //verify the result
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            A3981.RUN.BITS.OL = g_CmdChk.uint32_TempPara[1];
-            
-            uart2_sendbuffer('E');      //first the letter E
-            uart2_sendbuffer(13);       //then the CR
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _BipSBIPOL;         //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            //verify the limits if they are inside the tolerance
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipOlMin,_BipOlMax);
+
+            if(uint8_Result == 1)       //verify the result
+            {
+                A3981.RUN.BITS.OL = g_CmdChk.uint32_TempPara[1];
+
+                uart2_sendbuffer('E');      //first the letter E
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _BipSBIPOL;         //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
         }
     }
     else
@@ -4597,29 +4727,37 @@ void cmd_SBIPSTS(void)
     
     if(g_CmdChk.uint8_ParamPos == 3)        //number of received characters OK?
     {
-        //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipStsMin,_BipStsMax);
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_BipCdMin,_BipCdMax);
-        
-        if(uint8_Result == 2)       //verify the result
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            if(g_CmdChk.uint32_TempPara[1] == 2)
-            {
-                A3981.TBLLD.BITS.STS = 3;
-            }
-            else
-            {
-                A3981.TBLLD.BITS.STS = g_CmdChk.uint32_TempPara[1];
-            }
-            A3981.CONFIG1.BITS.CD = g_CmdChk.uint32_TempPara[2];
-            
-            uart2_sendbuffer('E');      //first the letter E
-            uart2_sendbuffer(13);       //then the CR
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _BipSBIPSTS;        //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            //verify the limits if they are inside the tolerance
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipStsMin,_BipStsMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_BipCdMin,_BipCdMax);
+
+            if(uint8_Result == 2)       //verify the result
+            {
+                if(g_CmdChk.uint32_TempPara[1] == 2)
+                {
+                    A3981.TBLLD.BITS.STS = 3;
+                }
+                else
+                {
+                    A3981.TBLLD.BITS.STS = g_CmdChk.uint32_TempPara[1];
+                }
+                A3981.CONFIG1.BITS.CD = g_CmdChk.uint32_TempPara[2];
+
+                uart2_sendbuffer('E');      //first the letter E
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _BipSBIPSTS;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
         }
     }
     else
@@ -4685,20 +4823,28 @@ void cmd_SBIPPFD(void)
     
     if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
     {
-        //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipPfdMin,_BipPfdMax);
-        
-        if(uint8_Result == 1)       //verify the result
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            A3981.CONFIG0.BITS.PFD = g_CmdChk.uint32_TempPara[1];
-            
-            uart2_sendbuffer('E');      //first the letter E
-            uart2_sendbuffer(13);       //then the CR
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _BipSBIPPFD;        //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            //verify the limits if they are inside the tolerance
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipPfdMin,_BipPfdMax);
+
+            if(uint8_Result == 1)       //verify the result
+            {
+                A3981.CONFIG0.BITS.PFD = g_CmdChk.uint32_TempPara[1];
+
+                uart2_sendbuffer('E');      //first the letter E
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _BipSBIPPFD;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
         }
     }
     else
@@ -4762,23 +4908,31 @@ void cmd_SBIPPWM(void)
     
     if(g_CmdChk.uint8_ParamPos == 3)        //number of received characters OK?
     {
-        //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipTbkMin,_BipTbkMax);
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_BipTofMin,_BipTofMax);
-        
-        if(uint8_Result == 2)       //verify the result
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            A3981.CONFIG0.BITS.TBK = g_CmdChk.uint32_TempPara[1];
-            A3981.CONFIG0.BITS.TOF_FRQ = g_CmdChk.uint32_TempPara[2];
-            A3981.CONFIG0.BITS.PWM = 0; //mode = fixed off-time (PWM)
-            
-            uart2_sendbuffer('E');      //first the letter E
-            uart2_sendbuffer(13);       //then the CR
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _BipSBIPPWM;        //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            //verify the limits if they are inside the tolerance
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipTbkMin,_BipTbkMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_BipTofMin,_BipTofMax);
+
+            if(uint8_Result == 2)       //verify the result
+            {
+                A3981.CONFIG0.BITS.TBK = g_CmdChk.uint32_TempPara[1];
+                A3981.CONFIG0.BITS.TOF_FRQ = g_CmdChk.uint32_TempPara[2];
+                A3981.CONFIG0.BITS.PWM = 0; //mode = fixed off-time (PWM)
+
+                uart2_sendbuffer('E');      //first the letter E
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _BipSBIPPWM;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
         }
     }
     else
@@ -4852,21 +5006,29 @@ void cmd_SBIPFRQ(void)
     
     if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
     {
-        //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipFrqMin,_BipFrqMax);
-        
-        if(uint8_Result == 1)       //verify the result
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            A3981.CONFIG0.BITS.TOF_FRQ = g_CmdChk.uint32_TempPara[1];
-            A3981.CONFIG0.BITS.PWM = 1; //mode = fixed frequency
-            
-            uart2_sendbuffer('E');      //first the letter E
-            uart2_sendbuffer(13);       //then the CR
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _BipSBIPFRQ;        //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            //verify the limits if they are inside the tolerance
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipFrqMin,_BipFrqMax);
+
+            if(uint8_Result == 1)       //verify the result
+            {
+                A3981.CONFIG0.BITS.TOF_FRQ = g_CmdChk.uint32_TempPara[1];
+                A3981.CONFIG0.BITS.PWM = 1; //mode = fixed frequency
+
+                uart2_sendbuffer('E');      //first the letter E
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _BipSBIPFRQ;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
         }
     }
     else
@@ -4938,20 +5100,28 @@ void cmd_SBIPSLEW(void)
     
     if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
     {
-        //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipSlewMin,_BipSlewMax);
-        
-        if(uint8_Result == 1)       //verify the result
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            A3981.RUN.BITS.SLEW = g_CmdChk.uint32_TempPara[1];
-            
-            uart2_sendbuffer('E');      //first the letter E
-            uart2_sendbuffer(13);       //then the CR
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _BipSBIPSLEW;        //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            //verify the limits if they are inside the tolerance
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipSlewMin,_BipSlewMax);
+
+            if(uint8_Result == 1)       //verify the result
+            {
+                A3981.RUN.BITS.SLEW = g_CmdChk.uint32_TempPara[1];
+
+                uart2_sendbuffer('E');      //first the letter E
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _BipSBIPSLEW;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
         }
     }
     else
@@ -5099,21 +5269,29 @@ void cmd_SRESLIN(void)
     
     if(g_CmdChk.uint8_ParamPos == 2)        //number of received characters OK?
     {
-        //verify the limits if they are inside the tolerance
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],_BipSlewMin,_BipSlewMax);
-        
-        if(uint8_Result == 1)       //verify the result
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            //store the new timeout
-            g_Param.uint8_LinRes = g_CmdChk.uint32_TempPara[1];
-            
-            uart2_sendbuffer('E');      //first the letter E
-            uart2_sendbuffer(13);       //then the CR
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _OutOfTolSRESLIN;   //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            //verify the limits if they are inside the tolerance
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[1],0,1);
+
+            if(uint8_Result == 1)       //verify the result
+            {
+                //store the new timeout
+                g_Param.uint8_LinRes = g_CmdChk.uint32_TempPara[1];
+
+                uart2_sendbuffer('E');      //first the letter E
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _OutOfTolSRESLIN;   //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
         }
     }
     else
@@ -5337,172 +5515,178 @@ void cmd_RTESTIN(void)
     
     if(g_CmdChk.uint8_ParamPos == 2)   //number of received characters OK?
     {
-        //test if unipolar, bipolar or matrix?
-        if((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'B') || 
-          (g_CmdChk.uint32_TempPara[1] == 'M'))
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            oVmotOnOff = 0;                 //switch off the main supply
-            oBiEnaVmot = 0;                 //switch off the bipolar supply
-            oEnaVLINSupply = 0;             //switch off the lin supply
-
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,3000);   //load the timer with an timeout of 3s
-
-            while(g_Timer1.uint8_TimeoutFlag)   //do this until the flag is low
-            {
-                adc_LaunchNextMeasure();        //call subroutine 
-                if(g_ADC.uint32_Vmot <= 100)    //voltage smaller than 0.322V
-                {
-                    g_Timer1.uint8_TimeoutFlag = 0; //clear timeout flag inside this loop
-                }
-            }
-
-            if(g_ADC.uint32_Vmot <= 100)    //test it again
-            {
-                oEnaCoilResMeas = 1;        //enable the relay for the resistor     
-                oEnaCurrSource = 1;         //enable the current source
-                
-                ads1115_SetChannel(_AIN3p_GND,_FS4096mV);   //set channel on Vmot
-                    
-                if((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
-                {
-                    uart2_sendbuffer('E');              //first the letter E
-                    uart2_sendbuffer(',');              //add the comma
-                    
-                    //measure coil A1
-                    oUniCoilA1 = 1;                     //switch on coil A1
-                    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-                    SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
-
-                    while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
-                    {
-//                        adc_LaunchNextMeasure();        //old call subroutine 
-                    }  
-                    uint32_WB = ads1115_read();         //read out Vmot
-                    oUniCoilA1 = 0;                     //switch off coil A1
-
-//                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
-                    uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
-                    funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
-                    uart2_sendbuffer(',');              //add the comma
-                    
-                    //measure coil A2
-                    oUniCoilA2 = 1;                     //switch on coil A2
-                    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-                    SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
-
-                    while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
-                    {
-//                        adc_LaunchNextMeasure();        //call subroutine 
-                    }           
-                    uint32_WB = ads1115_read();         //read out Vmot
-                    oUniCoilA2 = 0;                     //switch off coil A2
-
-//                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
-                    uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
-                    funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
-                    uart2_sendbuffer(',');              //add the comma
-                    
-                    //measure coil B1
-                    oUniCoilB1 = 1;                     //switch on coil B1
-                    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-                    SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
-
-                    while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
-                    {
-//                        adc_LaunchNextMeasure();        //call subroutine 
-                    }               
-                    uint32_WB = ads1115_read();         //read out Vmot
-                    oUniCoilB1 = 0;                     //switch off coil B1
-
-//                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
-                    uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
-                    funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
-                    uart2_sendbuffer(',');              //add the comma
-                                    
-                    //measure coil B2
-                    oUniCoilB2 = 1;                     //switch on coil B2
-                    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-                    SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
-
-                    while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
-                    {
-//                        adc_LaunchNextMeasure();        //call subroutine 
-                    }    
-                    uint32_WB = ads1115_read();         //read out Vmot
-                    oUniCoilB2 = 0;                     //switch off coil B2
-
-//                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
-                    uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
-                    funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
-                    uart2_sendbuffer(13);                           //add the CR at the end
-                }
-                else if (g_CmdChk.uint32_TempPara[1] == 'B')
-                {
-                    uart2_sendbuffer('E');              //first the letter E
-                    uart2_sendbuffer(',');              //add the comma
-                    
-                    //measure coil A
-                    oBiRelayCoilA = 1;                  //switch on relay for coil A
-                    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-                    SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
-
-                    while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
-                    {
-//                        adc_LaunchNextMeasure();        //call subroutine 
-                    }         
-                    uint32_WB = ads1115_read();         //read out Vmot
-                    oBiRelayCoilA = 0;                  //switch off relay forcoil A
-
-//                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
-                    uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
-                    funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
-                    uart2_sendbuffer(',');              //add the comma
-                    
-                    //measure coil B
-                    oBiRelayCoilB = 1;                  //switch on relay for coil B
-                    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-                    SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
-
-                    while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
-                    {
-//                        adc_LaunchNextMeasure();        //call subroutine 
-                    } 
-                    uint32_WB = ads1115_read();         //read out Vmot
-                    oBiRelayCoilB = 0;                  //switch off relay forcoil B
-
-//                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,310); //convert the result in mV
-                    uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
-                    funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
-                    uart2_sendbuffer(13);                           //add the CR at the end
-                }
-                else
-                {
-                    //do nothing, error will be send before
-                }
-                   
-                oEnaCoilResMeas = 0;        //disable the relay for the resistor
-                oEnaCurrSource = 0;         //disable the current source
-            }
-            else
-            {
-                uart2_sendbuffer('X');                          //first the letter E
-                uart2_sendbuffer(',');                          //then the comma
-                g_Param.uint8_ErrCode = _RTESTINsupply;         //set error code
-                funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
-                uart2_sendbuffer(',');                          //then the comma
-                //convert the result in mV
-                uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);
-                funct_IntToAscii(uint32_WB,_Active);            //add the voltage
-                uart2_sendbuffer('m');                          //add the m
-                uart2_sendbuffer('V');                          //add the V
-                uart2_sendbuffer(13);                           //add the CR at the end
-            }
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _RTESTINnotPossible;    //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode);     //call subroutine
+            g_CmdChk.uint8_GlobalLock = 1;  //enable global lock
+            
+            //test if unipolar, bipolar or matrix?
+            if((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'B') || 
+              (g_CmdChk.uint32_TempPara[1] == 'M'))
+            {
+                oVmotOnOff = 0;                 //switch off the main supply
+                oBiEnaVmot = 0;                 //switch off the bipolar supply
+                oEnaVLINSupply = 0;             //switch off the lin supply
+
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,3000);   //load the timer with an timeout of 3s
+
+                while(g_Timer1.uint8_TimeoutFlag)   //do this until the flag is low
+                {
+                    adc_LaunchNextMeasure();        //call subroutine 
+                    if(g_ADC.uint32_Vmot <= 100)    //voltage smaller than 0.322V
+                    {
+                        g_Timer1.uint8_TimeoutFlag = 0; //clear timeout flag inside this loop
+                    }
+                }
+
+                if(g_ADC.uint32_Vmot <= 100)    //test it again
+                {
+                    oEnaCoilResMeas = 1;        //enable the relay for the resistor     
+                    oEnaCurrSource = 1;         //enable the current source
+
+                    ads1115_SetChannel(_AIN3p_GND,_FS4096mV);   //set channel on Vmot
+
+                    if((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
+                    {
+                        uart2_sendbuffer('E');              //first the letter E
+                        uart2_sendbuffer(',');              //add the comma
+
+                        //measure coil A1
+                        oUniCoilA1 = 1;                     //switch on coil A1
+                        g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                        SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
+
+                        while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                        {
+                            //do nothing
+                        }  
+                        uint32_WB = ads1115_read();         //read out Vmot
+                        oUniCoilA1 = 0;                     //switch off coil A1
+
+                        uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
+                        funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
+                        uart2_sendbuffer(',');              //add the comma
+
+                        //measure coil A2
+                        oUniCoilA2 = 1;                     //switch on coil A2
+                        g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                        SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
+
+                        while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                        {
+                            //do nothing
+                        }           
+                        uint32_WB = ads1115_read();         //read out Vmot
+                        oUniCoilA2 = 0;                     //switch off coil A2
+
+                        uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
+                        funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
+                        uart2_sendbuffer(',');              //add the comma
+
+                        //measure coil B1
+                        oUniCoilB1 = 1;                     //switch on coil B1
+                        g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                        SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
+
+                        while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                        {
+                            //do nothing
+                        }               
+                        uint32_WB = ads1115_read();         //read out Vmot
+                        oUniCoilB1 = 0;                     //switch off coil B1
+
+                        uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
+                        funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
+                        uart2_sendbuffer(',');              //add the comma
+
+                        //measure coil B2
+                        oUniCoilB2 = 1;                     //switch on coil B2
+                        g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                        SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
+
+                        while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                        {
+                            //do nothing
+                        }    
+                        uint32_WB = ads1115_read();         //read out Vmot
+                        oUniCoilB2 = 0;                     //switch off coil B2
+
+                        uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
+                        funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
+                        uart2_sendbuffer(13);                           //add the CR at the end
+                    }
+                    else if (g_CmdChk.uint32_TempPara[1] == 'B')
+                    {
+                        uart2_sendbuffer('E');              //first the letter E
+                        uart2_sendbuffer(',');              //add the comma
+
+                        //measure coil A
+                        oBiRelayCoilA = 1;                  //switch on relay for coil A
+                        g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                        SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
+
+                        while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                        {
+                            //do nothing
+                        }         
+                        uint32_WB = ads1115_read();         //read out Vmot
+                        oBiRelayCoilA = 0;                  //switch off relay forcoil A
+
+                        uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
+                        funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
+                        uart2_sendbuffer(',');              //add the comma
+
+                        //measure coil B
+                        oBiRelayCoilB = 1;                  //switch on relay for coil B
+                        g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                        SetTimer(_TIMER1,_ENABLE,0,100);    //load the timer with 100ms
+
+                        while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                        {
+                            //do nothing
+                        } 
+                        uint32_WB = ads1115_read();         //read out Vmot
+                        oBiRelayCoilB = 0;                  //switch off relay forcoil B
+
+                        uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
+                        funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
+                        uart2_sendbuffer(13);                           //add the CR at the end
+                    }
+                    else
+                    {
+                        //do nothing, error will be send before
+                    }
+
+                    oEnaCoilResMeas = 0;        //disable the relay for the resistor
+                    oEnaCurrSource = 0;         //disable the current source
+                }
+                else
+                {
+                    uart2_sendbuffer('X');                          //first the letter E
+                    uart2_sendbuffer(',');                          //then the comma
+                    g_Param.uint8_ErrCode = _RTESTINsupply;         //set error code
+                    funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
+                    uart2_sendbuffer(',');                          //then the comma
+                    //convert the result in mV
+                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);
+                    funct_IntToAscii(uint32_WB,_Active);            //add the voltage
+                    uart2_sendbuffer('m');                          //add the m
+                    uart2_sendbuffer('V');                          //add the V
+                    uart2_sendbuffer(13);                           //add the CR at the end
+                }
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _RTESTINnotPossible;    //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode);     //call subroutine
+            }
+            
+            g_CmdChk.uint8_GlobalLock = 0;  //disable global lock
         }
     }
     else
@@ -5537,133 +5721,145 @@ void cmd_SPROD(void)
     
     if(g_CmdChk.uint8_ParamPos == 12)       //number of received characters OK?
     {
-        //control of all received values
-        uint8_Result = 1;   //because the serial number is 32bit lenght
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],0,99);   //year
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],0,52);   //week
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[4],0,1);    //test status
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[5],0,256);  //firmware 1. number
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[6],0,256);  //firmware 2. number
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[7],0,256);  //firmware 3. number
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[8],0,256);  //firmware 4. number
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[9],0,256);  //firmware 5. number
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[10],0,256); //firmware 6. number
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[11],65,90); //hardware 'A' - 'Z' OR
-        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[11],97,122); //hardware 'a' - 'z'
-        
-        if(uint8_Result == 11)  //all parameters correct?
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            //store the parameters into the variables
-            g_Prod.uint32_SN = g_CmdChk.uint32_TempPara[1];
-            g_Prod.uint8_year = g_CmdChk.uint32_TempPara[2];
-            g_Prod.uint8_week = g_CmdChk.uint32_TempPara[3];
-            g_Prod.uint8_TS = g_CmdChk.uint32_TempPara[4];
-            g_Prod.uint8_FW[0] = g_CmdChk.uint32_TempPara[5];
-            g_Prod.uint8_FW[1] = g_CmdChk.uint32_TempPara[6];
-            g_Prod.uint8_FW[2] = g_CmdChk.uint32_TempPara[7];
-            g_Prod.uint8_FW[3] = g_CmdChk.uint32_TempPara[8];
-            g_Prod.uint8_FW[4] = g_CmdChk.uint32_TempPara[9];
-            g_Prod.uint8_FW[5] = g_CmdChk.uint32_TempPara[10];
-            g_Prod.uint8_HW = g_CmdChk.uint32_TempPara[11];
-            
-            //store the parameters into the EEPROM
-            
-            //serial number LSB
-            uint8_WB = g_Prod.uint32_SN & 0xFF;
-            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_SERIAL_NUMBER1,uint8_WB);
-            
-            //serial number part 2
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms 
-            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
-            uint32_WB = g_Prod.uint32_SN >> 8;
-            uint8_WB = uint32_WB & 0xFF;
-            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_SERIAL_NUMBER2,uint8_WB);
-            
-            //serial number part 3
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
-            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
-            uint32_WB = g_Prod.uint32_SN >> 16;
-            uint8_WB = uint32_WB & 0xFF;
-            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_SERIAL_NUMBER3,uint8_WB);
-            
-            //serial number MSB
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
-            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
-            uint32_WB = g_Prod.uint32_SN >> 24;
-            uint8_WB = uint32_WB & 0xFF;
-            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_SERIAL_NUMBER4,uint8_WB);
-            
-            //production year
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
-            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
-            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_PROD_YEAR,g_Prod.uint8_year);
-            
-            //production week
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
-            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
-            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_PROD_WEEK,g_Prod.uint8_week);
-            
-            //test status
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
-            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
-            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_TEST_STATUS,g_Prod.uint8_TS);
-            
-            //firmware x.
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
-            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
-            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_1,g_Prod.uint8_FW[0]);
-            
-            //firmware x.x
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
-            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
-            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_2,g_Prod.uint8_FW[1]);
-            
-            //firmware x.xx
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
-            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
-            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_3,g_Prod.uint8_FW[2]);
-            
-            //firmware x.xx.x
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
-            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
-            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_4,g_Prod.uint8_FW[3]);
-            
-            //firmware x.xx.xx
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
-            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
-            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_5,g_Prod.uint8_FW[4]);
-            
-            //firmware x.xx.xxx
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
-            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
-            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_6,g_Prod.uint8_FW[5]);
-            
-            //hardware version
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
-            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
-            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_HW_VERSION,g_Prod.uint8_HW);
-            
-            //send back the feedback
-            uart2_sendbuffer('E');      //first the letter E
-            uart2_sendbuffer(13);       //then the CR
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
-            g_Param.uint8_ErrCode = _OutOfTolSPROD;  //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            g_CmdChk.uint8_GlobalLock = 1;  //enable global lock
+            
+            //control of all received values
+            uint8_Result = 1;   //because the serial number is 32bit lenght
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],0,99);   //year
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],0,52);   //week
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[4],0,1);    //test status
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[5],0,256);  //firmware 1. number
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[6],0,256);  //firmware 2. number
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[7],0,256);  //firmware 3. number
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[8],0,256);  //firmware 4. number
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[9],0,256);  //firmware 5. number
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[10],0,256); //firmware 6. number
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[11],65,90); //hardware 'A' - 'Z' OR
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[11],97,122); //hardware 'a' - 'z'
+
+            if(uint8_Result == 11)  //all parameters correct?
+            {
+                //store the parameters into the variables
+                g_Prod.uint32_SN = g_CmdChk.uint32_TempPara[1];
+                g_Prod.uint8_year = g_CmdChk.uint32_TempPara[2];
+                g_Prod.uint8_week = g_CmdChk.uint32_TempPara[3];
+                g_Prod.uint8_TS = g_CmdChk.uint32_TempPara[4];
+                g_Prod.uint8_FW[0] = g_CmdChk.uint32_TempPara[5];
+                g_Prod.uint8_FW[1] = g_CmdChk.uint32_TempPara[6];
+                g_Prod.uint8_FW[2] = g_CmdChk.uint32_TempPara[7];
+                g_Prod.uint8_FW[3] = g_CmdChk.uint32_TempPara[8];
+                g_Prod.uint8_FW[4] = g_CmdChk.uint32_TempPara[9];
+                g_Prod.uint8_FW[5] = g_CmdChk.uint32_TempPara[10];
+                g_Prod.uint8_HW = g_CmdChk.uint32_TempPara[11];
+
+                //store the parameters into the EEPROM
+
+                //serial number LSB
+                uint8_WB = g_Prod.uint32_SN & 0xFF;
+                ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_SERIAL_NUMBER1,uint8_WB);
+
+                //serial number part 2
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms 
+                while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+                uint32_WB = g_Prod.uint32_SN >> 8;
+                uint8_WB = uint32_WB & 0xFF;
+                ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_SERIAL_NUMBER2,uint8_WB);
+
+                //serial number part 3
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+                while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+                uint32_WB = g_Prod.uint32_SN >> 16;
+                uint8_WB = uint32_WB & 0xFF;
+                ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_SERIAL_NUMBER3,uint8_WB);
+
+                //serial number MSB
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+                while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+                uint32_WB = g_Prod.uint32_SN >> 24;
+                uint8_WB = uint32_WB & 0xFF;
+                ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_SERIAL_NUMBER4,uint8_WB);
+
+                //production year
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+                while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+                ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_PROD_YEAR,g_Prod.uint8_year);
+
+                //production week
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+                while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+                ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_PROD_WEEK,g_Prod.uint8_week);
+
+                //test status
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+                while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+                ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_TEST_STATUS,g_Prod.uint8_TS);
+
+                //firmware x.
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+                while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+                ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_1,g_Prod.uint8_FW[0]);
+
+                //firmware x.x
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+                while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+                ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_2,g_Prod.uint8_FW[1]);
+
+                //firmware x.xx
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+                while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+                ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_3,g_Prod.uint8_FW[2]);
+
+                //firmware x.xx.x
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+                while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+                ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_4,g_Prod.uint8_FW[3]);
+
+                //firmware x.xx.xx
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+                while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+                ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_5,g_Prod.uint8_FW[4]);
+
+                //firmware x.xx.xxx
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+                while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+                ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_6,g_Prod.uint8_FW[5]);
+
+                //hardware version
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+                while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+                ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_HW_VERSION,g_Prod.uint8_HW);
+
+                //send back the feedback
+                uart2_sendbuffer('E');      //first the letter E
+                uart2_sendbuffer(13);       //then the CR
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _OutOfTolSPROD;  //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
+            
+            g_CmdChk.uint8_GlobalLock = 0;  //disable global lock
         }
     }
     else
