@@ -731,6 +731,10 @@ void cmdchk_check(void)
             case (_IdSPROD):        // Command SPRODINFOS
                 cmd_SPROD();
                 break;
+                
+            case (_IdSTAT):         //command STAT
+                cmd_STAT();
+                break;
                                      
             default:    //command ID does not exist
                 //do nothing - error has to be send before this routine
@@ -895,6 +899,10 @@ void cmdchk_def(void)
             
         case (0x534C494E):  //cmd is = SLIN
             g_CmdChk.uint8_CmdID = _IdSLIN;
+            break;
+            
+        case (0x53544154):  //cmd is = STAT
+            g_CmdChk.uint8_CmdID = _IdSTAT;
             break;
         
         default:

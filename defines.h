@@ -299,6 +299,7 @@
 #define _IdGRUNBIT          114             //disable the run bit
 #define _IdRTESTIN          115             //resistance test / measure
 #define _IdSPROD            116             // Write production information in serial EEPROM
+#define _IdSTAT             117             //get status of the SMMA
 
 #endif	/* DEFINES_H */
 

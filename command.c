@@ -101,6 +101,7 @@
  *                          - cmd_GRUNBIT
  *                          - cmd_RTESTIN
  *                          - cmd_SPROD
+ *                          - cmd_STAT
 ***********************************************************************************************************************/
 
 
@@ -119,6 +120,7 @@ extern SUART1rxd g_UART1rxd;
 extern SADC g_ADC;
 extern STimer1 g_Timer1; 
 extern S_PROD g_Prod;
+extern SUART2txd g_UART2txd;
 
 /**********************************************************************************************************************
  * Routine:                 cmd_SILIM
@@ -1039,13 +1041,19 @@ void cmd_RAZ(void)
             uart2_sendbuffer('E');
             uart2_sendbuffer(13);
         
-            //set all back to the default value
-        
-            //switch off the output's, etc.
-        
             //send back the device information's
-            funct_LoadDeviceInfo();                     //call subroutine      
-        }      
+            funct_LoadDeviceInfo();         //call subroutine
+            
+            IEC1SET = _IEC1_U2TXIE_MASK;    //enable send routine
+            
+            //wait 500ms before executing the software reset
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,500);    //load the timer with 500ms
+            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+            
+            //launch software reset
+            SoftReset();
+        }     
     }
     else
     {
@@ -5868,3 +5876,58 @@ void cmd_SPROD(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_STAT
+
+ * Description:
+ * Verify that the customer send only STAT. If ok send back the status of the SMMA
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        15.02.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_STAT(void)
+{
+    if(g_CmdChk.uint8_ParamPos == 1)        //number of received characters OK?
+    {
+        uart2_sendbuffer('E');      //first the letter E
+        uart2_sendbuffer(',');      //then the comma
+        funct_IntToAscii(RCONbits.POR,_Active);
+        uart2_sendbuffer(',');      //then the comma
+        funct_IntToAscii(RCONbits.BOR,_Active);
+        uart2_sendbuffer(',');      //then the comma
+        funct_IntToAscii(RCONbits.IDLE,_Active);
+        uart2_sendbuffer(',');      //then the comma
+        funct_IntToAscii(RCONbits.SLEEP,_Active);
+        uart2_sendbuffer(',');      //then the comma
+        funct_IntToAscii(RCONbits.WDTO,_Active);
+        uart2_sendbuffer(',');      //then the comma
+        funct_IntToAscii(RCONbits.SWR,_Active);
+        uart2_sendbuffer(',');      //then the comma
+        funct_IntToAscii(RCONbits.EXTR,_Active);
+        uart2_sendbuffer(',');      //then the comma
+        funct_IntToAscii(RCONbits.CMR,_Active);
+        uart2_sendbuffer(13);      //then the CR
+        
+        //reset the errors
+        RCONbits.POR = 0;
+        RCONbits.BOR = 0;
+        RCONbits.IDLE = 0;
+        RCONbits.SLEEP = 0;
+        RCONbits.WDTO = 0;
+        RCONbits.SWR = 0;
+        RCONbits.EXTR = 0;
+        RCONbits.CMR = 0;
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+    } 
+}   //end of cmd_STAT
