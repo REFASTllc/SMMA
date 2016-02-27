@@ -1,67 +1,120 @@
-/********************************************************************************************************************/
-/*  Name of the file:       productionInfo.c								    
-/*  Purpose of the file:    Definitions of all functions related to production information					    
-/*  Creator:                julien_rebetez									    
-/*  Date of creation:       February 17, 2016									    
-/*														    
-/*  Last modification on:   -											    
-/*  Modified by:            -											    
-/*  Version:                -											    
-/*														    
-/*  List of functions:      -											    
-/* ******************************************************************************************************************/
+/**********************************************************************************************************************
+
+                                            UBD - Unipolar Bipolar Driver
+
+***********************************************************************************************************************
+ * File name:               productionInfo.c
+ * Creation date:           17.02.2016
+ * Main creator:            Julien Rebetez
+ * Company:                 REFAST GmbH
+ *                          Copyright (c) 2015 REFAST GmbH
+***********************************************************************************************************************
+ * Content overview:        - ReadProdInfoFromEEPROM
+***********************************************************************************************************************/
+
 
 #include "includes.h" // File which contain all includes files
 
-S_PROD prod, newProdValues;
-/********************************************************************************************************************/
-/*  Name of the function:       ReadProdInfoFromEEPROM									    
-/*  Purpose of the function:    Readout of all production info from external EEPROM	into working memory (RAM)							    
-/*  Parameters:													    
-/*      IN:                     -										    
-/*      OUT:                    -										    
-/*														    
-/*  Used global variables:      -										    
-/*														    
-/*  Creator:                    julien_rebetez								    
-/*  Date of creation:           February 17, 2016								    
-/*														    
-/*  Last modified on:           -										    
-/*  Modified by:                -										    
-/*  Version:                    -										    
-/*														    
-/*  Remark:                     -										    
-/********************************************************************************************************************/
+S_PROD g_Prod;
+extern Si2c1 g_i2c1;
+extern STimer1 g_Timer1; 
+
+
+/**********************************************************************************************************************
+ * Routine:                 ReadProdInfoFromEEPROM
+
+ * Description:
+ * Readout of all production info from external EEPROM	into working memory (RAM)	
+ * 
+ * Modified 27.02.2016 A. Staub:
+ * Modified the code for that it works. 
+ * 
+ * Creator:                 Julien Rebetez
+ * Date of creation:        17.02.2016
+ * Last modification on:    27.02.2016
+ * Modified by:             A. Staub
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
 void ReadProdInfoFromEEPROM(void)
 {
-    unsigned char i = 0;
-    // Readout of the serial number
-    prod.serialNumber = 0;
-    for(i=4;i>0;i--)
-    {
-        prod.serialNumber <<= 8;
-//        prod.serialNumber |= ROM24LC256_RdByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER + i - 1, 1);
-    }
-    // Readout of the production year
-    prod.Year = ROM24LC256_RdByte(EE_ADDR_H, EE_ADDR_L_PROD_YEAR, 1);
-    // Readout of the production week
-    prod.Week = ROM24LC256_RdByte(EE_ADDR_H, EE_ADDR_L_PROD_WEEK, 1);
-    // Readout of the test status
-    prod.testStatus = ROM24LC256_RdByte(EE_ADDR_H, EE_ADDR_L_TEST_STATUS, 1);
-    // Readout of the FW version
-/*    for(i = 0;i<3;i++)
-    {
-        prod.fwVersion[i] = ROM24LC256_RdByte(EE_ADDR_H, EE_ADDR_L_FW_VERSION + i, 1);
-    }*/
-    prod.fwVersion[0] = ROM24LC256_RdByte(EE_ADDR_H, EE_ADDR_L_FW_VERSION, 1);
-    prod.fwVersion[1] = ROM24LC256_RdByte(EE_ADDR_H, EE_ADDR_L_FW_VERSION + 1, 1);
-    prod.fwVersion[2] = ROM24LC256_RdByte(EE_ADDR_H, EE_ADDR_L_FW_VERSION + 2, 1);
-    Nop();
-    // Formatting of the FW version xyz ==> x.y.z
-    prod.fwVersion[5] = '\0';
-    prod.fwVersion[4] = prod.fwVersion[2] + 0x30;
-    prod.fwVersion[2] = prod.fwVersion[1] + 0x30;
-    prod.fwVersion[3] = prod.fwVersion[1] = '.';
-    // Readout of the HW version
-    prod.hwVersion = ROM24LC256_RdByte(EE_ADDR_H, EE_ADDR_L_HW_VERSION, 1);
+    volatile unsigned long int uint32_WB;   //local work byte
+    
+    //read out the eeprom and store them into the variables
+    uint32_WB = ROM24LC256_RdByte(EE_ADDR_H,EE_ADDR_L_SERIAL_NUMBER1,1);
+    
+    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+    SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+    while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+    g_Prod.uint32_SN = uint32_WB;        //LSB
+    uint32_WB = ROM24LC256_RdByte(EE_ADDR_H,EE_ADDR_L_SERIAL_NUMBER2,1);
+    
+    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+    SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+    while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+    g_Prod.uint32_SN += (uint32_WB << 8);  //2. part
+    uint32_WB = ROM24LC256_RdByte(EE_ADDR_H,EE_ADDR_L_SERIAL_NUMBER3,1);
+    
+    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+    SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+    while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+    g_Prod.uint32_SN += (uint32_WB << 16); //3. part
+    uint32_WB = ROM24LC256_RdByte(EE_ADDR_H,EE_ADDR_L_SERIAL_NUMBER4,1);
+    g_Prod.uint32_SN += (uint32_WB << 24); //MSB
+    
+    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+    SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+    while(g_Timer1.uint8_TimeoutFlag);  //wait the time    
+    g_Prod.uint8_year = ROM24LC256_RdByte(EE_ADDR_H,EE_ADDR_L_PROD_YEAR,1);
+    
+    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+    SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+    while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+    g_Prod.uint8_week = ROM24LC256_RdByte(EE_ADDR_H,EE_ADDR_L_PROD_WEEK,1);
+    
+    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+    SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+    while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+    g_Prod.uint8_TS = ROM24LC256_RdByte(EE_ADDR_H,EE_ADDR_L_TEST_STATUS,1);
+    
+    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+    SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+    while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+    g_Prod.uint8_FW[0] = ROM24LC256_RdByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_1,1);
+    
+    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+    SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+    while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+    g_Prod.uint8_FW[1] = ROM24LC256_RdByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_2,1);
+    
+    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+    SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+    while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+    g_Prod.uint8_FW[2] = ROM24LC256_RdByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_3,1);
+    
+    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+    SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+    while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+    g_Prod.uint8_FW[3] = ROM24LC256_RdByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_4,1);
+    
+    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+    SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+    while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+    g_Prod.uint8_FW[4] = ROM24LC256_RdByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_5,1);
+    
+    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+    SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+    while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+    g_Prod.uint8_FW[5] = ROM24LC256_RdByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_6,1);
+    
+    g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+    SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+    while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+    g_Prod.uint8_HW = ROM24LC256_RdByte(EE_ADDR_H,EE_ADDR_L_HW_VERSION,1); 
+    
+    
+    //erase i2c receive buffer (safety reason)
+    g_i2c1.uint8_RxRch++;
+    g_i2c1.uint8_RxWch++;
 }

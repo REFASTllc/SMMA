@@ -39,6 +39,7 @@ extern SUni g_Uni;
 extern Sbipol g_Bipol;
 extern T_A3981 A3981;
 extern SADC g_ADC;  
+extern S_PROD g_Prod;
 
 /**********************************************************************************************************************
  * Routine:                 funct_init
@@ -481,20 +482,21 @@ void funct_CheckMotType(unsigned char uint8_MotType)
  * Description:
  * Load the send buffer of the UART2 with the device information's for GVER & RAZ command
  * 
+ * Modification 27.02.2016 A. Staub:
+ * Added the idea of Julien into the GVER response.
+ * 
  * Creator:                 A. Staub
  * Date of creation:        19.10.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    27.02.2016
+ * Modified by:             A. Staub
  * 
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-extern S_PROD prod;
 void funct_LoadDeviceInfo(void)
 {
-    auto signed short int sint16_WB;    //local work integer
-    unsigned char i = 0;
-    
+    volatile signed short int sint16_WB;    //local work integer
+ 
     uart2_sendbuffer('E');
     uart2_sendbuffer(',');
     uart2_sendbuffer('S');                   
@@ -506,39 +508,26 @@ void funct_LoadDeviceInfo(void)
     uart2_sendbuffer('/');
     uart2_sendbuffer('N');
     uart2_sendbuffer(' ');
-    funct_IntToAscii(prod.serialNumber, _Active);   // serial number
+    uart2_sendbuffer('#');
+    funct_IntToAscii(g_Prod.uint32_SN,_Active);     //serial number
     uart2_sendbuffer(' ');
-    uart2_sendbuffer('F');
-    uart2_sendbuffer('W');
-    uart2_sendbuffer(' ');
-    uart2_sendbuffer('v');
-    for(;i<5;i++)
-        uart2_sendbuffer(prod.fwVersion[i]);   // FW version
-    uart2_sendbuffer(' ');
-    uart2_sendbuffer('H');
-    uart2_sendbuffer('W');
-    uart2_sendbuffer(' ');
-    uart2_sendbuffer(prod.hwVersion);
-    uart2_sendbuffer(' ');
-    uart2_sendbuffer('S');
-    uart2_sendbuffer('T');
-    uart2_sendbuffer('A');
-    uart2_sendbuffer('T');
-    uart2_sendbuffer('U');
-    uart2_sendbuffer('S');
-    uart2_sendbuffer(' ');
-    funct_IntToAscii(prod.testStatus, _Active);
- /*   uart2_sendbuffer('0');
-    uart2_sendbuffer('1');
+    uart2_sendbuffer('V');
+    funct_IntToAscii(g_Prod.uint8_FW[0],_Active);   //firmware x
     uart2_sendbuffer('.');
-    uart2_sendbuffer('0');
-    uart2_sendbuffer('0');
+    funct_IntToAscii(g_Prod.uint8_FW[1],_Active);   //firmware x.x
+    funct_IntToAscii(g_Prod.uint8_FW[2],_Active);   //firmware x.xx
+    uart2_sendbuffer('.');
+    funct_IntToAscii(g_Prod.uint8_FW[3],_Active);   //firmware x.xx.x
+    funct_IntToAscii(g_Prod.uint8_FW[4],_Active);   //firmware x.xx.xx
+    funct_IntToAscii(g_Prod.uint8_FW[5],_Active);   //firmware x.xx.xxx
+    uart2_sendbuffer(g_Prod.uint8_HW);  //hardware
     uart2_sendbuffer(' ');
-    uart2_sendbuffer('1');
-    uart2_sendbuffer('1');
+    uart2_sendbuffer('S');
+    funct_IntToAscii(g_Prod.uint8_TS,_Active);  //test status
+    uart2_sendbuffer(' ');
+    funct_IntToAscii(g_Prod.uint8_week,_Active);    //production week
     uart2_sendbuffer('/');
-    uart2_sendbuffer('1');
-    uart2_sendbuffer('5');*/
+    funct_IntToAscii(g_Prod.uint8_year,_Active);    //production year
     uart2_sendbuffer(' ');
     sint16_WB = g_Param.sint16_Temp;
     if(sint16_WB < 0)           //temp. smaller than 0°

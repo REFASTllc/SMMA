@@ -109,6 +109,7 @@
 //error code definition
                             //general errors
 #define _GlobalLock         0               //driver detected a POR; user configuration not guaranteed
+#define _OutOfTolSPROD      1               //SPROD internal used, parameters out of range
 #define _RTESTINsupply      17              //RTESTIN not possible to switch off the supply under 0.3V
 #define _RTESTINnotPossible 18              //RTESTIN not possible with this type of motor
 #define _OutOfTolSRUNBIT    19              //SRUNBIT, parameter out of range

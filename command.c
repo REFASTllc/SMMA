@@ -118,6 +118,7 @@ extern SUART1txd g_UART1txd;
 extern SUART1rxd g_UART1rxd;
 extern SADC g_ADC;
 extern STimer1 g_Timer1; 
+extern S_PROD g_Prod;
 
 /**********************************************************************************************************************
  * Routine:                 cmd_SILIM
@@ -977,7 +978,7 @@ void cmd_GVER(void)
 {
     if(g_CmdChk.uint8_ParamPos == 1)    //number of received characters OK?
     {   
-        RV30xx_TempMeas();
+        RV30xx_TempMeas();          //measure the temperature
         funct_LoadDeviceInfo();     //call subroutine 
     }
     else
@@ -5517,101 +5518,157 @@ void cmd_RTESTIN(void)
 
  * Description:             Writing in EEPROM of all productions information.
  * 
+ * Modification 27.02.2016 / A. Staub:
+ * Modified the code for that it works. 
+ * 
  * Creator:                 J. Rebetez
  * Date of creation:        17.02.2016
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    27.02.2016
+ * Modified by:             A. Staub
  * 
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-extern S_PROD newProdValues, prod;
 void cmd_SPROD(void)
 {
-    unsigned char i, isError = 0, temp;
+    volatile unsigned char uint8_Result = 0;    //local work byte 
+    volatile unsigned char uint8_WB;            //local work byte
+    volatile unsigned long int uint32_WB;       //local work byte
     
-    if(g_CmdChk.uint8_ParamPos == 9)        //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 12)       //number of received characters OK?
     {
-        // Control of all received values
-        newProdValues.serialNumber = g_CmdChk.uint32_TempPara[1];
-        if(g_CmdChk.uint32_TempPara[2] <= 99)
-            newProdValues.Year = g_CmdChk.uint32_TempPara[2];
-        else
-            isError = 1;
-        if(g_CmdChk.uint32_TempPara[3] <= 52)
-            newProdValues.Week = g_CmdChk.uint32_TempPara[3];
-        else
-            isError = 1;
-        newProdValues.testStatus = g_CmdChk.uint32_TempPara[4];
-        newProdValues.fwVersion[0] = g_CmdChk.uint32_TempPara[5];
-        newProdValues.fwVersion[1] = g_CmdChk.uint32_TempPara[6];
-        newProdValues.fwVersion[2] = g_CmdChk.uint32_TempPara[7];
-        if(g_CmdChk.uint32_TempPara[8] >= 'A' && g_CmdChk.uint32_TempPara[8] <= 'Z')
-            newProdValues.hwVersion = g_CmdChk.uint32_TempPara[8];
-        else
-            isError = 1;
-        // If no error happens during control of values, then writing in EEPROM
-        if(isError == 0)
-        {
-            // Writing of the serial number
-        /*    for(i = 4;i > 0; i--)
-            {
-                ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER + i - 1, newProdValues.serialNumber & 0xff);
-                newProdValues.serialNumber >> 8;
-            }*/
-            temp = newProdValues.serialNumber & 0xff;
-            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER1, temp);
-            newProdValues.serialNumber >>= 8;
-            temp = newProdValues.serialNumber & 0xff;
-            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER2, temp);
-            newProdValues.serialNumber >>= 8;
-            temp = newProdValues.serialNumber & 0xff;
-            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER3, temp);
-            newProdValues.serialNumber >>= 8;
-            temp = newProdValues.serialNumber & 0xff;
-            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_SERIAL_NUMBER4, temp);
-            // Writing of the production year
-            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_PROD_YEAR, newProdValues.Year);
-            // Writing of the production week
-            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_PROD_WEEK, newProdValues.Week);
-            // Writing of the test status
-            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_TEST_STATUS, newProdValues.testStatus);
-            // Writing of the FW version
-        /*    for(i = 0; i < 3; i++)
-                ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_FW_VERSION + i, newProdValues.fwVersion[i]); */
-            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_FW_VERSION, newProdValues.fwVersion[0]);
-//            for(i=0;i<255;i++)
-//                Nop();
-            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_FW_VERSION + 1, newProdValues.fwVersion[1]);
-//            for(i=0;i<255;i++)
-//                Nop();
-            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_FW_VERSION + 2, newProdValues.fwVersion[2]);
-            // Writing of the HW version
-            ROM24LC256_WrByte(EE_ADDR_H, EE_ADDR_L_HW_VERSION, newProdValues.hwVersion);
-            // Answer to the user
-            uart2_sendbuffer('E');      //first the letter E
-            uart2_sendbuffer(13);      //then the CR
-            prod.Week = newProdValues.Week;
-            prod.Year = newProdValues.Year;
-            prod.fwVersion[0] = newProdValues.fwVersion[0];
-            prod.fwVersion[1] = '.';
-            prod.fwVersion[2] = newProdValues.fwVersion[1];
-            prod.fwVersion[3] = '.';
-            prod.fwVersion[4] = newProdValues.fwVersion[2];
-            prod.hwVersion = newProdValues.hwVersion;
-            prod.serialNumber = newProdValues.serialNumber;
-            prod.testStatus = newProdValues.testStatus;
-
-        }
-        else
-        {
-            // TODO: Return error code here
-        }
+        //control of all received values
+        uint8_Result = 1;   //because the serial number is 32bit lenght
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],0,99);   //year
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],0,52);   //week
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[4],0,1);    //test status
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[5],0,256);  //firmware 1. number
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[6],0,256);  //firmware 2. number
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[7],0,256);  //firmware 3. number
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[8],0,256);  //firmware 4. number
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[9],0,256);  //firmware 5. number
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[10],0,256); //firmware 6. number
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[11],65,90); //hardware 'A' - 'Z' OR
+        uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[11],97,122); //hardware 'a' - 'z'
         
+        if(uint8_Result == 11)  //all parameters correct?
+        {
+            //store the parameters into the variables
+            g_Prod.uint32_SN = g_CmdChk.uint32_TempPara[1];
+            g_Prod.uint8_year = g_CmdChk.uint32_TempPara[2];
+            g_Prod.uint8_week = g_CmdChk.uint32_TempPara[3];
+            g_Prod.uint8_TS = g_CmdChk.uint32_TempPara[4];
+            g_Prod.uint8_FW[0] = g_CmdChk.uint32_TempPara[5];
+            g_Prod.uint8_FW[1] = g_CmdChk.uint32_TempPara[6];
+            g_Prod.uint8_FW[2] = g_CmdChk.uint32_TempPara[7];
+            g_Prod.uint8_FW[3] = g_CmdChk.uint32_TempPara[8];
+            g_Prod.uint8_FW[4] = g_CmdChk.uint32_TempPara[9];
+            g_Prod.uint8_FW[5] = g_CmdChk.uint32_TempPara[10];
+            g_Prod.uint8_HW = g_CmdChk.uint32_TempPara[11];
+            
+            //store the parameters into the EEPROM
+            
+            //serial number LSB
+            uint8_WB = g_Prod.uint32_SN & 0xFF;
+            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_SERIAL_NUMBER1,uint8_WB);
+            
+            //serial number part 2
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms 
+            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+            uint32_WB = g_Prod.uint32_SN >> 8;
+            uint8_WB = uint32_WB & 0xFF;
+            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_SERIAL_NUMBER2,uint8_WB);
+            
+            //serial number part 3
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+            uint32_WB = g_Prod.uint32_SN >> 16;
+            uint8_WB = uint32_WB & 0xFF;
+            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_SERIAL_NUMBER3,uint8_WB);
+            
+            //serial number MSB
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+            uint32_WB = g_Prod.uint32_SN >> 24;
+            uint8_WB = uint32_WB & 0xFF;
+            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_SERIAL_NUMBER4,uint8_WB);
+            
+            //production year
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_PROD_YEAR,g_Prod.uint8_year);
+            
+            //production week
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_PROD_WEEK,g_Prod.uint8_week);
+            
+            //test status
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_TEST_STATUS,g_Prod.uint8_TS);
+            
+            //firmware x.
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_1,g_Prod.uint8_FW[0]);
+            
+            //firmware x.x
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_2,g_Prod.uint8_FW[1]);
+            
+            //firmware x.xx
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_3,g_Prod.uint8_FW[2]);
+            
+            //firmware x.xx.x
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_4,g_Prod.uint8_FW[3]);
+            
+            //firmware x.xx.xx
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_5,g_Prod.uint8_FW[4]);
+            
+            //firmware x.xx.xxx
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_FW_VERSION_6,g_Prod.uint8_FW[5]);
+            
+            //hardware version
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,50);     //load the timer with 50ms
+            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+            ROM24LC256_WrByte(EE_ADDR_H,EE_ADDR_L_HW_VERSION,g_Prod.uint8_HW);
+            
+            //send back the feedback
+            uart2_sendbuffer('E');      //first the letter E
+            uart2_sendbuffer(13);       //then the CR
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolSPROD;  //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
     }
     else
     {
         g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-    } 
+    }
 }   
