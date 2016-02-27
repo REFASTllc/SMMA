@@ -204,8 +204,6 @@ typedef struct                      //definitions of multiple variable for comma
 //    volatile unsigned short int uint16_UmotGlobMin;       //minimal actuator voltage in [mV]
 //    volatile unsigned short int uint16_UmotGloMax;        //minimal actuator voltage in [mV]
 //    volatile unsigned short int uint16_IGloMax;           //maximal actuator current in [mV]
-//the follow parameter is used for that the user knows there was a POR
-    volatile unsigned char uint8_NotPOR;            //POR detection; 1 = OK no POR detected; 0 = POR detected
 //the follow parameters can be set by the customer
     volatile unsigned short int uint16_Imin;              //minimal ON current for the coils in [mA]
     volatile unsigned short int uint16_Imax;              //maximal ON current for the coils in [mA]

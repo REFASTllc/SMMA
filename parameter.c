@@ -41,8 +41,6 @@ void param_init(void)
 //    g_Param.uint16_UmotGloMax = 48000;  //maximal voltage to use the device
 //    g_Param.uint16_IGloMax = 3200;      //maximal current to use the device
     
-//initialize the variable for that the user knows there was a POR
-    g_Param.uint8_NotPOR = 0;           //POR detected
     
 //initialize the customer variables 
     g_Param.uint16_Imin = 20;           //range 20...2'800 mA

@@ -221,529 +221,519 @@ void cmdchk_check(void)
     //character in the buffer was CR and the position of the parameter is not 0
     if((uint8_RxDBuffChar == 13) && (g_CmdChk.uint8_ParamPos))
     {
-        if(g_Param.uint8_NotPOR)    //device did not see a POR? --> this is new
-        {
-            switch(g_CmdChk.uint8_CmdID)   //execute the needed commando
-            {           
-                case (_IdNotAllow):     //command ID is not allowed
-                    //do nothing - error has to be send before and uint8_CmdID 
-                    //has to be set to 0 before this routine for that the program execute this case.
-                    break;
+        switch(g_CmdChk.uint8_CmdID)   //execute the needed commando
+        {           
+            case (_IdNotAllow):     //command ID is not allowed
+                //do nothing - error has to be send before and uint8_CmdID 
+                //has to be set to 0 before this routine for that the program execute this case.
+                break;
             
-                case (_IdSILIM):        //command SILIM
-                    cmd_SILIM();        //call subroutine
-                    break;
+            case (_IdSILIM):        //command SILIM
+                cmd_SILIM();        //call subroutine
+                break;
             
-                case (_IdETESTIN):      //command ETESTIN
-                    cmd_ETESTIN();      //call subroutine
-                    break;
+            case (_IdETESTIN):      //command ETESTIN
+                cmd_ETESTIN();      //call subroutine
+                break;
             
-                case (_IdSRACC):        //command SRACC
-                    cmd_SRACC();        //call subroutine
-                    break;
+            case (_IdSRACC):        //command SRACC
+                cmd_SRACC();        //call subroutine
+                break;
             
-                case (_IdSRDEC):        //command SRDEC
-                    cmd_SRDEC();        //call subroutine
-                    break;
+            case (_IdSRDEC):        //command SRDEC
+                cmd_SRDEC();        //call subroutine
+                break;
                 
-                case (_IdRUN):          //command RUN
-                    cmd_RUN();          //call subroutine
-                    break;
+            case (_IdRUN):          //command RUN
+                cmd_RUN();          //call subroutine
+                break;
                 
-                case (_IdSPHC):         //command SPHC
-                    //command is not anymore supported with the new driver. 
-                    //I let it anyway here, if once we have to re-use it
-                    //cmd_SPHC();         //call subroutine
-                    g_Param.uint8_ErrCode = _NotSupAnymore;     //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdSPHC):         //command SPHC
+                //command is not anymore supported with the new driver. 
+                //I let it anyway here, if once we have to re-use it
+                //cmd_SPHC();         //call subroutine
+                g_Param.uint8_ErrCode = _NotSupAnymore;     //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
                 
-                case (_IdGVER):         //command GVER
-                    cmd_GVER();         //call subroutine
-                    break;
+            case (_IdGVER):         //command GVER
+                cmd_GVER();         //call subroutine
+                break;
             
-                case (_IdRAZ):          //command RAZ
-                    cmd_RAZ();          //call subroutine
-                    break;
+            case (_IdRAZ):          //command RAZ
+                cmd_RAZ();          //call subroutine
+                break;
             
-                case (_IdSMTYP):        //command SMTYP
-                    cmd_SMTYP();        //call subroutine
-                    break;
+            case (_IdSMTYP):        //command SMTYP
+                cmd_SMTYP();        //call subroutine
+                break;
             
-                case (_IdGMTYP):        //command GMTYP
-                    cmd_GMTYP();        //call subroutine
-                    break;
+            case (_IdGMTYP):        //command GMTYP
+                cmd_GMTYP();        //call subroutine
+                break;
                  
-                case (_IdSTEST):        //command STEST
-                    cmd_STEST();        //call subroutine
-                    break;
+            case (_IdSTEST):        //command STEST
+                cmd_STEST();        //call subroutine
+                break;
                     
-                case (_IdGILIM):        //command GILIM
-                    cmd_GILIM();        //call subroutine
-                    break;
+            case (_IdGILIM):        //command GILIM
+                cmd_GILIM();        //call subroutine
+                break;
                 
-                case (_IdGPHC):         //command GPHC
-                    //command is not anymore supported with the new driver. 
-                    //I let it anyway here, if once we have to re-use it
-                    //cmd_GPHC();         //call subroutine
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdGPHC):         //command GPHC
+                //command is not anymore supported with the new driver. 
+                //I let it anyway here, if once we have to re-use it
+                //cmd_GPHC();         //call subroutine
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
                 
-                case (_IdSIRUN):        //command SIRUN (not used anymore)
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdSIRUN):        //command SIRUN (not used anymore)
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
         
-                case (_IdGIRUN):        //command GIRUN
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdGIRUN):        //command GIRUN
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
                 
-                case (_IdGRACC):        //command GRACC
-                    cmd_GRACC();        //call subroutine
-                    break;
+            case (_IdGRACC):        //command GRACC
+                cmd_GRACC();        //call subroutine
+                break;
                 
-                case (_IdGRDEC):        //command GRDEC
-                    cmd_GRDEC();        //call subroutine
-                    break;
+            case (_IdGRDEC):        //command GRDEC
+                cmd_GRDEC();        //call subroutine
+                break;
                 
-                case (_IdSRUN):         //command SRUN (not used anymore)
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdSRUN):         //command SRUN (not used anymore)
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
                 
-                case (_IdGRUN):         //command GRUN
-                    cmd_GRUN();         //call subroutine
-                    break;
+            case (_IdGRUN):         //command GRUN
+                cmd_GRUN();         //call subroutine
+                break;
                 
-                case (_IdBREAK):        //command BREAK
-                    cmd_BREAK();        //call subroutine
-                    break;
+            case (_IdBREAK):        //command BREAK
+                cmd_BREAK();        //call subroutine
+                break;
                 
-                case (_IdCAL):          //command CAL (not used anymore)
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdCAL):          //command CAL (not used anymore)
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
             
-                case (_IdVCAL):         //command VCAL (not used anymore)
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdVCAL):         //command VCAL (not used anymore)
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
       
-                case (_IdSPRUN):        //command SPRUN (not used anymore)
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdSPRUN):        //command SPRUN (not used anymore)
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
             
-                case (_IdGPRUN):        //command GPRUN (not used anymore)
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdGPRUN):        //command GPRUN (not used anymore)
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
                 
-                case (_IdSUMOT):        //command SUMOT
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdSUMOT):        //command SUMOT
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
       
-                case (_IdGUMOT):        //command GUMOT
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;  
+            case (_IdGUMOT):        //command GUMOT
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;  
                 
-                case (_IdCHKSC):        //command CHKSC (not used anymore)
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdCHKSC):        //command CHKSC (not used anymore)
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
                 
-                case (_IdMUMOT):        //command MUMOT
-                    cmd_MUMOT();        //call subroutine
-                    break;
+            case (_IdMUMOT):        //command MUMOT
+                cmd_MUMOT();        //call subroutine
+                break;
                 
-                case (_IdCHKUMOT):      //command CHKUMOT (not used anymore)
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdCHKUMOT):      //command CHKUMOT (not used anymore)
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
                     
-                case (_IdSCOILON):      //command SCOILON 
-                    cmd_SCOILON();      //call subroutine
-                    break;
+            case (_IdSCOILON):      //command SCOILON 
+                cmd_SCOILON();      //call subroutine
+                break;
                     
-                case (_IdSCACC):        //command SCACC (not used anymore)
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdSCACC):        //command SCACC (not used anymore)
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
             
-                case (_IdGCACC):        //command GCACC (not used anymore)
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdGCACC):        //command GCACC (not used anymore)
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
             
-                case (_IdSCDEC):        //command SCDEC (not used anymore)
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdSCDEC):        //command SCDEC (not used anymore)
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
             
-                case (_IdGCDEC):        //command GCDEC (not used anymore)
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdGCDEC):        //command GCDEC (not used anymore)
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
             
-                case (_IdSSMOD):        //command SSMOD
-                    cmd_SSMOD();        //call subroutine
-                    break;
+            case (_IdSSMOD):        //command SSMOD
+                cmd_SSMOD();        //call subroutine
+                break;
       
-                case (_IdGSMOD):        //command GSMOD
-                    cmd_GSMOD();        //call subroutine
-                    break;
+            case (_IdGSMOD):        //command GSMOD
+                cmd_GSMOD();        //call subroutine
+                break;
             
-                case (_IdSERUN):        //command SERUN (not used anymore)
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
-                /*
-                case (38):  //command GERUN
-                    cmd_GERUN();        //call subroutine
-                    break;
+            case (_IdSERUN):        //command SERUN (not used anymore)
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
+            /*
+            case (38):  //command GERUN
+                cmd_GERUN();        //call subroutine
+                break;
                               
-                case (39):  //command ERUN
-                    cmd_ERUN();         //call subroutine
-                    break;
+            case (39):  //command ERUN
+                cmd_ERUN();         //call subroutine
+                break;
                     
-                case (40):  //command GO
-                    cmd_GO();           //call subroutine
-                    break;
-                */    
-                case (_IdSIMAN):        //command SIMAN (not used anymore)
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (40):  //command GO
+                cmd_GO();           //call subroutine
+                break;
+            */    
+            case (_IdSIMAN):        //command SIMAN (not used anymore)
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
             
-                case (_IdGIMAN):        //command GIMAN (not used anymore)
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdGIMAN):        //command GIMAN (not used anymore)
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
                 
-                case (_IdSBIT):         //command SBIT
-                    cmd_SBIT();         //call subroutine
-                    break;
+            case (_IdSBIT):         //command SBIT
+                cmd_SBIT();         //call subroutine
+                break;
                 
-                case (_IdCBIT):         //command CBIT
-                    cmd_CBIT();         //call subroutine
-                    break;
+            case (_IdCBIT):         //command CBIT
+                cmd_CBIT();         //call subroutine
+                break;
                 
-                case (_IdGBIT):         //command GBIT
-                    cmd_GBIT();         //call subroutine
-                    break;
+            case (_IdGBIT):         //command GBIT
+                cmd_GBIT();         //call subroutine
+                break;
                 
-                case (_IdSOUT):         //command SOUT
-                    cmd_SOUT();         //call subroutine
-                    break;
+            case (_IdSOUT):         //command SOUT
+                cmd_SOUT();         //call subroutine
+                break;
                 
-                case (_IdGOUT):         //command GOUT
-                    cmd_GOUT();         //call subroutine
-                    break;
+            case (_IdGOUT):         //command GOUT
+                cmd_GOUT();         //call subroutine
+                break;
                 
-                case (_IdGINP):         //command GINP
-                    cmd_GINP();         //call subroutine
-                    break;
+            case (_IdGINP):         //command GINP
+                cmd_GINP();         //call subroutine
+                break;
                 
-                case (_IdSMCRSTP):      //command SMCRSTP
-                    //command is not anymore supported with the new driver. 
-                    //I let it anyway here, if once we have to re-use it
-                    //cmd_SMCRSTP();      //call subroutine
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdSMCRSTP):      //command SMCRSTP
+                //command is not anymore supported with the new driver. 
+                //I let it anyway here, if once we have to re-use it
+                //cmd_SMCRSTP();      //call subroutine
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
                 
-                case (_IdGMCRSTP):      //command GMCRSTP
-                    //command is not anymore supported with the new driver. 
-                    //I let it anyway here, if once we have to re-use it
-                    //cmd_GMCRSTP();      //call subroutine
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdGMCRSTP):      //command GMCRSTP
+                //command is not anymore supported with the new driver. 
+                //I let it anyway here, if once we have to re-use it
+                //cmd_GMCRSTP();      //call subroutine
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
                 
-                case (_IdSSWLIM):       //command SSWLIM
-                    cmd_SSWLIM();       //call subroutine
-                    break;
+            case (_IdSSWLIM):       //command SSWLIM
+                cmd_SSWLIM();       //call subroutine
+                break;
                 
-                case (_IdGSWLIM):  //command GSWLIM
-                    cmd_GSWLIM();     //call subroutine
-                    break;
+            case (_IdGSWLIM):  //command GSWLIM
+                cmd_GSWLIM();     //call subroutine
+                break;
                 
-                case (_IdGSWPOS):  //command GSWPOS
-                    cmd_GSWPOS();     //call subroutine
-                    break;
+            case (_IdGSWPOS):  //command GSWPOS
+                cmd_GSWPOS();     //call subroutine
+                break;
       
-                case (_IdSPWMLIM):  //command SPWMLIM
-                    cmd_SPWMLIM();    //call subroutine
-                    break;
+            case (_IdSPWMLIM):  //command SPWMLIM
+                cmd_SPWMLIM();    //call subroutine
+                break;
                 
-                case (_IdGPWMLIM):  //command GPWMLIM
-                    cmd_GPWMLIM();    //call subroutine
-                    break;
+            case (_IdGPWMLIM):  //command GPWMLIM
+                cmd_GPWMLIM();    //call subroutine
+                break;
       
-                case (_IdGPWMPOS):  //command GPWMPOS
-                    cmd_GPWMPOS();    //call subroutine
-                    break;
+            case (_IdGPWMPOS):  //command GPWMPOS
+                cmd_GPWMPOS();    //call subroutine
+                break;
       
-                case (_IdGPWMVAL):  //command GPWMVAL
-                    cmd_GPWMVAL();    //call subroutine
-                    break;
+            case (_IdGPWMVAL):  //command GPWMVAL
+                cmd_GPWMVAL();    //call subroutine
+                break;
       
-                case (_IdSSWTYP):  //command SSWTYP
-                    cmd_SSWTYP();     //call subroutine
-                    break;
+            case (_IdSSWTYP):  //command SSWTYP
+                cmd_SSWTYP();     //call subroutine
+                break;
       
-                case (_IdGSWTYP):  //command GSWTYP
-                    cmd_GSWTYP();     //call subroutine
-                    break;
+            case (_IdGSWTYP):  //command GSWTYP
+                cmd_GSWTYP();     //call subroutine
+                break;
       
-                case (_IdGFRQVAL):  //command GFRQVAL
-                    cmd_GFRQVAL();    //call subroutine
-                    break;
+            case (_IdGFRQVAL):  //command GFRQVAL
+                cmd_GFRQVAL();    //call subroutine
+                break;
                 
-                case (_IdSPOSRUN):      //command SPOSRUN (not used anymore)
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdSPOSRUN):      //command SPOSRUN (not used anymore)
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
                 
-                case (_IdGPOSRUN):  //command GPOSRUN
-//                    cmd_GPOSRUN();    //call subroutine
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdGPOSRUN):  //command GPOSRUN
+//              cmd_GPOSRUN();    //call subroutine
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
                     
-                case (_IdPOSRUN):  //command POSRUN
-//                    cmd_POSRUN();       //call subroutine
-                    g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-                    break;
+            case (_IdPOSRUN):  //command POSRUN
+//              cmd_POSRUN();       //call subroutine
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                break;
                     
-                case (_IdGINPB):        //command GINPB                  
-                    cmd_GINPB();        //call subroutine
-                    break;
+            case (_IdGINPB):        //command GINPB                  
+                cmd_GINPB();        //call subroutine
+                break;
                     
-                case (_IdSROM):         //command SROM
-                    cmd_SROM();         //call subroutine
-                    break;
+            case (_IdSROM):         //command SROM
+                cmd_SROM();         //call subroutine
+                break;
                     
-                case (_IdRROM):         //command RROM
-                    cmd_RROM();         //call subroutine
-                    break;
+            case (_IdRROM):         //command RROM
+                cmd_RROM();         //call subroutine
+                break;
                     
-                case (_IdGTEMP):        //command GTEMP
-                    cmd_GTEMP();        //call subroutine
-                    break;
+            case (_IdGTEMP):        //command GTEMP
+                cmd_GTEMP();        //call subroutine
+                break;
                     
-                case (_IdSSEC):         //command SSEC
-                    cmd_SSEC();         //call subroutine
-                    break;
+            case (_IdSSEC):         //command SSEC
+                cmd_SSEC();         //call subroutine
+                break;
                     
-                case (_IdGSEC):         //commmand GSEC
-                    cmd_GSEC();         //call subroutine
-                    break;
+            case (_IdGSEC):         //commmand GSEC
+                cmd_GSEC();         //call subroutine
+                break;
                     
-                case (_IdSMIN):         //command SMIN
-                    cmd_SMIN();         //call subroutine
-                    break;
+            case (_IdSMIN):         //command SMIN
+                cmd_SMIN();         //call subroutine
+                break;
                     
-                case (_IdGMIN):         //command GMIN
-                    cmd_GMIN();         //call subroutine
-                    break;
+            case (_IdGMIN):         //command GMIN
+                cmd_GMIN();         //call subroutine
+                break;
                     
-                case (_IdSHRS):         //command SHRS
-                    cmd_SHRS();         //call subroutine
-                    break;   
+            case (_IdSHRS):         //command SHRS
+                cmd_SHRS();         //call subroutine
+                break;   
                     
-                case (_IdGHRS):         //command GHRS
-                    cmd_GHRS();         //call subroutine
-                    break;
+            case (_IdGHRS):         //command GHRS
+                cmd_GHRS();         //call subroutine
+                break;
                     
-                case (_IdSDAY):         //command SDAY
-                    cmd_SDAY();         //call subroutine
-                    break;
+            case (_IdSDAY):         //command SDAY
+                cmd_SDAY();         //call subroutine
+                break;
                     
-                case (_IdGDAY):         //command GDAY
-                    cmd_GDAY();         //call subroutine
-                    break;
+            case (_IdGDAY):         //command GDAY
+                cmd_GDAY();         //call subroutine
+                break;
                     
-                case (_IdSWDAY):        //command SWDAY
-                    cmd_SWDAY();        //call subroutine
-                    break;
+            case (_IdSWDAY):        //command SWDAY
+                cmd_SWDAY();        //call subroutine
+                break;
                     
-                case (_IdGWDAY):        //command GWDAY
-                    cmd_GWDAY();        //call subroutine
-                    break;
+            case (_IdGWDAY):        //command GWDAY
+                cmd_GWDAY();        //call subroutine
+                break;
                     
-                case (_IdSMONTH):       //command SMONTH
-                    cmd_SMONTH();       //call subroutine
-                    break;
+            case (_IdSMONTH):       //command SMONTH
+                cmd_SMONTH();       //call subroutine
+                break;
                     
-                case (_IdGMONTH):       //command GMONTH
-                    cmd_GMONTH();       //call subroutine 
-                    break;
+            case (_IdGMONTH):       //command GMONTH
+                cmd_GMONTH();       //call subroutine 
+                break;
                     
-                case (_IdSYEAR):        //command SYEAR
-                    cmd_SYEAR();        //call subroutine
-                    break;
+            case (_IdSYEAR):        //command SYEAR
+                cmd_SYEAR();        //call subroutine
+                break;
                     
-                case (_IdGYEAR):        //command GYEAR
-                    cmd_GYEAR();        //call subroutine
-                    break;
+            case (_IdGYEAR):        //command GYEAR
+                cmd_GYEAR();        //call subroutine
+                break;
                     
-                case (_IdGTIME):        //command GTIME
-                    cmd_GTIME();        //call subroutine
-                    break;
+            case (_IdGTIME):        //command GTIME
+                cmd_GTIME();        //call subroutine
+                break;
                     
-                case (_IdGSTALIN):      //command GSTALIN
-                    cmd_GSTALIN();      //call subroutine
-                    break;
+            case (_IdGSTALIN):      //command GSTALIN
+                cmd_GSTALIN();      //call subroutine
+                break;
                     
-                case (_IdSSPDLIN):      //command SSPDLIN
-                    cmd_SSPDLIN();      //call subroutine
-                    break;
+            case (_IdSSPDLIN):      //command SSPDLIN
+                cmd_SSPDLIN();      //call subroutine
+                break;
                     
-                case (_IdGSPDLIN):      //command GSPDLIN
-                    cmd_GSPDLIN();      //call subroutine
-                    break;
+            case (_IdGSPDLIN):      //command GSPDLIN
+                cmd_GSPDLIN();      //call subroutine
+                break;
                     
-                case (_IdSTOLIN):       //command STOLIN
-                    cmd_STOLIN();       //call subroutine
-                    break;
+            case (_IdSTOLIN):       //command STOLIN
+                cmd_STOLIN();       //call subroutine
+                break;
                     
-                case (_IdGTOLIN):       //command GTOLIN
-                    cmd_GTOLIN();       //call subroutine
-                    break;
+            case (_IdGTOLIN):       //command GTOLIN
+                cmd_GTOLIN();       //call subroutine
+                break;
                     
-                case (_IdSLIN):         //command SLIN
-                    cmd_SLIN();         //call subroutine
-                    break;
+            case (_IdSLIN):         //command SLIN
+                cmd_SLIN();         //call subroutine
+                break;
                     
-                case (_IdGBIPSTAS):     //command GBIPSTAS
-                    cmd_GBIPSTAS();     //call subroutine
-                    break;
+            case (_IdGBIPSTAS):     //command GBIPSTAS
+                cmd_GBIPSTAS();     //call subroutine
+                break;
                     
-                case (_IdGBIPSTAL):     //command GBIPSTAL
-                    cmd_GBIPSTAL();     //call subroutine
-                    break;
+            case (_IdGBIPSTAL):     //command GBIPSTAL
+                cmd_GBIPSTAL();     //call subroutine
+                break;
                     
-                case (_IdSBIPPD):       //command SBIPPD
-                    cmd_SBIPPD();       //call subroutine
-                    break;
+            case (_IdSBIPPD):       //command SBIPPD
+                cmd_SBIPPD();       //call subroutine
+                break;
                     
-                case (_IdGBIPPD):       //command GBIPPD
-                    cmd_GBIPPD();       //call subroutine
-                    break;
+            case (_IdGBIPPD):       //command GBIPPD
+                cmd_GBIPPD();       //call subroutine
+                break;
                     
-                case (_IdSBIPTSC):      //command SBIPTSC
-                    cmd_SBIPTSC();      //call subroutine
-                    break;
+            case (_IdSBIPTSC):      //command SBIPTSC
+                cmd_SBIPTSC();      //call subroutine
+                break;
                     
-                case (_IdGBIPTSC):      //command GBIPTSC
-                    cmd_GBIPTSC();      //call subroutine
-                    break;
+            case (_IdGBIPTSC):      //command GBIPTSC
+                cmd_GBIPTSC();      //call subroutine
+                break;
                     
-                case (_IdSBIPOL):       //command SBIPOL
-                    cmd_SBIPOL();       //call subroutine
-                    break;
+            case (_IdSBIPOL):       //command SBIPOL
+                cmd_SBIPOL();       //call subroutine
+                break;
                     
-                case (_IdGBIPOL):       //command GBIPOL
-                    cmd_GBIPOL();       //call subroutine
-                    break;
+            case (_IdGBIPOL):       //command GBIPOL
+                cmd_GBIPOL();       //call subroutine
+                break;
                 
-                case (_IdSBIPSTS):      //command SBIPSTS
-                    cmd_SBIPSTS();      //call subroutine
-                    break;
+            case (_IdSBIPSTS):      //command SBIPSTS
+                cmd_SBIPSTS();      //call subroutine
+                break;
                     
-                case (_IdGBIPSTS):      //command GBIPSTS
-                    cmd_GBIPSTS();      //call subroutine
-                    break;
+            case (_IdGBIPSTS):      //command GBIPSTS
+                cmd_GBIPSTS();      //call subroutine
+                break;
                     
-                case (_IdSBIPPFD):      //command SBIPPFD
-                    cmd_SBIPPFD();      //call subroutine
-                    break;
+            case (_IdSBIPPFD):      //command SBIPPFD
+                cmd_SBIPPFD();      //call subroutine
+                break;
                     
-                case (_IdGBIPPFD):      //command GBIPPFD
-                    cmd_GBIPPFD();      //call subroutine
-                    break;
+            case (_IdGBIPPFD):      //command GBIPPFD
+                cmd_GBIPPFD();      //call subroutine
+                break;
                     
-                case (_IdSBIPPWM):      //command SBIPPWM
-                    cmd_SBIPPWM();      //call subroutine
-                    break;
+            case (_IdSBIPPWM):      //command SBIPPWM
+                cmd_SBIPPWM();      //call subroutine
+                break;
                     
-                case (_IdGBIPPWM):      //command GBIPPWM
-                    cmd_GBIPPWM();      //call subroutine
-                    break;
+            case (_IdGBIPPWM):      //command GBIPPWM
+                cmd_GBIPPWM();      //call subroutine
+                break;
                     
-                case (_IdSBIPFRQ):      //command SBIPFRQ
-                    cmd_SBIPFRQ();      //call subroutine
-                    break;
+            case (_IdSBIPFRQ):      //command SBIPFRQ
+                cmd_SBIPFRQ();      //call subroutine
+                break;
                     
-                case (_IdGBIPFRQ):      //command GBIPFRQ
-                    cmd_GBIPFRQ();      //call subroutine
-                    break;
+            case (_IdGBIPFRQ):      //command GBIPFRQ
+                cmd_GBIPFRQ();      //call subroutine
+                break;
                     
-                case (_IdSBIPSLEW):     //command SBIPSLEW
-                    cmd_SBIPSLEW();     //call subroutine
-                    break;
+            case (_IdSBIPSLEW):     //command SBIPSLEW
+                cmd_SBIPSLEW();     //call subroutine
+                break;
                     
-                case (_IdGBIPSLEW):     //command GBIPSLEW
-                    cmd_GBIPSLEW();     //call subroutine
-                    break;
+            case (_IdGBIPSLEW):     //command GBIPSLEW
+                cmd_GBIPSLEW();     //call subroutine
+                break;
                     
-                case (_IdGBIPSST):      //command GBIPSST
-                    cmd_GBIPSST();      //call subroutine
-                    break;
+            case (_IdGBIPSST):      //command GBIPSST
+                cmd_GBIPSST();      //call subroutine
+                break;
                     
-                case (_IdGVBAK):        //command GVBAK
-                    cmd_GVBAK();        //call subroutine
-                    break;
+            case (_IdGVBAK):        //command GVBAK
+                cmd_GVBAK();        //call subroutine
+                break;
                     
-                case (_IdSRESLIN):      //command SRESLIN
-                    cmd_SRESLIN();      //call subroutine
-                    break;
+            case (_IdSRESLIN):      //command SRESLIN
+                cmd_SRESLIN();      //call subroutine
+                break;
                     
-                case (_IdGRESLIN):      //command GRESLIN
-                    cmd_GRESLIN();      //call subroutine
-                    break;
+            case (_IdGRESLIN):      //command GRESLIN
+                cmd_GRESLIN();      //call subroutine
+                break;
                     
-                case (_IdSFRQBIT):      //command SFRQBIT
-                    cmd_SFRQBIT();      //call subroutine
-                    break;
+            case (_IdSFRQBIT):      //command SFRQBIT
+                cmd_SFRQBIT();      //call subroutine
+                break;
                     
-                case (_IdGFRQBIT):      //command GFRQBIT
-                    cmd_GFRQBIT();      //call subroutine
-                    break;
+            case (_IdGFRQBIT):      //command GFRQBIT
+                cmd_GFRQBIT();      //call subroutine
+                break;
                     
-                case (_IdSRUNBIT):      //command SRUNBIT
-                    cmd_SRUNBIT();      //call subroutine
-                    break;
+            case (_IdSRUNBIT):      //command SRUNBIT
+                cmd_SRUNBIT();      //call subroutine
+                break;
                     
-                case (_IdGRUNBIT):      //command GRUNBIT
-                    cmd_GRUNBIT();      //call subroutine
-                    break;
+            case (_IdGRUNBIT):      //command GRUNBIT
+                cmd_GRUNBIT();      //call subroutine
+                break;
                     
-                case (_IdRTESTIN):      //command RTESTIN
-                    cmd_RTESTIN();      //call subroutine
-                    break;
+            case (_IdRTESTIN):      //command RTESTIN
+                cmd_RTESTIN();      //call subroutine
+                break;
                     
-                case (_IdSPROD):        // Command SPRODINFOS
-                    cmd_SPROD();
+            case (_IdSPROD):        // Command SPRODINFOS
+                cmd_SPROD();
+                break;
                                      
-                default:    //command ID does not exist
-                    //do nothing - error has to be send before this routine
-                    break;
-            }
-        }
-        else
-        {
-            //send back the information that a POR was detected and set the POR variable to true
-            g_Param.uint8_ErrCode = _GlobalLock;        //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-            
-            g_Param.uint8_NotPOR = 1;                   //release the communication
+            default:    //command ID does not exist
+                //do nothing - error has to be send before this routine
+                break;
         }
         //reset all variables for the next protocol
         g_CmdChk.uint8_ParamPos = 0;                 
