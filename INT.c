@@ -1046,7 +1046,6 @@ void __ISR(_ADC_VECTOR, IPL2SOFT) IntADCHandler(void)
     uint32_emptyADCbuffer = ADC1BUFF;  
     
     g_ADC.uint8_ConvStarted = 0;    //signal that conversion is done
-    oTestLed2 = 0;
     IFS1CLR = _IFS1_AD1IF_MASK;
     LOGP(OUT_OF_ISR);
     asm("ei");

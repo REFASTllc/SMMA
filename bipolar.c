@@ -583,8 +583,8 @@ void bi_CheckCalc(void)
         {
             //then signal an error and send back the error code
             g_Bipol.status.BITS.error = 1;
-            g_Param.uint8_ErrCode = _BipPlausiCheck;    //set error code
-            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+//            g_Param.uint8_ErrCode = _BipPlausiCheck;    //set error code
+//            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
         else
         {
@@ -617,7 +617,7 @@ void bi_CheckCalc(void)
     else
     {
         //send back the error code
-        g_Param.uint8_ErrCode = _UniPlausiCheck;    //set error code
-        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+//        g_Param.uint8_ErrCode = _UniPlausiCheck;    //set error code
+//        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
 }   //end of unipolar_checkcalc

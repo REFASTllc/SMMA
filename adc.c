@@ -262,6 +262,5 @@ void adc_LaunchNextMeasure(void)
         AD1CON1bits.ASAM = 1;           //launch the conversion
                                                 //note this bit is set back to 0 automatic after 
                                                 //the interrupt is generated
-        oTestLed2 = 1;
     }
 }   //end of adc_LaunchNextMeasure
