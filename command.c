@@ -5580,6 +5580,8 @@ void cmd_RTESTIN(void)
                         uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
                         funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
                         uart2_sendbuffer(',');              //add the comma
+                        funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
+                        uart2_sendbuffer(',');              //add the comma
 
                         //measure coil A2
                         oUniCoilA2 = 1;                     //switch on coil A2
@@ -5594,6 +5596,8 @@ void cmd_RTESTIN(void)
                         oUniCoilA2 = 0;                     //switch off coil A2
 
                         uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
+                        funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
+                        uart2_sendbuffer(',');              //add the comma
                         funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
                         uart2_sendbuffer(',');              //add the comma
 

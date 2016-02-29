@@ -1081,7 +1081,6 @@ void funct_MiliVoltToOhm(unsigned long int uint32_Milivolt)
     uart2_sendbuffer('.');    
     uint32_WB = uint32_Milivolt % 10;
     funct_IntToAscii(uint32_WB,_Active); 
-    uart2_sendbuffer('E'); 
 }   //end of funct_MiliVoltToOhm
 
 
