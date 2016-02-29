@@ -218,6 +218,7 @@ void bi_move(void)
         }
         else
         {
+            /* old source code
             //not arrived at the goal position, so verify if the acceleration ramp is still active
             if(g_Bipol.status.BITS.accelerationIsActived)           
                 bi_acc();                      //then call the subroutine acceleration
@@ -226,6 +227,25 @@ void bi_move(void)
                 bi_dec();                     //then call the subroutine deceleration
             else
                 bi_run();                     //otherwise call the subroutine run
+             */
+            //new source code
+            //acceleration still active
+            if(g_Bipol.status.BITS.accelerationIsActived)
+            {
+                bi_acc();       //call subroutine acceleration
+            }
+            else
+            {
+                //deceleration still active
+                if(g_Bipol.status.BITS.decelerationIsActived)
+                {
+                    bi_dec();   //call subroutine deceleration
+                }
+                else
+                {
+                    bi_run();   //call subroutine run
+                }
+            }
         }
     }  
 }   //end of bi_move
@@ -262,6 +282,7 @@ void bi_acc(void)
         g_Bipol.status.BITS.nextStepIsAllowed = 0;     //then clear the bit 'NS - next step'
         g_Bipol.uint16_AccNumbStep--;     //decrement the number of steps
     
+        /* old code
         //verify if real position is equal to acceleration stop position
         if(g_Bipol.uint32_RealPos == g_Bipol.uint32_AccStop)
             g_Bipol.status.BITS.accelerationIsActived = 0; //then clear bit 'ACCEL - acceleration'
@@ -271,6 +292,39 @@ void bi_acc(void)
         //or if real position is equal to goal position
         else if(g_Bipol.uint32_RealPos == g_Bipol.uint32_GoalPos)
             g_Bipol.status.BITS.goalIsReached = 1; //then set bit 'GOAL'
+        */
+        //new code
+        //verify if real position is equal to acceleration stop position
+        if(g_Bipol.uint32_RealPos == g_Bipol.uint32_AccStop)
+        {
+            g_Bipol.status.BITS.accelerationIsActived = 0;  //clear bit acceleration
+        }
+        else
+        {
+            //do nothing
+        }
+        
+        //verify if real position is equal to deceleration start position
+        if(g_Bipol.uint32_RealPos == g_Bipol.uint32_DecStart)
+        {
+            g_Bipol.status.BITS.decelerationIsActived = 1;  //set bit deceleration
+            g_Bipol.uint16_DecNumbStep = 0; //for security reason set this to 0
+        }
+        else
+        {
+            //do nothing
+        }
+        
+        //verify if real position is equal to goal position
+        if(g_Bipol.uint32_RealPos == g_Bipol.uint32_GoalPos)
+        {
+            g_Bipol.status.BITS.goalIsReached = 1;  //set bit goal 
+        }
+        else
+        {
+            //do nothing
+        }
+           
     }
     else
     {
@@ -316,16 +370,41 @@ void bi_run(void)
     {
         g_Bipol.status.BITS.nextStepIsAllowed = 0;         //then clear the bit 'NS - next step'
         
+        /* old code
         //verify if deceleration has to start if deceleration ramp is active
         if((g_Bipol.uint32_RealPos == g_Bipol.uint32_DecStart) && (g_Bipol.uint1_NextStepIsRamp == 1))
             g_Bipol.status.BITS.decelerationIsActived = 1;     //then set bit 'DECEL - deceleration'
         //or if real position is equal to goal position
         else if(g_Bipol.uint32_RealPos == g_Bipol.uint32_GoalPos)
             g_Bipol.status.BITS.goalIsReached = 1;     //then set bit 'GOAL'
+        */
+        //new code
+        //verify if deceleration has to start and if deceleration ramp is active
+        if((g_Bipol.uint32_RealPos == g_Bipol.uint32_DecStart) && (g_Bipol.uint1_NextStepIsRamp == 1))
+        {
+            g_Bipol.status.BITS.decelerationIsActived = 1;  //set bit deceleration
+            g_Bipol.uint16_DecNumbStep = 0; //for security reason set this variable to 0
+        }
+        else
+        {
+            //nothing is done
+        }
+        
+        //verify if real position is equal to goal position
+        if(g_Bipol.uint32_RealPos == g_Bipol.uint32_GoalPos)
+        {
+            g_Bipol.status.BITS.goalIsReached = 1;  //set bit goal
+        }
+        else
+        {
+            //nothing is done
+        }   
     }
     else //otherwise load always the run time
-        g_Bipol.uint32_IntTime = g_Bipol.uint32_RunTime;    
-}   //end of uni_run
+    {
+        g_Bipol.uint32_IntTime = g_Bipol.uint32_RunTime;        
+    }    
+}   //end of bi_run
 
 
 /**********************************************************************************************************************
@@ -360,7 +439,13 @@ void bi_dec(void)
     
         //verify if real position is equal to goal position
         if(g_Bipol.uint32_RealPos == g_Bipol.uint32_GoalPos)
+        {
             g_Bipol.status.BITS.goalIsReached = 1; //then set bit 'GOAL'
+        }
+        else
+        {
+            //nothing to do
+        }
     }
     else
     {

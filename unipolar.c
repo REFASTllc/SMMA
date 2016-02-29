@@ -255,6 +255,8 @@ void uni_move(void)
         }
         else
         {
+            /*
+            //old source code
             //not arrived at the goal position, so verify if the acceleration ramp is still active
             if(g_Uni.uint8_Status & 0x04)           
             {  
@@ -268,6 +270,25 @@ void uni_move(void)
             else
             {
                 uni_run();                     //otherwise call the subroutine run
+            }
+            */
+            //new source code
+            //not arrived at the goal position, so verify if the acceleration ramp is still active
+            if(g_Uni.uint8_Status & 0x04)
+            {
+                uni_acc();  //call the acceleration
+            }
+            else
+            {
+                //or if the deceleration ramp is still active
+                if(g_Uni.uint8_Status & 0x08)
+                {
+                    uni_dec();  //call the deceleration
+                }
+                else
+                {
+                    uni_run();  //call subroutine
+                }
             }
         }
     }  
@@ -305,6 +326,8 @@ void uni_acc(void)
         g_Uni.uint8_Status &= 0xEF;     //then clear the bit 'NS - next step'
         g_Uni.uint16_AccNumbStep--;     //decrement the number of steps
     
+        /*
+        //old source code
         //verify if real position is equal to acceleration stop position
         if(g_Uni.uint32_RealPos == g_Uni.uint32_AccStop)
         {
@@ -324,6 +347,38 @@ void uni_acc(void)
         {
         //nothing is to do, because it was a normal step
         }     
+        */
+        //new source code
+        //verify if real position is equal to acceleration stop position
+        if(g_Uni.uint32_RealPos == g_Uni.uint32_AccStop)
+        {
+            g_Uni.uint8_Status &= 0xFB; //then clear bit 'ACCEL - acceleration'
+        }
+        else
+        {
+            //do nothing
+        }
+        
+        //if real position is equal to deceleration start position
+        if(g_Uni.uint32_RealPos == g_Uni.uint32_DecStart)
+        {
+            g_Uni.uint8_Status |= 0x08; //then set bit 'DECEL - deceleration'
+            g_Uni.uint16_DecNumbStep = 0;   // for security reason set this to 0
+        }
+        else
+        {
+            //do nothing
+        }
+        
+        //if real position is equal to goal position
+        if(g_Uni.uint32_RealPos == g_Uni.uint32_GoalPos)
+        {
+            g_Uni.uint8_Status |= 0x20; //then set bit 'GOAL'
+        }
+        else
+        {
+            //do nothing
+        }
     }
     else
     {
@@ -374,6 +429,8 @@ void uni_run(void)
     {
         g_Uni.uint8_Status &= 0xEF;         //then clear the bit 'NS - next step'
         
+        /* 
+        //old source code
         //verify if deceleration has to start if deceleration ramp is active
         if((g_Uni.uint32_RealPos == g_Uni.uint32_DecStart) && (g_Uni.uint8_Settings & 0x20))
         {
@@ -387,7 +444,29 @@ void uni_run(void)
         else
         {
             //nothing is to do, because it was a normal step
-        }     
+        }  
+        */
+        //new source code
+        //verify if deceleration has to start if deceleration ramp is active
+        if((g_Uni.uint32_RealPos == g_Uni.uint32_DecStart) && (g_Uni.uint8_Settings & 0x20))
+        {
+            g_Uni.uint8_Status |= 0x08;     //then set bit 'DECEL - deceleration'
+            g_Uni.uint16_DecNumbStep = 0;   //for security reason set this to 0
+        }
+        else
+        {
+            //do nothing
+        }
+        
+        //if real position is equal to goal position
+        if(g_Uni.uint32_RealPos == g_Uni.uint32_GoalPos)
+        {
+            g_Uni.uint8_Status |= 0x20;     //then set bit 'GOAL'
+        }
+        else
+        {
+            //do nothing
+        }
     }
     else
     { 
