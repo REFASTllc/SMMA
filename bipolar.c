@@ -41,7 +41,7 @@ extern SCmdChk g_CmdChk;
 ***********************************************************************************************************************/
 void bi_init(void)
 {
-//initialize the variables of the unipolar actuator
+//initialize the variables of the bipolar actuator
     g_Bipol.uint32_RealPos = 0;               //set the real position to 0
     g_Bipol.uint32_GoalPos = 0;               //set the goal position to 0
     g_Bipol.uint16_RunFreq = 0;               //set the run frequency to 0    
@@ -228,7 +228,7 @@ void bi_move(void)
                 bi_run();                     //otherwise call the subroutine run
         }
     }  
-}   //end of unipolar_move
+}   //end of bi_move
 
 
 /**********************************************************************************************************************
@@ -389,9 +389,9 @@ void bi_dec(void)
  * move not so much to verify and of course not to start a move if we see that there is already a problem with the 
  * parameters.
  * A move will be not executed if we have one of these situations:
- * - the run or ramp frequency is higher then allowed (see definiton in unipolar.h)
+ * - the run or ramp frequency is higher then allowed (see definiton in bipolar.h)
  * - ramp active but first parameter is not correct
- * - ramp active but frequency is higher then allowed (see definition in unipolar.h)
+ * - ramp active but frequency is higher then allowed (see definition in bipolar.h)
  * - are there enough steps to execute the ramp(s) (if enable) and at the minimum one cycle that means 4 steps 
  *   in fullstep and 8 steps in halfsteps (run mode)
  * So first we check if the ramps are enabled and if true we verify each parameter. If there are 20 parameters and 
@@ -626,4 +626,4 @@ void bi_CheckCalc(void)
 //        g_Param.uint8_ErrCode = _UniPlausiCheck;    //set error code
 //        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
-}   //end of unipolar_checkcalc
+}   //end of bi_CheckCalc
