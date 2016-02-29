@@ -3045,6 +3045,7 @@ void cmd_GTEMP(void)
             funct_IntToAscii(sint16_WB,_Active);
             uart2_sendbuffer('°');
             uart2_sendbuffer('C');
+            uart2_sendbuffer(13);       //add the CR at the end
         }
     }
     else
