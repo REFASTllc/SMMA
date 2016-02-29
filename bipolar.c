@@ -66,7 +66,7 @@ void bi_init(void)
     g_Bipol.uint8_DecArrPos = 0;                //clear the deceleration array position
     g_Bipol.uint16_DecNumbStep = 0;             //clear the deceleration number of steps
     g_Bipol.uint32_DecStart = 0;                //clear the deceleration start position
-    g_Bipol.uint1_IntTimeExpiredFlag = 1;       //force the interrupt routine to load the new time
+    g_Bipol.uint1_IntTimeExpiredFlag = 0;       //force the interrupt routine to load the new time
 }   //end of bi_init
 
 
@@ -123,7 +123,7 @@ void bi_move(void)
                 TMR5 = 0;                       //reset MSB counter
                 PR4 = 400;                      //load LSB register with start condition (10us)
                 PR5 = 0;                        //load MSB register with 0 
-                g_Bipol.uint1_IntTimeExpiredFlag = 1;   //force the interrupt routine to load the new time
+                g_Bipol.uint1_IntTimeExpiredFlag = 0;   //force the interrupt routine to load the new time
                 A3981.RUN.BITS.EN = 0;
                 SendOneDataSPI1(A3981.RUN.REG);
                 g_Bipol.uint1_IsBipolEnabled = 0;
@@ -180,7 +180,7 @@ void bi_move(void)
                     TMR5 = 0;                       //reset MSB counter
                     PR4 = 400;                      //load LSB register with start condition (10us)
                     PR5 = 0;                        //load MSB register with 0
-                    g_Bipol.uint1_IntTimeExpiredFlag = 1;    //force the interrupt routine to load the new time
+                    g_Bipol.uint1_IntTimeExpiredFlag = 0;    //force the interrupt routine to load the new time
           
                     if(!g_Bipol.uint1_CurrInCoilAtTheEnd) //coils current active after move?
                     {
