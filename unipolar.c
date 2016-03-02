@@ -528,8 +528,8 @@ void uni_dec(void)
             uint16_Freq = funct_ReadRamp(_Dec,_Freq,g_Uni.uint8_DecArrPos);
             g_Uni.uint32_IntTime = funct_FreqToTimer23(uint16_Freq);
       
-            //decrement the array for the next parameter
-            g_Uni.uint8_DecArrPos--;       
+            //increment the array for the next parameter
+            g_Uni.uint8_DecArrPos++;       
         }
         else
         {
@@ -649,7 +649,7 @@ void uni_CheckCalc(void)
         }
     //-----------------------------DECELERATION-----------------------------
         //start the array position with 255, because 0 is already a place in the array
-        g_Uni.uint8_DecArrPos = 255;   
+//        g_Uni.uint8_DecArrPos = 255;   
     
         //verify the deceleration ramp if enable
         if(g_Uni.uint8_Settings & 0x20)
@@ -701,7 +701,7 @@ void uni_CheckCalc(void)
                     //into deceleration start position
                     g_Uni.uint32_DecStart += uint16_NumbStep;
                     //increment the start position of the deceleration array, to know where we have to start
-                    g_Uni.uint8_DecArrPos++;
+//                    g_Uni.uint8_DecArrPos++;
                 }
             }
         }
