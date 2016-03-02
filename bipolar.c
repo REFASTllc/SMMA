@@ -118,11 +118,17 @@ void bi_move(void)
                 g_Bipol.status.BITS.firstStepIsActived = 1;     //set the bit 'FS - first step'
         
                 //and stop the timer4 
-                T4CONbits.ON = 0;               //switch off timer 4
-                TMR4 = 0;                       //reset LSB counter
-                TMR5 = 0;                       //reset MSB counter
-                PR4 = 400;                      //load LSB register with start condition (10us)
-                PR5 = 0;                        //load MSB register with 0 
+                T4CONCLR = 0x8000;  //timer is off
+//                T4CONbits.ON = 0;               //switch off timer 4
+                
+                TMR4CLR = 0xFFFF;
+                TMR5CLR = 0xFFFF;
+                PR4SET = 400;
+                
+//                TMR4 = 0;                       //reset LSB counter
+//                TMR5 = 0;                       //reset MSB counter
+//                PR4 = 400;                      //load LSB register with start condition (10us)
+//                PR5 = 0;                        //load MSB register with 0 
                 g_Bipol.uint1_IntTimeExpiredFlag = 0;   //force the interrupt routine to load the new time
                 A3981.RUN.BITS.EN = 0;
                 SendOneDataSPI1(A3981.RUN.REG);
@@ -159,7 +165,11 @@ void bi_move(void)
       
         g_Bipol.status.BITS.error = 0;             //clear error
       
-        T4CONbits.ON = 1;                       //enable the timer 4
+        T4CONSET = 0x0008;  //timer in 32 bits mode
+        T4CONSET = 0x0010;  //prescale value = 1:2
+        
+//        T4CONbits.ON = 1;                       //enable the timer 4
+        T4CONSET = 0x8000;  //timer is off
         }
     }
     else
@@ -175,11 +185,16 @@ void bi_move(void)
                 {
                     //then stop the timer 
                     g_Bipol.uint1_IsBipolEnabled = 0;
-                    T4CONbits.ON = 0;               //switch off the timer
-                    TMR4 = 0;                       //reset LSB counter
-                    TMR5 = 0;                       //reset MSB counter
-                    PR4 = 400;                      //load LSB register with start condition (10us)
-                    PR5 = 0;                        //load MSB register with 0
+                    T4CONCLR = 0x8000;  //timer is off
+//                    T4CONbits.ON = 0;               //switch off the timer
+                    TMR4CLR = 0xFFFF;
+                    TMR5CLR = 0xFFFF;
+                    PR4SET = 400;
+                    
+//                    TMR4 = 0;                       //reset LSB counter
+//                    TMR5 = 0;                       //reset MSB counter
+//                    PR4 = 400;                      //load LSB register with start condition (10us)
+//                    PR5 = 0;                        //load MSB register with 0
                     g_Bipol.uint1_IntTimeExpiredFlag = 0;    //force the interrupt routine to load the new time
           
                     if(!g_Bipol.uint1_CurrInCoilAtTheEnd) //coils current active after move?

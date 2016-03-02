@@ -334,23 +334,33 @@ void InitTimer23(void)
 ***********************************************************************************************************************/
 void InitTimer45(void)
 {
-    T4CONbits.T32 = 1;  // Timer in 32 bits mode
-    T4CONbits.ON = 0;   // Timer is OFF
-    T5CON = 0;          // Has no effect in 32 bits mode
+//    T4CONbits.ON = 0;   // Timer is OFF
+    T4CONCLR = 0x8000;  //timer is off
+    
+    T4CON = 0;          //reset T4 settings
+    T5CON = 0;          //reset T5 settings
+    PR5CLR = 0xFFFF;
+    
+//    T4CONbits.T32 = 1;  // Timer in 32 bits mode
+    T4CONSET = 0x0008;  //timer in 32 bits mode
 
-    T4CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
-    T4CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
-    T4CONbits.TCKPS0 = 1;   // 101 = 1:32 prescale value
+    T4CONSET = 0x0010;  //prescale value = 1:2
+//    T4CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
+//    T4CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
+//    T4CONbits.TCKPS0 = 1;   // 101 = 1:32 prescale value
                             // 100 = 1:16 prescale value
                             // 011 = 1:8 prescale value
                             // 010 = 1:4 prescale value
                             // 001 = 1:2 prescale value
                             // 000 = 1:1 prescale value
 
-    TMR4 = 0;           // LSB --> clear counter
-    TMR5 = 0;           // MSB --> clear counter
-    PR4 = 400;          // LSB --> set to 10us
-    PR5 = 0;            // MSB --> (400 * 25ns)
+//    TMR4 = 0;           // LSB --> clear counter
+//    TMR5 = 0;           // MSB --> clear counter
+//    PR4 = 400;          // LSB --> set to 10us
+//    PR5 = 0;            // MSB --> (400 * 25ns)
+    TMR4CLR = 0xFFFF;
+    TMR5CLR = 0xFFFF;
+    PR4SET = 0x0190;
 }
 
 /**********************************************************************************************************************
