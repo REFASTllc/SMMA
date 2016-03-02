@@ -5580,7 +5580,10 @@ void cmd_RTESTIN(void)
                         uint32_WB = ads1115_read();         //read out Vmot
                         oUniCoilA1 = 0;                     //switch off coil A1
 
-                        uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
+                        if(uint32_WB)   //convert result in mV only if it is not 0
+                        {
+                            uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000);                             
+                        }
                         funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
                         uart2_sendbuffer(',');              //add the comma
 
@@ -5596,7 +5599,10 @@ void cmd_RTESTIN(void)
                         uint32_WB = ads1115_read();         //read out Vmot
                         oUniCoilA2 = 0;                     //switch off coil A2
 
-                        uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
+                        if(uint32_WB)   //convert result in mV only if it is not 0
+                        {
+                            uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000);                             
+                        }
                         funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
                         uart2_sendbuffer(',');              //add the comma
 
@@ -5612,7 +5618,10 @@ void cmd_RTESTIN(void)
                         uint32_WB = ads1115_read();         //read out Vmot
                         oUniCoilB1 = 0;                     //switch off coil B1
 
-                        uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
+                        if(uint32_WB)   //convert result in mV only if it is not 0
+                        {
+                            uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000);                             
+                        }
                         funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
                         uart2_sendbuffer(',');              //add the comma
 
@@ -5628,7 +5637,10 @@ void cmd_RTESTIN(void)
                         uint32_WB = ads1115_read();         //read out Vmot
                         oUniCoilB2 = 0;                     //switch off coil B2
 
-                        uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
+                        if(uint32_WB)   //convert result in mV only if it is not 0
+                        {
+                            uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000);                             
+                        }
                         funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
                         uart2_sendbuffer(13);                           //add the CR at the end
                     }
@@ -5649,7 +5661,10 @@ void cmd_RTESTIN(void)
                         uint32_WB = ads1115_read();         //read out Vmot
                         oBiRelayCoilA = 0;                  //switch off relay forcoil A
 
-                        uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
+                        if(uint32_WB)   //convert result in mV only if it is not 0
+                        {
+                            uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000);                             
+                        }
                         funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
                         uart2_sendbuffer(',');              //add the comma
                         funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
@@ -5667,7 +5682,10 @@ void cmd_RTESTIN(void)
                         uint32_WB = ads1115_read();         //read out Vmot
                         oBiRelayCoilB = 0;                  //switch off relay forcoil B
 
-                        uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000); //convert the result in mV
+                        if(uint32_WB)   //convert result in mV only if it is not 0
+                        {
+                            uint32_WB = funct_ADCtoMiliUnit(uint32_WB,8000);                             
+                        }
                         funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
                         uart2_sendbuffer(',');              //add the comma
                         funct_MiliVoltToOhm(uint32_WB); //convert into ohm and put it into the sendbuffer
@@ -5688,8 +5706,10 @@ void cmd_RTESTIN(void)
                     g_Param.uint8_ErrCode = _RTESTINsupply;         //set error code
                     funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
                     uart2_sendbuffer(',');                          //then the comma
-                    //convert the result in mV
-                    uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);
+                    if(uint32_WB)   //convert result in mV only if it is not 0
+                    {
+                       uint32_WB = funct_ADCtoMiliUnitg_ADC.uint32_Vmot,18);                             
+                    }
                     funct_IntToAscii(uint32_WB,_Active);            //add the voltage
                     uart2_sendbuffer('m');                          //add the m
                     uart2_sendbuffer('V');                          //add the V
