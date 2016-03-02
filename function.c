@@ -1101,18 +1101,12 @@ void funct_MiliVoltToOhm(unsigned long int uint32_Milivolt)
  * Output:                  -
 ***********************************************************************************************************************/
 void funct_ProtDev(void)
-{
-    volatile unsigned long int uint32_WB1;
-    volatile unsigned long int uint32_WB2;
-    
+{   
     //actuator = unipolar or matrix?
     if((g_Param.uint8_MotTyp == 'U') || (g_Param.uint8_MotTyp == 'M'))
     {
-        uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);  //convert the result in mV
-        uint32_WB2 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mA
-        
-        //voltage or current higher than allowed?
-        if((uint32_WB1 >= _VmotUniMax) || (uint32_WB2 >= _ImotUniMax))
+        //voltage or current higher than allowed (40V & 3A)?
+        if((g_ADC.uint32_Vmot >= 690) || (g_ADC.uint32_Imot >= 931))
         {
             oVmotOnOff = 0;                 //switch off the main supply
             oBiEnaVmot = 0;                 //switch off the bipolar supply
@@ -1128,11 +1122,8 @@ void funct_ProtDev(void)
     //actuator = bipolar?
     else if (g_Param.uint8_MotTyp == 'B')   
     {
-        uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);  //convert the result in mV
-        uint32_WB2 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mA
-        
-        //voltage or current higher than allowed?
-        if((uint32_WB1 >= _VmotBipMax) || (uint32_WB2 >= _ImotBipMax))
+        //voltage or current higher than allowed (28V & 3A)?
+        if((g_ADC.uint32_Vmot >= 485) || (g_ADC.uint32_Imot >= 931))
         {
             oVmotOnOff = 0;                 //switch off the main supply
             oBiEnaVmot = 0;                 //switch off the bipolar supply
@@ -1148,11 +1139,8 @@ void funct_ProtDev(void)
     //actuator = lin?
     else if (g_Param.uint8_MotTyp == 'L')
     {
-        uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);  //convert the result in mV
-        uint32_WB2 = funct_ADCtoMiliUnit(g_ADC.uint32_Imot,310); //convert the result in mA
-        
-        //voltage or current higher than allowed?
-        if((uint32_WB1 >= _VmotLinMax) || (uint32_WB2 >= _ImotLinMax))
+        //voltage or current higher than allowed (24V / 0.8A)?
+        if((g_ADC.uint32_Vmot >= 415) || (g_ADC.uint32_Imot >= 250))
         {
             oVmotOnOff = 0;                 //switch off the main supply
             oBiEnaVmot = 0;                 //switch off the bipolar supply

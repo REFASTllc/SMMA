@@ -91,7 +91,7 @@ void main(void)
     while(1)
     {  
         //launch this subroutine every time to protect our device from high voltage or current
-//        funct_ProtDev();
+        funct_ProtDev();
         
         if(g_Uni.uint8_Settings & 0x01) //verify if the unipolar motor has to move
         {
