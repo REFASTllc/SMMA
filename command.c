@@ -858,6 +858,9 @@ void cmd_RUN(void)
                 //type of motor = unipolar or matrix?
                 else if((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
                 {
+                    //clear the settings before defining
+                    g_Uni.uint8_Settings = 0;
+                            
                     //to decide what is to do when motor type changes
                     g_Param.uint8_MotTyp = g_CmdChk.uint32_TempPara[1] & 0xFF;  
                     //call subroutine to switch on/off the outputs for the motor type

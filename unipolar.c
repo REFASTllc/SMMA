@@ -135,16 +135,16 @@ void uni_move(void)
             }
             else
             {
-                g_Uni.uint32_GoalPos = g_Uni.uint32_RealPos;    //otherwise set the goal to the real position
-                g_Uni.uint8_Settings = 0;       //erase settings         
-                g_Uni.uint8_Status |= 0x01;     //set the bit 'FS - first step'
-        
                 //and stop the timer4 
                 T4CONbits.ON = 0;               //switch off timer 4
                 TMR4 = 0;                       //reset LSB counter
                 TMR5 = 0;                       //reset MSB counter
                 PR4 = 400;                      //load LSB register with start condition
-                PR5 = 0;                        //load MSB register with 0 
+                PR5 = 0;                        //load MSB register with 0
+                
+                g_Uni.uint32_GoalPos = g_Uni.uint32_RealPos;    //otherwise set the goal to the real position
+                g_Uni.uint8_Settings = 0;       //erase settings         
+                g_Uni.uint8_Status |= 0x01;     //set the bit 'FS - first step' 
                 
                 if(g_Param.uint8_RunBit)
                 {

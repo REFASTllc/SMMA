@@ -336,11 +336,14 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
     TMR4 = 0;                   //reset LSB counter
     TMR5 = 0;                   //reset MSB counter
     
+    oTestLed2 = ! oTestLed2;
+    
     if((g_Param.uint8_MotTyp == 'U') || (g_Param.uint8_MotTyp == 'M'))
     {
         //load the new interrupt time
         PR4 = g_Uni.uint32_IntTime & 0x0000FFFF;  //first the LSB
         PR5 = g_Uni.uint32_IntTime >> 16;         //second the MSB
+//        PR4 = g_Uni.uint32_IntTime;
 
         g_Uni.uint8_Status |= 0x10;     //allow next step
 
@@ -503,7 +506,7 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
             PR5 = 0x00FF;
         }
     }
-    else    //motor is a bipolar
+    else if (g_Param.uint8_MotTyp == 'B')   //motor is a bipolar
     {
         if(g_Bipol.uint1_IntTimeExpiredFlag)    //interrupt time expired?
         {
@@ -513,6 +516,7 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
             //load the new interrupt time
             PR4 = g_Bipol.uint32_IntTime & 0x0000FFFF;  //first the LSB
             PR5 = g_Bipol.uint32_IntTime >> 16;         //second the MSB
+//            PR4 = g_Uni.uint32_IntTime;
             PR4 -=8000;  //to correct the already waited time of 10us from the step impuls (output)
         }
         else
@@ -554,6 +558,10 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
                 PR5 = 0x00FF;
             }
         }
+    }
+    else
+    {
+        //issue, motor type is not defined
     }
     
     T4CONbits.ON = 1;           //enable interrupt module   
