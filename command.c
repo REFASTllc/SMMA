@@ -240,10 +240,13 @@ void cmd_ETESTIN(void)
                 {
                     //do nothing
                 }        
-                uint32_WB1 = ads1115_read();         //read out Vmot
+                uint32_WB1 = ads1115_read();         //read out Imot
                 oUniCoilA1 = 0;                     //switch off coil A1
-                uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,8000); //convert the result in mV
-
+                if(uint32_WB)   //convert result in mV only if it is not 0
+                {
+                    uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,8000);                             
+                }
+                
                 //measure coil A2
                 oUniCoilA2 = 1;                     //switch on coil A2
                 g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
@@ -252,10 +255,13 @@ void cmd_ETESTIN(void)
                 {
                     //do nothing
                 }              
-                uint32_WB2 = ads1115_read();         //read out Vmot
+                uint32_WB2 = ads1115_read();         //read out Imot
                 oUniCoilA2 = 0;                     //switch off coil A2
-                uint32_WB2 = funct_ADCtoMiliUnit(uint32_WB2,8000); //convert the result in mV
-
+                if(uint32_WB)   //convert result in mV only if it is not 0
+                {
+                    uint32_WB2 = funct_ADCtoMiliUnit(uint32_WB2,8000);                             
+                }
+                
                 //measure coil B1
                 oUniCoilB1 = 1;                     //switch on coil B1
                 g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
@@ -264,9 +270,12 @@ void cmd_ETESTIN(void)
                 {
                     //do nothing
                 }
-                uint32_WB3 = ads1115_read();         //read out Vmot
+                uint32_WB3 = ads1115_read();         //read out Imot
                 oUniCoilB1 = 0;                     //switch off coil B1
-                uint32_WB3 = funct_ADCtoMiliUnit(uint32_WB3,8000); //convert the result in mV
+                if(uint32_WB)   //convert result in mV only if it is not 0
+                {
+                    uint32_WB3 = funct_ADCtoMiliUnit(uint32_WB3,8000);                             
+                }
 
                 //measure coil B2
                 oUniCoilB2 = 1;                     //switch on coil B2
@@ -276,9 +285,12 @@ void cmd_ETESTIN(void)
                 {
                     //do nothing
                 }  
-                uint32_WB4 = ads1115_read();         //read out Vmot
+                uint32_WB4 = ads1115_read();         //read out Imot
                 oUniCoilB2 = 0;                     //switch off coil B2
-                uint32_WB4 = funct_ADCtoMiliUnit(uint32_WB4,8000); //convert the result in mV
+                if(uint32_WB)   //convert result in mV only if it is not 0
+                {
+                    uint32_WB4 = funct_ADCtoMiliUnit(uint32_WB4,8000);                             
+                }
 
                 //verify result
                 uint8_Result += funct_CheckTol(uint32_WB1,g_Param.uint16_Imin,g_Param.uint16_Imax);
@@ -309,9 +321,21 @@ void cmd_ETESTIN(void)
                 uart2_sendbuffer(',');      //add a ,
 
                 //convert Vmot
-                uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);
+                ads1115_SetChannel(_AIN3p_GND,_FS4096mV);   //set channel on Vmot
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
+                while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                {
+                    //do nothing 
+                }   
+                uint32_WB2 = ads1115_read();         //read out Vmot
+                oBiRelayCoilB = 0;                  //switch off relay for coil B
+                if(uint32_WB)   //convert result in mV only if it is not 0
+                {
+                    uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,8000);                             
+                }
                 funct_IntToAscii(uint32_WB1,_Active);   //add the Vmot result
-                uart2_sendbuffer(13);      //add a CR     
+                uart2_sendbuffer(13);      //add a CR        
             }
             else if (g_CmdChk.uint32_TempPara[1] == 'B')    //is motor type = bipolar
             {
@@ -330,9 +354,12 @@ void cmd_ETESTIN(void)
                 {
                     //do nothing
                 } 
-                uint32_WB1 = ads1115_read();         //read out Vmot
+                uint32_WB1 = ads1115_read();         //read out Imot
                 oBiRelayCoilA = 0;                  //switch off relay for coil A
-                uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,8000); //convert the result in mV
+                if(uint32_WB)   //convert result in mV only if it is not 0
+                {
+                    uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,8000);                             
+                }
 
                 //measure coil B
                 oBiRelayCoilB = 1;                  //switch on relay for coil B
@@ -342,10 +369,13 @@ void cmd_ETESTIN(void)
                 {
                     //do nothing 
                 }   
-                uint32_WB2 = ads1115_read();         //read out Vmot
+                uint32_WB2 = ads1115_read();         //read out Imot
                 oBiRelayCoilB = 0;                  //switch off relay for coil B
-                uint32_WB2 = funct_ADCtoMiliUnit(uint32_WB2,8000); //convert the result in mV
-
+                if(uint32_WB)   //convert result in mV only if it is not 0
+                {
+                    uint32_WB2 = funct_ADCtoMiliUnit(uint32_WB2,8000);                             
+                }
+               
                 //verify result
                 uint8_Result += funct_CheckTol(uint32_WB1,g_Param.uint16_Imin,g_Param.uint16_Imax);
                 uint8_Result += funct_CheckTol(uint32_WB2,g_Param.uint16_Imin,g_Param.uint16_Imax);
@@ -373,7 +403,19 @@ void cmd_ETESTIN(void)
                 uart2_sendbuffer(',');      //add a ,
 
                 //convert Vmot
-                uint32_WB1 = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);
+                ads1115_SetChannel(_AIN3p_GND,_FS4096mV);   //set channel on Vmot
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
+                while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                {
+                    //do nothing 
+                }   
+                uint32_WB2 = ads1115_read();         //read out Vmot
+                oBiRelayCoilB = 0;                  //switch off relay for coil B
+                if(uint32_WB)   //convert result in mV only if it is not 0
+                {
+                    uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,8000);                             
+                }
                 funct_IntToAscii(uint32_WB1,_Active);   //add the Vmot result
                 uart2_sendbuffer(13);      //add a CR        
             }
