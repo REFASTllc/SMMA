@@ -1574,8 +1574,11 @@ void cmd_MUMOT(void)
         //measure here the voltage or take the last measured parameter and send it back!
         uint32_WB = ads1115_read();     //read out Vmot
         
-        //convert the result in mV
-        uint32_WB = funct_ADCtoMiliUnit(uint32_WB,464);
+        //convert the result in mV only if the result is not 0!
+        if(uint32_WB)
+        {
+            uint32_WB = funct_ADCtoMiliUnit(uint32_WB,464);
+        }
         
         //send back the needed informations
         uart2_sendbuffer('E');                          //first the letter E
