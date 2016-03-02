@@ -242,7 +242,7 @@ void cmd_ETESTIN(void)
                 }        
                 uint32_WB1 = ads1115_read();         //read out Imot
                 oUniCoilA1 = 0;                     //switch off coil A1
-                if(uint32_WB)   //convert result in mV only if it is not 0
+                if(uint32_WB1)   //convert result in mV only if it is not 0
                 {
                     uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,8000);                             
                 }
@@ -257,7 +257,7 @@ void cmd_ETESTIN(void)
                 }              
                 uint32_WB2 = ads1115_read();         //read out Imot
                 oUniCoilA2 = 0;                     //switch off coil A2
-                if(uint32_WB)   //convert result in mV only if it is not 0
+                if(uint32_WB2)   //convert result in mV only if it is not 0
                 {
                     uint32_WB2 = funct_ADCtoMiliUnit(uint32_WB2,8000);                             
                 }
@@ -272,7 +272,7 @@ void cmd_ETESTIN(void)
                 }
                 uint32_WB3 = ads1115_read();         //read out Imot
                 oUniCoilB1 = 0;                     //switch off coil B1
-                if(uint32_WB)   //convert result in mV only if it is not 0
+                if(uint32_WB3)   //convert result in mV only if it is not 0
                 {
                     uint32_WB3 = funct_ADCtoMiliUnit(uint32_WB3,8000);                             
                 }
@@ -287,7 +287,7 @@ void cmd_ETESTIN(void)
                 }  
                 uint32_WB4 = ads1115_read();         //read out Imot
                 oUniCoilB2 = 0;                     //switch off coil B2
-                if(uint32_WB)   //convert result in mV only if it is not 0
+                if(uint32_WB4)   //convert result in mV only if it is not 0
                 {
                     uint32_WB4 = funct_ADCtoMiliUnit(uint32_WB4,8000);                             
                 }
@@ -328,11 +328,11 @@ void cmd_ETESTIN(void)
                 {
                     //do nothing 
                 }   
-                uint32_WB2 = ads1115_read();         //read out Vmot
+                uint32_WB1 = ads1115_read();         //read out Vmot
                 oBiRelayCoilB = 0;                  //switch off relay for coil B
-                if(uint32_WB)   //convert result in mV only if it is not 0
+                if(uint32_WB1)   //convert result in mV only if it is not 0
                 {
-                    uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,8000);                             
+                    uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,464);                             
                 }
                 funct_IntToAscii(uint32_WB1,_Active);   //add the Vmot result
                 uart2_sendbuffer(13);      //add a CR        
@@ -356,7 +356,7 @@ void cmd_ETESTIN(void)
                 } 
                 uint32_WB1 = ads1115_read();         //read out Imot
                 oBiRelayCoilA = 0;                  //switch off relay for coil A
-                if(uint32_WB)   //convert result in mV only if it is not 0
+                if(uint32_WB1)   //convert result in mV only if it is not 0
                 {
                     uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,8000);                             
                 }
@@ -371,7 +371,7 @@ void cmd_ETESTIN(void)
                 }   
                 uint32_WB2 = ads1115_read();         //read out Imot
                 oBiRelayCoilB = 0;                  //switch off relay for coil B
-                if(uint32_WB)   //convert result in mV only if it is not 0
+                if(uint32_WB2)   //convert result in mV only if it is not 0
                 {
                     uint32_WB2 = funct_ADCtoMiliUnit(uint32_WB2,8000);                             
                 }
@@ -410,11 +410,11 @@ void cmd_ETESTIN(void)
                 {
                     //do nothing 
                 }   
-                uint32_WB2 = ads1115_read();         //read out Vmot
+                uint32_WB1 = ads1115_read();         //read out Vmot
                 oBiRelayCoilB = 0;                  //switch off relay for coil B
-                if(uint32_WB)   //convert result in mV only if it is not 0
+                if(uint32_WB1)   //convert result in mV only if it is not 0
                 {
-                    uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,8000);                             
+                    uint32_WB1 = funct_ADCtoMiliUnit(uint32_WB1,464);                             
                 }
                 funct_IntToAscii(uint32_WB1,_Active);   //add the Vmot result
                 uart2_sendbuffer(13);      //add a CR        
@@ -5748,9 +5748,9 @@ void cmd_RTESTIN(void)
                     g_Param.uint8_ErrCode = _RTESTINsupply;         //set error code
                     funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
                     uart2_sendbuffer(',');                          //then the comma
-                    if(uint32_WB)   //convert result in mV only if it is not 0
+                    if(g_ADC.uint32_Vmot)   //convert result in mV only if it is not 0
                     {
-                       uint32_WB = funct_ADCtoMiliUnitg_ADC.uint32_Vmot,18);                             
+                       uint32_WB = funct_ADCtoMiliUnit(g_ADC.uint32_Vmot,18);                             
                     }
                     funct_IntToAscii(uint32_WB,_Active);            //add the voltage
                     uart2_sendbuffer('m');                          //add the m
