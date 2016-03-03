@@ -135,17 +135,12 @@ void uni_move(void)
             }
             else
             {
-                //and stop the timer4 
-//                T4CONbits.ON = 0;               //switch off timer 4
+                //and stop the timer45 
                 T4CONCLR = 0x8000;              //timer is off
-                TMR4CLR = 0xFFFF;
-                TMR5CLR = 0xFFFF;
-                PR4SET = 400;
                 
-//                TMR4 = 0;                       //reset LSB counter
-//                TMR5 = 0;                       //reset MSB counter
-//                PR4 = 400;                      //load LSB register with start condition
-//                PR5 = 0;                        //load MSB register with 0
+                TMR4CLR = 0xFFFF;   //clear the counter
+                TMR5CLR = 0xFFFF;   //clear the counter
+                PR4SET = 400;       //load 10us
                 
                 g_Uni.uint32_GoalPos = g_Uni.uint32_RealPos;    //otherwise set the goal to the real position
                 g_Uni.uint8_Settings = 0;       //erase settings         
@@ -192,11 +187,18 @@ void uni_move(void)
       
         g_Uni.uint8_Status &= 0x7F;             //clear error
       
-        T4CONSET = 0x0008;  //timer in 32 bits mode
-        T4CONSET = 0x0010;  //prescale value = 1:2
+//        T4CONCLR = 0xFFFF;  //reset T4 settings
+//        T5CONCLR = 0xFFFF;  //reset T5 settings
+    
+//        T4CONSET = 0x0008;  //timer in 32 bits mode
+
+//        T4CONSET = 0x0010;  //prescale value = 1:2
         
-//        T4CONbits.ON = 1;                       //enable the timer 4
-        T4CONSET = 0x8000;                      //timer is off
+        PR4SET = 400;       //load counter with 10us
+        TMR4CLR = 0xFFFF;   //reset the counter
+        TMR5CLR = 0xFFFF;   //reset the counter
+        
+        T4CONSET = 0x8000;  //timer is on
         }
     }
     else
@@ -212,15 +214,10 @@ void uni_move(void)
                 {
                     //then stop the timer 
                     T4CONCLR = 0x8000;              //timer is off
-//                    T4CONbits.ON = 0;               //switch off the timer
-                    TMR4CLR = 0xFFFF;
-                    TMR5CLR = 0xFFFF;
-                    PR4SET = 400;
                     
-//                    TMR4 = 0;                       //reset LSB counter
-//                    TMR5 = 0;                       //reset MSB counter
-//                    PR4 = 400;                      //load LSB register with start condition
-//                    PR5 = 0;                        //load MSB register with 0
+                    TMR4CLR = 0xFFFF;   //clear the counter
+                    TMR5CLR = 0xFFFF;   //clear the counter
+                    PR4SET = 400;       //load it with 10us
           
                     if(g_Uni.uint8_Settings & 0x08) //coils current active after move?
                     {

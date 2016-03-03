@@ -38,8 +38,8 @@ void periph_init(void)
     
     LINATA6628_init();      //initialization of the ATA6628
     
-//    ads1115_init();         //initialization of the ADS1115
-//    ads1115_SetChannel(_AIN3p_GND,_FS4096mV);   //set channel on Vmot
+    ads1115_init();         //initialization of the ADS1115
+    ads1115_SetChannel(_AIN0p_GND,_FS4096mV);   //set channel on Vmot
     
     ReadProdInfoFromEEPROM();   // Readout of all production information
 }

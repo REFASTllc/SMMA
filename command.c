@@ -225,7 +225,7 @@ void cmd_ETESTIN(void)
             //is motor type = unipolar or matrix?
             else if ((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
             {
-                ads1115_SetChannel(_AIN0p_GND,_FS4096mV);   //set channel on Imot
+                ads1115_SetChannel(_AIN1p_GND,_FS4096mV);   //set channel on Imot
 
                 //define the outputs
                 oVmotOnOff = 1;                 //switch off the main supply
@@ -321,7 +321,7 @@ void cmd_ETESTIN(void)
                 uart2_sendbuffer(',');      //add a ,
 
                 //convert Vmot
-                ads1115_SetChannel(_AIN3p_GND,_FS4096mV);   //set channel on Vmot
+                ads1115_SetChannel(_AIN0p_GND,_FS4096mV);   //set channel on Vmot
                 g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
                 SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
                 while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
@@ -339,7 +339,7 @@ void cmd_ETESTIN(void)
             }
             else if (g_CmdChk.uint32_TempPara[1] == 'B')    //is motor type = bipolar
             {
-                ads1115_SetChannel(_AIN0p_GND,_FS4096mV);   //set channel on Imot
+                ads1115_SetChannel(_AIN1p_GND,_FS4096mV);   //set channel on Imot
 
                 //define the outputs
                 oVmotOnOff = 1;                 //switch off the main supply
@@ -403,7 +403,7 @@ void cmd_ETESTIN(void)
                 uart2_sendbuffer(',');      //add a ,
 
                 //convert Vmot
-                ads1115_SetChannel(_AIN3p_GND,_FS4096mV);   //set channel on Vmot
+                ads1115_SetChannel(_AIN0p_GND,_FS4096mV);   //set channel on Vmot
                 g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
                 SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
                 while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
@@ -425,7 +425,7 @@ void cmd_ETESTIN(void)
                 uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
             }
 
-            ads1115_SetChannel(_AIN3p_GND,_FS4096mV);   //set channel on Vmot
+            ads1115_SetChannel(_AIN0p_GND,_FS4096mV);   //set channel on Vmot
             
             g_CmdChk.uint8_GlobalLock = 0;  //clear global lock
         }
@@ -5581,6 +5581,8 @@ void cmd_RTESTIN(void)
         {
             g_CmdChk.uint8_GlobalLock = 1;  //enable global lock
             
+            ads1115_SetChannel(_AIN0p_GND,_FS4096mV);   //set channel on Vmot
+            
             //test if unipolar, bipolar or matrix?
             if((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'B') || 
               (g_CmdChk.uint32_TempPara[1] == 'M'))
@@ -5606,7 +5608,7 @@ void cmd_RTESTIN(void)
                     oEnaCoilResMeas = 1;        //enable the relay for the resistor     
                     oEnaCurrSource = 1;         //enable the current source
 
-                    ads1115_SetChannel(_AIN3p_GND,_FS4096mV);   //set channel on Vmot
+                    ads1115_SetChannel(_AIN0p_GND,_FS4096mV);   //set channel on Vmot
 
                     if((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
                     {

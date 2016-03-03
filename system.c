@@ -82,7 +82,7 @@
 void system_init(void)
 {   
     CPUSpeedOptimization();
-    // Initialization of the system    
+//     Initialization of the system    
     system_osc();
     system_IOs();
     // Initialization of interrupts

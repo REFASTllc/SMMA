@@ -336,11 +336,11 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
     T4CONCLR = 0x8000;  //timer is off
     IFS0CLR = _IFS0_T5IF_MASK;
     
-    T4CON = 0;          //reset T4 settings
-    T5CON = 0;          //reset T5 settings
+//    T4CON = 0;          //reset T4 settings
+//    T5CON = 0;          //reset T5 settings
     
-    T4CONSET = 0x0008;  //timer in 32 bits mode
-    T4CONSET = 0x0010;  //prescale value = 1:2
+//    T4CONSET = 0x0008;  //timer in 32 bits mode
+//    T4CONSET = 0x0010;  //prescale value = 1:2
     
 //    TMR4 = 0;                   //reset LSB counter
 //    TMR5 = 0;                   //reset MSB counter
@@ -352,9 +352,6 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
     if((g_Param.uint8_MotTyp == 'U') || (g_Param.uint8_MotTyp == 'M'))
     {
         //load the new interrupt time
-//        PR4 = g_Uni.uint32_IntTime & 0x0000FFFF;  //first the LSB
-//        PR5 = g_Uni.uint32_IntTime >> 16;         //second the MSB
-//        PR4 = g_Uni.uint32_IntTime;
         PR4SET = g_Uni.uint32_IntTime & 0x0000FFFF;
         PR5SET = g_Uni.uint32_IntTime >> 16; 
 
@@ -527,19 +524,13 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
             oBiStepSignal = 0;                      //reset output
             
             //load the new interrupt time
-//            PR4 = g_Bipol.uint32_IntTime & 0x0000FFFF;  //first the LSB
-//            PR5 = g_Bipol.uint32_IntTime >> 16;         //second the MSB
-//            PR4 = g_Uni.uint32_IntTime;
-//            PR4 -=8000;  //to correct the already waited time of 10us from the step impuls (output)
             uint32_WB = g_Bipol.uint32_IntTime - 8000;
             PR4SET = uint32_WB & 0x0000FFFF;
             PR5SET = uint32_WB >> 16; 
         }
         else
         {
-//            PR4 = 8000;  //load interrupt time with 200us
-            //load interrupt time with 500us
-            uint32_WB = 8000;
+            uint32_WB = 8000; //load interrupt time with 200us
             PR4SET = uint32_WB & 0x0000FFFF;
             PR5SET = uint32_WB >> 16; 
             
@@ -585,8 +576,11 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
         //issue, motor type is not defined
     }
     
+//    TMR4CLR = 0xFFFF;   //reset the counter
+//    TMR5CLR = 0xFFFF;   //reset the counter
+    
     T4CONSET = 0x8000;  //timer is on
-//    T4CONbits.ON = 1;           //enable interrupt module   
+   
     LOGP(OUT_OF_ISR);
     asm("ei");
 }   //end of IntTimer2Handler

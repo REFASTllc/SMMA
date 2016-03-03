@@ -97,7 +97,7 @@ typedef struct          //definitions of multiple variable for unipolar
     volatile unsigned char uint1_CurrInCoilAtTheEnd:1; // Is current still needed after the last step?
     volatile unsigned char uint1_ErrConfig:1;           // Error flag of motor configuration
     volatile unsigned char uint1_IsBipolEnabled:1;      //
-    volatile unsigned char uint1_IntTimeExpiredFlag:1;  //1= interrupt time expired / 0= interrupt time not expired
+    volatile unsigned char uint1_IntTimeExpiredFlag;  //1= interrupt time expired / 0= interrupt time not expired
 } Sbipol;                 //struct name is SUni (S for struct)
 
 #endif	/* UNIPOLAR_H */

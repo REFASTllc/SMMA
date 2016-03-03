@@ -117,18 +117,13 @@ void bi_move(void)
                 g_Bipol.uint32_GoalPos = g_Bipol.uint32_RealPos;    //otherwise set the goal to the real position       
                 g_Bipol.status.BITS.firstStepIsActived = 1;     //set the bit 'FS - first step'
         
-                //and stop the timer4 
+                //and stop the timer45 
                 T4CONCLR = 0x8000;  //timer is off
-//                T4CONbits.ON = 0;               //switch off timer 4
                 
-                TMR4CLR = 0xFFFF;
-                TMR5CLR = 0xFFFF;
-                PR4SET = 400;
+                TMR4CLR = 0xFFFF;   //clear the counter
+                TMR5CLR = 0xFFFF;   //clear the counter
+                PR4SET = 400;       //load the next time with 10us
                 
-//                TMR4 = 0;                       //reset LSB counter
-//                TMR5 = 0;                       //reset MSB counter
-//                PR4 = 400;                      //load LSB register with start condition (10us)
-//                PR5 = 0;                        //load MSB register with 0 
                 g_Bipol.uint1_IntTimeExpiredFlag = 0;   //force the interrupt routine to load the new time
                 A3981.RUN.BITS.EN = 0;
                 SendOneDataSPI1(A3981.RUN.REG);
@@ -165,11 +160,18 @@ void bi_move(void)
       
         g_Bipol.status.BITS.error = 0;             //clear error
       
-        T4CONSET = 0x0008;  //timer in 32 bits mode
-        T4CONSET = 0x0010;  //prescale value = 1:2
+//        T4CONCLR = 0xFFFF;  //reset T4 settings
+//        T5CONCLR = 0xFFFF;  //reset T5 settings
         
-//        T4CONbits.ON = 1;                       //enable the timer 4
-        T4CONSET = 0x8000;  //timer is off
+//        T4CONSET = 0x0008;  //timer in 32 bits mode
+
+//        T4CONSET = 0x0010;  //prescale value = 1:2
+        
+        PR4SET = 400;       //load counter with 10us
+        TMR4CLR = 0xFFFF;   //reset the counter
+        TMR5CLR = 0xFFFF;   //reset the counter
+        
+        T4CONSET = 0x8000;  //timer is on
         }
     }
     else
@@ -186,15 +188,11 @@ void bi_move(void)
                     //then stop the timer 
                     g_Bipol.uint1_IsBipolEnabled = 0;
                     T4CONCLR = 0x8000;  //timer is off
-//                    T4CONbits.ON = 0;               //switch off the timer
-                    TMR4CLR = 0xFFFF;
-                    TMR5CLR = 0xFFFF;
-                    PR4SET = 400;
                     
-//                    TMR4 = 0;                       //reset LSB counter
-//                    TMR5 = 0;                       //reset MSB counter
-//                    PR4 = 400;                      //load LSB register with start condition (10us)
-//                    PR5 = 0;                        //load MSB register with 0
+                    TMR4CLR = 0xFFFF;   //clear the counter
+                    TMR5CLR = 0xFFFF;   //clear the counter
+                    PR4SET = 400;       //load counter with 10us
+                    
                     g_Bipol.uint1_IntTimeExpiredFlag = 0;    //force the interrupt routine to load the new time
           
                     if(!g_Bipol.uint1_CurrInCoilAtTheEnd) //coils current active after move?
@@ -233,18 +231,6 @@ void bi_move(void)
         }
         else
         {
-            /* old source code
-            //not arrived at the goal position, so verify if the acceleration ramp is still active
-            if(g_Bipol.status.BITS.accelerationIsActived)           
-                bi_acc();                      //then call the subroutine acceleration
-            //or if the deceleration ramp is still active
-            else if(g_Bipol.status.BITS.decelerationIsActived)
-                bi_dec();                     //then call the subroutine deceleration
-            else
-                bi_run();                     //otherwise call the subroutine run
-             */
-            //new source code
-            //acceleration still active
             if(g_Bipol.status.BITS.accelerationIsActived)
             {
                 bi_acc();       //call subroutine acceleration
@@ -296,19 +282,7 @@ void bi_acc(void)
     {
         g_Bipol.status.BITS.nextStepIsAllowed = 0;     //then clear the bit 'NS - next step'
         g_Bipol.uint16_AccNumbStep--;     //decrement the number of steps
-    
-        /* old code
-        //verify if real position is equal to acceleration stop position
-        if(g_Bipol.uint32_RealPos == g_Bipol.uint32_AccStop)
-            g_Bipol.status.BITS.accelerationIsActived = 0; //then clear bit 'ACCEL - acceleration'
-        //or if real position is equal to deceleration start position
-        else if(g_Bipol.uint32_RealPos == g_Bipol.uint32_DecStart)
-            g_Bipol.status.BITS.decelerationIsActived = 1; //then set bit 'DECEL - deceleration'
-        //or if real position is equal to goal position
-        else if(g_Bipol.uint32_RealPos == g_Bipol.uint32_GoalPos)
-            g_Bipol.status.BITS.goalIsReached = 1; //then set bit 'GOAL'
-        */
-        //new code
+        
         //verify if real position is equal to acceleration stop position
         if(g_Bipol.uint32_RealPos == g_Bipol.uint32_AccStop)
         {
@@ -385,16 +359,6 @@ void bi_run(void)
     {
         g_Bipol.status.BITS.nextStepIsAllowed = 0;         //then clear the bit 'NS - next step'
         
-        /* old code
-        //verify if deceleration has to start if deceleration ramp is active
-        if((g_Bipol.uint32_RealPos == g_Bipol.uint32_DecStart) && (g_Bipol.uint1_NextStepIsRamp == 1))
-            g_Bipol.status.BITS.decelerationIsActived = 1;     //then set bit 'DECEL - deceleration'
-        //or if real position is equal to goal position
-        else if(g_Bipol.uint32_RealPos == g_Bipol.uint32_GoalPos)
-            g_Bipol.status.BITS.goalIsReached = 1;     //then set bit 'GOAL'
-        */
-        //new code
-        //verify if deceleration has to start and if deceleration ramp is active
         if((g_Bipol.uint32_RealPos == g_Bipol.uint32_DecStart) && (g_Bipol.uint1_NextStepIsRamp == 1))
         {
             g_Bipol.status.BITS.decelerationIsActived = 1;  //set bit deceleration
@@ -450,6 +414,7 @@ void bi_dec(void)
     if(g_Bipol.status.BITS.nextStepIsAllowed)       //if the next step is allowed?
     {
         g_Bipol.status.BITS.nextStepIsAllowed = 0;     //then clear the bit 'NS - next step'
+        
         g_Bipol.uint16_DecNumbStep--;     //decrement the number of steps
     
         //verify if real position is equal to goal position
