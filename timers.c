@@ -334,29 +334,17 @@ void InitTimer23(void)
 ***********************************************************************************************************************/
 void InitTimer45(void)
 {
-    T4CONCLR = 0x8000;  //timer is off
+    T4CON = 0x0;        //clear settings of timer 4
+    T5CON = 0x0;        //clear settings of timer 5
     
-    T4CONCLR = 0xFFFF;  //reset T4 settings
-    T5CONCLR = 0xFFFF;  //reset T5 settings
-    PR5CLR = 0xFFFF;    //reset PR5
-    
-//    T4CONSET = 0x0008;  //timer in 32 bits mode
-//    T4CONSET = 0x0002;  //use external clock source
-//    T4CONSET = 0x0010;  //prescale value = 1:2
-    T4CONSET = 0x001A;
-//    T4CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
-//    T4CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
-//    T4CONbits.TCKPS0 = 1;   // 101 = 1:32 prescale value
-                            // 100 = 1:16 prescale value
-                            // 011 = 1:8 prescale value
-                            // 010 = 1:4 prescale value
-                            // 001 = 1:2 prescale value
-                            // 000 = 1:1 prescale value
+    T4CON = 0x0018;     //configure timer 4
+                        //timer in 32 bit mode
+                        //use internal peripheral clock
+                        //prescale value = 1:2 = 40MHz
+                        //timer 4 is disabled
 
-    TMR4CLR = 0xFFFF;   //reset the counter
-    TMR5CLR = 0xFFFF;   //reset the counter
-
-    PR4SET = 400;
+    TMR4 = 0x0;         //clear contents of the TMR4 and TMR5
+    PR4 = 400;          //load PR4 and PR5 with 10us
 }
 
 /**********************************************************************************************************************

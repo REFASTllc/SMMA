@@ -927,9 +927,7 @@ void cmd_RUN(void)
                         //error - definition is unknown send error later
                         uint8_UniErrConfig = 1;     //set error
                         g_Uni.uint8_Settings = 0;   //erase settings
-                    }
-                    // TODO: test to do
-                    
+                    }                   
           
                     //define switch ON time - first convert and then store it
                     g_Uni.uint32_SwOnTime = funct_msToTimer23(g_Param.uint16_AccOnDelay);

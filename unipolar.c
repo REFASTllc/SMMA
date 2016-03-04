@@ -136,11 +136,11 @@ void uni_move(void)
             else
             {
                 //and stop the timer45 
-                T4CONCLR = 0x8000;              //timer is off
+                T4CON &= 0x7FFF;    //disable interrupt module
                 
-                TMR4CLR = 0xFFFF;   //clear the counter
-                TMR5CLR = 0xFFFF;   //clear the counter
-                PR4SET = 400;       //load 10us
+                TMR4 = 0x0;         //clear contents of the TMR4 and TMR5
+                PR4 = 400;          //load the timer with 10us
+                IFS0CLR = _IFS0_T5IF_MASK;  //clear interrupt flag
                 
                 g_Uni.uint32_GoalPos = g_Uni.uint32_RealPos;    //otherwise set the goal to the real position
                 g_Uni.uint8_Settings = 0;       //erase settings         
@@ -162,43 +162,31 @@ void uni_move(void)
         }
         else
         {
-        //It is a must have to load the modulo timer already with a number. This number must be higher then 0, and 
-        //should be not to small. Is this time is to short, then the interrupt will be called to much time before it 
-        //has time to load the new switch on delay. The delay should be 400 * 25ns (timebase) that give us 10us
-        //this means on a switch on wait time of 1ms, the real time is 1.01ms. Now it is important to know, that you 
-        //cannot load this modulo timer in this else case, because this case could be executed more then 1 time 
-        //(depending on main charge routine). Writing more then 1 time on this modulo timer inhibits the interrupt bit. 
-        //So you have to load this modulo timer during the initialization phase and to set it again at the end 
-        //of the move! PR4 = 400;
+            //it is a must have to load the modulo timer already with a number. This number must be higher then 0, and 
+            //should be not to small. Is this time is to short, then the interrupt will be called to much time before it 
+            //has time to load the new switch on delay. The delay should be 400 * 25ns (timebase) that give us 10us
+            //this means on a switch on wait time of 1ms, the real time is 1.01ms. Now it is important to know, that you 
+            //cannot load this modulo timer in this else case, because this case could be executed more then 1 time 
+            //(depending on main charge routine). Writing more then 1 time on this modulo timer inhibits the interrupt bit. 
+            //So you have to load this modulo timer during the initialization phase and to set it again at the end 
+            //of the move! PR4 = 400;   
+            
+            if(g_Param.uint8_RunBit)
+            {
+                oSinkSource0 = 1;
+            }
       
-        //load the first switch on delay 
-        g_Uni.uint32_IntTime = g_Uni.uint32_SwOnTime;
-        
-        if(g_Param.uint8_RunBit)
-        {
-            oSinkSource0 = 1;
-        }
-      
-        //prepare the start sequency
-        oUniCoilA1 = g_Uni.uint8_PhA1;
-        oUniCoilA2 = g_Uni.uint8_PhA2;
-        oUniCoilB1 = g_Uni.uint8_PhB1;
-        oUniCoilB2 = g_Uni.uint8_PhB2;
-      
-        g_Uni.uint8_Status &= 0x7F;             //clear error
-      
-//        T4CONCLR = 0xFFFF;  //reset T4 settings
-//        T5CONCLR = 0xFFFF;  //reset T5 settings
-    
-//        T4CONSET = 0x0008;  //timer in 32 bits mode
+            //prepare the start sequency
+            oUniCoilA1 = g_Uni.uint8_PhA1;
+            oUniCoilA2 = g_Uni.uint8_PhA2;
+            oUniCoilB1 = g_Uni.uint8_PhB1;
+            oUniCoilB2 = g_Uni.uint8_PhB2;
 
-//        T4CONSET = 0x0010;  //prescale value = 1:2
-        
-        PR4SET = 400;       //load counter with 10us
-        TMR4CLR = 0xFFFF;   //reset the counter
-        TMR5CLR = 0xFFFF;   //reset the counter
-        
-        T4CONSET = 0x8000;  //timer is on
+            g_Uni.uint8_Status &= 0x7F;             //clear error
+            
+            g_Uni.uint32_IntTime = g_Uni.uint32_SwOnTime;
+
+            T4CONSET |= 0x8000;         //enable timer
         }
     }
     else
@@ -213,11 +201,11 @@ void uni_move(void)
                 if(g_Uni.uint8_Status & 0x02)   //is this the last step?
                 {
                     //then stop the timer 
-                    T4CONCLR = 0x8000;              //timer is off
-                    
-                    TMR4CLR = 0xFFFF;   //clear the counter
-                    TMR5CLR = 0xFFFF;   //clear the counter
-                    PR4SET = 400;       //load it with 10us
+                    T4CON &= 0x7FFF;    //disable interrupt module
+                
+                    TMR4 = 0x0;         //clear contents of the TMR4 and TMR5
+                    PR4 = 400;          //load the timer with 10us
+                    IFS0CLR = _IFS0_T5IF_MASK;  //clear interrupt flag
           
                     if(g_Uni.uint8_Settings & 0x08) //coils current active after move?
                     {
@@ -266,25 +254,6 @@ void uni_move(void)
         }
         else
         {
-            /*
-            //old source code
-            //not arrived at the goal position, so verify if the acceleration ramp is still active
-            if(g_Uni.uint8_Status & 0x04)           
-            {  
-                uni_acc();                      //then call the subroutine acceleration
-            }
-            //or if the deceleration ramp is still active
-            else if(g_Uni.uint8_Status & 0x08)
-            {
-                uni_dec();                     //then call the subroutine deceleration
-            }
-            else
-            {
-                uni_run();                     //otherwise call the subroutine run
-            }
-            */
-            //new source code
-            //not arrived at the goal position, so verify if the acceleration ramp is still active
             if(g_Uni.uint8_Status & 0x04)
             {
                 uni_acc();  //call the acceleration
@@ -337,30 +306,6 @@ void uni_acc(void)
         g_Uni.uint8_Status &= 0xEF;     //then clear the bit 'NS - next step'
         g_Uni.uint16_AccNumbStep--;     //decrement the number of steps
     
-        /*
-        //old source code
-        //verify if real position is equal to acceleration stop position
-        if(g_Uni.uint32_RealPos == g_Uni.uint32_AccStop)
-        {
-            g_Uni.uint8_Status &= 0xFB; //then clear bit 'ACCEL - acceleration'
-        }
-        //or if real position is equal to deceleration start position
-        else if(g_Uni.uint32_RealPos == g_Uni.uint32_DecStart)
-        {
-            g_Uni.uint8_Status |= 0x08; //then set bit 'DECEL - deceleration'
-        }
-        //or if real position is equal to goal position
-        else if(g_Uni.uint32_RealPos == g_Uni.uint32_GoalPos)
-        {
-            g_Uni.uint8_Status |= 0x20; //then set bit 'GOAL'
-        }
-        else
-        {
-        //nothing is to do, because it was a normal step
-        }     
-        */
-        //new source code
-        //verify if real position is equal to acceleration stop position
         if(g_Uni.uint32_RealPos == g_Uni.uint32_AccStop)
         {
             g_Uni.uint8_Status &= 0xFB; //then clear bit 'ACCEL - acceleration'
@@ -440,25 +385,6 @@ void uni_run(void)
     {
         g_Uni.uint8_Status &= 0xEF;         //then clear the bit 'NS - next step'
         
-        /* 
-        //old source code
-        //verify if deceleration has to start if deceleration ramp is active
-        if((g_Uni.uint32_RealPos == g_Uni.uint32_DecStart) && (g_Uni.uint8_Settings & 0x20))
-        {
-            g_Uni.uint8_Status |= 0x08;     //then set bit 'DECEL - deceleration'
-        }
-        //or if real position is equal to goal position
-        else if(g_Uni.uint32_RealPos == g_Uni.uint32_GoalPos)
-        {
-            g_Uni.uint8_Status |= 0x20;     //then set bit 'GOAL'
-        }
-        else
-        {
-            //nothing is to do, because it was a normal step
-        }  
-        */
-        //new source code
-        //verify if deceleration has to start if deceleration ramp is active
         if((g_Uni.uint32_RealPos == g_Uni.uint32_DecStart) && (g_Uni.uint8_Settings & 0x20))
         {
             g_Uni.uint8_Status |= 0x08;     //then set bit 'DECEL - deceleration'
@@ -660,8 +586,6 @@ void uni_CheckCalc(void)
         }
     //-----------------------------DECELERATION-----------------------------
         //start the array position with 255, because 0 is already a place in the array
-//        g_Uni.uint8_DecArrPos = 255;   
-    
         //verify the deceleration ramp if enable
         if(g_Uni.uint8_Settings & 0x20)
         {
@@ -711,8 +635,6 @@ void uni_CheckCalc(void)
                     //otherwise all parameters are right, so add the number of steps
                     //into deceleration start position
                     g_Uni.uint32_DecStart += uint16_NumbStep;
-                    //increment the start position of the deceleration array, to know where we have to start
-//                    g_Uni.uint8_DecArrPos++;
                 }
             }
         }
@@ -792,26 +714,8 @@ void uni_CheckCalc(void)
         }
         else
         {
-            //otherwise all is correct, so verify if the ACC ramp is active 
-            //to load the first time, otherwise load the run time
-            if(g_Uni.uint8_Settings & 0x02)
-            {
-                //load the firt ACC time
-                uint16_Freq = funct_ReadRamp(_Acc,_Freq,0);
-                g_Uni.uint32_IntTime = funct_FreqToTimer23(uint16_Freq);
-        
-                //load the number of steps that are to do with this frequency
-                g_Uni.uint16_AccNumbStep = funct_ReadRamp(_Acc,_Step,0);
-        
-                //increment the position for the next read out in the array
-                g_Uni.uint8_AccArrPos++;
-            }
-            else
-            {
-                //otherwise convert the run time and store it
-                g_Uni.uint32_RunTime = funct_FreqToTimer23(g_Uni.uint16_RunFreq);
-                g_Uni.uint32_IntTime = g_Uni.uint32_RunTime;
-            }
+            //convert the run frequency to have the value ready
+            g_Uni.uint32_RunTime = funct_FreqToTimer23(g_Uni.uint16_RunFreq);
             
             //send back the OK
             uart2_sendbuffer('E');              //first the letter E
@@ -821,7 +725,7 @@ void uni_CheckCalc(void)
     else
     {
         //send back the error code
-//        g_Param.uint8_ErrCode = _UniPlausiCheck;    //set error code
-//        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        g_Param.uint8_ErrCode = _UniPlausiCheck;    //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
 }   //end of unipolar_checkcalc

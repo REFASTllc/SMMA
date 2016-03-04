@@ -118,11 +118,11 @@ void bi_move(void)
                 g_Bipol.status.BITS.firstStepIsActived = 1;     //set the bit 'FS - first step'
         
                 //and stop the timer45 
-                T4CONCLR = 0x8000;  //timer is off
+                T4CON &= 0x7FFF;    //disable interrupt module
                 
-                TMR4CLR = 0xFFFF;   //clear the counter
-                TMR5CLR = 0xFFFF;   //clear the counter
-                PR4SET = 400;       //load the next time with 10us
+                TMR4 = 0x0;         //clear contents of the TMR4 and TMR5
+                PR4 = 400;          //load the timer with 10us
+                IFS0CLR = _IFS0_T5IF_MASK;  //clear interrupt flag
                 
                 g_Bipol.uint1_IntTimeExpiredFlag = 0;   //force the interrupt routine to load the new time
                 A3981.RUN.BITS.EN = 0;
@@ -139,39 +139,27 @@ void bi_move(void)
         }
         else
         {
-        //It is a must have to load the modulo timer already with a number. This number must be higher then 0, and 
-        //should be not to small. Is this time is to short, then the interrupt will be called too much time before it 
-        //has time to load the new switch on delay. The delay should be 400 * 25ns (timebase) that give us 10us
-        //this means on a switch on wait time of 1ms, the real time is 1.01ms. Now it is important to know, that you 
-        //cannot load this modulo timer in this else case, because this case could be executed more then 1 time 
-        //(depending on main charge routine). Writing more then 1 time on this modulo timer inhibits the interrupt bit. 
-        //So you have to load this modulo timer during the initialization phase and to set it again at the end 
-        //of the move! PR4 = 400;
+            //it is a must have to load the modulo timer already with a number. This number must be higher then 0, and 
+            //should be not to small. Is this time is to short, then the interrupt will be called too much time before it 
+            //has time to load the new switch on delay. The delay should be 400 * 25ns (timebase) that give us 10us
+            //this means on a switch on wait time of 1ms, the real time is 1.01ms. Now it is important to know, that you 
+            //cannot load this modulo timer in this else case, because this case could be executed more then 1 time 
+            //(depending on main charge routine). Writing more then 1 time on this modulo timer inhibits the interrupt bit. 
+            //So you have to load this modulo timer during the initialization phase and to set it again at the end 
+            //of the move! PR4 = 400;
       
-        //load the first switch on delay
-        g_Bipol.uint32_IntTime = g_Bipol.uint32_SwOnTime;
-        
-        if(g_Param.uint8_RunBit)
-        {
-            oSinkSource0 = 1;
-        }
-      
-        SendOneDataSPI1(A3981.RUN.REG);
-      
-        g_Bipol.status.BITS.error = 0;             //clear error
-      
-//        T4CONCLR = 0xFFFF;  //reset T4 settings
-//        T5CONCLR = 0xFFFF;  //reset T5 settings
-        
-//        T4CONSET = 0x0008;  //timer in 32 bits mode
+            if(g_Param.uint8_RunBit)
+            {
+                oSinkSource0 = 1;
+            }
 
-//        T4CONSET = 0x0010;  //prescale value = 1:2
-        
-        PR4SET = 400;       //load counter with 10us
-        TMR4CLR = 0xFFFF;   //reset the counter
-        TMR5CLR = 0xFFFF;   //reset the counter
-        
-        T4CONSET = 0x8000;  //timer is on
+            SendOneDataSPI1(A3981.RUN.REG);
+            
+            g_Bipol.uint32_IntTime = g_Bipol.uint32_SwOnTime;
+
+            g_Bipol.status.BITS.error = 0;             //clear error
+
+            T4CONSET |= 0x8000;         //enable timer
         }
     }
     else
@@ -187,11 +175,11 @@ void bi_move(void)
                 {
                     //then stop the timer 
                     g_Bipol.uint1_IsBipolEnabled = 0;
-                    T4CONCLR = 0x8000;  //timer is off
-                    
-                    TMR4CLR = 0xFFFF;   //clear the counter
-                    TMR5CLR = 0xFFFF;   //clear the counter
-                    PR4SET = 400;       //load counter with 10us
+                    T4CON &= 0x7FFF;    //disable interrupt module
+                
+                    TMR4 = 0x0;         //clear contents of the TMR4 and TMR5
+                    PR4 = 400;          //load the timer with 10us
+                    IFS0CLR = _IFS0_T5IF_MASK;  //clear interrupt flag
                     
                     g_Bipol.uint1_IntTimeExpiredFlag = 0;    //force the interrupt routine to load the new time
           
@@ -545,8 +533,6 @@ void bi_CheckCalc(void)
         }
     //-----------------------------DECELERATION-----------------------------
         //start the array position with 255, because 0 is already a place in the array
-//        g_Bipol.uint8_DecArrPos = 255;   
-    
         //verify the deceleration ramp if enable
         if(g_Bipol.uint1_IsDecNeeded == 1)
         {
@@ -590,8 +576,6 @@ void bi_CheckCalc(void)
                     //otherwise all parameters are right, so add the number of steps
                     //into deceleration start position
                     g_Bipol.uint32_DecStart += uint16_NumbStep;
-                    //increment the start position of the deceleration array, to know where we have to start
-//                    g_Bipol.uint8_DecArrPos++;
                 }
             }
         }
@@ -659,26 +643,8 @@ void bi_CheckCalc(void)
         }
         else
         {
-            //otherwise all is correct, so verify if the ACC ramp is active 
-            //to load the first time, otherwise load the run time
-            if(g_Bipol.uint1_NextStepIsRamp == 1)
-            {
-                //load the first ACC time, convert and store it
-                uint16_Freq = funct_ReadRamp(_Acc,_Freq,0);
-                g_Bipol.uint32_IntTime = funct_FreqToTimer23(uint16_Freq);
-        
-                //load the number of steps that are to do with this frequency
-                g_Bipol.uint16_AccNumbStep = funct_ReadRamp(_Acc,_Step,0);
-        
-                //increment the position for the next read out in the array
-                g_Bipol.uint8_AccArrPos++;
-            }
-            else
-            {
-                //otherwise convert the run time and store it
-                g_Bipol.uint32_RunTime = funct_FreqToTimer23(g_Bipol.uint16_RunFreq);
-                g_Bipol.uint32_IntTime = g_Bipol.uint32_RunTime;
-            }
+            //convert the run frequency to have the value ready
+            g_Bipol.uint32_RunTime = funct_FreqToTimer23(g_Bipol.uint16_RunFreq);
             
             //send back the OK
             uart2_sendbuffer('E');              //first the letter E
@@ -688,7 +654,7 @@ void bi_CheckCalc(void)
     else
     {
         //send back the error code
-//        g_Param.uint8_ErrCode = _UniPlausiCheck;    //set error code
-//        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        g_Param.uint8_ErrCode = _BipPlausiCheck;    //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
 }   //end of bi_CheckCalc

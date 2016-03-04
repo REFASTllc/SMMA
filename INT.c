@@ -332,28 +332,14 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
     LOGP(ENTER_IN_ISR);
     LOGP(TIMER45);
     
-//    T4CONbits.ON = 0;           //disable interrupt module
-    T4CONCLR = 0x8000;  //timer is off
-    IFS0CLR = _IFS0_T5IF_MASK;
+    T4CON &= 0x7FFF;    //disable interrupt module
     
-//    T4CON = 0;          //reset T4 settings
-//    T5CON = 0;          //reset T5 settings
-    
-//    T4CONSET = 0x0008;  //timer in 32 bits mode
-//    T4CONSET = 0x0010;  //prescale value = 1:2
-    
-//    TMR4 = 0;                   //reset LSB counter
-//    TMR5 = 0;                   //reset MSB counter
-    TMR4CLR = 0xFFFF;
-    TMR5CLR = 0xFFFF;
-    
-    oTestLed2 = ! oTestLed2;
+    TMR4 = 0x0;         //clear contents of the TMR4 and TMR5
     
     if((g_Param.uint8_MotTyp == 'U') || (g_Param.uint8_MotTyp == 'M'))
     {
         //load the new interrupt time
-        PR4SET = g_Uni.uint32_IntTime & 0x0000FFFF;
-        PR5SET = g_Uni.uint32_IntTime >> 16; 
+        PR4 = g_Uni.uint32_IntTime;
 
         g_Uni.uint8_Status |= 0x10;     //allow next step
 
@@ -525,14 +511,12 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
             
             //load the new interrupt time
             uint32_WB = g_Bipol.uint32_IntTime - 8000;
-            PR4SET = uint32_WB & 0x0000FFFF;
-            PR5SET = uint32_WB >> 16; 
+            PR4 = uint32_WB;
         }
         else
         {
-            uint32_WB = 8000; //load interrupt time with 200us
-            PR4SET = uint32_WB & 0x0000FFFF;
-            PR5SET = uint32_WB >> 16; 
+            //load interrupt time with 200us
+            PR4 = 8000;
             
             //force the interrupt routine to load the correct time (next time)
             g_Bipol.uint1_IntTimeExpiredFlag = 1;   
@@ -576,10 +560,9 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
         //issue, motor type is not defined
     }
     
-//    TMR4CLR = 0xFFFF;   //reset the counter
-//    TMR5CLR = 0xFFFF;   //reset the counter
+    IFS0CLR = _IFS0_T5IF_MASK;  //clear interrupt flag
     
-    T4CONSET = 0x8000;  //timer is on
+    T4CONSET |= 0x8000;         //enable timer
    
     LOGP(OUT_OF_ISR);
     asm("ei");

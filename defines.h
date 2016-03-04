@@ -144,7 +144,7 @@
 #define _MotorInRun         49              //driver send not back an information during actuator is in run mode
                             //unipolar errors are the same for matrix errors!
 #define _UniSILIM           50              //received parameters not within the tolerance for SILIM
-//#define _UniPlausiCheck     51              //plausibility check not passed (could be re-used)
+#define _UniPlausiCheck     51              //plausibility check not passed (could be re-used)
 #define _UniSMTYP           52              //parameters not within tolerance to switch on unipolar
 #define _UniETESTIN         53              //ETESTIN current measure not within the tolerance
                             //bipolar errors
@@ -152,7 +152,7 @@
 #define _BipSMTYP           101             //parameters not within tolerance for switch on bipolar
 #define _BipETESTIN         102             //ETESTIN current measure not within the tolerance
 //103 is free
-//#define _BipPlausiCheck     104             //plausibility check not passed (could be re-used)
+#define _BipPlausiCheck     104             //plausibility check not passed (could be re-used)
 #define _BipSBIPPD          105             //SBIPPD parameters not within the tolerance
 #define _BipSBIPTSC         106             //SBIPTSC parameter not within the tolerance
 #define _BipSBIPOL          107             //SBIPOL parameter not within the tolerance

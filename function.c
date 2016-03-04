@@ -273,7 +273,7 @@ unsigned long int funct_FreqToTimer23(unsigned long int uint32_Freq)
 ***********************************************************************************************************************/
 unsigned long int funct_msToTimer23(unsigned long int uint32_msTime)
 {
-    auto unsigned long int uint32_WB = 40000;       //local work register for time base = 25ns
+    volatile unsigned long int uint32_WB = 40000;   //local work register for time base = 25ns
                                                     //calculated with 40MHz / 1000 (for ms) = 40kHz
     
     uint32_WB = uint32_WB * uint32_msTime;          //calculation the needed wait time
