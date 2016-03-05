@@ -121,6 +121,7 @@ extern SADC g_ADC;
 extern STimer1 g_Timer1; 
 extern S_PROD g_Prod;
 extern SUART2txd g_UART2txd;
+extern S_IC1 g_IC1;
 
 /**********************************************************************************************************************
  * Routine:                 cmd_SILIM
@@ -2648,15 +2649,15 @@ void cmd_GPWMPOS(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-extern unsigned int nbreTMR2Overflow;
-S_IC dataIC;
+//extern unsigned int nbreTMR2Overflow;
+//S_IC dataIC;
 void cmd_GPWMVAL(void)
 {
     unsigned char nbreSamples = 1, actualSample;
     
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
-        dataIC.timeoutMeas = 1;
+        /*dataIC.timeoutMeas = 1;
         nbreTMR2Overflow = 0;
         TMR2 = 0;
         IFS0CLR = _IFS0_T2IF_MASK;
@@ -2691,7 +2692,7 @@ void cmd_GPWMVAL(void)
             g_Param.uint8_ErrCode = _OutOfTolGPWMVAL;  //set error code
             uart2_sendbuffer(',');  //add the comma
             funct_IntToAscii(g_Param.uint8_ErrCode,_Active);
-        }   
+        }  */ 
     } 
     else
     {
@@ -2795,32 +2796,47 @@ void cmd_GFRQVAL(void)
 {    
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
-        while(IC1CONbits.ICBNE)
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
         {
-            volatile unsigned short temp = IC1BUF;
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
-        dataIC.timeoutMeas = 1;
-        nbreTMR2Overflow = 0;
-        TMR2 = 0;
-        SetTimer(_TIMER1, _ENABLE, 0, 5000);
-        IFS0CLR = _IFS0_T2IF_MASK;
-        T2CONbits.ON = 1;
-        IC1CONbits.ON = 1;
-        while(IC1CONbits.ON && dataIC.timeoutMeas);
-        SetTimer(_TIMER1, _DISABLE, 0, 1500);
-        FormatBufToRealValues(&dataIC, _MEAS_FREQ);
-        uart2_sendbuffer('E');
-        uart2_sendbuffer(',');  //add the comma
-        funct_IntToAscii(dataIC.frequency, _Active);
-     /*   do{
-            g_Funct.uint8_ArrAsciiPos--;
-            uart2_sendbuffer(g_Funct.uint8_ArrAscii[g_Funct.uint8_ArrAsciiPos]);
-            if(g_Funct.uint8_ArrAsciiPos == 1)
+        else
+        {
+            g_CmdChk.uint8_GlobalLock = 1;      //set global lock
+            
+            g_Timer1.uint8_TimeoutFlag = 1;     //set timeout flag
+            SetTimer(_TIMER1,_ENABLE,0,1000);   //load timeout of 1s
+            
+            //prepare all for the measure
+            g_IC1.uint8_EventCounter = 0;       //reset the counter
+            g_IC1.uint8_Wbuf = 0;               //reset write buffer  
+            TMR2 = 0;                           //reset the counter
+            IC1CONbits.ICM = 3;                 //capture on every rising edge
+            T2CONbits.ON = 1;                   //enable timer 2
+            IC1CONbits.ON = 1;                  //enable input capture 1
+            
+            //wait until write buffer is not 3 and timeout flag not reseted
+            while(!(g_IC1.uint8_Wbuf == 1) && g_Timer1.uint8_TimeoutFlag);
+                                  
+            T2CONbits.ON = 0;   //disable timer 2
+            IC1CONbits.ON = 0;  //disable input capture 1
+           
+            if(!(g_IC1.uint8_Wbuf == 1))   //measure was possible?
             {
-                uart2_sendbuffer('.');
+                g_Param.uint8_ErrCode = _GFRQVAL_PWM;  //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
             }
-        }while(g_Funct.uint8_ArrAsciiPos);*/
-        uart2_sendbuffer(13);
+            else
+            {
+                uart2_sendbuffer('E');
+                uart2_sendbuffer(',');  //add the comma
+                funct_IntToAscii(g_IC1.uint32_Results[0],_Active);
+                uart2_sendbuffer(13);
+            }
+              
+            g_CmdChk.uint8_GlobalLock = 0;      //reset global lock
+        }
     } 
     else
     {

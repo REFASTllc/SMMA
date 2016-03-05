@@ -39,7 +39,7 @@ extern SLin g_LIN;
 extern SUART1txd g_UART1txd;      
 extern SUART1rxd g_UART1rxd;
 extern SADC g_ADC;
-extern S_IC dataIC;
+extern S_IC1 g_IC1;
 
 /**********************************************************************************************************************
  * Routine:                 INT_init
@@ -868,7 +868,6 @@ void __ISR(_TIMER_1_VECTOR, IPL1SOFT) IntTimer1Handler(void)
             //LIN:
             g_LIN.uint8_SlaveTimeout = 1;   //timeout occured
             g_LIN.uint8_LinBusy = 0;        //reset busy flag
-            dataIC.timeoutMeas = 0;         // Timeout occurs during measure of PWM / frequency
             g_Timer1.uint8_TimeoutFlag = 0; //timeout flag
             
             
@@ -1079,9 +1078,10 @@ void __ISR(_TIMER_2_VECTOR, IPL2SOFT) IntTimer2Handler(void)
     asm("di");
     LOGP(ENTER_IN_ISR);
     LOGP(TIMER2);
-    oTestLed1 =! oTestLed1;
+    
     IFS0CLR = _IFS0_T2IF_MASK;
-    nbreTMR2Overflow++;
+//    nbreTMR2Overflow++;
+    
     LOGP(OUT_OF_ISR);
     asm("ei");
 }
@@ -1101,30 +1101,30 @@ void __ISR(_TIMER_2_VECTOR, IPL2SOFT) IntTimer2Handler(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
-extern unsigned long eventTime[3];
-extern unsigned short eventMultiplicator[3];
 void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL1SOFT) IntInputCapture1Handler(void)
 {
-    static unsigned char nbreEvent = 0;
+    volatile unsigned short int trash;
     
     asm("di");
     LOGP(ENTER_IN_ISR);
     LOGP(IC1);
-
-    if(++nbreEvent <= 2)
+    
+    g_IC1.uint8_EventCounter++;         //increment the event counter
+    
+    if(g_IC1.uint8_EventCounter <= 2)   //event counter smaller or equal to 3
     {
-        eventTime[nbreEvent-1] = 0xFFFF & IC1BUF;
-        eventMultiplicator[nbreEvent-1] = nbreTMR2Overflow;
+        trash = IC1BUF;                 //erase the value
+        TMR2 = 0;                       //reset the counter of timer 2
     }
-    if(nbreEvent == 3)
-    {    
-        IC1CONbits.ON = 0;
-        T2CONbits.ON = 0;
-        TMR2 = 0;
-        nbreTMR2Overflow = 0;
-        nbreEvent = 0;
-    }
+    else
+    {
+        //store the value and increment the write variable
+        g_IC1.uint32_Results[g_IC1.uint8_Wbuf] = IC1BUF;
+        g_IC1.uint8_Wbuf++;
+    }    
+    
     IFS0CLR = _IFS0_IC1IF_MASK;
+    
     LOGP(OUT_OF_ISR);
     asm("ei");
 }
@@ -1148,7 +1148,7 @@ void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL1SOFT) IntInputCapture2Handler(void)
 {   
     static unsigned char nbreEvent = 0;
     asm("di");
-    LOGP(ENTER_IN_ISR);
+    /*LOGP(ENTER_IN_ISR);
     LOGP(IC2);
     if(!IC2CONbits.ICBNE)
         Nop();
@@ -1165,7 +1165,7 @@ void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL1SOFT) IntInputCapture2Handler(void)
         TMR2 = 0;
         nbreTMR2Overflow = 0;
         nbreEvent = 0;
-    }
+    }*/
     IFS0CLR = _IFS0_IC2IF_MASK;
     LOGP(OUT_OF_ISR);
     asm("ei");

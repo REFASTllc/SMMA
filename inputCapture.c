@@ -1,17 +1,29 @@
-/********************************************************************************************************************/
-/*  Name of the file:       inputCapture.								    
-/*  Purpose of the file:    Definitions of all functions related to the input capture module						    
-/*  Creator:                julien_rebetez									    
-/*  Date of creation:       January 18, 2016									    
-/*														    
-/*  Last modification on:   -											    
-/*  Modified by:            -											    
-/*  Version:                -											    
-/*														    
-/*  List of functions:      -											    
-/* ******************************************************************************************************************/
+/**********************************************************************************************************************
 
-#include "includes.h" // File which contain all includes files
+                                            UBD - Unipolar Bipolar Driver
+
+***********************************************************************************************************************
+ * File name:               inputCapture.c
+ * Creation date:           18.01.2016
+ * Main creator:            Julien Rebetez
+ * Company:                 REFAST GmbH
+ *                          Copyright (c) 2015 REFAST GmbH
+***********************************************************************************************************************
+ * Content overview:        - InitInputCapture1Module
+ *                          - InitInputCapture2Module
+ *                          - InitInputCapture3Module
+ *                          - InitInputCapture4Module
+ *                          - InitInputCapture5Module
+ *                          - InitInterruptInputCaptureModule
+ *                          - ResetInputCaptureModule
+ *                          - FormatBufToRealValues
+***********************************************************************************************************************/
+
+
+#include "includes.h"   // File which contain all includes files
+
+S_IC1 g_IC1;            //global variables for struct
+
 
 /********************************************************************************************************************/
 /*  Name of the function:       InitInputCapture1Module									    
@@ -38,11 +50,11 @@ void InitInputCapture1Module(void)
                             // 0 = Disable and reset module, disable clocks, disable interrupt generation and allow SFR
                             // modifications
     
-    IC1CONbits.SIDL = 1;    // Stop in Idle Control bit
+    IC1CONbits.SIDL = 0;    // Stop in Idle Control bit
                             // 1 = Halt in CPU Idle mode
                             // 0 = Continue to operate in CPU Idle mode
     
-    IC1CONbits.FEDGE = 1;   // First Capture Edge Select bit (only used in mode 6, ICM<2:0> = 110)
+    IC1CONbits.FEDGE = 0;   // First Capture Edge Select bit (only used in mode 6, ICM<2:0> = 110)
                             // 1 = Capture rising edge first
                             // 0 = Capture falling edge first
     
@@ -68,7 +80,7 @@ void InitInputCapture1Module(void)
                             // 1 = Input capture buffer is not empty; at least one more capture value can be read
                             // 0 = Input capture buffer is empty
     
-    IC1CONbits.ICM = 3;     // Input Capture Mode Select bits
+    IC1CONbits.ICM = 6;     // Input Capture Mode Select bits
                             // 111 = Interrupt-Only mode (only supported while in Sleep mode or Idle mode)
                             // 110 = Simple Capture Event mode ? every edge, specified edge first and every edge thereafter
                             // 101 = Prescaled Capture Event mode ? every sixteenth rising edge
@@ -79,6 +91,9 @@ void InitInputCapture1Module(void)
                             // 000 = Capture Disable mode
     
     TRISDbits.TRISD8 = 1;   // Set PIN RD8 (IC1) as input
+    
+    
+    g_IC1.uint8_Wbuf = 0;   //write-pointer of the ring buffer at position 0
 }
 
 /********************************************************************************************************************/
@@ -136,7 +151,7 @@ void InitInputCapture2Module(void)
                             // 1 = Input capture buffer is not empty; at least one more capture value can be read
                             // 0 = Input capture buffer is empty
     
-    IC2CONbits.ICM = 6;     // Input Capture Mode Select bits
+    IC2CONbits.ICM = 3;     // Input Capture Mode Select bits
                             // 111 = Interrupt-Only mode (only supported while in Sleep mode or Idle mode)
                             // 110 = Simple Capture Event mode - every edge, specified edge first and every edge thereafter
                             // 101 = Prescaled Capture Event mode - every sixteenth rising edge
@@ -340,7 +355,7 @@ void InitInputCapture5Module(void)
                             // 1 = Input capture buffer is not empty; at least one more capture value can be read
                             // 0 = Input capture buffer is empty
     
-    IC5CONbits.ICM = 3;     // Input Capture Mode Select bits
+    IC5CONbits.ICM = 6;     // Input Capture Mode Select bits
                             // 111 = Interrupt-Only mode (only supported while in Sleep mode or Idle mode)
                             // 110 = Simple Capture Event mode ? every edge, specified edge first and every edge thereafter
                             // 101 = Prescaled Capture Event mode ? every sixteenth rising edge
@@ -471,7 +486,7 @@ void InitInterruptInputCaptureModule(unsigned char module, unsigned char status)
 /*														    
 /*  Remark:                     -										    
 /********************************************************************************************************************/
-void ResetInputCaptureModule(unsigned char module)
+/*void ResetInputCaptureModule(unsigned char module)
 {
     unsigned int i = 0;
     switch(module)
@@ -509,7 +524,7 @@ void ResetInputCaptureModule(unsigned char module)
         default:
         break;
     }
-}
+}*/
 
 /********************************************************************************************************************/
 /*  Name of the function:       FormatBufToRealValues									    
@@ -530,7 +545,7 @@ void ResetInputCaptureModule(unsigned char module)
 /*														    
 /*  Remark:                     -										    
 /********************************************************************************************************************/
-unsigned long eventTime[3] = {0};
+/*unsigned long eventTime[3] = {0};
 unsigned short eventMultiplicator[3] = {0};
 void FormatBufToRealValues(S_IC *data, unsigned char typeMeasure)
 {
@@ -554,4 +569,4 @@ void FormatBufToRealValues(S_IC *data, unsigned char typeMeasure)
             data->frequency = (1/((1/_FREQ_OSC)*(data->periodeTime * 100))) * 100;
         }
     }
-}
+}*/
