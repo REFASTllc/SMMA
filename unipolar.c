@@ -186,7 +186,7 @@ void uni_move(void)
             
             g_Uni.uint32_IntTime = g_Uni.uint32_SwOnTime;
 
-            T4CONSET |= 0x8000;         //enable timer
+            T4CON |= 0x8000;            //enable timer
         }
     }
     else

@@ -562,7 +562,7 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
     
     IFS0CLR = _IFS0_T5IF_MASK;  //clear interrupt flag
     
-    T4CONSET |= 0x8000;         //enable timer
+    T4CON |= 0x8000;            //enable timer
    
     LOGP(OUT_OF_ISR);
     asm("ei");

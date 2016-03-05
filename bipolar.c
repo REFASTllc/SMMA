@@ -159,7 +159,7 @@ void bi_move(void)
 
             g_Bipol.status.BITS.error = 0;             //clear error
 
-            T4CONSET |= 0x8000;         //enable timer
+            T4CON |= 0x8000;            //enable timer
         }
     }
     else
