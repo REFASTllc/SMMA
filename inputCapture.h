@@ -1,16 +1,32 @@
-/********************************************************************************************************************/
-/*  Name of the file:       inputCapture.h                                                              
-/*  Purpose of the file:    Headers of all functions related to the input capture module                                         
-/*  Creator:                julien_rebetez                                                                      
-/*  Date of creation:       January 18, 2016                                                                       
-/*                                                                                                                  
-/*  Last modification on:   -                                                                                       
-/*  Modified by:            -                                                                                       
-/*  Version:                -                                                                                       
-/*                                                                                                                  
-/*  List of functions:      -                                                                                       
-/* ******************************************************************************************************************/
+/**********************************************************************************************************************
 
+                                            UBD - Unipolar Bipolar Driver
+
+***********************************************************************************************************************
+ * File name:               inputCapture.h
+ * Creation date:           18.01.2016
+ * Main creator:            A. Staub
+ * Company:                 REFAST GmbH
+ *                          Copyright (c) 2015 REFAST GmbH
+***********************************************************************************************************************
+ * Content overview :       - INPUTCAPTURE_H
+***********************************************************************************************************************/
+
+
+/**********************************************************************************************************************
+ * Routine:                 INPUTCAPTURE_H
+
+ * Description:
+ * Headers of all functions related to the input capture module  
+ * 
+ * Creator:                 J. Rebetez
+ * Date of creation:        06.08.2015
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
 #ifndef INPUTCAPTURE_H
 #define	INPUTCAPTURE_H
 
@@ -125,6 +141,6 @@ void ResetInputCaptureModule(unsigned char module);
 /*														    
 /*  Remark:                     -										    
 /********************************************************************************************************************/
-void FormatBufToRealValues(S_IC *data, unsigned char typeMeasure);
+//void FormatBufToRealValues(S_IC *data, unsigned char typeMeasure);
 
 #endif	/* INPUTCAPTURE_H */

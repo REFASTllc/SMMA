@@ -2650,6 +2650,8 @@ void cmd_GPWMPOS(void)
 ***********************************************************************************************************************/
 extern unsigned int nbreTMR2Overflow;
 S_IC dataIC;
+unsigned long eventTime[3];
+unsigned short eventMultiplicator[3];
 void cmd_GPWMVAL(void)
 {
     unsigned char nbreSamples = 1, actualSample, i;

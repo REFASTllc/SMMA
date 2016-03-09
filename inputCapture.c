@@ -1,17 +1,27 @@
-/********************************************************************************************************************/
-/*  Name of the file:       inputCapture.								    
-/*  Purpose of the file:    Definitions of all functions related to the input capture module						    
-/*  Creator:                julien_rebetez									    
-/*  Date of creation:       January 18, 2016									    
-/*														    
-/*  Last modification on:   -											    
-/*  Modified by:            -											    
-/*  Version:                -											    
-/*														    
-/*  List of functions:      -											    
-/* ******************************************************************************************************************/
+/**********************************************************************************************************************
 
-#include "includes.h" // File which contain all includes files
+                                            UBD - Unipolar Bipolar Driver
+
+***********************************************************************************************************************
+ * File name:               inputCapture.c
+ * Creation date:           18.01.2016
+ * Main creator:            Julien Rebetez
+ * Company:                 REFAST GmbH
+ *                          Copyright (c) 2015 REFAST GmbH
+***********************************************************************************************************************
+ * Content overview:        - InitInputCapture1Module
+ *                          - InitInputCapture2Module
+ *                          - InitInputCapture3Module
+ *                          - InitInputCapture4Module
+ *                          - InitInputCapture5Module
+ *                          - InitInterruptInputCaptureModule
+ *                          - ResetInputCaptureModule
+ *                          - FormatBufToRealValues
+***********************************************************************************************************************/
+
+
+#include "includes.h"   // File which contain all includes files
+
 
 /********************************************************************************************************************/
 /*  Name of the function:       InitInputCapture1Module									    
@@ -340,7 +350,7 @@ void InitInputCapture5Module(void)
                             // 1 = Input capture buffer is not empty; at least one more capture value can be read
                             // 0 = Input capture buffer is empty
     
-    IC5CONbits.ICM = 3;     // Input Capture Mode Select bits
+    IC5CONbits.ICM = 6;     // Input Capture Mode Select bits
                             // 111 = Interrupt-Only mode (only supported while in Sleep mode or Idle mode)
                             // 110 = Simple Capture Event mode ? every edge, specified edge first and every edge thereafter
                             // 101 = Prescaled Capture Event mode ? every sixteenth rising edge
@@ -471,7 +481,7 @@ void InitInterruptInputCaptureModule(unsigned char module, unsigned char status)
 /*														    
 /*  Remark:                     -										    
 /********************************************************************************************************************/
-void ResetInputCaptureModule(unsigned char module)
+/*void ResetInputCaptureModule(unsigned char module)
 {
     unsigned int i = 0;
     switch(module)
@@ -509,7 +519,7 @@ void ResetInputCaptureModule(unsigned char module)
         default:
         break;
     }
-}
+}*/
 
 /********************************************************************************************************************/
 /*  Name of the function:       FormatBufToRealValues									    

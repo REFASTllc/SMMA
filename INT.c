@@ -1079,7 +1079,7 @@ void __ISR(_TIMER_2_VECTOR, IPL2SOFT) IntTimer2Handler(void)
     asm("di");
     LOGP(ENTER_IN_ISR);
     LOGP(TIMER2);
-    oTestLed1 =! oTestLed1;
+    
     IFS0CLR = _IFS0_T2IF_MASK;
     nbreTMR2Overflow++;
     LOGP(OUT_OF_ISR);
