@@ -462,64 +462,6 @@ void InitInterruptInputCaptureModule(unsigned char module, unsigned char status)
     }
 }
 
-/********************************************************************************************************************/
-/*  Name of the function:       ResetInputCaptureModule									    
-/*  Purpose of the function:    Reset of the module in case of buffer overflow
-/*  Parameters:													    
-/*      IN:                     - module: select the module to initialize	    
-/*      OUT:                    -			
-/* 							    See the .h file for the list of all defines.
-/*														    
-/*  Used global variables:      -										    
-/*														    
-/*  Creator:                    julien_rebetez								    
-/*  Date of creation:           January 23, 2016								    
-/*														    
-/*  Last modified on:           -										    
-/*  Modified by:                -										    
-/*  Version:                    -										    
-/*														    
-/*  Remark:                     -										    
-/********************************************************************************************************************/
-/*void ResetInputCaptureModule(unsigned char module)
-{
-    unsigned int i = 0;
-    switch(module)
-    {
-        case _IC_1: 
-            IC1CONbits.ON = 0;
-            for(;i<5000;i++)
-                Nop();
-            IC1CONbits.ON = 1;          
-        break;
-        case _IC_2:
-            IC2CONbits.ON = 0;
-            for(;i<5000;i++)
-                Nop();
-            IC2CONbits.ON = 1; 
-        break;
-        case _IC_3:
-            IC3CONbits.ON = 0;
-            for(;i<5000;i++)
-                Nop();
-            IC3CONbits.ON = 1; 
-        break;
-        case _IC_4:
-            IC4CONbits.ON = 0;
-            for(;i<5000;i++)
-                Nop();
-            IC4CONbits.ON = 1; 
-        break;
-        case _IC_5:
-            IC5CONbits.ON = 0;
-            for(;i<5000;i++)
-                Nop();
-            IC5CONbits.ON = 1; 
-        break;
-        default:
-        break;
-    }
-}*/
 
 /********************************************************************************************************************/
 /*  Name of the function:       FormatBufToRealValues									    
