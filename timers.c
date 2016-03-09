@@ -135,7 +135,7 @@ void InitTimer2(void)
 
     T2CONbits.TCKPS2 = 0;   // 111 = 1:256 prescale value
     T2CONbits.TCKPS1 = 0;   // 110 = 1:64 prescale value
-    T2CONbits.TCKPS0 = 0;   // 101 = 1:32 prescale value
+    T2CONbits.TCKPS0 = 1;   // 101 = 1:32 prescale value
                             // 100 = 1:16 prescale value
                             // 011 = 1:8 prescale value
                             // 010 = 1:4 prescale value
@@ -149,7 +149,7 @@ void InitTimer2(void)
                             // 0 = Internal peripheral clock
 
     TMR2 = 0;               //clear counter
-    PR2 = 0xffff;
+    PR2 = 0xFFFF;           //PR2 register at maximum, timer2 free-running
 }
 
 /**********************************************************************************************************************
