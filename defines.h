@@ -109,7 +109,6 @@
 //error code definition
                             //general errors
 #define _OutOfTolSPROD      1               //SPROD internal used, parameters out of range
-#define _GFRQVAL_PWM        16              //GFRQVAL, GPWMVAL, not possible to measure a PWM
 #define _RTESTINsupply      17              //RTESTIN not possible to switch off the supply under 0.3V
 #define _RTESTINnotPossible 18              //RTESTIN not possible with this type of motor
 #define _OutOfTolSRUNBIT    19              //SRUNBIT, parameter out of range
@@ -126,7 +125,7 @@
 #define _AckSROMRROM        30              //SROM,RROM; acknowledge error - no answer from EEPROM
 #define _OutOfTolSROMRROM   31              //SROM,RROM; received parameters out of tolerance
 #define _OutOfTolSSWTYP     32              //SSWTYP; parameter out of range
-#define _OutOfTolGPWMVAL    33              //GPWMVAL; parameter(s) out of range
+#define _OutOfTolGPWMVAL    33              //GPWMVAL, GFREQVAL; parameter(s) out of range
 #define _OutOfTolGPWMPOS    34              //GPWMPOS; parameter(s) out of range
 #define _OutOfTolSPWMLIM    35              //SPWMLIM; parameter(s) out of range
 #define _OutOfTolGSWPOS     36              //GSWPOS; parameter(s) out of range
@@ -148,7 +147,6 @@
 #define _UniPlausiCheck     51              //plausibility check not passed (could be re-used)
 #define _UniSMTYP           52              //parameters not within tolerance to switch on unipolar
 #define _UniETESTIN         53              //ETESTIN current measure not within the tolerance
-#define _OutOfTolGFREQVAL   54              //GFREQVAL; parameter(s) out of range
                             //bipolar errors
 #define _BipSILIM           100             //received parameters not within the tolerance for SILIM
 #define _BipSMTYP           101             //parameters not within tolerance for switch on bipolar

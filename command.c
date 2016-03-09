@@ -2823,7 +2823,7 @@ void cmd_GFRQVAL(void)
         }
         else
         {
-            g_Param.uint8_ErrCode = _OutOfTolGFREQVAL;  //set error code
+            g_Param.uint8_ErrCode = _OutOfTolGPWMVAL;  //set error code
             uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
         }
     } 
