@@ -535,23 +535,23 @@ unsigned short eventMultiplicator[3] = {0};
 void FormatBufToRealValues(S_IC *data, unsigned char typeMeasure)
 {
     unsigned char i = 0;   
+    long temp1 = 0, temp2 = 0;
     
-    if(data->timeoutMeas)
-    {
-        for(;i<typeMeasure;i++)
-            eventTime[i] += eventMultiplicator[i] * 0xffff;
+    for(;i<typeMeasure;i++)
+        eventTime[i] += eventMultiplicator[i] * 0xffff;
 
-        if(typeMeasure == _MEAS_PWM)
-        {
-            data->timeHigh = eventTime[1] - eventTime[0];
-            data->periodeTime = eventTime[2] - eventTime[0];
-            data->frequency = 1/((1/_FREQ_OSC)*(data->periodeTime * 100));
-            data->dutyCycle = (data->timeHigh * 1000) / data->periodeTime;
-        }
-        else if(typeMeasure == _MEAS_FREQ)
-        {
-            data->periodeTime = eventTime[1] - eventTime[0];
-            data->frequency = (1/((1/_FREQ_OSC)*(data->periodeTime * 100))) * 100;
-        }
+    if(typeMeasure == _MEAS_PWM)
+    {
+        data->timeHigh = eventTime[1] - eventTime[0];
+        data->periodeTime = eventTime[2] - eventTime[0];
+        if(data->timeHigh > 4294967)
+            data->dutyCycle = (data->timeHigh / (data->periodeTime / 1000)) + 1;
+        else
+            data->dutyCycle = ((data->timeHigh * 1000) / data->periodeTime) + 1;
+    }
+    else if(typeMeasure == _MEAS_FREQ)
+    {
+        data->periodeTime = eventTime[1] - eventTime[0];
+        data->frequency = (1/((1/_FREQ_OSC)*(data->periodeTime * 100))) * 100;
     }
 }

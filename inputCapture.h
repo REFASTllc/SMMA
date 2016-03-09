@@ -27,6 +27,9 @@
 #define _MEAS_PWM   3
 #define _MEAS_FREQ  2
 
+#define _NBRE_NOT_USED_VALUES   4
+#define _NBRE_MEAS_EDGES        3
+
 typedef struct
 {
     unsigned long timeHigh;

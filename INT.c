@@ -1111,12 +1111,14 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL1SOFT) IntInputCapture1Handler(void)
     LOGP(ENTER_IN_ISR);
     LOGP(IC1);
 
-    if(++nbreEvent <= 2)
+    if(++nbreEvent <= _NBRE_NOT_USED_VALUES)
+        eventTime[0] = IC1BUF;
+    else if(nbreEvent <= _NBRE_NOT_USED_VALUES + 2)
     {
-        eventTime[nbreEvent-1] = 0xFFFF & IC1BUF;
-        eventMultiplicator[nbreEvent-1] = nbreTMR2Overflow;
+        eventTime[nbreEvent - _NBRE_NOT_USED_VALUES - 1] = 0xFFFF & IC1BUF;
+        eventMultiplicator[nbreEvent - _NBRE_NOT_USED_VALUES - 1] = nbreTMR2Overflow;
     }
-    if(nbreEvent == 3)
+    else
     {    
         IC1CONbits.ON = 0;
         T2CONbits.ON = 0;
@@ -1152,10 +1154,12 @@ void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL1SOFT) IntInputCapture2Handler(void)
     LOGP(IC2);
     if(!IC2CONbits.ICBNE)
         Nop();
-    if(++nbreEvent <= 3)
+    if(++nbreEvent <= _NBRE_NOT_USED_VALUES)     // 4 first measures are not used
+        eventTime[0] = IC2BUF;
+    else if(nbreEvent <= _NBRE_NOT_USED_VALUES + _NBRE_MEAS_EDGES)
     {
-        eventTime[nbreEvent - 1] = 0xFFFF & IC2BUF;
-        eventMultiplicator[nbreEvent -1] = nbreTMR2Overflow;
+        eventTime[nbreEvent - 1 - _NBRE_NOT_USED_VALUES] = 0xFFFF & IC2BUF;
+        eventMultiplicator[nbreEvent - 1 - _NBRE_NOT_USED_VALUES] = nbreTMR2Overflow;
     }
     else
     {

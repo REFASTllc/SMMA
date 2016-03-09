@@ -2652,10 +2652,12 @@ extern unsigned int nbreTMR2Overflow;
 S_IC dataIC;
 void cmd_GPWMVAL(void)
 {
-    unsigned char nbreSamples = 1, actualSample;
+    unsigned char nbreSamples = 1, actualSample, i;
     
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
+        while(IC2CONbits.ICBNE)
+            actualSample = IC2BUF;
         dataIC.timeoutMeas = 1;
         nbreTMR2Overflow = 0;
         TMR2 = 0;
@@ -2666,7 +2668,8 @@ void cmd_GPWMVAL(void)
         for(actualSample = 0; actualSample < nbreSamples; actualSample++)
         {
             while(IC2CONbits.ON && dataIC.timeoutMeas);
-            FormatBufToRealValues(&dataIC, _MEAS_PWM);
+            if(dataIC.timeoutMeas)
+                FormatBufToRealValues(&dataIC, _MEAS_PWM);
         }
         SetTimer(_TIMER1, _DISABLE, 0, 1500);
         if(dataIC.timeoutMeas)
@@ -2802,25 +2805,25 @@ void cmd_GFRQVAL(void)
         dataIC.timeoutMeas = 1;
         nbreTMR2Overflow = 0;
         TMR2 = 0;
-        SetTimer(_TIMER1, _ENABLE, 0, 5000);
+        SetTimer(_TIMER1, _ENABLE, 0, 2500);
         IFS0CLR = _IFS0_T2IF_MASK;
         T2CONbits.ON = 1;
         IC1CONbits.ON = 1;
         while(IC1CONbits.ON && dataIC.timeoutMeas);
         SetTimer(_TIMER1, _DISABLE, 0, 1500);
-        FormatBufToRealValues(&dataIC, _MEAS_FREQ);
-        uart2_sendbuffer('E');
-        uart2_sendbuffer(',');  //add the comma
-        funct_IntToAscii(dataIC.frequency, _Active);
-     /*   do{
-            g_Funct.uint8_ArrAsciiPos--;
-            uart2_sendbuffer(g_Funct.uint8_ArrAscii[g_Funct.uint8_ArrAsciiPos]);
-            if(g_Funct.uint8_ArrAsciiPos == 1)
-            {
-                uart2_sendbuffer('.');
-            }
-        }while(g_Funct.uint8_ArrAsciiPos);*/
-        uart2_sendbuffer(13);
+        if(dataIC.timeoutMeas)
+        {
+            FormatBufToRealValues(&dataIC, _MEAS_FREQ);
+            uart2_sendbuffer('E');
+            uart2_sendbuffer(',');  //add the comma
+            funct_IntToAscii(dataIC.frequency, _Active);
+            uart2_sendbuffer(13);
+        }
+        else
+        {
+            g_Param.uint8_ErrCode = _OutOfTolGFREQVAL;  //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
     } 
     else
     {

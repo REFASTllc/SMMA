@@ -147,6 +147,7 @@
 #define _UniPlausiCheck     51              //plausibility check not passed (could be re-used)
 #define _UniSMTYP           52              //parameters not within tolerance to switch on unipolar
 #define _UniETESTIN         53              //ETESTIN current measure not within the tolerance
+#define _OutOfTolGFREQVAL   54              //GFREQVAL; parameter(s) out of range
                             //bipolar errors
 #define _BipSILIM           100             //received parameters not within the tolerance for SILIM
 #define _BipSMTYP           101             //parameters not within tolerance for switch on bipolar
