@@ -15,6 +15,7 @@
  *                          - bi_run
  *                          - bi_dec
  *                          - bi_CheckCalc
+ *                          - bi_ImotToDAC
 ***********************************************************************************************************************/
 
 
@@ -105,11 +106,15 @@ void bi_move(void)
             if(!g_Bipol.status.BITS.error)    //no error detected during the check from the subroutine
             {
                 if(g_Bipol.uint1_NextStepIsRamp == 1) //then verify as next if the acceleration ramp is active?
+                {
                     g_Bipol.status.BITS.accelerationIsActived = 1; //set bit 'ACCEL - acceleration'
+                    bi_ImotToDAC(g_Param.uint16_BipAccI);
+                }
                 else
                 {
                     g_Bipol.status.BITS.accelerationIsActived = 0; //if not active then clear for security the bit 'ACC and DEC'
                     g_Bipol.status.BITS.decelerationIsActived = 0;
+                    bi_ImotToDAC(g_Param.uint16_BipRunI);
                 }
             }
             else
@@ -153,6 +158,7 @@ void bi_move(void)
                 oSinkSource0 = 1;
             }
 
+            bi_ImotToDAC(g_Param.uint16_BipHoldI);
             SendOneDataSPI1(A3981.RUN.REG);
             
             g_Bipol.uint32_IntTime = g_Bipol.uint32_SwOnTime;
@@ -188,6 +194,10 @@ void bi_move(void)
                         //switch off all outputs
                         A3981.RUN.BITS.EN = 0;
                         SendOneDataSPI1(A3981.RUN.REG);
+                    }
+                    else
+                    {
+                        bi_ImotToDAC(g_Param.uint16_BipHoldI);
                     }
                     
                     if(g_Param.uint8_RunBit)
@@ -275,6 +285,7 @@ void bi_acc(void)
         if(g_Bipol.uint32_RealPos == g_Bipol.uint32_AccStop)
         {
             g_Bipol.status.BITS.accelerationIsActived = 0;  //clear bit acceleration
+            bi_ImotToDAC(g_Param.uint16_BipRunI);
         }
         else
         {
@@ -286,6 +297,7 @@ void bi_acc(void)
         {
             g_Bipol.status.BITS.decelerationIsActived = 1;  //set bit deceleration
             g_Bipol.uint16_DecNumbStep = 0; //for security reason set this to 0
+            bi_ImotToDAC(g_Param.uint16_BipDecI);
         }
         else
         {
@@ -351,6 +363,7 @@ void bi_run(void)
         {
             g_Bipol.status.BITS.decelerationIsActived = 1;  //set bit deceleration
             g_Bipol.uint16_DecNumbStep = 0; //for security reason set this variable to 0
+            bi_ImotToDAC(g_Param.uint16_BipDecI);
         }
         else
         {
@@ -658,3 +671,101 @@ void bi_CheckCalc(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
 }   //end of bi_CheckCalc
+
+
+/**********************************************************************************************************************
+ * Routine:                 bi_ImotToDAC
+
+ * Description:
+ * Use this routine to convert the wished current into a voltage for the DAC.
+ * The formula for Vref is Vref = (I * 16 * R) / (Percent * 1000)
+ * V is in mV
+ * I is in mA 
+ * R is in mOhm, once 248 (if mosfet disable) and 76 (if mosfet enable)
+ * Percent is in divided by 100, means 25% are 0.25
+ * The formular than for the DAC is Vdac = 1240 * (Vref / 1000)
+ * 1240 comes from 4095000 / 3300mV (DACres / 3.3V)
+ * 
+ * Creator:                 A. Staub 
+ * Date of creation:        14.03.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint32_current
+ * Output:                  uint32_DAC
+***********************************************************************************************************************/
+void bi_ImotToDAC(unsigned long int uint32_current)
+{
+    volatile unsigned long uint32_DAC = 0;
+    
+    if(uint32_current <= 126)       //current less than 126mA
+    {
+        oBiPhCurrCtrl = 0;          //disable the mosfet
+        uint32_DAC = uint32_current * 16 * 248;
+        uint32_DAC /= 250;          //0.25% * 1000 = 250
+        uint32_DAC *= 1240;         //*1240
+        uint32_DAC /= 1000;         //result is now in mV ready for the DAC
+        DAC7571_WrByte(_NormalMode,uint32_DAC);    //set up the DAC with the new value
+        A3981.CONFIG0.BITS.MXI = 0; //25% of Imax
+        SendOneDataSPI1(A3981.CONFIG0.REG); //set up the new Imax current
+    }
+    else if(uint32_current <= 252)  //current less than 252mA
+    {
+        oBiPhCurrCtrl = 0;          //disable the mosfet
+        uint32_DAC = uint32_current * 16 * 248;
+        uint32_DAC /= 500;          //0.50% * 1000 = 500
+        uint32_DAC *= 1240;         //*1240
+        uint32_DAC /= 1000;         //result is now in mV ready for the DAC
+        DAC7571_WrByte(_NormalMode,uint32_DAC);    //set up the DAC with the new value
+        A3981.CONFIG0.BITS.MXI = 1; //50% of Imax
+        SendOneDataSPI1(A3981.CONFIG0.REG); //set up the new Imax current
+    }
+    else if(uint32_current <= 378)  //current less than 378mA
+    {
+        oBiPhCurrCtrl = 0;          //disable the mosfet
+        uint32_DAC = uint32_current * 16 * 248;
+        uint32_DAC /= 750;          //0.75% * 1000 = 750
+        uint32_DAC *= 1240;         //*1240
+        uint32_DAC /= 1000;         //result is now in mV ready for the DAC
+        DAC7571_WrByte(_NormalMode,uint32_DAC);    //set up the DAC with the new value
+        A3981.CONFIG0.BITS.MXI = 2; //50% of Imax
+        SendOneDataSPI1(A3981.CONFIG0.REG); //set up the new Imax current
+    }
+    else if(uint32_current <= 500)  //current less than 500mA
+    {
+        oBiPhCurrCtrl = 0;          //disable the mosfet
+        uint32_DAC = uint32_current * 16 * 248;
+        uint32_DAC /= 1000;         //1% * 1000 = 1000
+        uint32_DAC *= 1240;         //*1240
+        uint32_DAC /= 1000;         //result is now in mV ready for the DAC
+        DAC7571_WrByte(_NormalMode,uint32_DAC);    //set up the DAC with the new value
+        A3981.CONFIG0.BITS.MXI = 3; //100% of Imax
+        SendOneDataSPI1(A3981.CONFIG0.REG); //set up the new Imax current
+    }
+    else if(uint32_current <= 822)  //current less than 822mA
+    {
+        oBiPhCurrCtrl = 1;          //enable the mosfet
+        uint32_DAC = uint32_current * 16 * 76;
+        uint32_DAC /= 500;          //0.50% * 1000 = 500
+        uint32_DAC *= 1240;         //*1240
+        uint32_DAC /= 1000;         //result is now in mV ready for the DAC
+        DAC7571_WrByte(_NormalMode,uint32_DAC);    //set up the DAC with the new value
+        A3981.CONFIG0.BITS.MXI = 1; //50% of Imax
+        SendOneDataSPI1(A3981.CONFIG0.REG); //set up the new Imax current
+    }
+    else if(uint32_current >= 823)  //current bigger than 823mA
+    {
+        oBiPhCurrCtrl = 1;          //enable the mosfet
+        uint32_DAC = uint32_current * 16 * 76;
+        uint32_DAC /= 1000;         //1.0% * 1000 = 1000
+        uint32_DAC *= 1240;         //*1240
+        uint32_DAC /= 1000;         //result is now in mV ready for the DAC
+        DAC7571_WrByte(_NormalMode,uint32_DAC);    //set up the DAC with the new value
+        A3981.CONFIG0.BITS.MXI = 3; //100% of Imax
+        SendOneDataSPI1(A3981.CONFIG0.REG); //set up the new Imax current
+    }
+    else
+    {
+        //do nothing
+    }
+}   //end of bi_ImotToDAC

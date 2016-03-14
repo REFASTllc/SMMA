@@ -36,6 +36,7 @@ extern void bi_acc(void);
 extern void bi_run(void);
 extern void bi_dec(void);
 extern void bi_CheckCalc(void);
+extern void bi_ImotToDAC(unsigned long int uint32_current);
 
 
 #define	_BiPhON		1       //definition ON for the output of the bipolar stepper motor
