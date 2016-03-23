@@ -157,4 +157,6 @@ void param_init(void)
     
     g_Param.uint8_FreqBit = 1;           //frequency bit (out1) for run
     g_Param.uint8_RunBit = 1;            //run bit (out0) for run 
+    
+    g_Param.uint8_GOcmdTrue = 0;         //disable GO command
 }   //end of param_init

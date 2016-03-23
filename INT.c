@@ -315,6 +315,9 @@ void __ISR(_SPI_1_VECTOR, IPL4SOFT) IntSPI1Handler(void)
  * Modification (06.02.2016 / A. Staub)
  * Run Frequency on output 1 if active.  
  * 
+ * Modification (23.03.2016 / A. Staub)
+ * Added the GO command. 
+ * 
  * Creator:                 J. Rebetez
  * Date of creation:        08.08.2015
  * Last modification on:    29.12.2015
@@ -354,7 +357,12 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
             }
             else    //otherwise do...
             {
-                g_Uni.uint32_RealPos++;     //increment real position with 1      
+                g_Uni.uint32_RealPos++;     //increment real position with 1 
+                
+                if(g_Param.uint8_GOcmdTrue) //is it a GO command?
+                {
+                    g_Uni.uint32_GoalPos++; //increment goal position
+                }
 
                 if(g_Uni.uint8_Settings & 0x10)     //verify the direction
                 {
@@ -535,6 +543,12 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
                 else        //otherwise do...
                 {
                     g_Bipol.uint32_RealPos++;       //increment real position with 1  
+                    
+                    if(g_Param.uint8_GOcmdTrue) //is it a GO command?
+                    {
+                        g_Bipol.uint32_GoalPos++;   //increment goal position
+                    }
+                    
                     if(g_Param.uint8_FreqBit)       //frequency bit set for output 1?
                     {
                         oSinkSource1 = !oSinkSource1;

@@ -301,5 +301,6 @@
 #define _IdSPROD            116             // Write production information in serial EEPROM
 #define _IdSTAT             117             //get status of the SMMA
 
+
 #endif	/* DEFINES_H */
 

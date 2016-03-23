@@ -280,6 +280,7 @@ typedef struct                      //definitions of multiple variable for comma
     volatile unsigned char uint8_SLEW;              //bipolar select slow rate control 
     volatile unsigned char uint8_FreqBit;           //frequency bit on output 1
     volatile unsigned char uint8_RunBit;            //run bit on output0
+    volatile unsigned char uint8_GOcmdTrue;         //1= GO command / 0 = no GO command
 }   SParam;                         //struct name is SParam (S for struct)
 
 #endif	/* PARAMETER_H */
