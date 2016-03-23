@@ -124,5 +124,6 @@ extern void cmd_GRUNBIT(void);
 extern void cmd_RTESTIN(void);
 extern void cmd_SPROD(void);
 extern void cmd_STAT(void);
+extern void cmd_GO(void);
 
 #endif	/* COMMAND_H */

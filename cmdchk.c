@@ -246,6 +246,7 @@ void cmdchk_check(void)
                 break;
                 
             case (_IdRUN):          //command RUN
+                g_Param.uint8_GOcmdTrue = 0;    //disable GO command
                 cmd_RUN();          //call subroutine
                 break;
                 
@@ -408,11 +409,13 @@ void cmdchk_check(void)
             case (39):  //command ERUN
                 cmd_ERUN();         //call subroutine
                 break;
-                    
-            case (40):  //command GO
-                cmd_GO();           //call subroutine
-                break;
             */    
+                
+            case (_IdGO):           //command GO
+                g_Param.uint8_GOcmdTrue = 1;    //enable GO command
+                cmd_RUN();
+                break;
+                
             case (_IdSIMAN):        //command SIMAN (not used anymore)
                 g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                 uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
