@@ -1555,30 +1555,98 @@ void cmd_GRUN(void)
  * Description:
  * Stops immediately all running systems!!!
  * 
+ * Modified 23.03.2016 by A. Staub:
+ * Added the conditions.
+ * 
  * Creator:                 A. Staub
  * Date of creation:        26.10.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    23.03.2016
+ * Modified by:             A. Staub
  * 
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
 void cmd_BREAK(void)
 {  
-    if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
+    if(g_CmdChk.uint8_ParamPos == 1)    //number of received characters OK?
     {
-    // Code for bipolar motor here below //
-        oBiResetSignal = 0;
-        oVmotOnOff = 0;
-        oBiEnaVmot = 0;
-        A3981.RUN.BITS.EN = 0;
-        SendOneDataSPI1(A3981.RUN.REG);
+        g_CmdChk.uint8_GlobalLock = 0;  //global lock disable
         
-    // Code for unipolar motor here below // 
-        //add here the conditions!!!!!
+    // Code for bipolar motor here below //
+//        oBiResetSignal = 0;
+//        oVmotOnOff = 0;
+//        oBiEnaVmot = 0;
+        g_Bipol.uint32_RealPos = 0;
+        g_Bipol.uint32_GoalPos = 0;
+        
+        g_Bipol.uint1_IsBipolEnabled = 0;
+        T4CON &= 0x7FFF;    //disable interrupt module
+        TMR4 = 0x0;         //clear contents of the TMR4 and TMR5
+        PR4 = 400;          //load the timer with 10us
+        IFS0CLR = _IFS0_T5IF_MASK;  //clear interrupt flag
+        g_Bipol.uint1_IntTimeExpiredFlag = 0;    //force the interrupt routine to load the new time
+        
+        if(!g_Bipol.uint1_CurrInCoilAtTheEnd) //coils current active after move?
+        {
+            //switch off all outputs
+            A3981.RUN.BITS.EN = 0;
+            SendOneDataSPI1(A3981.RUN.REG);
+        }
+        else
+        {
+            bi_ImotToDAC(g_Param.uint16_BipHoldI);
+        }
+        
+        if(g_Param.uint8_RunBit)
+        {
+            oSinkSource0 = 0;
+        }
+
+        g_Bipol.status.BITS.nextStepIsAllowed = 0;     //clear 'NS', 'DEC', 'ACC', 'GOAL' and 'LS' bit
+        g_Bipol.status.BITS.decelerationIsActived = 0;
+        g_Bipol.status.BITS.accelerationIsActived = 0;
+        g_Bipol.status.BITS.accelerationIsActived = 0;
+        g_Bipol.status.BITS.goalIsReached = 0;
+        g_Bipol.status.BITS.lastStepIsActived = 0;
+        g_Bipol.status.BITS.firstStepIsActived = 1;     //set the bit 'FS'                          
+        
+        
+    // Code for unipolar motor here below  
+        g_Uni.uint8_Settings &= 0xFE;   //clear the 'RUN' bit
+        g_Uni.uint8_Status &= 0xC1;     //clear 'NS', 'DEC', 'ACC', 'GOAL' and 'LS' bit
+        g_Uni.uint8_Status |= 0x01;     //set the bit 'FS'
+        
+        g_Param.uint8_GOcmdTrue = 0;
+        g_Uni.uint32_RealPos = 0;
+        g_Uni.uint32_GoalPos = 0;
+        
+        T4CON &= 0x7FFF;                    //disable interrupt module
+        TMR4 = 0x0;                         //clear contents of the TMR4 and TMR5
+        PR4 = 400;                          //load the timer with 10us
+        IFS0CLR = _IFS0_T5IF_MASK;          //clear interrupt flag
+        
+        if(g_Uni.uint8_Settings & 0x08)     //coils current active after move?
+        {
+            //then nothing is to do
+        }
+        else
+        {
+            //otherwise switch off all outputs
+            oUniCoilA1 = _UniPhOFF;         //output PhA1 = off
+            oUniCoilA2 = _UniPhOFF;         //output PhA2 = off
+            oUniCoilB1 = _UniPhOFF;         //output PhB1 = off
+            oUniCoilB2 = _UniPhOFF;         //output PhB2 = off
+        }
+        
+        if(g_Param.uint8_RunBit)
+        {
+            oSinkSource0 = 0;
+        }
+ 
         
     // Code for LIN motor here below // 
-        //add here the conditions!!!!!
+//        oVmotOnOff = 0;
+        oEnaVLINSupply = 0;
         
         //send back the needed informations
         uart2_sendbuffer('E');                  //first the letter E
