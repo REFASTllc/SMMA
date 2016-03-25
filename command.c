@@ -2465,7 +2465,7 @@ void cmd_GMCRSTP(void)
         g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
-}   //end of cmd_GMCRSTP cmd_SSWLIM
+}   //end of cmd_GMCRSTP
 
 
 /**********************************************************************************************************************
@@ -2476,14 +2476,18 @@ void cmd_GMCRSTP(void)
  * 
  * Creator:                 A. Staub
  * Date of creation:        30.11.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    25.03.2016
+ * Modified by:             J. Rebetez
+ * Modification:            As this command must still be defined, it will at the beginning not be used. If the 
+ *                          define _NOT_USED_CMD is defined, SMMA will answer with X,255 code. Without define, code here
+ *                          below will be executed.
  * 
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
 void cmd_SSWLIM(void)
 {
+#ifndef _NOT_USED_CMD
     auto unsigned char uint8_Result = 0;    //local work byte
     
     if(g_CmdChk.uint8_ParamPos == 5)   //number of received characters OK?
@@ -2523,6 +2527,11 @@ void cmd_SSWLIM(void)
         g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
+#endif
+#ifdef _NOT_USED_CMD
+    g_Param.uint8_ErrCode = _UnknownCmd;  //set error code
+    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+#endif
 }   //end of cmd_SSWLIM 
 
 /**********************************************************************************************************************
@@ -2533,14 +2542,18 @@ void cmd_SSWLIM(void)
  * 
  * Creator:                 J. Rebetez
  * Date of creation:        30.11.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    25.03.2016
+ * Modified by:             J. Rebetez
+ * Modification:            As this command must still be defined, it will at the beginning not be used. If the 
+ *                          define _NOT_USED_CMD is defined, SMMA will answer with X,255 code. Without define, code here
+ *                          below will be executed.
  * 
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
 void cmd_GSWLIM(void)
 {    
+#ifndef _NOT_USED_CMD
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         uart2_sendbuffer('E');          //first the letter E
@@ -2561,6 +2574,11 @@ void cmd_GSWLIM(void)
         g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
+#endif
+#ifdef _NOT_USED_CMD
+    g_Param.uint8_ErrCode = _UnknownCmd;  //set error code
+    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+#endif
 }   //end of cmd_GSWLIM 
 
 /**********************************************************************************************************************
@@ -2571,14 +2589,18 @@ void cmd_GSWLIM(void)
  * 
  * Creator:                 J. Rebetez
  * Date of creation:        30.11.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    25.03.2016
+ * Modified by:             J. Rebetez
+ * Modification:            As this command must still be defined, it will at the beginning not be used. If the 
+ *                          define _NOT_USED_CMD is defined, SMMA will answer with X,255 code. Without define, code here
+ *                          below will be executed.
  * 
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
 void cmd_GSWPOS(void)
 {    
+#ifndef _NOT_USED_CMD
     auto unsigned char uint8_Result = 0;
 
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
@@ -2608,6 +2630,11 @@ void cmd_GSWPOS(void)
         g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
+#endif
+#ifdef _NOT_USED_CMD
+    g_Param.uint8_ErrCode = _UnknownCmd;  //set error code
+    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+#endif
 }   //end of cmd_GSWPOS 
 
 /**********************************************************************************************************************
@@ -2618,14 +2645,18 @@ void cmd_GSWPOS(void)
  * 
  * Creator:                 J. Rebetez
  * Date of creation:        30.11.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    25.03.2016
+ * Modified by:             J. Rebetez
+ * Modification:            As this command must still be defined, it will at the beginning not be used. If the 
+ *                          define _NOT_USED_CMD is defined, SMMA will answer with X,255 code. Without define, code here
+ *                          below will be executed.
  * 
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
 void cmd_SPWMLIM(void)
 {
+#ifndef _NOT_USED_CMD
     auto unsigned char uint8_Result = 0;    //local work byte
     
     if(g_CmdChk.uint8_ParamPos == 3)   //number of received characters OK?
@@ -2661,6 +2692,11 @@ void cmd_SPWMLIM(void)
         g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
+#endif
+#ifdef _NOT_USED_CMD
+    g_Param.uint8_ErrCode = _UnknownCmd;  //set error code
+    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+#endif
 }   //end of cmd_SPWMLIM 
 
 /**********************************************************************************************************************
@@ -2671,14 +2707,18 @@ void cmd_SPWMLIM(void)
  * 
  * Creator:                 J. Rebetez
  * Date of creation:        30.11.2015
- * Last modification on:    -
- * Modified by:             - 
+ * Last modification on:    25.03.2016
+ * Modified by:             J. Rebetez
+ * Modification:            As this command must still be defined, it will at the beginning not be used. If the 
+ *                          define _NOT_USED_CMD is defined, SMMA will answer with X,255 code. Without define, code here
+ *                          below will be executed.
  * 
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
 void cmd_GPWMLIM(void)
 {    
+#ifndef _NOT_USED_CMD
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         uart2_sendbuffer('E');          //first the letter E
@@ -2695,6 +2735,11 @@ void cmd_GPWMLIM(void)
         g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
+#endif
+#ifdef _NOT_USED_CMD
+    g_Param.uint8_ErrCode = _UnknownCmd;  //set error code
+    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+#endif
 }   //end of cmd_GPWMLIM
 
 /**********************************************************************************************************************
@@ -2705,14 +2750,18 @@ void cmd_GPWMLIM(void)
  * 
  * Creator:                 J. Rebetez
  * Date of creation:        30.11.2015
- * Last modification on:    -
- * Modified by:             - 
+* Last modification on:    25.03.2016
+ * Modified by:             J. Rebetez
+ * Modification:            As this command must still be defined, it will at the beginning not be used. If the 
+ *                          define _NOT_USED_CMD is defined, SMMA will answer with X,255 code. Without define, code here
+ *                          below will be executed.
  * 
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
 void cmd_GPWMPOS(void)
-{    
+{  
+#ifndef _NOT_USED_CMD
     auto unsigned char uint8_Result = 0;
     
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
@@ -2750,6 +2799,11 @@ void cmd_GPWMPOS(void)
         g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
+#endif
+#ifdef _NOT_USED_CMD
+    g_Param.uint8_ErrCode = _UnknownCmd;  //set error code
+    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+#endif
 }   //end of cmd_GPWMLIM
 
 /**********************************************************************************************************************

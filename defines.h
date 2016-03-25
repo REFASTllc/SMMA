@@ -35,6 +35,7 @@
 //#define _BIPOLAR
 //#define _LIN
 //#define _UNIPOLAR
+#define _NOT_USED_CMD
 
 
 // Inputs & Outputs definitions
