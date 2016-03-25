@@ -1209,6 +1209,56 @@ void cmd_STEST(void)
         {
             g_CmdChk.uint8_GlobalLock = 1;  //enable global lock
 
+            // General explanations: each test definition is described as follow:
+            // Description of the test 
+            // ==> module, peripheral, device tested
+            
+            // Check the motor supply voltage 
+            // ==> uC ADC channel
+            // Remark: Max 12VDC. If this test fail, next steps are not performed.
+            
+            // Check of the EEPROM memory: read a value, increment it, 
+            // write it and read it again to check it.
+            // ==> I2C communication
+            
+            // Read the temperature out from temp sensor 
+            // ==> Check of the I2C communication
+            
+            // Check of the voltage of the button cell 
+            // ==> uC ADC channel, battery voltage
+            
+            // Set a voltage reference 
+            // ==> I2C communication, voltage reference chip
+            
+            // Communication with bipolar driver 
+            // ==> SPI communication, bipolar driver status
+            
+            // Measure of the bipolar coils resistor 
+            // ==> uC ADC channel
+            
+            // Run the unipolar motor 
+            // ==> unipolar driver (MOSFETs)
+            
+            // Measure of the unipolar coils resistor 
+            // ==> uC ADC channel
+            
+            // Run the LIN motor
+            // ==> LIN communication
+            
+            // Measure of the VLIN supply voltage
+            // uC ADC channel
+            
+            // Check all IOs: connect each input on one output. By changing
+            // the state of the output, input state should also change.
+            // ==> IOs
+            
+            // Measure of a frequency: use an output to generate a square signal
+            // ==> uC input capture 1
+            
+            // Measure of a PWM signal: use an output to generate a PWM signal
+            // ==> uC input capture 2
+            
+            
             //to define!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
             uart2_sendbuffer('E');                      //first the letter E
