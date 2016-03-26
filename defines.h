@@ -35,7 +35,7 @@
 //#define _BIPOLAR
 //#define _LIN
 //#define _UNIPOLAR
-#define _NOT_USED_CMD
+#define _NOT_USED_CMD       // Undefined / Unused commands
 
 
 // Inputs & Outputs definitions
@@ -110,6 +110,7 @@
 //error code definition
                             //general errors
 #define _OutOfTolSPROD      1               //SPROD internal used, parameters out of range
+#define _OutOfTolVmot       16              // Out of tolerance of the Vmot voltage
 #define _RTESTINsupply      17              //RTESTIN not possible to switch off the supply under 0.3V
 #define _RTESTINnotPossible 18              //RTESTIN not possible with this type of motor
 #define _OutOfTolSRUNBIT    19              //SRUNBIT, parameter out of range

@@ -1196,8 +1196,11 @@ void cmd_GMTYP(void)
  * Input:                   -
  * Output:                  -
 ***********************************************************************************************************************/
+U_STEST STESTstatus;
 void cmd_STEST(void)
 {  
+    unsigned char statusOK = 1, temp, temp2, i;
+    
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         if(g_CmdChk.uint8_GlobalLock == 1)  //global lock enable?
@@ -1208,62 +1211,121 @@ void cmd_STEST(void)
         else
         {
             g_CmdChk.uint8_GlobalLock = 1;  //enable global lock
-
+            
+            STESTstatus.REG = 0;
+            oVmotOnOff = 1;                 //switch on the main supply
+            oBiEnaVmot = 0;                 //switch off the bipolar supply
+            oEnaVLINSupply = 0;             //switch off the lin supply
+            
             // General explanations: each test definition is described as follow:
             // Description of the test 
             // ==> module, peripheral, device tested
             
+            // Set the default timeout values
+            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+            SetTimer(_TIMER1, _DISABLE, 0, 3000);   //load the timer with an timeout of 3s
+            
             // Check the motor supply voltage 
             // ==> uC ADC channel
             // Remark: Max 12VDC. If this test fail, next steps are not performed.
-            
-            // Check of the EEPROM memory: read a value, increment it, 
-            // write it and read it again to check it.
-            // ==> I2C communication
-            
-            // Read the temperature out from temp sensor 
-            // ==> Check of the I2C communication
-            
-            // Check of the voltage of the button cell 
-            // ==> uC ADC channel, battery voltage
-            
-            // Set a voltage reference 
-            // ==> I2C communication, voltage reference chip
-            
-            // Communication with bipolar driver 
-            // ==> SPI communication, bipolar driver status
-            
-            // Measure of the bipolar coils resistor 
-            // ==> uC ADC channel
-            
-            // Run the unipolar motor 
-            // ==> unipolar driver (MOSFETs)
-            
-            // Measure of the unipolar coils resistor 
-            // ==> uC ADC channel
-            
-            // Run the LIN motor
-            // ==> LIN communication
-            
-            // Measure of the VLIN supply voltage
-            // uC ADC channel
-            
-            // Check all IOs: connect each input on one output. By changing
-            // the state of the output, input state should also change.
-            // ==> IOs
-            
-            // Measure of a frequency: use an output to generate a square signal
-            // ==> uC input capture 1
-            
-            // Measure of a PWM signal: use an output to generate a PWM signal
-            // ==> uC input capture 2
-            
-            
-            //to define!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            ads1115_SetChannel(_AIN0p_GND,_FS4096mV);   //set channel on Vmot
+            T1CONbits.ON = 1;
+            while(g_Timer1.uint8_TimeoutFlag && statusOK)   
+            {
+                adc_LaunchNextMeasure();
+                // Vmot must be between 11V and 12V (0.8V - 0.88V at the AOP output)
+                if(g_ADC.uint32_Vmot >= 275 || g_ADC.uint32_Vmot <= 250)  
+                    statusOK = 0;
+            }
+            if(statusOK)
+            {
+                // Check of the EEPROM memory: read a value, increment it, 
+                // write it and read it again to check it.
+                // ==> I2C communication
+                temp = (ROM24LC256_RdByte(0, _TEST_REG_STEST, 1)) + 1;
+                ROM24LC256_WrByte(0, _TEST_REG_STEST, temp);
+                temp2 = ROM24LC256_RdByte(0, _TEST_REG_STEST, 1);
+                if(temp != temp2)
+                {
+                    STESTstatus.BITS.eFlagEEPROM = 1;
+                    statusOK = 0;
+                }
+                // Read the temperature out from temp sensor 
+                // ==> I2C communication
+                SetTimer(_TIMER1, _ENABLE, 0, 3000);   //load the timer with an timeout of 3s
+                while(g_Timer1.uint8_TimeoutFlag && !statusOK)   
+                {
+                    RV30xx_TempMeas();
+                    if(g_Param.sint16_Temp <= 10 || g_Param.sint16_Temp >= 45)
+                    {
+                        STESTstatus.BITS.eFlagTemp = 1;
+                        statusOK = 0;
+                    }
+                }
+                // Check of the voltage of the button cell 
+                // ==> uC ADC channel, battery voltage
+                temp = funct_ADCtoMiliUnit(g_ADC.uint32_Battery,310);
+                if(g_ADC.uint32_Battery <= 621)
+                {
+                    STESTstatus.BITS.eFlagButtCell = 1;
+                    statusOK = 0;
+                }
+                // Set a voltage reference 
+                // ==> I2C communication, voltage reference chip
 
-            uart2_sendbuffer('E');                      //first the letter E
-            uart2_sendbuffer(13);                       //add the CR at the end
+                // Communication with bipolar driver 
+                // ==> SPI communication, bipolar driver status
+
+                // Measure of the bipolar coils resistor 
+                // ==> uC ADC channel
+
+                // Run the unipolar motor 
+                // ==> unipolar driver (MOSFETs)
+
+                // Measure of the unipolar coils resistor 
+                // ==> uC ADC channel
+
+                // Run the LIN motor
+                // ==> LIN communication
+
+                // Measure of the VLIN supply voltage
+                // uC ADC channel
+
+                // Check all IOs: connect each input on one output. By changing
+                // the state of the output, input state should also change.
+                // ==> IOs
+
+                // Measure of a frequency: use an output to generate a square signal
+                // ==> uC input capture 1
+
+                // Measure of a PWM signal: use an output to generate a PWM signal
+                // ==> uC input capture 2
             
+           
+                if(statusOK)
+                {
+                    uart2_sendbuffer('E');                      //first the letter E
+                    uart2_sendbuffer(13);                       //add the CR at the end
+                }
+                else
+                {
+                    uart2_sendbuffer('X');
+                    uart2_sendbuffer(','); 
+                    for(i=0;i<32;i++)
+                    {
+                        temp = STESTstatus.REG & 0x01;
+                        STESTstatus.REG >> 1;
+                        funct_IntToAscii(temp, _Active);
+                        uart2_sendbuffer(','); 
+                    }
+                    uart2_sendbuffer(13);
+                }
+            }
+            else   // Vmot is out of tolerances 
+            {
+                g_Param.uint8_ErrCode = _OutOfTolVmot;  //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+            }
             g_CmdChk.uint8_GlobalLock = 0;  //disable global lock
         }
     }

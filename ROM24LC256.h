@@ -36,6 +36,8 @@ extern unsigned char ROM24LC256_RdByte(unsigned char uint8_AdrH, unsigned char u
 
 #define _ROM24LC256addr     0xA2    //definition of the address for the EEPROM
 
+#define _TEST_REG_STEST     0x0F
+
 
 #endif	/* ROM24LC256_H */
 

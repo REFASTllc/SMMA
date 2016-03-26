@@ -126,4 +126,38 @@ extern void cmd_SPROD(void);
 extern void cmd_STAT(void);
 extern void cmd_GO(void);
 
+typedef union
+{
+    long REG;
+    struct
+    {
+        long eFlagEEPROM        :1;     // bit 0
+        long eFlagTemp          :1;     // bit 1
+        long eFlagButtCell      :1;     // bit 2
+        long eFlagVref          :1;     // bit 3
+        long eFlagCommBipolar   :1;     // bit 4
+        long eFlagCoilMeasBip   :1;     // bit 5
+        long eFlagRunUnipolar   :1;     // bit 6
+        long eFlagCoilMeasUni   :1;     // bit 7
+        long eFlagRunLin        :1;     // bit 8
+        long eFlagInput0        :1;     // bit 9
+        long eFlagInput1        :1;     // bit 10
+        long eFlagInput2        :1;     // bit 11
+        long eFlagInput3PWM     :1;     // bit 12
+        long eFlagInput4        :1;     // bit 13
+        long eFlagInput5        :1;     // bit 14
+        long eFlagInput6Freq    :1;     // bit 15
+        long eFlagInput7        :1;     // bit 16
+        long eFlagOutput0       :1;     // bit 17
+        long eFlagOutput1       :1;     // bit 18
+        long eFlagOutput2       :1;     // bit 19
+        long eFlagOutput3       :1;     // bit 20
+        long eFlagOutput4       :1;     // bit 21
+        long eFlagOutput5       :1;     // bit 22
+        long eFlagOutput6       :1;     // bit 23
+        long eFlagOutput7       :1;     // bit 24
+        long notUsed            :7;
+    } BITS;
+} U_STEST;
+
 #endif	/* COMMAND_H */
