@@ -172,60 +172,58 @@ void bi_move(void)
     {
         if(g_Bipol.status.BITS.goalIsReached)         //otherwise verify if the motor arrived at his goal position
         {
-            if(g_Bipol.status.BITS.nextStepIsAllowed)     //if true - motor arrived at his goal position, 
-                                                //verify if the next step is allowed
+            if(g_Bipol.status.BITS.nextStepIsAllowed)       //if true - motor arrived at his goal position, 
+                                                            //verify if the next step is allowed
             {
                 g_Bipol.status.BITS.nextStepIsAllowed = 0;     //then clear the bit 'NS - next step'
         
-                if(g_Bipol.status.BITS.lastStepIsActived)   //is this the last step?
-                {
-                    //then stop the timer 
-                    g_Bipol.uint1_IsBipolEnabled = 0;
-                    T4CON &= 0x7FFF;    //disable interrupt module
+                //then stop the timer 
+                g_Bipol.uint1_IsBipolEnabled = 0;
+                T4CON &= 0x7FFF;    //disable interrupt module
                 
-                    TMR4 = 0x0;         //clear contents of the TMR4 and TMR5
-                    PR4 = 400;          //load the timer with 10us
-                    IFS0CLR = _IFS0_T5IF_MASK;  //clear interrupt flag
+                TMR4 = 0x0;         //clear contents of the TMR4 and TMR5
+                PR4 = 400;          //load the timer with 10us
+                IFS0CLR = _IFS0_T5IF_MASK;  //clear interrupt flag
                     
-                    g_Bipol.uint1_IntTimeExpiredFlag = 0;    //force the interrupt routine to load the new time
+                g_Bipol.uint1_IntTimeExpiredFlag = 0;    //force the interrupt routine to load the new time
           
-                    if(!g_Bipol.uint1_CurrInCoilAtTheEnd) //coils current active after move?
-                    {
-                        //switch off all outputs
-                        A3981.RUN.BITS.EN = 0;
-                        SendOneDataSPI1(A3981.RUN.REG);
-                    }
-                    else
-                    {
-                        bi_ImotToDAC(g_Param.uint16_BipHoldI);
-                    }
-                    
-                    if(g_Param.uint8_RunBit)
-                    {
-                        oSinkSource0 = 0;
-                    }
-                 
-                    g_Bipol.status.BITS.nextStepIsAllowed = 0;     //clear 'NS', 'DEC', 'ACC', 'GOAL' and 'LS' bit
-                    g_Bipol.status.BITS.decelerationIsActived = 0;
-                    g_Bipol.status.BITS.accelerationIsActived = 0;
-                    g_Bipol.status.BITS.accelerationIsActived = 0;
-                    g_Bipol.status.BITS.goalIsReached = 0;
-                    g_Bipol.status.BITS.lastStepIsActived = 0;
-                    g_Bipol.status.BITS.firstStepIsActived = 1;     //set the bit 'FS'
-                    
-                    if(g_Param.uint8_Acknowledge)           //verify if we have to send back a second ack
-                    {
-                        uart2_sendbuffer('E');              //first the letter E
-                        uart2_sendbuffer(13);               //with CR at the end
-                    }      
-                    
-                    g_CmdChk.uint8_GlobalLock = 0;  //disable global lock
+                if(!g_Bipol.uint1_CurrInCoilAtTheEnd) //coils current active after move?
+                {
+                    //switch off all outputs
+                    A3981.RUN.BITS.EN = 0;
+                    SendOneDataSPI1(A3981.RUN.REG);
                 }
                 else
-                    g_Bipol.status.BITS.lastStepIsActived = 1;     //otherwise set the bit 'LS'
+                {
+                    bi_ImotToDAC(g_Param.uint16_BipHoldI);
+                }
+                    
+                if(g_Param.uint8_RunBit)
+                {
+                    oSinkSource0 = 0;
+                }
+                 
+                g_Bipol.status.BITS.nextStepIsAllowed = 0;     //clear 'NS', 'DEC', 'ACC', 'GOAL' and 'LS' bit
+                g_Bipol.status.BITS.decelerationIsActived = 0;
+                g_Bipol.status.BITS.accelerationIsActived = 0;
+                g_Bipol.status.BITS.accelerationIsActived = 0;
+                g_Bipol.status.BITS.goalIsReached = 0;
+                g_Bipol.status.BITS.lastStepIsActived = 0;
+                g_Bipol.status.BITS.firstStepIsActived = 1;     //set the bit 'FS'
+                    
+                if(g_Param.uint8_Acknowledge)           //verify if we have to send back a second ack
+                {
+                    uart2_sendbuffer('E');              //first the letter E
+                    uart2_sendbuffer(13);               //with CR at the end
+                }      
+                    
+                g_CmdChk.uint8_GlobalLock = 0;  //disable global lock
             }
             else //otherwise load the last switch off delay 
+            {
                 g_Bipol.uint32_IntTime = g_Bipol.uint32_SwOffTime;
+                g_Bipol.status.BITS.lastStepIsActived = 1;     //otherwise set the bit 'LS'
+            }
         }
         else
         {

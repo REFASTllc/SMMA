@@ -204,6 +204,10 @@ void cmd_ETESTIN(void)
     volatile unsigned long int uint32_WB2;
     volatile unsigned long int uint32_WB3;
     volatile unsigned long int uint32_WB4;
+    volatile unsigned long int uint32_WB5;
+    volatile unsigned long int uint32_WB6;
+    volatile unsigned long int uint32_TolMin;
+    volatile unsigned long int uint32_TolMax;
     volatile unsigned char uint8_Result = 0;
     
     if(g_CmdChk.uint8_ParamPos == 2)   //number of received characters OK?
@@ -262,6 +266,23 @@ void cmd_ETESTIN(void)
                     uint32_WB2 = funct_ADCtoMiliUnit(uint32_WB2,8000);                             
                 }
                 
+                //measure both coils A
+                oUniCoilA1 = 1;                     //switch on coil A1
+                oUniCoilA2 = 1;                     //switch on coil A2
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
+                while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                {
+                    //do nothing
+                }              
+                uint32_WB5 = ads1115_read();         //read out Imot
+                oUniCoilA1 = 0;                     //switch off coil A1
+                oUniCoilA2 = 0;                     //switch off coil A2
+                if(uint32_WB5)   //convert result in mV only if it is not 0
+                {
+                    uint32_WB5 = funct_ADCtoMiliUnit(uint32_WB5,8000);                             
+                }
+                
                 //measure coil B1
                 oUniCoilB1 = 1;                     //switch on coil B1
                 g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
@@ -291,13 +312,37 @@ void cmd_ETESTIN(void)
                 {
                     uint32_WB4 = funct_ADCtoMiliUnit(uint32_WB4,8000);                             
                 }
+                
+                //measure both coils A
+                oUniCoilB1 = 1;                     //switch on coil B1
+                oUniCoilB2 = 1;                     //switch on coil B2
+                g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
+                SetTimer(_TIMER1,_ENABLE,0,200);    //load the timer with 200ms
+                while(g_Timer1.uint8_TimeoutFlag)   //rest in the while until flag is reseted
+                {
+                    //do nothing
+                }              
+                uint32_WB6 = ads1115_read();         //read out Imot
+                oUniCoilB1 = 0;                     //switch off coil B1
+                oUniCoilB2 = 0;                     //switch off coil B2
+                if(uint32_WB6)   //convert result in mV only if it is not 0
+                {
+                    uint32_WB6 = funct_ADCtoMiliUnit(uint32_WB6,8000);                             
+                }
 
+                //calculate tolerance for both coils
+                uint32_TolMin = g_Param.uint16_Imin * 2;
+                uint32_TolMax = g_Param.uint16_Imax * 2;
+                        
                 //verify result
                 uint8_Result += funct_CheckTol(uint32_WB1,g_Param.uint16_Imin,g_Param.uint16_Imax);
                 uint8_Result += funct_CheckTol(uint32_WB2,g_Param.uint16_Imin,g_Param.uint16_Imax);
                 uint8_Result += funct_CheckTol(uint32_WB3,g_Param.uint16_Imin,g_Param.uint16_Imax);
                 uint8_Result += funct_CheckTol(uint32_WB4,g_Param.uint16_Imin,g_Param.uint16_Imax);
-                if(uint8_Result == 4)
+                uint8_Result += funct_CheckTol(uint32_WB5,uint32_TolMin,uint32_TolMax);
+                uint8_Result += funct_CheckTol(uint32_WB6,uint32_TolMin,uint32_TolMax);
+                
+                if(uint8_Result == 6)
                 {
                     uart2_sendbuffer('E');      //add an E
                     uart2_sendbuffer(',');      //add a ,
