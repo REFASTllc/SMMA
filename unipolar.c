@@ -198,52 +198,59 @@ void uni_move(void)
             {
                 g_Uni.uint8_Status &= 0xEF;     //then clear the bit 'NS - next step'
         
-                //then stop the timer 
-                T4CON &= 0x7FFF;    //disable interrupt module
-                
-                TMR4 = 0x0;         //clear contents of the TMR4 and TMR5
-                PR4 = 400;          //load the timer with 10us
-                IFS0CLR = _IFS0_T5IF_MASK;  //clear interrupt flag
-          
-                if(g_Uni.uint8_Settings & 0x08) //coils current active after move?
+                if(g_Uni.uint8_Status &= 0x02)
                 {
-                    //then nothing is to do
+                    //then stop the timer 
+                    T4CON &= 0x7FFF;    //disable interrupt module
+
+                    TMR4 = 0x0;         //clear contents of the TMR4 and TMR5
+                    PR4 = 400;          //load the timer with 10us
+                    IFS0CLR = _IFS0_T5IF_MASK;  //clear interrupt flag
+
+                    if(g_Uni.uint8_Settings & 0x08) //coils current active after move?
+                    {
+                        //then nothing is to do
+                    }
+                    else
+                    {
+                        //otherwise switch off all outputs
+                        oUniCoilA1 = _UniPhOFF;     //output PhA1 = off
+                        oUniCoilA2 = _UniPhOFF;     //output PhA2 = off
+                        oUniCoilB1 = _UniPhOFF;     //output PhB1 = off
+                        oUniCoilB2 = _UniPhOFF;     //output PhB2 = off
+                    }
+
+                    if(g_Param.uint8_RunBit)
+                    {
+                        oSinkSource0 = 0;
+                    }
+
+                    g_Uni.uint8_Settings &= 0xFE;   //clear the 'RUN' bit
+                    g_Uni.uint8_Status &= 0xC1;     //clear 'NS', 'DEC', 'ACC', 'GOAL' and 'LS' bit
+                    g_Uni.uint8_Status |= 0x01;     //set the bit 'FS'
+
+                    if(g_Param.uint8_Acknowledge)           //verify if we have to send back a second ack
+                    {
+                        uart2_sendbuffer('E');              //first the letter E
+                        uart2_sendbuffer(13);               //with CR at the end
+                    }
+                    else
+                    {
+                        //nothing to send back
+                    }    
+
+                    g_CmdChk.uint8_GlobalLock = 0;  //global lock disable
                 }
                 else
                 {
-                    //otherwise switch off all outputs
-                    oUniCoilA1 = _UniPhOFF;     //output PhA1 = off
-                    oUniCoilA2 = _UniPhOFF;     //output PhA2 = off
-                    oUniCoilB1 = _UniPhOFF;     //output PhB1 = off
-                    oUniCoilB2 = _UniPhOFF;     //output PhB2 = off
+                    g_Uni.uint8_Status |= 0x02;     //otherwise set the bit 'LS'
                 }
-                    
-                if(g_Param.uint8_RunBit)
-                {
-                    oSinkSource0 = 0;
-                }
-                 
-                g_Uni.uint8_Settings &= 0xFE;   //clear the 'RUN' bit
-                g_Uni.uint8_Status &= 0xC1;     //clear 'NS', 'DEC', 'ACC', 'GOAL' and 'LS' bit
-                g_Uni.uint8_Status |= 0x01;     //set the bit 'FS'
-                    
-                if(g_Param.uint8_Acknowledge)           //verify if we have to send back a second ack
-                {
-                    uart2_sendbuffer('E');              //first the letter E
-                    uart2_sendbuffer(13);               //with CR at the end
-                }
-                else
-                {
-                    //nothing to send back
-                }    
-                    
-                g_CmdChk.uint8_GlobalLock = 0;  //global lock disable
+                        
             }
             else
             {
                 //otherwise load the last switch off delay 
                 g_Uni.uint32_IntTime = g_Uni.uint32_SwOffTime;
-                g_Uni.uint8_Status |= 0x02;     //otherwise set the bit 'LS'
             }
         }
         else
