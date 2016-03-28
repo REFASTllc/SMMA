@@ -1064,23 +1064,109 @@ unsigned long int funct_ADCtoMiliUnit(unsigned long int uint32_ADCvalue,unsigned
  * the result will be directly in ohm and stored into the sendbuffer of the UART with one number after the 
  * comma. 
  * 
+ * Modified by A. Staub the 28.03.2016:
+ * We have to add an offset because the result is not stable. 
  * Creator:                 A. Staub
  * Date of creation:        18.02.2016
- * Last modification on:    
- * Modified by:             
+ * Last modification on:    28.03.2016
+ * Modified by:             A. Staub
  * 
  * Input:                   uint32_Milivolt
- * Output:                  uint32_WB
+ * Output:                  -
 ***********************************************************************************************************************/
 void funct_MiliVoltToOhm(unsigned long int uint32_Milivolt)
 {
-    volatile unsigned long int uint32_WB;
+    volatile unsigned long int uint32_BeforComma;
+    volatile unsigned long int uint32_AfterComma;
     
-    uint32_WB = uint32_Milivolt / 10;
-    funct_IntToAscii(uint32_WB,_Active);     
-    uart2_sendbuffer('.');    
-    uint32_WB = uint32_Milivolt % 10;
-    funct_IntToAscii(uint32_WB,_Active); 
+    //add a software offset
+    if(uint32_Milivolt <= 145)
+    {
+        uint32_Milivolt += 3;   //add an offset of 0.3 ohm
+    }
+    else if (uint32_Milivolt <= 195)
+    {
+        uint32_Milivolt += 4;   //add an offset of 0.4 ohm
+    }
+    else if (uint32_Milivolt <= 230)
+    {
+        uint32_Milivolt += 6;   //add an offset of 0.6 ohm
+    }
+    else if (uint32_Milivolt <= 285)
+    {
+        uint32_Milivolt += 8;   //add an offset of 0.8 ohm
+    }
+    else if (uint32_Milivolt <= 320)
+    {
+        uint32_Milivolt += 12;   //add an offset of 1.2 ohm
+    }
+    else if (uint32_Milivolt <= 380)
+    {
+        uint32_Milivolt += 15;   //add an offset of 1.5 ohm
+    }
+    else if (uint32_Milivolt <= 420)
+    {
+        uint32_Milivolt += 19;   //add an offset of 1.9 ohm
+    }
+    else if (uint32_Milivolt <= 470)
+    {
+        uint32_Milivolt += 24;   //add an offset of 2.4 ohm
+    }
+    else if (uint32_Milivolt <= 515)
+    {
+        uint32_Milivolt += 29;   //add an offset of 2.9 ohm
+    }
+    else if (uint32_Milivolt <= 550)
+    {
+        uint32_Milivolt += 34;   //add an offset of 3.4 ohm
+    }
+    else if (uint32_Milivolt <= 600)
+    {
+        uint32_Milivolt += 40;   //add an offset of 4.0 ohm
+    }
+    else if (uint32_Milivolt <= 645)
+    {
+        uint32_Milivolt += 47;   //add an offset of 4.7 ohm
+    }
+    else if (uint32_Milivolt <= 690)
+    {
+        uint32_Milivolt += 53;   //add an offset of 5.3 ohm
+    }
+    else if (uint32_Milivolt <= 725)
+    {
+        uint32_Milivolt += 60;   //add an offset of 6.0 ohm
+    }
+    else if (uint32_Milivolt <= 770)
+    {
+        uint32_Milivolt += 68;   //add an offset of 6.8 ohm
+    }
+    else if (uint32_Milivolt <= 815)
+    {
+        uint32_Milivolt += 75;   //add an offset of 7.5 ohm
+    }
+    else if (uint32_Milivolt <= 850)
+    {
+        uint32_Milivolt += 84;   //add an offset of 8.4 ohm
+    }
+    else if (uint32_Milivolt <= 900)
+    {
+        uint32_Milivolt += 93;   //add an offset of 9.3 ohm
+    }
+    else if (uint32_Milivolt >= 901)
+    {
+        uint32_Milivolt += 100; //add an offset of 10.0 ohm
+    }
+    else
+    {
+        //do nothing
+    }
+    
+    uint32_BeforComma = uint32_Milivolt / 10;    
+    uint32_AfterComma = uint32_Milivolt % 10;
+    
+    funct_IntToAscii(uint32_BeforComma,_Active);     
+    uart2_sendbuffer('.');
+    funct_IntToAscii(uint32_AfterComma,_Active); 
 }   //end of funct_MiliVoltToOhm
 
 
