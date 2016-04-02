@@ -401,15 +401,16 @@ void cmdchk_check(void)
                 g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                 uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                 break;
-            /*
-            case (38):  //command GERUN
-                cmd_GERUN();        //call subroutine
+                
+            case (_IdGERUN):        //command GERUN (not used anymore
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode);     //call subroutine
                 break;
-                              
-            case (39):  //command ERUN
-                cmd_ERUN();         //call subroutine
-                break;
-            */    
+                
+            case (_IdERUN):         //command ERUN (not used anymore
+                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode);     //call subroutine
+                break;  
                 
             case (_IdGO):           //command GO
                 g_Param.uint8_GOcmdTrue = 1;    //enable GO command
@@ -451,17 +452,11 @@ void cmdchk_check(void)
                 break;
                 
             case (_IdSMCRSTP):      //command SMCRSTP
-                //command is not anymore supported with the new driver. 
-                //I let it anyway here, if once we have to re-use it
-                //cmd_SMCRSTP();      //call subroutine
                 g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                 uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                 break;
                 
             case (_IdGMCRSTP):      //command GMCRSTP
-                //command is not anymore supported with the new driver. 
-                //I let it anyway here, if once we have to re-use it
-                //cmd_GMCRSTP();      //call subroutine
                 g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                 uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                 break;
@@ -512,13 +507,11 @@ void cmdchk_check(void)
                 break;
                 
             case (_IdGPOSRUN):  //command GPOSRUN
-//              cmd_GPOSRUN();    //call subroutine
                 g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                 uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                 break;
                     
             case (_IdPOSRUN):  //command POSRUN
-//              cmd_POSRUN();       //call subroutine
                 g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
                 uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
                 break;

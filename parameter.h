@@ -51,10 +51,10 @@ extern void param_init(void);
 //#define _Imax               2800        //<OK> maximal ON current for the coils in [mA]
 //#define _UmotMin            7000        //<OK> minimal test voltage for the actuators in [mV]
 //#define _UmotMax            40000       //<OK> maximal test voltage for the actuators in [mV]
-#define _SCiLevelMin        100         //minimal short-circuit current limit in [mA]
-#define _SCiLevelMax        3200        //maximal short-circuit current limit in [mA]
-#define _SCtLevelMin        1           //minimal short-circuit time in [ms]
-#define _SCtLevelMax        100         //maximal short-circuit time in [ms]
+#define _SCiLevelMin        0x0         //minimal short-circuit current limit in [mA]
+#define _SCiLevelMax        0xFFFFFFFF  //maximal short-circuit current limit in [mA]
+#define _SCtLevelMin        0x0         //minimal short-circuit time in [ms]
+#define _SCtLevelMax        0xFFFFFFFF  //maximal short-circuit time in [ms]
 #define _AccNumbStepMin     1           //minimal number of steps for the frequency for acceleration
 #define _AccNumbStepMax     1000        //maximal number of steps for the frequency for acceleration
 #define _AccFreqMin         1           //minimal frequency for the number of steps in [Hz] for acceleration

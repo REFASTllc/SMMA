@@ -1039,6 +1039,7 @@ void cmd_RUN(void)
 ***********************************************************************************************************************/
 void cmd_SPHC(void)
 {
+#ifndef _NOT_USED_CMD
     auto unsigned char uint8_Result = 0;    //local work byte for the result 
     
     if(g_CmdChk.uint8_ParamPos == 2)   //number of received characters OK?
@@ -1064,6 +1065,11 @@ void cmd_SPHC(void)
         g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
+#endif
+#ifdef _NOT_USED_CMD
+    g_Param.uint8_ErrCode = _NotSupAnymore;  //set error code
+    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+#endif
 }   //end of cmd_SPHC
 
 
@@ -1451,7 +1457,8 @@ void cmd_GILIM(void)
  * Output:                  -
 ***********************************************************************************************************************/
 void cmd_GPHC(void)
-{  
+{ 
+#ifndef _NOT_USED_CMD
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
     {
         if(g_Uni.uint8_Settings & 0x01) //is motor in run mode?
@@ -1475,6 +1482,11 @@ void cmd_GPHC(void)
         g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
+#endif
+#ifdef _NOT_USED_CMD
+    g_Param.uint8_ErrCode = _NotSupAnymore;  //set error code
+    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+#endif
 }   //end of cmd_GPHC
 
 
@@ -2439,6 +2451,7 @@ void cmd_GINP(void)
 ***********************************************************************************************************************/
 void cmd_SMCRSTP(void)
 {
+#ifndef _NOT_USED_CMD
     auto unsigned char uint8_Result = 0;    //local work byte for the result
     auto unsigned char uint8_WB1;           //local work byte for the loops
     auto unsigned char uint8_WB2;           //local work byte to store the results into the array
@@ -2513,6 +2526,11 @@ void cmd_SMCRSTP(void)
         g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
+#endif
+#ifdef _NOT_USED_CMD
+    g_Param.uint8_ErrCode = _NotSupAnymore;  //set error code
+    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+#endif
 }   // end of cmd_SMCRSTP
 
 
@@ -2532,6 +2550,7 @@ void cmd_SMCRSTP(void)
 ***********************************************************************************************************************/
 void cmd_GMCRSTP(void)
 {
+#ifndef _NOT_USED_CMD
     auto unsigned char uint8_WB;    //local work byte
     
     if(g_CmdChk.uint8_ParamPos == 1)   //number of received characters OK?
@@ -2572,6 +2591,11 @@ void cmd_GMCRSTP(void)
         g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
+#endif
+#ifdef _NOT_USED_CMD
+    g_Param.uint8_ErrCode = _NotSupAnymore;  //set error code
+    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+#endif
 }   //end of cmd_GMCRSTP
 
 
@@ -2683,7 +2707,7 @@ void cmd_GSWLIM(void)
     }
 #endif
 #ifdef _NOT_USED_CMD
-    g_Param.uint8_ErrCode = _UnknownCmd;  //set error code
+    g_Param.uint8_ErrCode = _NotSupAnymore;  //set error code
     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
 #endif
 }   //end of cmd_GSWLIM 
@@ -2739,7 +2763,7 @@ void cmd_GSWPOS(void)
     }
 #endif
 #ifdef _NOT_USED_CMD
-    g_Param.uint8_ErrCode = _UnknownCmd;  //set error code
+    g_Param.uint8_ErrCode = _NotSupAnymore;  //set error code
     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
 #endif
 }   //end of cmd_GSWPOS 
@@ -2801,7 +2825,7 @@ void cmd_SPWMLIM(void)
     }
 #endif
 #ifdef _NOT_USED_CMD
-    g_Param.uint8_ErrCode = _UnknownCmd;  //set error code
+    g_Param.uint8_ErrCode = _NotSupAnymore;  //set error code
     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
 #endif
 }   //end of cmd_SPWMLIM 
@@ -2844,7 +2868,7 @@ void cmd_GPWMLIM(void)
     }
 #endif
 #ifdef _NOT_USED_CMD
-    g_Param.uint8_ErrCode = _UnknownCmd;  //set error code
+    g_Param.uint8_ErrCode = _NotSupAnymore;  //set error code
     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
 #endif
 }   //end of cmd_GPWMLIM
@@ -2908,7 +2932,7 @@ void cmd_GPWMPOS(void)
     }
 #endif
 #ifdef _NOT_USED_CMD
-    g_Param.uint8_ErrCode = _UnknownCmd;  //set error code
+    g_Param.uint8_ErrCode = _NotSupAnymore;  //set error code
     uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
 #endif
 }   //end of cmd_GPWMLIM
