@@ -540,7 +540,9 @@ void bi_CheckCalc(void)
             else if(uint16_Freq > g_Bipol.uint16_RunFreq) //then we have nothing more to read out and we can leave the for loop
                 uint8_loop = g_Param.uint8_AccNumbRamp;
             else //otherwise all parameters are right, so add the number of steps into acceleration stop position
+            {
                 g_Bipol.uint32_AccStop += uint16_NumbStep;
+            }
         }
     //-----------------------------DECELERATION-----------------------------
         //start the array position with 255, because 0 is already a place in the array

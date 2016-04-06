@@ -340,7 +340,7 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
     TMR4 = 0x0;         //clear contents of the TMR4 and TMR5
     
     if((g_Param.uint8_MotTyp == 'U') || (g_Param.uint8_MotTyp == 'M'))
-    {
+    {      
         //load the new interrupt time
         PR4 = g_Uni.uint32_IntTime;
 
@@ -349,6 +349,15 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
         //for security - be sure that the motor is in run
         if(g_Uni.uint8_Settings & 0x01)
         {
+            if(g_Param.uint8_FreqBit)   //frequency bit set for output 1?
+            {
+                oSinkSource1 = !oSinkSource1;
+            }
+            else
+            {
+                //do nothing
+            }
+            
             //then verify if it is the first or last step or motor error = true or real = goal position
             if((g_Uni.uint8_Status & 0x01) || (g_Uni.uint8_Status & 0x02) ||
             (g_Uni.uint8_Status & 0x80) || (g_Uni.uint32_RealPos == g_Uni.uint32_GoalPos))
@@ -485,16 +494,7 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
                             break;
                     }
                 }      
-                
-                if(g_Param.uint8_FreqBit)   //frequency bit set for output 1?
-                {
-                    oSinkSource1 = !oSinkSource1;
-                }
-                else
-                {
-                    //do nothing
-                }
-                
+                              
                 //write the new values to the outputs
                 oUniCoilA1 = g_Uni.uint8_PhA1;
                 oUniCoilA2 = g_Uni.uint8_PhA2;
@@ -512,6 +512,16 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
     }
     else if (g_Param.uint8_MotTyp == 'B')   //motor is a bipolar
     {
+        //frequency bit set for output 1 and time not expired?
+        if((g_Param.uint8_FreqBit) && (!g_Bipol.uint1_IntTimeExpiredFlag))   
+        {
+            oSinkSource1 = !oSinkSource1;
+        }
+        else
+        {
+            //do nothing
+        }
+    
         if(g_Bipol.uint1_IntTimeExpiredFlag)    //interrupt time expired?
         {
             g_Bipol.uint1_IntTimeExpiredFlag = 0;   //clear the flag
@@ -549,14 +559,14 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
                         g_Bipol.uint32_GoalPos++;   //increment goal position
                     }
                     
-                    if(g_Param.uint8_FreqBit)       //frequency bit set for output 1?
+                    /*if(g_Param.uint8_FreqBit)       //frequency bit set for output 1?
                     {
                         oSinkSource1 = !oSinkSource1;
                     }
                     else
                     {
                         //do nothing
-                    }
+                    }*/
                     oBiStepSignal = 1;              //execute one step
                 }
             }
