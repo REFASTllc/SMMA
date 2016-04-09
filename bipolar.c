@@ -95,6 +95,8 @@ void bi_init(void)
 ***********************************************************************************************************************/
 void bi_move(void)
 {
+    volatile unsigned short int uint16_Freq;
+    
     if(g_Bipol.status.BITS.firstStepIsActived)               //is this the first step?
     {
         if(g_Bipol.status.BITS.nextStepIsAllowed)           //and is the next step allowed?
@@ -102,13 +104,25 @@ void bi_move(void)
             g_Bipol.status.BITS.nextStepIsAllowed = 0;         //then clear the bit 'NS - next step'
             bi_CheckCalc();                    //subroutine to verify all parameters and calculate different pos.       
             g_Bipol.status.BITS.firstStepIsActived = 0;         //clear the bit 'FS - first step'
-      
+            
             if(!g_Bipol.status.BITS.error)    //no error detected during the check from the subroutine
             {
                 if(g_Bipol.uint1_NextStepIsRamp == 1) //then verify as next if the acceleration ramp is active?
                 {
                     g_Bipol.status.BITS.accelerationIsActived = 1; //set bit 'ACCEL - acceleration'
                     bi_ImotToDAC(g_Param.uint16_BipAccI);
+                    
+                    //****new code****
+                    /*//then load the new number of steps from the array
+                    g_Bipol.uint16_AccNumbStep = funct_ReadRamp(_Acc,_Step,g_Bipol.uint8_AccArrPos);
+
+                    //load the new ACC time, convert and store it
+                    uint16_Freq = funct_ReadRamp(_Acc,_Freq,g_Bipol.uint8_AccArrPos);
+                    g_Bipol.uint32_IntTime = funct_FreqToTimer23(uint16_Freq);
+                    
+                    //increment position for the array
+                    g_Bipol.uint8_AccArrPos++;*/                   
+                    //****end new code*****
                 }
                 else
                 {
@@ -272,7 +286,7 @@ void bi_move(void)
 ***********************************************************************************************************************/
 void bi_acc(void)
 {
-    auto unsigned short int uint16_Freq;      //local variable for the frequency
+    volatile unsigned short int uint16_Freq;      //local variable for the frequency
   
     if(g_Bipol.status.BITS.nextStepIsAllowed)       //is the next step is allowed?
     {

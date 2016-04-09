@@ -559,14 +559,6 @@ void __ISR(_TIMER_5_VECTOR, IPL6SOFT) IntTimer45Handler(void)
                         g_Bipol.uint32_GoalPos++;   //increment goal position
                     }
                     
-                    /*if(g_Param.uint8_FreqBit)       //frequency bit set for output 1?
-                    {
-                        oSinkSource1 = !oSinkSource1;
-                    }
-                    else
-                    {
-                        //do nothing
-                    }*/
                     oBiStepSignal = 1;              //execute one step
                 }
             }

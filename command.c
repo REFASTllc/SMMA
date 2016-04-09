@@ -564,7 +564,7 @@ void cmd_SRACC(void)
                     }
                     //then store each parameter on the right place (start with the 2nd parameter)
                     uint8_WB1 = 1;
-                    uint8_WB2 = 0;
+                    uint8_WB2 = 0;  
                     do
                     {
                         g_Param.uint16_AccNumbStep[uint8_WB2] = g_CmdChk.uint32_TempPara[uint8_WB1] & 0xFFFF;
@@ -687,7 +687,7 @@ void cmd_SRDEC(void)
                     }
                     //then store each parameter on the right place (start with the 2nd parameter)
                     uint8_WB1 = 1;
-                    uint8_WB2 = 0;
+                    uint8_WB2 = 0;  
                     do
                     {
                         g_Param.uint16_DecNumbStep[uint8_WB2] = g_CmdChk.uint32_TempPara[uint8_WB1] & 0xFFFF;
@@ -1529,7 +1529,7 @@ void cmd_GRACC(void)
             //send back the needed informations
             uart2_sendbuffer('E');                      //first the letter E
            
-            for(uint8_WB=0; uint8_WB<50; uint8_WB++)    //read out both arrays
+            for(uint8_WB=0; uint8_WB<50; uint8_WB++)    //read out both arrays 
             {
                 //is one of the next parameter = 0?
                 if((g_Param.uint16_AccNumbStep[uint8_WB] == 0) || (g_Param.uint16_AccFreq[uint8_WB] == 0))

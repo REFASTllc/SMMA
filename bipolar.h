@@ -76,11 +76,6 @@ typedef struct          //definitions of multiple variable for unipolar
     volatile unsigned long int uint32_RealPos;      //real position of the motor
     volatile unsigned long int uint32_GoalPos;      //goal position of the motor
     volatile unsigned short int uint16_RunFreq;       //run frequency for normal run
-//    volatile unsigned char uint8_PhA1;          //output state of phase A1
-//    volatile unsigned char uint8_PhA2;          //output state of phase A2
-//    volatile unsigned char uint8_PhB1;          //output state of phase B1
-//    volatile unsigned char uint8_PhB2;          //output state of phase B2
-//    volatile unsigned char uint8_Status;        //motor status - definition see uni_init()
 //variables for timer 23
     volatile unsigned long int uint32_IntTime;      //effective interrupt time
     volatile unsigned long int uint32_RunTime;      //run time for interrupt
@@ -99,6 +94,7 @@ typedef struct          //definitions of multiple variable for unipolar
     volatile unsigned char uint1_ErrConfig:1;           // Error flag of motor configuration
     volatile unsigned char uint1_IsBipolEnabled:1;      //
     volatile unsigned char uint1_IntTimeExpiredFlag;  //1= interrupt time expired / 0= interrupt time not expired
+    volatile unsigned long int uint32_NextTime;     //next time for timer
 } Sbipol;                 //struct name is SUni (S for struct)
 
 #endif	/* UNIPOLAR_H */

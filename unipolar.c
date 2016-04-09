@@ -564,7 +564,7 @@ void uni_CheckCalc(void)
                 //then we have nothing more to read out and we can leave the for loop
                 uint8_loop = g_Param.uint8_AccNumbRamp;
             }
-            //is the frequency higger then allowed?
+            //is the frequency higher then allowed?
             else if(uint16_Freq > _UniFreqMax)
             {
                 //then signal an error
