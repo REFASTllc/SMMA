@@ -302,6 +302,7 @@
 #define _IdRTESTIN          115             //resistance test / measure
 #define _IdSPROD            116             // Write production information in serial EEPROM
 #define _IdSTAT             117             //get status of the SMMA
+#define _IdJEprotocol       118             //command is a JE protocol
 
 
 #endif	/* DEFINES_H */

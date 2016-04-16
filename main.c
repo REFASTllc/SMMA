@@ -49,35 +49,9 @@ void main(void)
     system_init();          //call subroutine    
     
     asm("ei");              //enable all interrupts (code in assembler) use declaration "di" to disable all interrupts
-    
- //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!
- //we both play with the switch for the supply. I am still testing the LIN bus driver.
- //please inform me if you increase the voltage higher than 24V!!!
- //otherwise I think nothing will happen if we switch on both supplies (bipolar & lin)
- //but I switched off your supply to be sure! 
-    //bipolar
-/*#ifdef _BIPOLAR
-    oBiResetSignal = 1;
-    oVmotOnOff = 1;
-    oBiEnaVmot = 1;
-    oEnaVLINSupply = 0;
-    oBiPhCurrCtrl = 1;
-#endif
-#ifdef _LIN
-    oVmotOnOff = 1;
-    oEnaVLINSupply = 1;
-#endif
-#ifdef _UNIPOLAR
-    oVmotOnOff = 1;
-    oEnaVLINSupply = 0;
-#endif*/
- //!!!!!!!!!!!!!!!!!!!!!!!!!BE CAREFUL!!!!!!!!!!!!!!!!!!!!!!   
-    
-      periph_init();
-//      DAC7571_WrByte(_NormalMode, 1240);  // 1V
-//    DAC7571_WrByte(_NormalMode, 2381);  // 2V
-//    DAC7571_WrByte(_NormalMode, 992);  // 0V8
-//    DAC7571_WrByte(_NormalMode, 2113);  // 1.7V
+        
+    periph_init();
+    DAC7571_WrByte(_NormalMode, 992);  // 0V8
     
 #ifdef DEBUG_ON
     InitDebugBuf();

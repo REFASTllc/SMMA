@@ -11,14 +11,17 @@
 ***********************************************************************************************************************
  * Content overview:        - LINATA6628_init
  *                          - LINATA6629_SendBackSlaveAnswer
+ *                          - LINJE_Protocol
 ***********************************************************************************************************************/
 
 
 #include "includes.h"
 
 SLin g_LIN; 
+SJE g_JE;
 extern SParam g_Param;
 extern SUART1rxd g_UART1rxd;
+extern SCmdChk g_CmdChk; 
 
 
 /**********************************************************************************************************************
@@ -161,3 +164,87 @@ void LINATA6629_SendBackSlaveAnswer(void)
     g_LIN.uint8_SlaveAnswerFinish = 0;      //reset variable
     g_LIN.uint8_SlaveTimeout = 0;           //reset variable
 }   //end of LINATA6629_SendBackSlaveAnswer
+
+
+/**********************************************************************************************************************
+ * Routine:                 LINJE_Protocol
+
+ * Description:
+ * ...
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.04.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void LINJE_Protocol(void)
+{
+    volatile unsigned char uint8_Result = 0;
+    volatile unsigned char uint8_WB = 0;
+    
+    //protocol without data byte, or 2, 4 or 8 data bytes
+    if((g_CmdChk.uint8_ParamPos == 8) ||
+        (g_CmdChk.uint8_ParamPos == 6) ||
+        (g_CmdChk.uint8_ParamPos == 10) ||
+        (g_CmdChk.uint8_ParamPos == 12) ||
+        (g_CmdChk.uint8_ParamPos == 14))
+    {    
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock enabled?
+        {
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+        else
+        {
+            g_CmdChk.uint8_GlobalLock = 1;
+            
+            uart2_sendbuffer('E');
+            uart2_sendbuffer(',');
+            do
+            {
+                uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[0],0,255);
+                funct_IntToAscii(g_CmdChk.uint32_TempPara[uint8_WB],_Active);
+                uint8_WB++;
+                uart2_sendbuffer(',');                  //add the comma
+            }
+            while(uint8_WB <= g_CmdChk.uint8_ParamPos);
+            uart2_sendbuffer(13);
+            
+            g_CmdChk.uint8_GlobalLock = 0;
+        }
+    }
+    else
+    {
+        //
+    }
+}   //end of LINJE_Protocol
+
+
+/**********************************************************************************************************************
+ * Routine:                 LINJE_ConvertASCII
+
+ * Description:
+ * ...
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        16.04.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   uint8_Character
+ * Output:                  uint8_Result
+***********************************************************************************************************************/
+unsigned char LINJE_ConvertASCII(unsigned char uint8_Character)
+{
+    volatile unsigned char uint8_Result = 0;
+    
+    uint8_Result = (uint8_Character - 48) & 0x000000FF;
+    uint8_Result += ((uint8_Character - 48) & 0x0000FF00) * 10;
+    uint8_Result += ((uint8_Character - 48) & 0x00FF0000) * 100;
+    uint8_Result += ((uint8_Character - 48) & 0xFF000000) * 100;
+    
+    return uint8_Result;
+}   //end of LINJE_ConvertASCII
