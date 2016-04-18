@@ -185,12 +185,12 @@ void LINJE_Protocol(void)
     volatile unsigned char uint8_Result = 0;
     volatile unsigned char uint8_WB = 0;
     
-    //protocol without data byte, or 2, 4 or 8 data bytes
-    if((g_CmdChk.uint8_ParamPos == 8) ||
-        (g_CmdChk.uint8_ParamPos == 6) ||
-        (g_CmdChk.uint8_ParamPos == 10) ||
-        (g_CmdChk.uint8_ParamPos == 12) ||
-        (g_CmdChk.uint8_ParamPos == 14))
+    //protocol without data byte, or 2, 4, 6 or 8 data bytes
+    if((g_JE.uint8_ParamPos == 6) ||
+        (g_JE.uint8_ParamPos == 8) ||
+        (g_JE.uint8_ParamPos == 10) ||
+        (g_JE.uint8_ParamPos == 12) ||
+        (g_JE.uint8_ParamPos == 14))
     {    
         if(g_CmdChk.uint8_GlobalLock == 1)  //global lock enabled?
         {
@@ -201,7 +201,27 @@ void LINJE_Protocol(void)
         {
             g_CmdChk.uint8_GlobalLock = 1;
             
-            uart2_sendbuffer('E');
+            if(g_JE.uint32_TempPara[0] == 80)
+            {
+                //do nothing 
+            }
+            else
+            {
+                switch (g_JE.uint8_ParamPos)
+                {
+                    case 6:
+                        g_LIN.uint8_LinBreakToSend = 1;             //enable LIN break to send
+                        IEC0SET = _IEC0_U1TXIE_MASK;                //enable the send interrupt
+                        g_LIN.uint8_LinBusy = 1;                    //set busy flag
+                        uart1_sendbuffer(0x17);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            
+            /*uart2_sendbuffer('E');
             uart2_sendbuffer(',');
             do
             {
@@ -211,40 +231,14 @@ void LINJE_Protocol(void)
                 uart2_sendbuffer(',');                  //add the comma
             }
             while(uint8_WB <= g_CmdChk.uint8_ParamPos);
-            uart2_sendbuffer(13);
+            uart2_sendbuffer(13);*/
             
             g_CmdChk.uint8_GlobalLock = 0;
         }
     }
     else
     {
-        //
+        g_Param.uint8_ErrCode = _IDJELIN;        //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     }
 }   //end of LINJE_Protocol
-
-
-/**********************************************************************************************************************
- * Routine:                 LINJE_ConvertASCII
-
- * Description:
- * ...
- * 
- * Creator:                 A. Staub
- * Date of creation:        16.04.2016
- * Last modification on:    -
- * Modified by:             - 
- * 
- * Input:                   uint8_Character
- * Output:                  uint8_Result
-***********************************************************************************************************************/
-unsigned char LINJE_ConvertASCII(unsigned char uint8_Character)
-{
-    volatile unsigned char uint8_Result = 0;
-    
-    uint8_Result = (uint8_Character - 48) & 0x000000FF;
-    uint8_Result += ((uint8_Character - 48) & 0x0000FF00) * 10;
-    uint8_Result += ((uint8_Character - 48) & 0x00FF0000) * 100;
-    uint8_Result += ((uint8_Character - 48) & 0xFF000000) * 100;
-    
-    return uint8_Result;
-}   //end of LINJE_ConvertASCII

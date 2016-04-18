@@ -33,7 +33,6 @@
 extern void LINATA6628_init(void);
 extern void LINATA6629_SendBackSlaveAnswer(void);
 extern void LINJE_Protocol(void);
-extern unsigned char LINJE_ConvertASCII(unsigned char uint8_Character);
 
 typedef struct                  //definitions of multiple variable for LIN
 {
@@ -49,6 +48,8 @@ typedef struct                  //definitions of multiple variable for LIN
 typedef struct                  //definitions of multiple variable for JE protocol
 {
     volatile unsigned char uint8_JEprotocol;                //1 = true / 0 = false
+    volatile unsigned char uint8_ParamPos;
+    volatile unsigned char uint32_TempPara[50];             
 }SJE;                           //struct name is SJE (S for struct)
 
 

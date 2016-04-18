@@ -300,9 +300,10 @@
 #define _IdSRUNBIT          113             //enable the run bit
 #define _IdGRUNBIT          114             //disable the run bit
 #define _IdRTESTIN          115             //resistance test / measure
-#define _IdSPROD            116             // Write production information in serial EEPROM
+#define _IdSPROD            116             //Write production information in serial EEPROM
 #define _IdSTAT             117             //get status of the SMMA
 #define _IdJEprotocol       118             //command is a JE protocol
+#define _IDJELIN            119             //number of parameter are correct
 
 
 #endif	/* DEFINES_H */

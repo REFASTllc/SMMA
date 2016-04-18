@@ -22,6 +22,8 @@ extern SFunct g_Funct;
 extern SParam g_Param;
 extern SUART2rxd g_UART2rxd;
 extern SJE g_JE;
+extern STimer1 g_Timer1;
+extern SLin g_LIN; 
 
 /**********************************************************************************************************************
  * Routine:                 cmdchk_init
@@ -69,42 +71,60 @@ void cmdchk_check(void)
     volatile unsigned char uint8_WB;
     
     uint8_RxDBuffChar = uart2_receivebuffer();  //read out one byte from the receive buffer
-   
-    //verify JE protocol
-//    uint8_WB = LINJE_ConvertASCII(uint8_RxDBuffChar);
-        
-    uart2_sendbuffer(uint8_RxDBuffChar); 
-    uart2_sendbuffer(','); 
-    /*if(g_JE.uint8_JEprotocol)
+    uint8_WB = uint8_RxDBuffChar;
+    
+    if(g_JE.uint8_JEprotocol)
     {
         //store the new character into the temporary register at the place "ParamPos"
-        g_CmdChk.uint32_TempPara[g_CmdChk.uint8_ParamPos] = uint8_WB;
-
-        g_CmdChk.uint8_ParamPos++;  //increment the position
+        g_JE.uint32_TempPara[g_JE.uint8_ParamPos] = uint8_WB;
 
         //all characters received?
-        if(g_CmdChk.uint8_ParamPos == (g_CmdChk.uint32_TempPara[1]))
+        if(g_JE.uint8_ParamPos == g_JE.uint32_TempPara[1])
         {
             LINJE_Protocol();
             g_JE.uint8_JEprotocol = 0;
         }
+        else if(g_LIN.uint8_SlaveTimeout)
+        {
+            g_JE.uint8_JEprotocol = 0;
+            //reset the variables
+            g_JE.uint8_ParamPos = 0;                                
+
+            //clear the receive buffer
+            g_UART2rxd.uint16_Rch = g_UART2rxd.uint16_Wch;          
+            g_UART2rxd.uint8_BufEmpty = 1;        
+        }
         else
         {
-
+            //do nothing
         }
+        
+        g_JE.uint8_ParamPos++;  //increment the position
     }
     else
     {
         //store the new character into the temporary register at the place "ParamPos"
-        g_CmdChk.uint32_TempPara[0] = uint8_WB;
+        g_JE.uint32_TempPara[g_JE.uint8_ParamPos] = uint8_WB;
         
-        g_CmdChk.uint8_ParamPos++;  //increment the position  
+        g_JE.uint8_ParamPos++;  //increment the position  
         
-        if(uint8_WB == 49)
+        if((uint8_WB == 150) || (uint8_WB == 120))  //JE command ID?
         {
+            SetTimer(_TIMER1,_ENABLE,0,g_Param.uint16_LinTO);
+            g_LIN.uint8_SlaveTimeout = 0;
             g_JE.uint8_JEprotocol = 1;
         }
-    }*/
+        else
+        {
+            g_JE.uint8_JEprotocol = 0;
+            //reset the variables
+            g_JE.uint8_ParamPos = 0;                                
+
+            //clear the receive buffer
+            g_UART2rxd.uint16_Rch = g_UART2rxd.uint16_Wch;          
+            g_UART2rxd.uint8_BufEmpty = 1;
+        }
+    }
     
     //verify the position of the parameter (is it the first, second, etc.)
     switch(g_CmdChk.uint8_ParamPos) 
