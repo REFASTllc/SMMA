@@ -67,6 +67,8 @@ extern void param_init(void);
 #define _StepModeMax        5           //supported or maximal step mode for unipolar and matrix actuators
 #define _StepCountMin       0           //minimal step count 
 #define _StepCountMax       10000000    //maximal step count
+#define _FreeStepCountMin   0           //minimal free step count 
+#define _FreeStepCountMax   10000000    //maximal free step count
 #define _RunFreqMin         1           //minimal run speed in [Hz]
 #define _RunFreqMax         1000        //maximal run speed in [Hz]
 #define _DirMin             0           //minimal for direction
@@ -181,29 +183,8 @@ extern void param_init(void);
 #define _SRUNbitMin         0           //range for the run bit
 #define _SRUNbitMax         1           //range for the run bit
 
-
-/*
-#define StepModeMin       0           //OK range for step mode -> minimum
-#define StepModeMax       5           //OK range for step mode -> maximum
-#define FreeStepCountMin  0           //minimal free step count
-#define FreeStepCountMax  7200000     //maximal free step count
-//#define TestVoltageMin    0           //minimal test voltage for the calibration
-//#define TestVoltageMax    7           //maximal test voltage for the calibration
-#define _NumStepsMin        1       //<OK> minimal number of steps for the frequency 
-#define _NumStepsMax        1000    //<OK> maximal number of steps for the frequency
-#define _FreqMin            1           //OK minimal frequency for the number of steps in [Hz]
-#define _FreqMax            20000       //OK maximal frequency for the number of stpes in [Hz] 
-#define SWfrqValMin       0           //OK minimal frequency (torque signal) in [Hz]
-#define SWfrqValMax       1000000     //OK maximal frequency (torque singal) in [Hz] (1000000 means 100000.0) 
-*/
-
-
 typedef struct                      //definitions of multiple variable for command
 {
-//the follow parameters are used to protect the device
-//    volatile unsigned short int uint16_UmotGlobMin;       //minimal actuator voltage in [mV]
-//    volatile unsigned short int uint16_UmotGloMax;        //minimal actuator voltage in [mV]
-//    volatile unsigned short int uint16_IGloMax;           //maximal actuator current in [mV]
 //the follow parameters can be set by the customer
     volatile unsigned short int uint16_Imin;              //minimal ON current for the coils in [mA]
     volatile unsigned short int uint16_Imax;              //maximal ON current for the coils in [mA]
@@ -281,6 +262,10 @@ typedef struct                      //definitions of multiple variable for comma
     volatile unsigned char uint8_FreqBit;           //frequency bit on output 1
     volatile unsigned char uint8_RunBit;            //run bit on output0
     volatile unsigned char uint8_GOcmdTrue;         //1= GO command / 0 = no GO command
+    volatile unsigned char uint8_ERUN1;             //switch detection for ERUN command
+    volatile unsigned char uint8_ERUN2;             //switch detection for ERUN command
+    volatile unsigned char uint8_ERUNdetected;      //switch detected
+    volatile unsigned char uint8_ERUNactive;        //first time in the command
 }   SParam;                         //struct name is SParam (S for struct)
 
 #endif	/* PARAMETER_H */

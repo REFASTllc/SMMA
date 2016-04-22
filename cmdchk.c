@@ -452,8 +452,7 @@ void cmdchk_check(void)
                 break;
 
             case (_IdERUN):         //command ERUN (not used anymore
-                g_Param.uint8_ErrCode = _NotSupAnymore;        //set error code
-                uart2_SendErrorCode(g_Param.uint8_ErrCode);     //call subroutine
+                cmd_ERUN();
                 break;  
 
             case (_IdGO):           //command GO

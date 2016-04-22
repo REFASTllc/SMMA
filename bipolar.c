@@ -232,6 +232,11 @@ void bi_move(void)
                 }      
                     
                 g_CmdChk.uint8_GlobalLock = 0;  //disable global lock
+                
+                if(g_Param.uint8_ERUNdetected)
+                {
+                    cmd_ERUN();
+                }
             }
             else //otherwise load the last switch off delay 
             {

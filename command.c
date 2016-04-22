@@ -6315,3 +6315,376 @@ void cmd_STAT(void)
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
     } 
 }   //end of cmd_STAT
+
+
+/**********************************************************************************************************************
+ * Routine:                 cmd_ERUN
+
+ * Description:
+ * This command can only be executed if the motor is not in run, this is the first verification. 
+ * Then it verifies if the number of received parameters is correct, otherwise we send back an error code. 
+ * This command can only be used for unipolar or bipolar actuators, so if the motor type is LIN or N we send
+ * back the corresponding error code. 
+ * It will execute the steps in one direction until we arrive at the goal position or the switch
+ * input is set. In this case it will move the seconds part of the steps in the opposite direction. 
+ * 
+ * Note:
+ * Not every parameter inside this command is used for unipolar / matrix actuators. Some are for the bipolar 
+ * actuator, but the customer want to use the same command. 
+ * 
+ * Unipolar / Matrix:
+ * Once all parameters are verified we store every received parameter into the corresponding register or 
+ * set the corresponding bit for the actuator move. If some definitions are not OK then we send back an error. 
+ * All parameters are verified before but if for example the customer wants to execute micro stepping with an 
+ * unipolar driver then this is still not possible. 
+ * The follow parameter are not used for these type of actuators:
+ * - BipRunI
+ * - BipRunI
+ * - BipHoldI
+ * - BipAccI
+ * - BipDecI
+ * Note: 
+ * The 'ack' will be not send back inside this routine, because this is a pre-verification. Only if the 
+ * 'plausibility check' from the source code inside 'unipolar.c' is verified and ok, we send back the 'ack'. 
+ * A second 'ack' will be send back if the 'ack' bit is set true and the actuator reached his position. 
+ * 
+ * Bipolar:
+ * The bipolar part does quite the same like the unipolar / matrix part. But here we use now the parameters:
+ * - BipRunI
+ * - BipRunI
+ * - BipHoldI
+ * - BipAccI
+ * - BipDecI
+ * And in the same time we have an SPI communication to set up the external driver.
+ * 
+ * Creator:                 A. Staub
+ * Date of creation:        22.04.2016
+ * Last modification on:    -
+ * Modified by:             - 
+ * 
+ * Input:                   -
+ * Output:                  -
+***********************************************************************************************************************/
+void cmd_ERUN(void)
+{
+    auto unsigned char uint8_Result = 0;    //local work byte for the result 
+    auto unsigned char uint8_UniErrConfig = 0;  //local work byte for error configuration unipolar
+    
+    g_Param.uint8_ERUNactive = 1;
+    
+    switch(g_Param.uint8_SwType)
+    {
+        case 0:
+            g_Param.uint8_ERUN1 = iSinkSource1;
+            break;
+            
+        case 1:
+            g_Param.uint8_ERUN1 = iSinkSource2;
+            break;
+            
+        case 2:
+            g_Param.uint8_ERUN1 = iSinkSource3;
+            break;
+            
+        case 3:
+            g_Param.uint8_ERUN1 = iSinkSource4;
+            g_Param.uint8_ERUN2 = iSinkSource5;
+            break;
+            
+        default:
+            break;            
+    }
+    
+    g_Bipol.uint1_ErrConfig = 0;
+    
+    //number of received characters OK or an ERUN detected?
+    if((g_CmdChk.uint8_ParamPos == 16) || g_Param.uint8_ERUNactive)  
+    {
+        if(g_CmdChk.uint8_GlobalLock == 1)  //global lock active?
+        {
+            g_Param.uint8_ErrCode = _MotorInRun;        //set error code
+            uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        }
+        else
+        {
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[2],_StepModeMin,_StepModeMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[3],_StepCountMin,_StepCountMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[4],_FreeStepCountMin,_FreeStepCountMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[5],_RunFreqMin,_RunFreqMax);      
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[6],_DirMin,_DirMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[7],_CoilStateMin,_CoilStateMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[8],_BipRunIMin,_BipRunIMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[9],_BipHoldIMin,_BipHoldIMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[10],_SelectRampMin,_SelectRampMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[11],_BipAccIMin,_BipAccIMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[12],_BipDecIMin,_BipDecIMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[13],_AccOnDelayMin,_AccOnDelayMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[14],_DecOffDelayMin,_DecOffDelayMax);
+            uint8_Result += funct_CheckTol(g_CmdChk.uint32_TempPara[15],_AckMin,_AckMax);
+            
+            //each parameter within the tolerance or an ERUN detected?
+            if((uint8_Result == 13) || g_Param.uint8_ERUNactive)      
+            {
+                //then store the parameters
+                g_Param.uint8_StepMode = g_CmdChk.uint32_TempPara[2] & 0xFF;
+                g_Param.uint32_StepCount = g_CmdChk.uint32_TempPara[3] & 0xFFFFFFFF;
+                g_Param.uint32_FreeStepCount = g_CmdChk.uint32_TempPara[4] & 0xFFFFFFFF;
+                g_Param.uint16_RunFreq = g_CmdChk.uint32_TempPara[5] & 0xFFFF;
+                g_Param.uint8_Direction = g_CmdChk.uint32_TempPara[6] & 0xFF;
+                g_Param.uint8_CoilState = g_CmdChk.uint32_TempPara[7] & 0xFF;
+                g_Param.uint16_BipRunI = g_CmdChk.uint32_TempPara[8] & 0xFFFF;
+                g_Param.uint16_BipHoldI = g_CmdChk.uint32_TempPara[9] & 0xFFFF;
+                g_Param.uint8_SelectRamp = g_CmdChk.uint32_TempPara[10] & 0xFF;
+                g_Param.uint16_BipAccI = g_CmdChk.uint32_TempPara[11] & 0xFFFF;
+                g_Param.uint16_BipDecI = g_CmdChk.uint32_TempPara[12] & 0xFFFF;
+                g_Param.uint16_AccOnDelay = g_CmdChk.uint32_TempPara[13] & 0xFFFF;
+                g_Param.uint16_DecOffDelay = g_CmdChk.uint32_TempPara[14] & 0xFFFF;
+                g_Param.uint8_Acknowledge = g_CmdChk.uint32_TempPara[15] & 0xFF;
+                
+                //before continue verify type of motor to know what is to do!
+                if(g_CmdChk.uint32_TempPara[1] == 'N') //type of motor = None?
+                {
+                    g_Param.uint8_ErrCode = _MotTypRUN;         //set error code
+                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                }
+                else if(g_CmdChk.uint32_TempPara[1] == 'L')    //type of motor = Lin?
+                {
+                    g_Param.uint8_ErrCode = _LinRUN;            //set error code
+                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine                
+                }
+                else if(g_CmdChk.uint32_TempPara[1] == 'B')    //type of motor = Bipolar?
+                {
+                    //to decide what is to do when motor type changes
+                    g_Param.uint8_MotTyp = g_CmdChk.uint32_TempPara[1] & 0xFF;
+                    //call subroutine to switch on/off the outputs for the motor type
+                    funct_CheckMotType(g_Param.uint8_MotTyp);
+                    
+                    
+                    // Set the step mode
+                    switch(g_Param.uint8_StepMode)
+                    {
+                        case 0: g_Bipol.uint1_ErrConfig = 1;    // Mode Full step one phase on is not supported by the A3981 driver ==> error
+                        break;
+                        case 1: A3981.CONFIG0.BITS.MS = 0;      // Mode Full step
+                        break;
+                        case 2: // TODO: Check the current compensated config
+                        case 3: A3981.CONFIG0.BITS.MS = 1;      // Mode Half step
+                        break;
+                        case 4: A3981.CONFIG0.BITS.MS = 2;      // Mode quarter step
+                        break;
+                        case 5: A3981.CONFIG0.BITS.MS = 3;      // Mode sixteenth step
+                        break;
+                        default:g_Bipol.uint1_ErrConfig = 1;    // default ==> error
+                        break;
+                    }
+                    
+                    if(g_Param.uint8_ERUNdetected)
+                    {
+                        g_Bipol.uint32_GoalPos = g_Param.uint32_FreeStepCount;
+                    }
+                    else
+                    {
+                        g_Bipol.uint32_GoalPos = g_Param.uint32_StepCount;    //store step count into goal position         
+                    }
+                    g_Bipol.uint16_RunFreq = g_Param.uint16_RunFreq;      //store the run frequency
+                    // Set the running direction
+                    oBiDirSignal = !g_Param.uint8_Direction;
+                    
+                    if(g_Param.uint8_ERUNdetected)
+                    {
+                        if(oBiDirSignal)
+                        {
+                            oBiDirSignal = 0;
+                        }
+                        else
+                        {
+                            oBiDirSignal = 1;
+                        }
+                        g_Param.uint8_ERUNdetected = 0;
+                    }                    
+                    // State of supply after the end of the running
+                    g_Bipol.uint1_CurrInCoilAtTheEnd = g_Param.uint8_CoilState;
+
+                    switch(g_Param.uint8_SelectRamp)
+                    {
+                        case 0: g_Bipol.uint1_IsDecNeeded = 0;      // No ramp
+                                g_Bipol.uint1_NextStepIsRamp = 0;
+                        break;
+                        case 1: g_Bipol.uint1_IsDecNeeded = 0;      // Increase ramp only
+                                g_Bipol.uint1_NextStepIsRamp = 1;
+                        break;
+                        case 2: g_Bipol.uint1_IsDecNeeded = 1;      // Increase and decrease ramp
+                                g_Bipol.uint1_NextStepIsRamp = 1;
+                        break;
+                        default:g_Bipol.uint1_ErrConfig = 1;        // Error case
+                        break;
+                    }
+                    //define switch ON time - first convert and then store it
+                    g_Bipol.uint32_SwOnTime = funct_msToTimer23(g_Param.uint16_AccOnDelay);
+                    //define switch OFF time - first convert and then store it
+                    g_Bipol.uint32_SwOffTime = funct_msToTimer23(g_Param.uint16_DecOffDelay);
+                    
+                    if(!g_Bipol.uint1_ErrConfig)
+                    {
+                        SendOneDataSPI1(A3981.CONFIG0.REG);
+                        SendOneDataSPI1(A3981.CONFIG1.REG);
+                        A3981.RUN.BITS.EN = 1;
+                        g_Bipol.uint1_IsBipolEnabled = 1;
+                        
+                        //no error detected, so enable global lock
+                        g_CmdChk.uint8_GlobalLock = 1;
+                    }
+                    else
+                    {
+                        g_Param.uint8_ErrCode = _OutOfTolRUN;       //set error code
+                        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                    }     
+                }
+                //type of motor = unipolar or matrix?
+                else if((g_CmdChk.uint32_TempPara[1] == 'U') || (g_CmdChk.uint32_TempPara[1] == 'M'))
+                {
+                    //clear the settings before defining
+                    g_Uni.uint8_Settings = 0;
+                            
+                    //to decide what is to do when motor type changes
+                    g_Param.uint8_MotTyp = g_CmdChk.uint32_TempPara[1] & 0xFF;  
+                    //call subroutine to switch on/off the outputs for the motor type
+                    funct_CheckMotType(g_Param.uint8_MotTyp);
+                           
+                    if(g_Param.uint8_StepMode == 0) //which step mode?
+                    {
+                        g_Uni.uint8_Settings &= 0xFB;   //enable full step
+                        g_Uni.uint8_Settings &= 0xBF;   //one phase ON
+                    }
+                    else if(g_Param.uint8_StepMode == 1)
+                    {
+                        g_Uni.uint8_Settings &= 0xFB;   //enable full step
+                        g_Uni.uint8_Settings |= 0x40;   //two phase ON
+                    }
+                    else if(g_Param.uint8_StepMode == 2)
+                    {
+                        g_Uni.uint8_Settings |= 0x04;   //enable half step
+                    }
+                    else
+                    {
+                        //error - definition is half step compensated or micro step send error later
+                        uint8_UniErrConfig = 1;     //set error
+                        g_Uni.uint8_Settings = 0;   //erase settings
+                    }
+          
+                    if(g_Param.uint8_ERUNdetected)
+                    {
+                        g_Uni.uint32_GoalPos = g_Param.uint32_FreeStepCount;
+                    }
+                    else
+                    {
+                        g_Uni.uint32_GoalPos = g_Param.uint32_StepCount;    //store step count into goal position         
+                    }
+                    g_Uni.uint16_RunFreq = g_Param.uint16_RunFreq;      //store the run frequency
+                 
+                    if(g_Param.uint8_Direction)     //define direction
+                    {
+                        g_Uni.uint8_Settings &= 0xEF;   //enable CCW
+                    }
+                    else
+                    {
+                        g_Uni.uint8_Settings |= 0x10;   //enable CW
+                    }
+                    
+                    if(g_Param.uint8_ERUNdetected)
+                    {
+                        g_Param.uint8_ERUNdetected = 0;
+                        if(g_Param.uint8_Direction)     //define direction
+                        {
+                            g_Uni.uint8_Settings |= 0x10;   //enable CCW
+                        }
+                        else
+                        {
+                            g_Uni.uint8_Settings &= 0xEF;   //enable CW
+                        }
+                    }
+          
+                    if(g_Param.uint8_CoilState)     //define coil state
+                    {
+                        g_Uni.uint8_Settings |= 0x08;   //enable coil current
+                    }
+                    else
+                    {
+                        g_Uni.uint8_Settings &= 0xF7;   //disable coil current
+                    }
+          
+                    if(g_Param.uint8_SelectRamp == 0)   //ramp disabled?
+                    {
+                        g_Uni.uint8_Settings &= 0xFD;   //disable ramp function
+                    }
+                    else if(g_Param.uint8_SelectRamp == 1)  //only acceleration?
+                    {
+                        g_Uni.uint8_Settings |= 0x02;   //enable ramp function
+                        g_Uni.uint8_Settings &= 0xDF;   //only acceleration
+                    }
+                    else if(g_Param.uint8_SelectRamp == 2)  //both ramps active?
+                    {
+                        g_Uni.uint8_Settings |= 0x02;   //enable ramp function
+                        g_Uni.uint8_Settings |= 0x20;   //both ramps acceleration and decelration
+                    }
+                    else
+                    {
+                        //error - definition is unknown send error later
+                        uint8_UniErrConfig = 1;     //set error
+                        g_Uni.uint8_Settings = 0;   //erase settings
+                    }                   
+          
+                    //define switch ON time - first convert and then store it
+                    g_Uni.uint32_SwOnTime = funct_msToTimer23(g_Param.uint16_AccOnDelay);
+                    //define switch OFF time - first convert and then store it
+                    g_Uni.uint32_SwOffTime = funct_msToTimer23(g_Param.uint16_DecOffDelay);
+          
+                    if(uint8_UniErrConfig)  //verify if we had an configuration error
+                    {
+                        //error detected, send error code
+                        g_Param.uint8_ErrCode = _OutOfTolRUN;       //set error code
+                        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                        
+                        g_Uni.uint8_Settings &= 0xFE;   //disable run bit
+                        
+                        //switch off output's
+                        oUniCoilA1 = _UniPhOFF;     //output PhA1 = off
+                        oUniCoilA2 = _UniPhOFF;     //output PhA2 = off
+                        oUniCoilB1 = _UniPhOFF;     //output PhB1 = off
+                        oUniCoilB2 = _UniPhOFF;     //output PhB2 = off
+                    }
+                    else
+                    {
+                        //nothing wrong, set the run bit
+                        g_Uni.uint8_Settings |= 0x01;   //enable run bit
+                        
+                        //no error detected, so enable the global lock
+                        g_CmdChk.uint8_GlobalLock = 1;
+                    }      
+                }
+                else
+                {
+                    g_Param.uint8_ErrCode = _UnknownMotTyp;     //set error code
+                    uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                    g_Param.uint8_ERUNactive = 0;
+                    g_Param.uint8_ERUNdetected = 0;
+                }
+                g_Param.uint8_ERUNactive = 0;
+            }
+            else
+            {
+                g_Param.uint8_ErrCode = _OutOfTolRUN;       //set error code
+                uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+                g_Param.uint8_ERUNactive = 0;
+                g_Param.uint8_ERUNdetected = 0;
+            }
+        }  
+    }
+    else
+    {
+        g_Param.uint8_ErrCode = _NumbRecCharNotOK;  //set error code
+        uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
+        g_Param.uint8_ERUNactive = 0;
+        g_Param.uint8_ERUNdetected = 0;
+    }
+}   //end of cmd_ERUN

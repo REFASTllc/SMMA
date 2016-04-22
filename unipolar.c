@@ -240,6 +240,11 @@ void uni_move(void)
                     }    
 
                     g_CmdChk.uint8_GlobalLock = 0;  //global lock disable
+                    
+                    if(g_Param.uint8_ERUNdetected)
+                    {
+                        cmd_ERUN();
+                    }
                 }
                 else
                 {

@@ -25,6 +25,7 @@ extern T_SPI SPI1;
 extern T_A3981 A3981;
 extern SLin g_LIN;
 extern SADC g_ADC;
+extern SParam g_Param;
 #ifdef DEBUG_ON
 extern S_RING_BUF debugBuf;
 #endif
@@ -103,6 +104,22 @@ void main(void)
         }
         
         adc_LaunchNextMeasure();    //call subroutine 
+        
+        //free step count in opposite direction active?
+        if((g_Param.uint8_ERUN1 != iSinkSource1) ||
+          (g_Param.uint8_ERUN1 != iSinkSource2) ||
+          (g_Param.uint8_ERUN1 != iSinkSource3) ||
+          (g_Param.uint8_ERUN1 != iSinkSource4) ||
+          (g_Param.uint8_ERUN2 != iSinkSource5) && g_Param.uint8_ERUNactive)
+        {
+            g_Param.uint8_ERUNdetected = 1;
+            g_Bipol.uint32_RealPos = g_Bipol.uint32_GoalPos;
+            g_Uni.uint32_RealPos = g_Uni.uint32_GoalPos;
+        }
+        else
+        {
+            //do nothing
+        }
         
     }
 }   //end of main
