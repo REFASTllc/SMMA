@@ -1140,13 +1140,16 @@ void cmd_RAZ(void)
             
             IEC1SET = _IEC1_U2TXIE_MASK;    //enable send routine
             
-            //wait 500ms before executing the software reset
-            g_Timer1.uint8_TimeoutFlag = 1;     //set the timeout flag
-            SetTimer(_TIMER1,_ENABLE,0,500);    //load the timer with 500ms
-            while(g_Timer1.uint8_TimeoutFlag);  //wait the time
+            //launch reset
+            oVmotOnOff = 0;
+            oBiEnaVmot = 0;
+            oEnaVLINSupply = 0;
             
-            //launch software reset
-            SoftReset();
+            uni_init();     //initialization of unipolar
+            
+            bi_init();      //initialization of bipolar
+            
+            param_init();   //initialization of user parameters
         }     
     }
     else

@@ -78,7 +78,6 @@ void cmdchk_check(void)
     if(g_JE.uint8_JEprotocol)
     {
         //all characters received?
-//        if(g_JE.uint8_ParamPos == g_JE.uint32_TempPara[1])
         if(g_JE.uint8_ParamPos == 8)
         {
             LINJE_Protocol();

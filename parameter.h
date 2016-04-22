@@ -75,9 +75,9 @@ extern void param_init(void);
 #define _CoilStateMax       1           //maximal for coil state
 #define _SelectRampMin      0           //minimal for select ramp
 #define _SelectRampMax      2           //maximal for select ramp
-#define _AccOnDelayMin      1           //minimal time before start the move in [ms]
+#define _AccOnDelayMin      5           //minimal time before start the move in [ms]
 #define _AccOnDelayMax      1000        //maximal time before start the move in [ms]
-#define _DecOffDelayMin     1           //minimal time after the move is finished in [ms]
+#define _DecOffDelayMin     5           //minimal time after the move is finished in [ms]
 #define _DecOffDelayMax     1000        //maximal time after the move is finished in [ms]
 #define _AckMin             0           //minimal for protocol
 #define _AckMax             1           //maximal for protocol
