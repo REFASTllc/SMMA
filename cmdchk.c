@@ -68,18 +68,18 @@ void cmdchk_init(void)
 void cmdchk_check(void)
 {
     volatile unsigned char uint8_RxDBuffChar;       //local byte for the actually received character
-    volatile unsigned char uint8_WB;
     
     uint8_RxDBuffChar = uart2_receivebuffer();  //read out one byte from the receive buffer
-    uint8_WB = uint8_RxDBuffChar;
+    
+    //store the new character into the temporary register at the place "ParamPos"
+    g_JE.uint32_TempPara[g_JE.uint8_ParamPos] = uint8_RxDBuffChar;
+    g_JE.uint8_ParamPos++;
     
     if(g_JE.uint8_JEprotocol)
     {
-        //store the new character into the temporary register at the place "ParamPos"
-        g_JE.uint32_TempPara[g_JE.uint8_ParamPos] = uint8_WB;
-
         //all characters received?
-        if(g_JE.uint8_ParamPos == g_JE.uint32_TempPara[1])
+//        if(g_JE.uint8_ParamPos == g_JE.uint32_TempPara[1])
+        if(g_JE.uint8_ParamPos == 8)
         {
             LINJE_Protocol();
             g_JE.uint8_JEprotocol = 0;
@@ -87,10 +87,7 @@ void cmdchk_check(void)
         else if(g_LIN.uint8_SlaveTimeout)
         {
             g_JE.uint8_JEprotocol = 0;
-            //reset the variables
             g_JE.uint8_ParamPos = 0;                                
-
-            //clear the receive buffer
             g_UART2rxd.uint16_Rch = g_UART2rxd.uint16_Wch;          
             g_UART2rxd.uint8_BufEmpty = 1;        
         }
@@ -98,17 +95,10 @@ void cmdchk_check(void)
         {
             //do nothing
         }
-        
-        g_JE.uint8_ParamPos++;  //increment the position
     }
     else
     {
-        //store the new character into the temporary register at the place "ParamPos"
-        g_JE.uint32_TempPara[g_JE.uint8_ParamPos] = uint8_WB;
-        
-        g_JE.uint8_ParamPos++;  //increment the position  
-        
-        if((uint8_WB == 150) || (uint8_WB == 120))  //JE command ID?
+        if(uint8_RxDBuffChar == 0x96)  //JE command ID?
         {
             SetTimer(_TIMER1,_ENABLE,0,g_Param.uint16_LinTO);
             g_LIN.uint8_SlaveTimeout = 0;
@@ -117,10 +107,7 @@ void cmdchk_check(void)
         else
         {
             g_JE.uint8_JEprotocol = 0;
-            //reset the variables
             g_JE.uint8_ParamPos = 0;                                
-
-            //clear the receive buffer
             g_UART2rxd.uint16_Rch = g_UART2rxd.uint16_Wch;          
             g_UART2rxd.uint8_BufEmpty = 1;
         }
@@ -282,10 +269,6 @@ void cmdchk_check(void)
     {
         switch(g_CmdChk.uint8_CmdID)   //execute the needed commando
         {   
-            /*case (_IdJEprotocol):
-                LINJE_Protocol();
-                break;*/
-                    
             case (_IdNotAllow):     //command ID is not allowed
                 //do nothing - error has to be send before and uint8_CmdID 
                 //has to be set to 0 before this routine for that the program execute this case.
@@ -847,10 +830,6 @@ void cmdchk_def(void)
     //first verify the commands with 4 letters or less
     switch(uint32_WR)
     {
-        /*case (0x313530):
-            g_CmdChk.uint8_CmdID = _IdJEprotocol;
-            break;*/
-            
         case (0x52554E):    //cmd is = RUN
             g_CmdChk.uint8_CmdID = _IdRUN;
             break;

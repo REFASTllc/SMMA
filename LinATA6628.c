@@ -183,10 +183,35 @@ void LINATA6629_SendBackSlaveAnswer(void)
 void LINJE_Protocol(void)
 {
     volatile unsigned char uint8_Result = 0;
-    volatile unsigned char uint8_WB = 0;
+    volatile unsigned char uint8_WB = 1;
+    
+    uart1_sendbuffer(0x17);
+    
+    g_LIN.uint8_LinBreakToSend = 1;             //enable LIN break to send
+    IEC0SET = _IEC0_U1TXIE_MASK;                //enable the send interrupt
+    g_LIN.uint8_LinBusy = 1;                    //set busy flag
+
+    do
+    {
+        uart1_sendbuffer(g_JE.uint32_TempPara[uint8_WB]);
+        uint8_WB++;
+    }
+    while(uint8_WB <= g_JE.uint8_ParamPos);
+    
+    //position for array plus 1 because of the lin break
+    uint8_WB = g_JE.uint8_ParamPos + 1;
+    
+    do
+    {
+        uart2_sendbuffer(',');      //add a comma
+        uint8_WB = uart1_receivebuffer();  //read out one byte from the receive buffer
+        uart2_sendbuffer(uint8_WB); //store the character into the sendbuffer
+    }
+    while(!g_UART1rxd.uint8_BufEmpty);
+    
     
     //protocol without data byte, or 2, 4, 6 or 8 data bytes
-    if((g_JE.uint8_ParamPos == 6) ||
+    /*if((g_JE.uint8_ParamPos == 6) ||
         (g_JE.uint8_ParamPos == 8) ||
         (g_JE.uint8_ParamPos == 10) ||
         (g_JE.uint8_ParamPos == 12) ||
@@ -221,7 +246,7 @@ void LINJE_Protocol(void)
                 }
             }
             
-            /*uart2_sendbuffer('E');
+            uart2_sendbuffer('E');
             uart2_sendbuffer(',');
             do
             {
@@ -231,7 +256,7 @@ void LINJE_Protocol(void)
                 uart2_sendbuffer(',');                  //add the comma
             }
             while(uint8_WB <= g_CmdChk.uint8_ParamPos);
-            uart2_sendbuffer(13);*/
+            uart2_sendbuffer(13);
             
             g_CmdChk.uint8_GlobalLock = 0;
         }
@@ -240,5 +265,5 @@ void LINJE_Protocol(void)
     {
         g_Param.uint8_ErrCode = _IDJELIN;        //set error code
         uart2_SendErrorCode(g_Param.uint8_ErrCode); //call subroutine
-    }
+    }*/
 }   //end of LINJE_Protocol
