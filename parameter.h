@@ -58,19 +58,19 @@ extern void param_init(void);
 #define _AccNumbStepMin     1           //minimal number of steps for the frequency for acceleration
 #define _AccNumbStepMax     1000        //maximal number of steps for the frequency for acceleration
 #define _AccFreqMin         1           //minimal frequency for the number of steps in [Hz] for acceleration
-#define _AccFreqMax         1000        //maximal frequency for the number of stpes in [Hz] for acceleration
+#define _AccFreqMax         1500        //maximal frequency for the number of stpes in [Hz] for acceleration
 #define _DecNumbStepMin     1           //minimal number of steps for the frequency for deceleration
 #define _DecNumbStepMax     1000        //maximal number of steps for the frequency for deceleration
 #define _DecFreqMin         1           //minimal frequency for the number of steps in [Hz] for deceleration
-#define _DecFreqMax         1000        //maximal frequency for the number of stpes in [Hz] for deceleration
+#define _DecFreqMax         1500        //maximal frequency for the number of stpes in [Hz] for deceleration
 #define _StepModeMin        0           //supported or minimal step mode for unipolar and matrix actuators
 #define _StepModeMax        5           //supported or maximal step mode for unipolar and matrix actuators
 #define _StepCountMin       0           //minimal step count 
-#define _StepCountMax       10000000    //maximal step count
+#define _StepCountMax       40000000    //maximal step count
 #define _FreeStepCountMin   0           //minimal free step count 
-#define _FreeStepCountMax   10000000    //maximal free step count
+#define _FreeStepCountMax   40000000    //maximal free step count
 #define _RunFreqMin         1           //minimal run speed in [Hz]
-#define _RunFreqMax         1000        //maximal run speed in [Hz]
+#define _RunFreqMax         1500        //maximal run speed in [Hz]
 #define _DirMin             0           //minimal for direction
 #define _DirMax             1           //maximal for direction
 #define _CoilStateMin       0           //minimal for coil state

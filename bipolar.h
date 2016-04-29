@@ -41,7 +41,7 @@ extern void bi_ImotToDAC(unsigned long int uint32_current);
 
 #define	_BiPhON		1       //definition ON for the output of the bipolar stepper motor
 #define _BiPhOFF    0       //definition OFF for the output of the bipolar stepper motor
-#define _BiFreqMax  1000    //definition of maximal frequency
+#define _BiFreqMax  1500    //definition of maximal frequency
 
 typedef union
 {
